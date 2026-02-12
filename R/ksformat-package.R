@@ -1,0 +1,44 @@
+#' ksformat: SAS-Style PROC FORMAT for R
+#'
+#' @description
+#' Provides SAS PROC FORMAT-like functionality for creating and applying
+#' value formats in R. The package supports mapping values to labels,
+#' range-based formatting, reverse formatting (invalue), and proper handling
+#' of missing values (NA, NULL, NaN).
+#'
+#' @details
+#' Main features:
+#' \itemize{
+#'   \item Create value-to-label mappings (formats)
+#'   \item Apply formats to vectors and data frames
+#'   \item Reverse formatting (label-to-value conversion)
+#'   \item Comprehensive missing value handling
+#'   \item Global format library
+#'   \item Range-based formatting for numeric data
+#' }
+#'
+#' Key functions:
+#' \itemize{
+#'   \item \code{\link{format_create}} - Create format definitions
+#'   \item \code{\link{format_apply}} - Apply formats to data
+#'   \item \code{\link{format_invalue}} - Create reverse formats
+#'   \item \code{\link{invalue_apply}} - Apply reverse formats
+#'   \item \code{\link{format_register}} - Store formats in library
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' # Create and apply a format
+#' sex_fmt <- format_create(
+#'   "M" = "Male",
+#'   "F" = "Female",
+#'   .missing = "Unknown"
+#' )
+#' format_apply(c("M", "F", NA), sex_fmt)
+#' }
+#'
+#' @docType package
+#' @name ksformat-package
+#' @aliases ksformat
+#' @keywords package
+"_PACKAGE"
