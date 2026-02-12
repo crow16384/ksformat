@@ -64,7 +64,10 @@ Parsing SAS-like text definitions and exporting formats back to text.
 | `.block_to_ks_invalue` | Function | – | No (internal) | Converts INVALUE block to ks_invalue object |
 | `.format_to_text` | Function | – | No (internal) | Converts ks_format to SAS-like text |
 | `.invalue_to_text` | Function | – | No (internal) | Converts ks_invalue to SAS-like text |
-| `.format_range_bound` | Function | – | No (internal) | Formats numeric bound as LOW/HIGH/number string |
+| `.format_range_bound` | Function | – | No (internal) | Formats numeric bound as LOW/HIGH/number string (decimals preserved) |
+
+### R/utilities.R — added symbol
+| `.parse_range_key` | Function | – | No (internal) | Parses range key string ("low,high,inc_low,inc_high" or legacy "low,high") into components |
 
 ### R/ksformat-package.R
 Package-level roxygen2 documentation only. No symbols.
@@ -99,8 +102,15 @@ list(
 ### `range_spec`
 Created by `range_spec()`. Structure:
 ```r
-list(low = numeric, high = numeric, label = character)
+list(
+  low      = numeric,
+  high     = numeric,
+  label    = character,
+  inc_low  = logical,   # TRUE = inclusive (>=), FALSE = exclusive (>)
+  inc_high = logical    # TRUE = inclusive (<=), FALSE = exclusive (<)
+)
 ```
+Default bounds: `[low, high)` (inc_low=TRUE, inc_high=FALSE).
 
 ## Global State
 - `.format_library` (R environment in `R/utilities.R` line 93): stores named formats.
@@ -123,7 +133,9 @@ Supported by `format_parse` and `format_export` (R/format_parse.R):
 - `VALUE name (type) ... ;` — defines a ks_format
 - `INVALUE name (target_type) ... ;` — defines a ks_invalue
 - Discrete: `"key" = "label"` or unquoted `key = label`
-- Ranges: `low - high = "label"` (VALUE blocks only)
+- Ranges with interval notation: `[low, high) = "label"`, `(low, high] = "label"`, `[low, high] = "label"`, `(low, high) = "label"`
+- Legacy range syntax: `low - high = "label"` (defaults to `[low, high)`)
+- Decimal numbers supported: `[18.5, 25) = "Normal"`
 - Special keywords: `LOW` (-Inf), `HIGH` (Inf)
 - Directives: `.missing = "label"`, `.other = "label"`
 - Comments: `//`, `/* */`, `*`, `#`
@@ -131,5 +143,5 @@ Supported by `format_parse` and `format_export` (R/format_parse.R):
 
 ## Known Stubs / Incomplete Areas
 1. **`format_put`** (R/format_apply.R:155–158): always `stop()`s — not implemented.
-2. **Range matching in `format_apply`** (R/format_apply.R:69–76): the loop body for numeric range matching is empty (no actual range check logic).
-3. **`detect_format_type`** (R/format_create.R:93): `has_ranges` is always FALSE due to `sapply(mappings, function(x) FALSE)`.
+2. **Range matching in `format_apply`**: IMPLEMENTED — uses `.parse_range_key()` to parse range keys and checks bounds with inc_low/inc_high.
+3. **`detect_format_type`** (R/format_create.R): `has_ranges` is always FALSE due to `sapply(mappings, function(x) FALSE)` — dead code but harmless since parser sets type explicitly.

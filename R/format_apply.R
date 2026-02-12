@@ -26,18 +26,18 @@ format_apply <- function(x, format, keep_na = FALSE) {
   if (!inherits(format, "ks_format")) {
     stop("format must be a ks_format object created with format_create()")
   }
-  
+
   # Handle NULL input
   if (is.null(x)) {
     return(character(0))
   }
-  
+
   # Initialize result vector
   result <- rep(NA_character_, length(x))
-  
+
   # Identify missing values (NA, NaN, NULL)
   is_missing <- is.na(x) | is.nan(x)
-  
+
   # Apply missing label if defined
   if (!is.null(format$missing_label) && !keep_na) {
     result[is_missing] <- format$missing_label
@@ -45,38 +45,57 @@ format_apply <- function(x, format, keep_na = FALSE) {
     # Keep NA as NA
     result[is_missing] <- NA_character_
   }
-  
+
+  # Pre-parse range keys for numeric formats
+  range_entries <- list()
+  if (format$type == "numeric") {
+    for (i in seq_along(format$mappings)) {
+      key <- names(format$mappings)[i]
+      parsed <- .parse_range_key(key)
+      if (!is.null(parsed)) {
+        range_entries <- c(range_entries, list(list(
+          idx = i,
+          low = parsed$low,
+          high = parsed$high,
+          inc_low = parsed$inc_low,
+          inc_high = parsed$inc_high,
+          label = format$mappings[[i]]
+        )))
+      }
+    }
+  }
+
   # Process non-missing values
   non_missing_idx <- which(!is_missing)
-  
+
   for (idx in non_missing_idx) {
     value <- x[idx]
     matched <- FALSE
-    
+
     # Try exact match first
     for (i in seq_along(format$mappings)) {
       key <- names(format$mappings)[i]
-      
-      # Check if key is a range specification (contains comma or dash)
-      # For now, handle simple exact matches
+
       if (as.character(value) == key) {
         result[idx] <- format$mappings[[i]]
         matched <- TRUE
         break
       }
     }
-    
+
     # Try range match for numeric values
     if (!matched && format$type == "numeric" && is.numeric(value)) {
-      for (i in seq_along(format$mappings)) {
-        range_key <- names(format$mappings)[i]
-        
-        # Check if this is a range (will be improved in utilities)
-        # For now, store ranges in a better format
-        if (matched) break
+      for (re in range_entries) {
+        low_ok <- if (re$inc_low) value >= re$low else value > re$low
+        high_ok <- if (re$inc_high) value <= re$high else value < re$high
+        if (low_ok && high_ok) {
+          result[idx] <- re$label
+          matched <- TRUE
+          break
+        }
       }
     }
-    
+
     # Apply other label if no match
     if (!matched) {
       if (!is.null(format$other_label)) {
@@ -87,7 +106,7 @@ format_apply <- function(x, format, keep_na = FALSE) {
       }
     }
   }
-  
+
   return(result)
 }
 

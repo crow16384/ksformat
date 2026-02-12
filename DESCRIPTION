@@ -4,8 +4,8 @@ Title: SAS-Style PROC FORMAT for R
 Version: 0.1.0
 Authors@R: c(
     person(
-      "Developer", "User",
-      email = "developer@example.com",
+      "Developer", "Vladimir Larchenko",
+      email = "vladimir.larchenko@keystatsolutions.com",
       role = c("aut", "cre")
     )
   )

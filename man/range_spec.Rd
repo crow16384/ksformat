@@ -4,23 +4,34 @@
 \alias{range_spec}
 \title{Create Range Specification}
 \usage{
-range_spec(low, high, label)
+range_spec(low, high, label, inc_low = TRUE, inc_high = FALSE)
 }
 \arguments{
-\item{low}{Numeric. Lower bound (inclusive)}
+\item{low}{Numeric. Lower bound of the range.}
 
-\item{high}{Numeric. Upper bound (inclusive)}
+\item{high}{Numeric. Upper bound of the range.}
 
-\item{label}{Character. Label for values in this range}
+\item{label}{Character. Label for values in this range.}
+
+\item{inc_low}{Logical. If \code{TRUE} (default), the lower bound is inclusive
+(>=). If \code{FALSE}, exclusive (>).}
+
+\item{inc_high}{Logical. If \code{TRUE}, the upper bound is inclusive (<=).
+If \code{FALSE} (default), exclusive (<).}
 }
 \value{
-List with range specification
+A \code{range_spec} object (list with low, high, label, inc_low, inc_high).
 }
 \description{
 Helper function to create range specifications for numeric formats.
 }
+\details{
+By default, ranges are half-open: \code{[low, high)} — the lower bound is
+included and the upper bound is excluded. This matches SAS PROC FORMAT
+range semantics and prevents overlap between adjacent ranges.
+}
 \examples{
-range_spec(0, 18, "Child")
-range_spec(18, 65, "Adult")
-range_spec(65, Inf, "Senior")
+range_spec(0, 18, "Child")          # [0, 18)
+range_spec(18, 65, "Adult")         # [18, 65)
+range_spec(65, Inf, "Senior", inc_high = TRUE)  # [65, Inf]
 }

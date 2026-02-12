@@ -30,22 +30,26 @@ print(data.frame(
 ))
 
 # ============================================================================
-# Example 2: Numeric range formatting
+# Example 2: Numeric range formatting with interval notation
 # ============================================================================
 
 cat("\n=== Example 2: Numeric Range Formatting ===\n")
 
-# Create age group format
-age_fmt <- format_create(
-  c(0, 18) = "Child",
-  c(18, 65) = "Adult",
-  c(65, Inf) = "Senior",
-  .missing = "Age Unknown",
-  name = "age"
-)
+# Define formats in SAS-like text with interval notation
+fmt_text <- '
+VALUE age (numeric)
+  [0, 18)     = "Child"
+  [18, 65)    = "Adult"
+  [65, HIGH]  = "Senior"
+  .missing    = "Age Unknown"
+;
+'
 
-# Apply to age data
-ages <- c(5, 15, 25, 45, 70, 85, NA)
+formats <- format_parse(text = fmt_text)
+age_fmt <- formats$age
+
+# Apply to age data (decimals work too)
+ages <- c(5, 15.3, 17.9, 18, 45, 64.99, 65, 85, NA)
 age_groups <- format_apply(ages, age_fmt)
 
 print(data.frame(
@@ -54,10 +58,58 @@ print(data.frame(
 ))
 
 # ============================================================================
-# Example 3: Reverse formatting with invalue
+# Example 3: Decimal ranges (e.g. BMI categories)
 # ============================================================================
 
-cat("\n=== Example 3: Reverse Formatting (Invalue) ===\n")
+cat("\n=== Example 3: Decimal Ranges ===\n")
+
+bmi_text <- '
+VALUE bmi (numeric)
+  [0, 18.5)    = "Underweight"
+  [18.5, 25)   = "Normal"
+  [25, 30)     = "Overweight"
+  [30, HIGH]   = "Obese"
+  .missing     = "No data"
+;
+'
+
+bmi_fmt <- format_parse(text = bmi_text)$bmi
+bmi_values <- c(16.2, 18.5, 22.7, 25, 29.9, 35.1, NA)
+bmi_labels <- format_apply(bmi_values, bmi_fmt)
+
+print(data.frame(
+  bmi = bmi_values,
+  category = bmi_labels
+))
+
+# ============================================================================
+# Example 4: Exclusive/inclusive bounds
+# ============================================================================
+
+cat("\n=== Example 4: Bound Inclusivity ===\n")
+
+score_text <- '
+VALUE score (numeric)
+  (0, 50]    = "Low"
+  (50, 100]  = "High"
+  .other     = "Out of range"
+;
+'
+
+score_fmt <- format_parse(text = score_text)$score
+scores <- c(0, 1, 50, 51, 100, 101)
+score_labels <- format_apply(scores, score_fmt)
+
+print(data.frame(
+  score = scores,
+  label = score_labels
+))
+
+# ============================================================================
+# Example 5: Reverse formatting with invalue
+# ============================================================================
+
+cat("\n=== Example 5: Reverse Formatting (Invalue) ===\n")
 
 # Create invalue to convert labels back to codes
 sex_inv <- format_invalue(
@@ -76,10 +128,10 @@ print(data.frame(
 ))
 
 # ============================================================================
-# Example 4: Bidirectional formatting
+# Example 6: Bidirectional formatting
 # ============================================================================
 
-cat("\n=== Example 4: Bidirectional Formatting ===\n")
+cat("\n=== Example 6: Bidirectional Formatting ===\n")
 
 # Create both format and invalue at once
 status_bi <- format_bidirectional(
@@ -104,28 +156,65 @@ cat("\nReverse (label -> code):\n")
 print(data.frame(label = test_labels, code = test_codes))
 
 # ============================================================================
-# Example 5: Format library usage
+# Example 7: Parse multiple formats from a file-like text
 # ============================================================================
 
-cat("\n=== Example 5: Format Library ===\n")
+cat("\n=== Example 7: Multi-format Parsing ===\n")
 
-# Register formats for reuse
-format_register(sex_fmt)
-format_register(age_fmt)
+catalog <- '
+// Study format definitions
 
-cat("\nRegistered formats:\n")
-print(format_list())
+VALUE sex (character)
+  "M" = "Male"
+  "F" = "Female"
+  .missing = "Unknown"
+;
 
-# Retrieve and use a format
+VALUE age (numeric)
+  [0, 18)    = "Child"
+  [18, 65)   = "Adult"
+  [65, HIGH] = "Senior"
+;
+
+INVALUE sex_inv (character)
+  "Male"   = "M"
+  "Female" = "F"
+;
+'
+
+all_fmts <- format_parse(text = catalog, register = TRUE)
+
+cat("Parsed formats:", paste(names(all_fmts), collapse = ", "), "\n")
+cat("Registered in library:", paste(format_list(), collapse = ", "), "\n")
+
+# ============================================================================
+# Example 8: Export formats back to text
+# ============================================================================
+
+cat("\n=== Example 8: Export Formats to Text ===\n")
+
+# Export a format created programmatically
+cat(format_export(bmi = bmi_fmt))
+cat("\n")
+
+# ============================================================================
+# Example 9: Format library usage
+# ============================================================================
+
+cat("\n=== Example 9: Format Library ===\n")
+
+cat("Registered formats:", paste(format_list(), collapse = ", "), "\n")
+
+# Retrieve and use a format from library
 retrieved_fmt <- format_get("sex")
-cat("\nUsing retrieved format:\n")
-print(format_apply(c("M", "F"), retrieved_fmt))
+cat("Using retrieved format:\n")
+print(format_apply(c("M", "F", NA), retrieved_fmt))
 
 # ============================================================================
-# Example 6: Data frame formatting
+# Example 10: Data frame formatting
 # ============================================================================
 
-cat("\n=== Example 6: Data Frame Formatting ===\n")
+cat("\n=== Example 10: Data Frame Formatting ===\n")
 
 # Create sample data
 df <- data.frame(
@@ -135,14 +224,14 @@ df <- data.frame(
   status = c("A", "I", "A", "P", "A", "I")
 )
 
-cat("\nOriginal data:\n")
+cat("Original data:\n")
 print(df)
 
 # Format multiple columns at once
 df_formatted <- format_apply_df(
   df,
-  sex = sex_fmt,
-  age = age_fmt,
+  sex = all_fmts$sex,
+  age = all_fmts$age,
   status = status_bi$format,
   suffix = "_label"
 )
@@ -151,38 +240,37 @@ cat("\nFormatted data:\n")
 print(df_formatted)
 
 # ============================================================================
-# Example 7: Missing value handling
+# Example 11: Missing value handling
 # ============================================================================
 
-cat("\n=== Example 7: Missing Value Handling ===\n")
+cat("\n=== Example 11: Missing Value Handling ===\n")
 
-# Test various missing value types
-test_values <- c("M", "F", NA, NULL)
-cat("\nWith .missing label:\n")
-print(format_apply(test_values, sex_fmt))
+cat("With .missing label:\n")
+print(format_apply(c("M", "F", NA), all_fmts$sex))
 
 cat("\nWith keep_na = TRUE:\n")
-print(format_apply(c("M", "F", NA), sex_fmt, keep_na = TRUE))
+print(format_apply(c("M", "F", NA), all_fmts$sex, keep_na = TRUE))
 
-# Test is_missing_value utility
-cat("\nTesting is_missing_value():\n")
-cat("is_missing_value(NA):", is_missing_value(NA), "\n")
-cat("is_missing_value(''):", is_missing_value(""), "\n")
-cat("is_missing_value('', include_empty = TRUE):", 
-    is_missing_value("", include_empty = TRUE), "\n")
+cat("\nis_missing_value():\n")
+cat("  NA:            ", is_missing_value(NA), "\n")
+cat("  NaN:           ", is_missing_value(NaN), "\n")
+cat("  '':            ", is_missing_value(""), "\n")
+cat("  '' (w/ empty): ", is_missing_value("", include_empty = TRUE), "\n")
 
 # ============================================================================
-# Example 8: Format validation
+# Example 12: Format validation
 # ============================================================================
 
-cat("\n=== Example 8: Format Validation ===\n")
+cat("\n=== Example 12: Format Validation ===\n")
 
-# Validate data against format
-validation_data <- c("M", "F", "X", NA, "M")
-validation_result <- format_validate(validation_data, sex_fmt)
-
-cat("\nValidation results:\n")
+validation_result <- format_validate(c("M", "F", "X", NA, "M"), all_fmts$sex)
+cat("Validation results:\n")
 print(validation_result)
+
+# Range validation
+range_validation <- format_validate(c(5, 18, 50, 100, NA), all_fmts$age)
+cat("\nRange validation:\n")
+print(range_validation)
 
 # Clean up
 format_clear()

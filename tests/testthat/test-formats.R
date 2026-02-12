@@ -9,7 +9,7 @@ test_that("format_create works with discrete values", {
     .missing = "Unknown",
     name = "sex"
   )
-  
+
   expect_s3_class(sex_fmt, "ks_format")
   expect_equal(sex_fmt$name, "sex")
   expect_equal(sex_fmt$type, "character")
@@ -22,9 +22,9 @@ test_that("format_apply handles missing values correctly", {
     "F" = "Female",
     .missing = "Unknown"
   )
-  
+
   result <- format_apply(c("M", "F", NA, "X"), sex_fmt)
-  
+
   expect_equal(result[1], "Male")
   expect_equal(result[2], "Female")
   expect_equal(result[3], "Unknown")
@@ -37,9 +37,9 @@ test_that("format_apply preserves NA when keep_na = TRUE", {
     "F" = "Female",
     .missing = "Unknown"
   )
-  
+
   result <- format_apply(c("M", NA), sex_fmt, keep_na = TRUE)
-  
+
   expect_equal(result[1], "Male")
   expect_true(is.na(result[2]))
 })
@@ -50,9 +50,9 @@ test_that("invalue_apply reverses formatting", {
     "Female" = "F",
     "Unknown" = NA
   )
-  
+
   result <- invalue_apply(c("Male", "Female", "Unknown"), sex_inv)
-  
+
   expect_equal(result[1], "M")
   expect_equal(result[2], "F")
   expect_true(is.na(result[3]))
@@ -72,14 +72,14 @@ test_that("format_register and format_get work", {
     "F" = "Female",
     name = "test_sex"
   )
-  
+
   format_register(sex_fmt)
-  
+
   expect_true("test_sex" %in% format_list())
-  
+
   retrieved <- format_get("test_sex")
   expect_equal(retrieved$name, "test_sex")
-  
+
   format_remove("test_sex")
   expect_false("test_sex" %in% format_list())
 })
@@ -90,14 +90,14 @@ test_that("format_bidirectional creates both format and invalue", {
     "F" = "Female",
     name = "sex_bi"
   )
-  
+
   expect_s3_class(bi$format, "ks_format")
   expect_s3_class(bi$invalue, "ks_invalue")
-  
+
   # Test forward
   formatted <- format_apply("M", bi$format)
   expect_equal(formatted, "Male")
-  
+
   # Test reverse
   original <- invalue_apply("Male", bi$invalue)
   expect_equal(original, "M")
@@ -149,9 +149,10 @@ VALUE age (numeric)
   expect_equal(fmt$type, "numeric")
   expect_equal(fmt$missing_label, "Age Unknown")
   expect_equal(length(fmt$mappings), 3)
-  # Range keys are stored as "low,high"
-  expect_true("0,18" %in% names(fmt$mappings))
-  expect_true("65,Inf" %in% names(fmt$mappings))
+  # Range keys are stored as "low,high,inc_low,inc_high"
+  # (legacy syntax defaults to [low, high))
+  expect_true("0,18,TRUE,FALSE" %in% names(fmt$mappings))
+  expect_true("65,Inf,TRUE,FALSE" %in% names(fmt$mappings))
 })
 
 test_that("format_parse handles LOW keyword", {
@@ -164,8 +165,8 @@ VALUE score (numeric)
   result <- format_parse(text = txt)
   fmt <- result$score
 
-  expect_true("-Inf,0" %in% names(fmt$mappings))
-  expect_equal(fmt$mappings[["-Inf,0"]], "Negative")
+  expect_true("-Inf,0,TRUE,FALSE" %in% names(fmt$mappings))
+  expect_equal(fmt$mappings[["-Inf,0,TRUE,FALSE"]], "Negative")
 })
 
 test_that("format_parse parses INVALUE block", {
@@ -361,4 +362,225 @@ test_that("format_export handles multiple formats", {
 
   expect_true(grepl("VALUE sex", txt))
   expect_true(grepl("VALUE yn", txt))
+})
+
+# ===================================================================
+# Range bounds and decimal support
+# ===================================================================
+
+context("Range Bounds and Decimal Support")
+
+test_that("format_parse handles interval notation [low, high)", {
+  txt <- '
+VALUE age (numeric)
+  [0, 18) = "Child"
+  [18, 65) = "Adult"
+  [65, HIGH] = "Senior"
+;
+'
+  result <- format_parse(text = txt)
+  fmt <- result$age
+
+  expect_equal(fmt$type, "numeric")
+  expect_equal(length(fmt$mappings), 3)
+  # [0, 18) -> inc_low=TRUE, inc_high=FALSE
+  expect_true("0,18,TRUE,FALSE" %in% names(fmt$mappings))
+  # [65, Inf] -> inc_low=TRUE, inc_high=TRUE
+  expect_true("65,Inf,TRUE,TRUE" %in% names(fmt$mappings))
+})
+
+test_that("format_parse handles exclusive lower bound (low, high]", {
+  txt <- '
+VALUE score (numeric)
+  (0, 50] = "Low"
+  (50, 100] = "High"
+;
+'
+  result <- format_parse(text = txt)
+  fmt <- result$score
+
+  expect_true("0,50,FALSE,TRUE" %in% names(fmt$mappings))
+  expect_true("50,100,FALSE,TRUE" %in% names(fmt$mappings))
+})
+
+test_that("format_parse handles fully open and fully closed intervals", {
+  txt <- '
+VALUE test (numeric)
+  (0, 10) = "Open"
+  [10, 20] = "Closed"
+;
+'
+  result <- format_parse(text = txt)
+  fmt <- result$test
+
+  expect_true("0,10,FALSE,FALSE" %in% names(fmt$mappings))
+  expect_true("10,20,TRUE,TRUE" %in% names(fmt$mappings))
+})
+
+test_that("format_parse handles decimal numbers in ranges", {
+  txt <- '
+VALUE bmi (numeric)
+  [0, 18.5) = "Underweight"
+  [18.5, 25) = "Normal"
+  [25, 30) = "Overweight"
+  [30, HIGH] = "Obese"
+;
+'
+  result <- format_parse(text = txt)
+  fmt <- result$bmi
+
+  expect_equal(length(fmt$mappings), 4)
+  expect_true("0,18.5,TRUE,FALSE" %in% names(fmt$mappings))
+  expect_true("18.5,25,TRUE,FALSE" %in% names(fmt$mappings))
+  expect_equal(fmt$mappings[["18.5,25,TRUE,FALSE"]], "Normal")
+})
+
+test_that("format_apply matches ranges correctly with [low, high)", {
+  txt <- '
+VALUE age (numeric)
+  [0, 18) = "Child"
+  [18, 65) = "Adult"
+  [65, HIGH] = "Senior"
+;
+'
+  result <- format_parse(text = txt)
+  fmt <- result$age
+
+  applied <- format_apply(c(0, 5, 17.9, 18, 64.99, 65, 100), fmt)
+
+  expect_equal(applied[1], "Child")    # 0 is in [0, 18)
+  expect_equal(applied[2], "Child")    # 5 is in [0, 18)
+  expect_equal(applied[3], "Child")    # 17.9 is in [0, 18)
+  expect_equal(applied[4], "Adult")    # 18 is in [18, 65)
+  expect_equal(applied[5], "Adult")    # 64.99 is in [18, 65)
+  expect_equal(applied[6], "Senior")   # 65 is in [65, HIGH]
+  expect_equal(applied[7], "Senior")   # 100 is in [65, HIGH]
+})
+
+test_that("format_apply handles exclusive lower bound correctly", {
+  txt <- '
+VALUE score (numeric)
+  (0, 50] = "Low"
+  (50, 100] = "High"
+;
+'
+  result <- format_parse(text = txt)
+  fmt <- result$score
+
+  applied <- format_apply(c(0, 1, 50, 51, 100), fmt)
+
+  expect_equal(applied[1], "0")       # 0 is NOT in (0, 50] — returned as-is
+  expect_equal(applied[2], "Low")     # 1 is in (0, 50]
+  expect_equal(applied[3], "Low")     # 50 is in (0, 50]
+  expect_equal(applied[4], "High")    # 51 is in (50, 100]
+  expect_equal(applied[5], "High")    # 100 is in (50, 100]
+})
+
+test_that("format_apply handles decimal ranges", {
+  txt <- '
+VALUE bmi (numeric)
+  [0, 18.5) = "Underweight"
+  [18.5, 25) = "Normal"
+  [25, 30) = "Overweight"
+;
+'
+  result <- format_parse(text = txt)
+  fmt <- result$bmi
+
+  applied <- format_apply(c(15.2, 18.5, 24.9, 25, 29.99), fmt)
+
+  expect_equal(applied[1], "Underweight")
+  expect_equal(applied[2], "Normal")
+  expect_equal(applied[3], "Normal")
+  expect_equal(applied[4], "Overweight")
+  expect_equal(applied[5], "Overweight")
+})
+
+test_that("format_apply handles missing + ranges together", {
+  txt <- '
+VALUE temp (numeric)
+  [LOW, 0) = "Freezing"
+  [0, 20) = "Cold"
+  [20, HIGH] = "Warm"
+  .missing = "No data"
+;
+'
+  result <- format_parse(text = txt)
+  fmt <- result$temp
+
+  applied <- format_apply(c(-10, 0, 15, 25, NA), fmt)
+
+  expect_equal(applied[1], "Freezing")
+  expect_equal(applied[2], "Cold")
+  expect_equal(applied[3], "Cold")
+  expect_equal(applied[4], "Warm")
+  expect_equal(applied[5], "No data")
+})
+
+test_that("format_export roundtrips interval notation", {
+  txt_in <- '
+VALUE bmi (numeric)
+  [0, 18.5) = "Underweight"
+  [18.5, 25) = "Normal"
+  [25, HIGH] = "Overweight"
+;
+'
+  parsed <- format_parse(text = txt_in)
+  exported <- format_export(bmi = parsed$bmi)
+
+  # Should contain interval notation
+  expect_true(grepl("\\[0, 18\\.5\\)", exported))
+  expect_true(grepl("\\[18\\.5, 25\\)", exported))
+  expect_true(grepl("\\[25, HIGH\\]", exported))
+
+  # Re-parse and verify roundtrip
+  reparsed <- format_parse(text = exported)
+  expect_equal(reparsed$bmi$mappings[["18.5,25,TRUE,FALSE"]], "Normal")
+})
+
+test_that("range_spec supports inc_low and inc_high parameters", {
+  rs1 <- range_spec(0, 10, "test1")
+  expect_true(rs1$inc_low)
+  expect_false(rs1$inc_high)
+
+  rs2 <- range_spec(0, 10, "test2", inc_low = FALSE, inc_high = TRUE)
+  expect_false(rs2$inc_low)
+  expect_true(rs2$inc_high)
+})
+
+test_that("in_range respects bound inclusivity", {
+  rs_half_open <- range_spec(0, 10, "test")                          # [0, 10)
+  rs_closed <- range_spec(0, 10, "test", inc_high = TRUE)            # [0, 10]
+  rs_open <- range_spec(0, 10, "test", inc_low = FALSE)              # (0, 10)
+
+  # [0, 10): includes 0, excludes 10
+  expect_true(in_range(0, rs_half_open))
+  expect_true(in_range(5, rs_half_open))
+  expect_false(in_range(10, rs_half_open))
+
+  # [0, 10]: includes both
+  expect_true(in_range(0, rs_closed))
+  expect_true(in_range(10, rs_closed))
+
+  # (0, 10): excludes both bounds
+  expect_false(in_range(0, rs_open))
+  expect_true(in_range(5, rs_open))
+  expect_false(in_range(10, rs_open))
+})
+
+test_that("format_validate works with range formats", {
+  txt <- '
+VALUE temp (numeric)
+  [0, 100) = "Normal"
+  .other = "Abnormal"
+;
+'
+  result <- format_parse(text = txt)
+  fmt <- result$temp
+
+  validation <- format_validate(c(50, 150, NA), fmt)
+
+  expect_true(validation$matched[1])    # 50 in [0, 100)
+  expect_false(validation$matched[2])   # 150 not in range
+  expect_false(validation$matched[3])   # NA
 })

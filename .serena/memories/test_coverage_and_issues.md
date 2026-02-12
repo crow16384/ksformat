@@ -67,7 +67,7 @@ Single test file, 7 test cases, using `context("Format Creation and Application"
 
 6. **No integration test for data frame workflow**: `format_apply_df` with `suffix`/`replace` modes untested.
 
-7. **`in_range` uses inclusive bounds on both ends** (`>=` and `<=`): This means adjacent ranges like `c(0,18)` and `c(18,65)` will double-match value 18. SAS uses `low <= x < high` by default.
+7. **`in_range` and `range_spec` now support `inc_low`/`inc_high`** parameters. Default is `[low, high)` matching SAS semantics. RESOLVED.
 
 ## NAMESPACE
 17 exported functions + 2 S3 methods. All match the functions defined in R/ files.

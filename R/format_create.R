@@ -145,20 +145,32 @@ print.ks_format <- function(x, ...) {
   cat("KS Format:", if (!is.null(x$name)) x$name else "(unnamed)", "\n")
   cat("Type:", x$type, "\n")
   cat("Mappings:\n")
-  
+
   for (i in seq_along(x$mappings)) {
     key <- names(x$mappings)[i]
     value <- x$mappings[[i]]
-    cat("  ", key, " => ", value, "\n", sep = "")
+
+    # Try to display range keys in interval notation
+    parsed <- .parse_range_key(key)
+    if (!is.null(parsed)) {
+      left_bracket <- if (parsed$inc_low) "[" else "("
+      right_bracket <- if (parsed$inc_high) "]" else ")"
+      low_str <- if (is.infinite(parsed$low) && parsed$low < 0) "LOW" else as.character(parsed$low)
+      high_str <- if (is.infinite(parsed$high) && parsed$high > 0) "HIGH" else as.character(parsed$high)
+      cat("  ", left_bracket, low_str, ", ", high_str, right_bracket,
+          " => ", value, "\n", sep = "")
+    } else {
+      cat("  ", key, " => ", value, "\n", sep = "")
+    }
   }
-  
+
   if (!is.null(x$missing_label)) {
     cat("  .missing => ", x$missing_label, "\n", sep = "")
   }
-  
+
   if (!is.null(x$other_label)) {
     cat("  .other => ", x$other_label, "\n", sep = "")
   }
-  
+
   invisible(x)
 }

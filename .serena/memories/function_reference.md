@@ -30,9 +30,10 @@
 - **Logic**:
   1. NULL input → `character(0)`.
   2. Missing (NA/NaN) → `missing_label` if set and `keep_na=FALSE`, else NA.
-  3. Exact match: `as.character(value) == key` in mappings.
-  4. Range match: **not implemented** (loop body is empty).
-  5. No match: `other_label` or original value as character.
+  3. Pre-parse all range keys via `.parse_range_key()`.
+  4. Exact match: `as.character(value) == key` in mappings.
+  5. Range match: for numeric values, checks bounds with inc_low/inc_high.
+  6. No match: `other_label` or original value as character.
 - **Returns**: `character` vector same length as `x`.
 
 ### `format_apply_df(data, ..., suffix = "_fmt", replace = FALSE)`
@@ -96,14 +97,22 @@
 - **Purpose**: Element-wise check for NA/NaN; optionally empty strings.
 - **Returns**: logical vector. NULL input → `logical(0)`.
 
-### `range_spec(low, high, label)`
-- **Purpose**: Create a `range_spec` S3 object.
+### `range_spec(low, high, label, inc_low = TRUE, inc_high = FALSE)`
+- **Purpose**: Create a `range_spec` S3 object with explicit bound inclusivity.
+- **Params**: `inc_low` — TRUE means >= (default), FALSE means >. `inc_high` — TRUE means <=, FALSE means < (default).
+- **Default**: `[low, high)` — includes lower, excludes upper (matches SAS PROC FORMAT).
 - **Validation**: low/high must be numeric, low ≤ high.
-- **Returns**: `range_spec` (list with low, high, label).
+- **Returns**: `range_spec` (list with low, high, label, inc_low, inc_high).
 
 ### `in_range(x, range_spec)` *(internal, not exported)*
-- **Purpose**: Check `x >= low & x <= high` (inclusive both ends).
+- **Purpose**: Check if x falls within range, respecting inc_low/inc_high bounds.
+- **Logic**: Uses `>=` or `>` for low, `<=` or `<` for high based on flags.
 - **Returns**: logical.
+
+### `.parse_range_key(key)` *(internal, not exported)*
+- **Purpose**: Parse range key string into components.
+- **Formats**: 4-part `"low,high,TRUE,FALSE"` or legacy 2-part `"low,high"` (defaults to [low,high)).
+- **Returns**: list(low, high, inc_low, inc_high) or NULL if not a valid range key.
 
 ### `.format_library`
 - R environment `new.env(parent = emptyenv())` for storing named formats.

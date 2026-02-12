@@ -32,7 +32,8 @@ The syntax supports two block types:
 VALUE name (type)
   "value1" = "Label 1"
   "value2" = "Label 2"
-  low - high = "Range Label"
+  [low, high) = "Range Label (half-open)"
+  (low, high] = "Range Label (open-low, closed-high)"
   .missing = "Missing Label"
   .other = "Other Label"
 ;
@@ -51,7 +52,13 @@ INVALUE name (target_type)
   \item Blocks start with \code{VALUE} or \code{INVALUE} keyword and end with \code{;}
   \item The type in parentheses is optional; defaults to \code{"auto"}
   \item Values can be quoted or unquoted
-  \item Ranges use \code{low - high} syntax (e.g. \code{0 - 18})
+  \item Ranges use interval notation with explicit bounds:
+    \code{[0, 18)} (inclusive low, exclusive high),
+    \code{(0, 100]} (exclusive low, inclusive high),
+    \code{[0, 100]} (both inclusive),
+    \code{(0, 100)} (both exclusive)
+  \item Legacy range syntax \code{low - high} is also supported and defaults to \code{[low, high)}
+  \item Decimal numbers are fully supported: \code{[0.5, 1.5)}
   \item Special range keywords: \code{LOW} (-Inf) and \code{HIGH} (Inf)
   \item \code{.missing} and \code{.other} are special directives
   \item Lines starting with \code{/*} or \code{*} or \code{//} are comments
@@ -67,9 +74,9 @@ VALUE sex (character)
 ;
 
 VALUE age (numeric)
-  0 - 18 = "Child"
-  18 - 65 = "Adult"
-  65 - HIGH = "Senior"
+  [0, 18) = "Child"
+  [18, 65) = "Adult"
+  [65, HIGH] = "Senior"
 ;
 '
 

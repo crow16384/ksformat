@@ -21,7 +21,8 @@
 #' VALUE name (type)
 #'   "value1" = "Label 1"
 #'   "value2" = "Label 2"
-#'   low - high = "Range Label"
+#'   [low, high) = "Range Label (half-open)"
+#'   (low, high] = "Range Label (open-low, closed-high)"
 #'   .missing = "Missing Label"
 #'   .other = "Other Label"
 #' ;
@@ -40,7 +41,13 @@
 #'   \item Blocks start with \code{VALUE} or \code{INVALUE} keyword and end with \code{;}
 #'   \item The type in parentheses is optional; defaults to \code{"auto"}
 #'   \item Values can be quoted or unquoted
-#'   \item Ranges use \code{low - high} syntax (e.g. \code{0 - 18})
+#'   \item Ranges use interval notation with explicit bounds:
+#'     \code{[0, 18)} (inclusive low, exclusive high),
+#'     \code{(0, 100]} (exclusive low, inclusive high),
+#'     \code{[0, 100]} (both inclusive),
+#'     \code{(0, 100)} (both exclusive)
+#'   \item Legacy range syntax \code{low - high} is also supported and defaults to \code{[low, high)}
+#'   \item Decimal numbers are fully supported: \code{[0.5, 1.5)}
 #'   \item Special range keywords: \code{LOW} (-Inf) and \code{HIGH} (Inf)
 #'   \item \code{.missing} and \code{.other} are special directives
 #'   \item Lines starting with \code{/*} or \code{*} or \code{//} are comments
@@ -57,9 +64,9 @@
 #' ;
 #'
 #' VALUE age (numeric)
-#'   0 - 18 = "Child"
-#'   18 - 65 = "Adult"
-#'   65 - HIGH = "Senior"
+#'   [0, 18) = "Child"
+#'   [18, 65) = "Adult"
+#'   [65, HIGH] = "Senior"
 #' ;
 #' '
 #'
@@ -286,23 +293,47 @@ format_export <- function(..., formats = NULL, file = NULL) {
     return(list(type = "other", value = rhs))
   }
 
-  # Check for range: low - high pattern
-  # Range pattern: optional quotes around values, separated by ' - '
+  # Check for interval notation: [low, high) or (low, high] etc.
+  interval_match <- regmatches(lhs, regexec(
+    "^(\\[|\\()\\s*(-?[0-9.]+|LOW|HIGH|Inf|-Inf)\\s*,\\s*(-?[0-9.]+|LOW|HIGH|Inf|-Inf)\\s*(\\]|\\))$",
+    lhs, ignore.case = TRUE
+  ))[[1]]
+
+  if (length(interval_match) == 5) {
+    left_bracket <- interval_match[2]
+    low_str <- trimws(interval_match[3])
+    high_str <- trimws(interval_match[4])
+    right_bracket <- interval_match[5]
+
+    low_val <- .parse_range_bound(low_str, is_low = TRUE)
+    high_val <- .parse_range_bound(high_str, is_low = FALSE)
+
+    inc_low <- (left_bracket == "[")
+    inc_high <- (right_bracket == "]")
+
+    if (!is.na(low_val) && !is.na(high_val)) {
+      return(list(type = "range", low = low_val, high = high_val,
+                  inc_low = inc_low, inc_high = inc_high, label = rhs))
+    }
+  }
+
+  # Check for legacy range: low - high pattern (no brackets)
   range_match <- regmatches(lhs, regexec(
-    "^([\"']?[^\"']*[\"']?)\\s*-\\s*([\"']?[^\"']*[\"']?)$",
-    lhs
+    "^(-?[0-9.]+|LOW|HIGH|Inf|-Inf)\\s*-\\s*(-?[0-9.]+|LOW|HIGH|Inf|-Inf)$",
+    lhs, ignore.case = TRUE
   ))[[1]]
 
   if (length(range_match) == 3) {
-    low_str <- trimws(.unquote(range_match[2]))
-    high_str <- trimws(.unquote(range_match[3]))
+    low_str <- trimws(range_match[2])
+    high_str <- trimws(range_match[3])
 
-    # Check for special keywords
     low_val <- .parse_range_bound(low_str, is_low = TRUE)
     high_val <- .parse_range_bound(high_str, is_low = FALSE)
 
     if (!is.na(low_val) && !is.na(high_val)) {
-      return(list(type = "range", low = low_val, high = high_val, label = rhs))
+      # Legacy syntax defaults to [low, high)
+      return(list(type = "range", low = low_val, high = high_val,
+                  inc_low = TRUE, inc_high = FALSE, label = rhs))
     }
   }
 
@@ -363,13 +394,16 @@ format_export <- function(..., formats = NULL, file = NULL) {
     } else if (entry$type == "discrete") {
       mappings[[entry$key]] <- entry$label
     } else if (entry$type == "range") {
-      # Store range as "low,high" key for compatibility with format_create
-      range_key <- paste0(entry$low, ",", entry$high)
+      # Store range as "low,high,inc_low,inc_high" key
+      inc_low <- if (!is.null(entry$inc_low)) entry$inc_low else TRUE
+      inc_high <- if (!is.null(entry$inc_high)) entry$inc_high else FALSE
+      range_key <- paste0(entry$low, ",", entry$high, ",",
+                          toupper(inc_low), ",", toupper(inc_high))
       mappings[[range_key]] <- entry$label
     }
   }
 
-  # Build the format using format_create's underlying logic
+  # Build the format
   type <- block$subtype
 
   format_obj <- structure(
@@ -464,20 +498,20 @@ format_export <- function(..., formats = NULL, file = NULL) {
   }
   lines <- c(lines, paste0("VALUE ", name, type_part))
 
-  # Discrete mappings
+  # Mappings
   for (i in seq_along(fmt$mappings)) {
     key <- names(fmt$mappings)[i]
     label <- fmt$mappings[[i]]
 
-    # Check if key looks like a range ("low,high")
-    if (grepl("^-?[0-9.]+,-?[0-9.]+$", key) ||
-        grepl("^-?Inf,-?[0-9.]+$", key) ||
-        grepl("^-?[0-9.]+,-?Inf$", key) ||
-        grepl("^-?Inf,-?Inf$", key)) {
-      parts <- strsplit(key, ",")[[1]]
-      low <- .format_range_bound(as.numeric(parts[1]), is_low = TRUE)
-      high <- .format_range_bound(as.numeric(parts[2]), is_low = FALSE)
-      lines <- c(lines, paste0("  ", low, " - ", high, " = \"", label, "\""))
+    # Try to parse as a range key
+    parsed <- .parse_range_key(key)
+    if (!is.null(parsed)) {
+      left_bracket <- if (parsed$inc_low) "[" else "("
+      right_bracket <- if (parsed$inc_high) "]" else ")"
+      low <- .format_range_bound(parsed$low, is_low = TRUE)
+      high <- .format_range_bound(parsed$high, is_low = FALSE)
+      lines <- c(lines, paste0("  ", left_bracket, low, ", ", high,
+                                right_bracket, " = \"", label, "\""))
     } else {
       lines <- c(lines, paste0("  \"", key, "\" = \"", label, "\""))
     }
@@ -532,10 +566,6 @@ format_export <- function(..., formats = NULL, file = NULL) {
   if (is.infinite(val)) {
     if (val < 0) return("LOW")
     return("HIGH")
-  }
-  # Use integer format if value is whole number
-  if (val == floor(val)) {
-    return(as.character(as.integer(val)))
   }
   return(as.character(val))
 }

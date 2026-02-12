@@ -29,16 +29,16 @@
 #' )
 format_invalue <- function(..., name = NULL, target_type = "auto", missing_value = NA) {
   mappings <- list(...)
-  
+
   if (length(mappings) == 0) {
     stop("At least one label-value mapping must be provided")
   }
-  
+
   # Determine target type
   if (target_type == "auto") {
     target_type <- detect_invalue_type(mappings)
   }
-  
+
   # Create invalue object
   invalue_obj <- structure(
     list(
@@ -50,7 +50,7 @@ format_invalue <- function(..., name = NULL, target_type = "auto", missing_value
     ),
     class = "ks_invalue"
   )
-  
+
   return(invalue_obj)
 }
 
@@ -61,18 +61,18 @@ format_invalue <- function(..., name = NULL, target_type = "auto", missing_value
 #' @keywords internal
 detect_invalue_type <- function(mappings) {
   values <- unlist(mappings)
-  
+
   if (all(sapply(values, is.logical))) {
     return("logical")
   }
-  
+
   if (all(sapply(values, is.numeric))) {
     if (all(sapply(values, function(x) x == as.integer(x)))) {
       return("integer")
     }
     return("numeric")
   }
-  
+
   return("character")
 }
 
@@ -96,34 +96,34 @@ invalue_apply <- function(x, invalue, na_if = NULL) {
   if (!inherits(invalue, "ks_invalue")) {
     stop("invalue must be a ks_invalue object created with format_invalue()")
   }
-  
+
   # Handle NULL input
   if (is.null(x)) {
     return(vector(invalue$target_type, 0))
   }
-  
+
   # Initialize result vector with appropriate type
   result <- vector(invalue$target_type, length(x))
   result[] <- invalue$missing_value
-  
+
   # Identify missing values
   is_missing <- is.na(x)
-  
+
   # Add na_if values to missing
   if (!is.null(na_if)) {
     is_missing <- is_missing | x %in% na_if
   }
-  
+
   # Process non-missing values
   non_missing_idx <- which(!is_missing)
-  
+
   for (idx in non_missing_idx) {
     label <- as.character(x[idx])
-    
+
     # Look up label in mappings
     if (label %in% names(invalue$mappings)) {
       value <- invalue$mappings[[label]]
-      
+
       # Handle NA in mapping
       if (is.na(value)) {
         result[idx] <- invalue$missing_value
@@ -149,7 +149,7 @@ invalue_apply <- function(x, invalue, na_if = NULL) {
       }
     }
   }
-  
+
   return(result)
 }
 
@@ -179,10 +179,10 @@ invalue_apply <- function(x, invalue, na_if = NULL) {
 #' invalue_apply("Male", sex_bi$invalue)
 format_bidirectional <- function(..., name = NULL, type = "auto") {
   mappings <- list(...)
-  
+
   # Create format (value -> label)
   format_obj <- do.call(format_create, c(mappings, list(name = name, type = type)))
-  
+
   # Create invalue (label -> value)
   # Reverse the mappings
   reversed_mappings <- lapply(names(mappings), function(key) {
@@ -190,12 +190,12 @@ format_bidirectional <- function(..., name = NULL, type = "auto") {
     stats::setNames(list(key), value)
   })
   reversed_mappings <- do.call(c, reversed_mappings)
-  
+
   invalue_obj <- do.call(
     format_invalue,
     c(reversed_mappings, list(name = paste0(name, "_inv"), target_type = type))
   )
-  
+
   return(list(
     format = format_obj,
     invalue = invalue_obj
@@ -211,16 +211,16 @@ print.ks_invalue <- function(x, ...) {
   cat("KS Invalue:", if (!is.null(x$name)) x$name else "(unnamed)", "\n")
   cat("Target Type:", x$target_type, "\n")
   cat("Mappings:\n")
-  
+
   for (i in seq_along(x$mappings)) {
     key <- names(x$mappings)[i]
     value <- x$mappings[[i]]
     cat("  ", key, " => ", value, "\n", sep = "")
   }
-  
+
   if (!is.na(x$missing_value)) {
     cat("  Missing value: ", x$missing_value, "\n", sep = "")
   }
-  
+
   invisible(x)
 }
