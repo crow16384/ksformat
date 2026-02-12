@@ -48,6 +48,24 @@ Utility functions and global format library.
 | `format_clear` | Function | 205–209 | Yes | Removes all formats from library |
 | `format_validate` | Function | 225–249 | Yes | Applies format + reports which values matched vs used `.other` |
 
+### R/format_parse.R
+Parsing SAS-like text definitions and exporting formats back to text.
+
+| Symbol | Kind | Lines | Exported | Description |
+|--------|------|-------|----------|-------------|
+| `format_parse` | Function | – | Yes | Parses SAS-like text/file into `ks_format`/`ks_invalue` objects |
+| `format_export` | Function | – | Yes | Exports format objects to SAS-like text or file |
+| `.parse_blocks` | Function | – | No (internal) | Splits text lines into block structures |
+| `.parse_mapping_line` | Function | – | No (internal) | Parses a single `key = value` mapping line |
+| `.parse_range_bound` | Function | – | No (internal) | Converts LOW/HIGH/numeric strings to values |
+| `.unquote` | Function | – | No (internal) | Strips surrounding quotes |
+| `.block_to_format` | Function | – | No (internal) | Dispatches block to ks_format or ks_invalue builder |
+| `.block_to_ks_format` | Function | – | No (internal) | Converts VALUE block to ks_format object |
+| `.block_to_ks_invalue` | Function | – | No (internal) | Converts INVALUE block to ks_invalue object |
+| `.format_to_text` | Function | – | No (internal) | Converts ks_format to SAS-like text |
+| `.invalue_to_text` | Function | – | No (internal) | Converts ks_invalue to SAS-like text |
+| `.format_range_bound` | Function | – | No (internal) | Formats numeric bound as LOW/HIGH/number string |
+
 ### R/ksformat-package.R
 Package-level roxygen2 documentation only. No symbols.
 
@@ -99,6 +117,17 @@ list(low = numeric, high = numeric, label = character)
 - `format_validate` → `format_apply`
 - `format_register` → uses `.format_library`
 - `format_get` → `format_list`, uses `.format_library`
+
+## SAS-like Text Format Syntax
+Supported by `format_parse` and `format_export` (R/format_parse.R):
+- `VALUE name (type) ... ;` — defines a ks_format
+- `INVALUE name (target_type) ... ;` — defines a ks_invalue
+- Discrete: `"key" = "label"` or unquoted `key = label`
+- Ranges: `low - high = "label"` (VALUE blocks only)
+- Special keywords: `LOW` (-Inf), `HIGH` (Inf)
+- Directives: `.missing = "label"`, `.other = "label"`
+- Comments: `//`, `/* */`, `*`, `#`
+- Type in parentheses is optional (defaults to "auto")
 
 ## Known Stubs / Incomplete Areas
 1. **`format_put`** (R/format_apply.R:155–158): always `stop()`s — not implemented.

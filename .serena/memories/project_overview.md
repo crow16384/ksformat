@@ -28,14 +28,15 @@ Maps values to labels (formats), labels back to values (invalues), with range an
 - `R/format_apply.R` — `format_apply()`, `format_apply_df()`, `format_put()`
 - `R/format_invalue.R` — `format_invalue()`, `detect_invalue_type()`, `invalue_apply()`, `format_bidirectional()`, `print.ks_invalue()`
 - `R/utilities.R` — `is_missing_value()`, `range_spec()`, `in_range()`, format library functions (`format_register`, `format_get`, `format_list`, `format_remove`, `format_clear`, `format_validate`), `.format_library` environment
+- `R/format_parse.R` — `format_parse()`, `format_export()` and internal parser/exporter helpers
 - `R/ksformat-package.R` — package-level documentation (no symbols)
 - `tests/testthat/test-formats.R` — test suite (testthat)
 
-## Exported Functions (17 total)
+## Exported Functions (19 total)
 format_create, format_apply, format_apply_df, format_put, format_invalue,
 invalue_apply, format_bidirectional, format_register, format_get, format_list,
 format_remove, format_clear, format_validate, is_missing_value, range_spec,
-print.ks_format, print.ks_invalue
+format_parse, format_export, print.ks_format, print.ks_invalue
 
 ## Dependencies
 - No runtime dependencies (base R only)

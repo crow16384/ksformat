@@ -75,6 +75,21 @@
 
 ---
 
+## format_parse.R
+
+### `format_parse(text = NULL, file = NULL, register = FALSE)`
+- **Purpose**: Parse SAS-like text into `ks_format`/`ks_invalue` objects.
+- **Params**: `text` — character string/vector; `file` — path to .fmt file; `register` — auto-register in library.
+- **Returns**: Named list of format objects.
+- **Syntax**: VALUE/INVALUE blocks, discrete/range mappings, .missing/.other, LOW/HIGH, comments.
+
+### `format_export(..., formats = NULL, file = NULL)`
+- **Purpose**: Export format objects to SAS-like text.
+- **Params**: `...` — named format objects; `formats` — named list alternative; `file` — output path.
+- **Returns**: Character string (or invisible file path if `file` given).
+
+---
+
 ## utilities.R
 
 ### `is_missing_value(x, include_empty = FALSE)`

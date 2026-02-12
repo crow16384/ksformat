@@ -15,6 +15,28 @@ Single test file, 7 test cases, using `context("Format Creation and Application"
 | 6 | `format_register and format_get work` | `format_create`, `format_register`, `format_list`, `format_get`, `format_remove` | register/retrieve/remove cycle |
 | 7 | `format_bidirectional creates both format and invalue` | `format_bidirectional`, `format_apply`, `invalue_apply` | forward + reverse roundtrip |
 
+### Parse/Export Tests (test-formats.R, context "Format Parsing" + "Format Export")
+
+| # | Test name | Functions tested |
+|---|-----------|-----------------|
+| 8 | `format_parse parses a basic VALUE block` | `format_parse` |
+| 9 | `format_parse handles numeric ranges` | `format_parse` |
+| 10 | `format_parse handles LOW keyword` | `format_parse` |
+| 11 | `format_parse parses INVALUE block` | `format_parse` |
+| 12 | `format_parse handles multiple blocks` | `format_parse` |
+| 13 | `format_parse skips comments` | `format_parse` |
+| 14 | `format_parse auto-detects type from ranges` | `format_parse` |
+| 15 | `format_parse with register = TRUE stores formats` | `format_parse`, `format_list`, `format_get`, `format_remove` |
+| 16 | `format_parse reads from file` | `format_parse` |
+| 17 | `format_parse errors with no input` | `format_parse` |
+| 18 | `format_parse errors with both inputs` | `format_parse` |
+| 19 | `format_parse handles unquoted values` | `format_parse` |
+| 20 | `format_export produces valid text for VALUE` | `format_create`, `format_export` |
+| 21 | `format_export produces valid text for INVALUE` | `format_invalue`, `format_export` |
+| 22 | `format_export roundtrips with format_parse` | `format_create`, `format_export`, `format_parse` |
+| 23 | `format_export writes to file` | `format_create`, `format_export` |
+| 24 | `format_export handles multiple formats` | `format_create`, `format_export` |
+
 ### Functions NOT Tested
 - `detect_format_type` — called indirectly via format_create, but no explicit edge cases tested
 - `detect_invalue_type` — called indirectly, no explicit tests
