@@ -44,7 +44,7 @@ format_apply(c("M", "F", NA), sex_fmt)
 
 }
 \author{
-\strong{Maintainer}: Developer User \email{developer@example.com}
+\strong{Maintainer}: Developer Vladimir Larchenko \email{vladimir.larchenko@keystatsolutions.com}
 
 }
 \keyword{package}
