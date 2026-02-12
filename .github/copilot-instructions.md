@@ -1,14 +1,5 @@
 # ksformat R Package Development Guide
 
-## RStudio Connection
-
-To connect RStudio use http://debian13:8787/ with username `rdev` and password `rstudio`. This will give you access to the RStudio IDE where you can develop the R package.
-Use the following command in R to connect to the RStudio server and start working on the package: 
-
-```r
-mcptools::mcp_server(type="http", host="debian13", port=8787, user="rdev", password="rstudio")
-```
-
 CRAN="https://mirror.truenetwork.ru/CRAN/"
 
 IMPORTANT: This project uses Serena MCP for comprehensive knowledge management. Before asking questions or making assumptions:
