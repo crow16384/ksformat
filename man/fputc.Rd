@@ -9,7 +9,9 @@ fputc(x, format_name, ...)
 \arguments{
 \item{x}{Character vector of values to format}
 
-\item{format_name}{Character. Name of a registered character format.}
+\item{format_name}{Character. Name of a registered character format,
+or a character vector of format names (same length as \code{x}) to apply
+a different format per element (like SAS PUTC with a variable format).}
 
 \item{...}{Additional arguments passed to \code{\link{fput}} for expression
 labels (mapped to \code{.x1}, \code{.x2}, etc.).}

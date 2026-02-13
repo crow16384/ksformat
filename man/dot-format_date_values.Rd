@@ -4,7 +4,7 @@
 \alias{.format_date_values}
 \title{Format date values}
 \usage{
-.format_date_values(x, pattern)
+.format_date_values(x, pattern, origin = "1970-01-01")
 }
 \description{
 Format date values

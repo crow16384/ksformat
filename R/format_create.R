@@ -154,6 +154,9 @@ print.ks_format <- function(x, ...) {
       pattern_str <- paste0(pattern_str, " (", x$sas_name, ".)")
     }
     cat("Pattern:", pattern_str, "\n")
+    if (!is.null(x$dt_origin) && x$dt_origin != "1970-01-01") {
+      cat("Origin:", x$dt_origin, "\n")
+    }
   } else {
     cat("Mappings:\n")
 

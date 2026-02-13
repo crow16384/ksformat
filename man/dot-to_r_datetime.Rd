@@ -4,16 +4,19 @@
 \alias{.to_r_datetime}
 \title{Convert input to R POSIXct}
 \usage{
-.to_r_datetime(x)
+.to_r_datetime(x, origin = "1970-01-01")
 }
 \arguments{
 \item{x}{Input vector}
+
+\item{origin}{Character. Origin date for numeric conversion.
+Default \code{"1970-01-01"} (R epoch).}
 }
 \value{
 POSIXct vector
 }
 \description{
-Handles POSIXct, Date, numeric (SAS epoch: seconds since 1960-01-01 00:00:00),
+Handles POSIXct, Date, numeric (using specified epoch origin),
 and character inputs.
 }
 \keyword{internal}

@@ -4,16 +4,19 @@
 \alias{.to_r_date}
 \title{Convert input to R Date}
 \usage{
-.to_r_date(x)
+.to_r_date(x, origin = "1970-01-01")
 }
 \arguments{
 \item{x}{Input vector}
+
+\item{origin}{Character. Origin date for numeric conversion.
+Default \code{"1970-01-01"} (R epoch).}
 }
 \value{
 Date vector
 }
 \description{
-Handles Date, POSIXct, numeric (SAS epoch: days since 1960-01-01),
+Handles Date, POSIXct, numeric (using specified epoch origin),
 and character inputs.
 }
 \keyword{internal}

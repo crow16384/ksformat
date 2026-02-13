@@ -251,12 +251,19 @@ in_range <- function(x, range_spec) {
 #' @noRd
 .format_get <- function(name) {
   if (!exists(name, envir = .format_library)) {
+    # Case-insensitive lookup: try matching available names
+    available <- ls(envir = .format_library)
+    ci_match <- available[tolower(available) == tolower(name)]
+    if (length(ci_match) == 1L) {
+      return(get(ci_match, envir = .format_library))
+    }
+
     # Fallback: check if it's a built-in SAS datetime format
     if (.is_sas_datetime_format(name)) {
       fmt <- fnew_date(pattern = name, name = name)
       return(fmt)
     }
-    available <- ls(envir = .format_library)
+
     if (length(available) == 0) {
       cli_abort(c(
         "Format {.val {name}} not found.",

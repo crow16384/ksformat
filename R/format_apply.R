@@ -191,13 +191,45 @@ fput <- function(x, format, ..., keep_na = FALSE) {
   return(result)
 }
 
+# ---------------------------------------------------------------------------
+# Internal helper: vectorized format names (per-element format application)
+# ---------------------------------------------------------------------------
+
+#' @keywords internal
+.fput_vectorized <- function(x, format_names, type_check = NULL, ...) {
+  n <- length(x)
+  result <- rep(NA_character_, n)
+
+  # Group by unique format name for efficiency
+  unique_fmts <- unique(format_names[!is.na(format_names)])
+
+  for (fmt_name in unique_fmts) {
+    idx <- which(format_names == fmt_name)
+    format_obj <- .format_get(fmt_name)
+    if (!inherits(format_obj, "ks_format")) {
+      cli_warn("{.val {fmt_name}} is not a VALUE format ({.cls ks_format}), skipping.")
+      next
+    }
+    if (!is.null(type_check) &&
+        !format_obj$type %in% c(type_check, "date", "time", "datetime")) {
+      cli_warn("Format {.val {fmt_name}} is type {.val {format_obj$type}}, not {.val {type_check}}.")
+    }
+    result[idx] <- fput(x[idx], format_obj, ...)
+  }
+
+  result
+}
+
+
 #' Apply Numeric Format by Name (like SAS PUTN)
 #'
 #' Looks up a numeric VALUE format by name from the global format library
 #' and applies it to the input vector.
 #'
 #' @param x Numeric vector of values to format
-#' @param format_name Character. Name of a registered numeric format.
+#' @param format_name Character. Name of a registered numeric format,
+#'   or a character vector of format names (same length as \code{x}) to apply
+#'   a different format per element (like SAS PUTN with a variable format).
 #' @param ... Additional arguments passed to \code{\link{fput}} for expression
 #'   labels (mapped to \code{.x1}, \code{.x2}, etc.).
 #'
@@ -217,6 +249,13 @@ fput <- function(x, format, ..., keep_na = FALSE) {
 #' fputn(c(5, 25, 70), "age")
 #' }
 fputn <- function(x, format_name, ...) {
+  # Support vectorized format names (like SAS PUTN with variable format)
+  if (length(format_name) > 1L) {
+    if (length(format_name) != length(x)) {
+      cli_abort("{.arg format_name} must be length 1 or same length as {.arg x} ({length(x)}).")
+    }
+    return(.fput_vectorized(x, format_name, type_check = "numeric", ...))
+  }
   format_obj <- .format_get(format_name)
   if (!inherits(format_obj, "ks_format")) {
     cli_abort("{.val {format_name}} is not a VALUE format ({.cls ks_format}).")
@@ -233,7 +272,9 @@ fputn <- function(x, format_name, ...) {
 #' and applies it to the input vector.
 #'
 #' @param x Character vector of values to format
-#' @param format_name Character. Name of a registered character format.
+#' @param format_name Character. Name of a registered character format,
+#'   or a character vector of format names (same length as \code{x}) to apply
+#'   a different format per element (like SAS PUTC with a variable format).
 #' @param ... Additional arguments passed to \code{\link{fput}} for expression
 #'   labels (mapped to \code{.x1}, \code{.x2}, etc.).
 #'
@@ -247,6 +288,13 @@ fputn <- function(x, format_name, ...) {
 #' fputc(c("M", "F"), "sex")
 #' }
 fputc <- function(x, format_name, ...) {
+  # Support vectorized format names (like SAS PUTC with variable format)
+  if (length(format_name) > 1L) {
+    if (length(format_name) != length(x)) {
+      cli_abort("{.arg format_name} must be length 1 or same length as {.arg x} ({length(x)}).")
+    }
+    return(.fput_vectorized(x, format_name, type_check = "character", ...))
+  }
   format_obj <- .format_get(format_name)
   if (!inherits(format_obj, "ks_format")) {
     cli_abort("{.val {format_name}} is not a VALUE format ({.cls ks_format}).")

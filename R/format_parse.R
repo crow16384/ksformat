@@ -221,6 +221,7 @@ fexport <- function(..., formats = NULL, file = NULL) {
 
       block_type <- toupper(block_match[2])
       block_name <- block_match[3]
+
       block_subtype <- if (length(block_match) >= 4 && block_match[4] != "") {
         trimws(block_match[4])
       } else {

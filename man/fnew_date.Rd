@@ -4,7 +4,13 @@
 \alias{fnew_date}
 \title{Create Date/Time Format}
 \usage{
-fnew_date(pattern, name = NULL, type = "auto", .missing = NULL)
+fnew_date(
+  pattern,
+  name = NULL,
+  type = "auto",
+  origin = "1970-01-01",
+  .missing = NULL
+)
 }
 \arguments{
 \item{pattern}{Character. Either a SAS format name (e.g., \code{"DATE9."},
@@ -17,6 +23,10 @@ the SAS format name (with period) or the pattern itself.}
 \item{type}{Character. Type of format: \code{"date"}, \code{"time"},
 \code{"datetime"}, or \code{"auto"} (auto-detect from SAS name).
 Must be specified for custom strftime patterns.}
+
+\item{origin}{Character. Origin date for converting numeric values to dates.
+Default \code{"1970-01-01"} (R epoch). Use \code{"1960-01-01"} for SAS
+numeric dates (days/seconds since January 1, 1960).}
 
 \item{.missing}{Character. Label for missing values (NA). Default \code{NULL}.}
 }
@@ -37,15 +47,15 @@ registered in the global format library.
   \item \strong{Datetime:} DATETIME20., DATETIME13., etc.
 }
 
-\strong{Numeric input} is treated using the SAS epoch:
+\strong{Numeric input} is converted using the \code{origin} parameter:
 \itemize{
-  \item Dates: days since January 1, 1960
-  \item Times: seconds since midnight
-  \item Datetimes: seconds since January 1, 1960 00:00:00
+  \item Default \code{"1970-01-01"}: R epoch (standard for R numeric dates)
+  \item \code{"1960-01-01"}: SAS epoch (for SAS numeric date values)
+  \item Times: always treated as seconds since midnight (origin not used)
 }
 }
 \examples{
-# Use a SAS format name
+# Use a SAS format name (R epoch by default)
 fnew_date("DATE9.", name = "mydate")
 fput(as.Date("2020-01-01"), "mydate")
 # [1] "01JAN2020"
@@ -59,10 +69,15 @@ fnew_date("\%Y/\%m/\%d", name = "custom_date", type = "date")
 fput(as.Date("2020-01-01"), "custom_date")
 # [1] "2020/01/01"
 
-# SAS numeric date (days since 1960-01-01)
-fputn(21915, "DATE9.")
+# SAS numeric date (days since 1960-01-01) — specify origin explicitly
+fnew_date("DATE9.", name = "sas_date", origin = "1960-01-01")
+fput(21915, "sas_date")
+# [1] "01JAN2020"
 
-# Time formatting (seconds since midnight)
+# R numeric date (days since 1970-01-01) — default origin
+fputn(as.numeric(as.Date("2020-01-01")), "DATE9.")
+
+# Time formatting (seconds since midnight, origin not used)
 fputn(45000, "TIME8.")
 # [1] "12:30:00"
 fclear()

@@ -9,7 +9,9 @@ fputn(x, format_name, ...)
 \arguments{
 \item{x}{Numeric vector of values to format}
 
-\item{format_name}{Character. Name of a registered numeric format.}
+\item{format_name}{Character. Name of a registered numeric format,
+or a character vector of format names (same length as \code{x}) to apply
+a different format per element (like SAS PUTN with a variable format).}
 
 \item{...}{Additional arguments passed to \code{\link{fput}} for expression
 labels (mapped to \code{.x1}, \code{.x2}, etc.).}

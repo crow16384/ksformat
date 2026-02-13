@@ -621,4 +621,88 @@ cat("  ", paste(fput(c("val", "val"), label_fmt, c(42, 55), 100),
                collapse = ", "), "\n")
 
 fclear()
+
+# ============================================================================
+# Example 16: Vectorized format names (SAS PUTC/PUTN with variable format)
+# ============================================================================
+
+cat("\n=== Example 16: Vectorized Format Names (SAS PUTC-style) ===\n")
+
+# Define a "dispatch" format that maps type codes to format names
+fnew("1" = "groupx", "2" = "groupy", "3" = "groupz",
+     name = "typefmt", type = "numeric")
+
+# Define per-group character formats
+fnew("positive" = "agree",  "negative" = "disagree", "neutral" = "notsure",
+     name = "groupx", type = "character")
+fnew("positive" = "accept", "negative" = "reject",   "neutral" = "possible",
+     name = "groupy", type = "character")
+fnew("positive" = "pass",   "negative" = "fail",     "neutral" = "retest",
+     name = "groupz", type = "character")
+
+type     <- c(1, 1, 1, 2, 2, 2, 3, 3, 3)
+response <- c("positive", "negative", "neutral",
+              "positive", "negative", "neutral",
+              "positive", "negative", "neutral")
+
+# Step 1: map type -> format name
+respfmt <- fput(type, "typefmt")
+
+# Step 2: apply per-element format (vector of format names)
+word <- fputc(response, respfmt)
+
+print(data.frame(type = type, response = response, respfmt = respfmt, word = word))
+
+fclear()
+
+# ============================================================================
+# Example 17: Working with Dates and Formats — PUTN with date formats
+# ============================================================================
+#
+# SAS equivalent:
+#   proc format; value writfmt 1='date9.' 2='mmddyy10.'; run;
+#   data dates;
+#     input number key;
+#     datefmt = put(key, writfmt.);
+#     date    = putn(number, datefmt);
+#     datalines;
+#     15756 1
+#     14552 2
+#     ;
+#   proc print data=dates; title 'Working with Dates and Formats'; run;
+#
+# The PROC FORMAT step creates a format, WRITFMT., that formats the variable
+# values 1 and 2 with the name of a SAS date format. The DATA step creates a
+# SAS data set from raw data that consists of a number and a key. After reading
+# a record, the DATA step uses the value of KEY to create a variable, DATEFMT,
+# that contains the value of the appropriate date format. The DATA step also
+# creates a new variable, DATE, whose value is the formatted value of the date.
+# PUTN assigns the value of DATE based on the value of NUMBER and the
+# appropriate format.
+
+cat("\n=== Example 17: Working with Dates and Formats (SAS PUTN) ===\n\n")
+
+# Step 1: Create a numeric format that maps key codes to date format names
+fnew("1" = "date9.", "2" = "mmddyy10.",
+     name = "writfmt", type = "numeric")
+
+# Step 2: Register the SAS date formats with SAS epoch (days since 1960-01-01)
+fnew_date("date9.", origin = "1960-01-01")
+fnew_date("mmddyy10.", origin = "1960-01-01")
+
+# Input data (SAS date numbers = days since 1960-01-01)
+number <- c(15756, 14552)
+key    <- c(1, 2)
+
+# Step 3: Look up format name per observation (like SAS PUT(key, writfmt.))
+datefmt <- fputn(key, "writfmt")
+
+# Step 4: Apply per-element date format (like SAS PUTN(number, datefmt))
+date <- fputn(number, datefmt)
+
+cat("Working with Dates and Formats\n")
+result <- data.frame(number = number, key = key, datefmt = datefmt, date = date)
+print(result)
+
+fclear()
 cat("\n=== Examples completed ===\n")
