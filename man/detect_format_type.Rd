@@ -4,12 +4,12 @@
 \alias{detect_format_type}
 \title{Detect Format Type}
 \usage{
-detect_format_type(names, mappings)
+detect_format_type(keys, mappings)
 }
 \arguments{
-\item{names}{Character vector of mapping names}
+\item{keys}{Character vector of mapping key names}
 
-\item{mappings}{List of mappings}
+\item{mappings}{List of mappings (unused, kept for API compatibility)}
 }
 \value{
 Character: "character" or "numeric"

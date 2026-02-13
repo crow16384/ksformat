@@ -46,12 +46,12 @@
 #' fclear()
 fput <- function(x, format, ..., keep_na = FALSE) {
   # Resolve format by name if string provided
-  if (is.character(format) && length(format) == 1) {
+  if (is.character(format) && length(format) == 1L) {
     format <- .format_get(format)
   }
 
   if (!inherits(format, "ks_format")) {
-    stop("format must be a ks_format object or a registered format name")
+    cli_abort("{.arg format} must be a {.cls ks_format} object or a registered format name.")
   }
 
   # Handle NULL input
@@ -64,116 +64,124 @@ fput <- function(x, format, ..., keep_na = FALSE) {
     return(.apply_datetime_format(x, format, keep_na = keep_na))
   }
 
-  # Capture extra arguments for expression labels
   extra_args <- list(...)
-
-  # Flags
   nocase <- isTRUE(format$ignore_case)
 
-  # Initialize result vector
-  result <- rep(NA_character_, length(x))
-
-  # Track expression-label assignments: list of expr_str -> indices
-  expr_map <- list()
+  n <- length(x)
+  result <- rep(NA_character_, n)
 
   # Identify missing values (NA, NaN)
   is_miss <- is.na(x) | is.nan(x)
 
-  # Apply missing label if defined
+  # Apply missing label
   if (!is.null(format$missing_label) && !keep_na) {
     result[is_miss] <- format$missing_label
-  } else if (keep_na) {
-    result[is_miss] <- NA_character_
   }
 
-  # Pre-parse range keys for numeric formats
-  range_entries <- list()
+  non_miss <- which(!is_miss)
+  if (length(non_miss) == 0L) return(result)
+
+  # Vectorized mapping lookup
+  map_keys <- names(format$mappings)
+  map_labels <- unlist(format$mappings, use.names = FALSE)
+
+  # Phase 1: Vectorized exact match using match()
+  val_str <- as.character(x[non_miss])
+  pos <- if (nocase) {
+    match(tolower(val_str), tolower(map_keys))
+  } else {
+    match(val_str, map_keys)
+  }
+
+  found <- !is.na(pos)
+  matched <- logical(n)
+  expr_map <- list()
+
+  if (any(found)) {
+    found_labels <- map_labels[pos[found]]
+    found_nm <- non_miss[found]
+    is_expr <- grepl("\\.x\\d+", found_labels)
+
+    # Assign static labels in bulk
+    static <- !is_expr
+    if (any(static)) {
+      result[found_nm[static]] <- found_labels[static]
+      matched[found_nm[static]] <- TRUE
+    }
+
+    # Defer expression labels
+    if (any(is_expr)) {
+      for (j in which(is_expr)) {
+        lbl <- found_labels[j]
+        expr_map[[lbl]] <- c(expr_map[[lbl]], found_nm[j])
+      }
+      matched[found_nm[is_expr]] <- TRUE
+    }
+  }
+
+  # Phase 2: Vectorized range match for numeric formats
   if (format$type == "numeric") {
-    for (i in seq_along(format$mappings)) {
-      key <- names(format$mappings)[i]
-      parsed <- .parse_range_key(key)
+    # Pre-parse range entries
+    range_entries <- list()
+    for (i in seq_along(map_keys)) {
+      parsed <- .parse_range_key(map_keys[i])
       if (!is.null(parsed)) {
-        range_entries <- c(range_entries, list(list(
-          idx = i,
-          low = parsed$low,
-          high = parsed$high,
-          inc_low = parsed$inc_low,
-          inc_high = parsed$inc_high,
-          label = format$mappings[[i]]
-        )))
-      }
-    }
-  }
-
-  # Process non-missing values
-  non_missing_idx <- which(!is_miss)
-
-  for (idx in non_missing_idx) {
-    value <- x[idx]
-    matched <- FALSE
-
-    # Try exact match first
-    for (i in seq_along(format$mappings)) {
-      key <- names(format$mappings)[i]
-      val_str <- as.character(value)
-
-      match_ok <- if (nocase) {
-        tolower(val_str) == tolower(key)
-      } else {
-        val_str == key
-      }
-
-      if (match_ok) {
-        label <- format$mappings[[i]]
-        if (.is_expr_label(label)) {
-          # Defer expression evaluation: record index
-          if (is.null(expr_map[[label]])) expr_map[[label]] <- integer(0)
-          expr_map[[label]] <- c(expr_map[[label]], idx)
-        } else {
-          result[idx] <- label
-        }
-        matched <- TRUE
-        break
+        range_entries[[length(range_entries) + 1L]] <- list(
+          low = parsed$low, high = parsed$high,
+          inc_low = parsed$inc_low, inc_high = parsed$inc_high,
+          label = map_labels[i]
+        )
       }
     }
 
-    # Try range match for numeric values
-    if (!matched && format$type == "numeric" && is.numeric(value)) {
-      for (re in range_entries) {
-        low_ok <- if (re$inc_low) value >= re$low else value > re$low
-        high_ok <- if (re$inc_high) value <= re$high else value < re$high
-        if (low_ok && high_ok) {
-          label <- re$label
-          if (.is_expr_label(label)) {
-            if (is.null(expr_map[[label]])) expr_map[[label]] <- integer(0)
-            expr_map[[label]] <- c(expr_map[[label]], idx)
-          } else {
-            result[idx] <- label
+    if (length(range_entries) > 0L) {
+      unmatched_nm <- non_miss[!matched[non_miss]]
+      if (length(unmatched_nm) > 0L) {
+        vals <- suppressWarnings(as.numeric(x[unmatched_nm]))
+        valid_num <- !is.na(vals)
+
+        for (re in range_entries) {
+          still_free <- !matched[unmatched_nm] & valid_num
+          if (!any(still_free)) break
+
+          idx <- which(still_free)
+          v <- vals[idx]
+          low_ok <- if (re$inc_low) v >= re$low else v > re$low
+          high_ok <- if (re$inc_high) v <= re$high else v < re$high
+          in_rng <- low_ok & high_ok
+
+          if (any(in_rng)) {
+            target <- unmatched_nm[idx[in_rng]]
+            if (grepl("\\.x\\d+", re$label)) {
+              expr_map[[re$label]] <- c(expr_map[[re$label]], target)
+            } else {
+              result[target] <- re$label
+            }
+            matched[target] <- TRUE
           }
-          matched <- TRUE
-          break
         }
-      }
-    }
-
-    # Apply other label if no match
-    if (!matched) {
-      if (!is.null(format$other_label)) {
-        if (.is_expr_label(format$other_label)) {
-          label <- format$other_label
-          if (is.null(expr_map[[label]])) expr_map[[label]] <- integer(0)
-          expr_map[[label]] <- c(expr_map[[label]], idx)
-        } else {
-          result[idx] <- format$other_label
-        }
-      } else {
-        result[idx] <- as.character(value)
       }
     }
   }
 
-  # Evaluate deferred expression labels
-  if (length(expr_map) > 0) {
+  # Phase 3: Unmatched -> .other or original value
+  unmatched_final <- non_miss[!matched[non_miss]]
+  if (length(unmatched_final) > 0L) {
+    if (!is.null(format$other_label)) {
+      if (grepl("\\.x\\d+", format$other_label)) {
+        expr_map[[format$other_label]] <- c(
+          expr_map[[format$other_label]], unmatched_final
+        )
+      } else {
+        result[unmatched_final] <- format$other_label
+      }
+    } else {
+      result[unmatched_final] <- as.character(x[unmatched_final])
+    }
+  }
+
+  # Phase 4: Evaluate deferred expression labels
+  if (length(expr_map) > 0L) {
     for (expr_str in names(expr_map)) {
       indices <- expr_map[[expr_str]]
       result[indices] <- .eval_expr_label(expr_str, extra_args, indices)
@@ -211,11 +219,10 @@ fput <- function(x, format, ..., keep_na = FALSE) {
 fputn <- function(x, format_name, ...) {
   format_obj <- .format_get(format_name)
   if (!inherits(format_obj, "ks_format")) {
-    stop("'", format_name, "' is not a VALUE format (ks_format)")
+    cli_abort("{.val {format_name}} is not a VALUE format ({.cls ks_format}).")
   }
   if (!format_obj$type %in% c("numeric", "date", "time", "datetime")) {
-    warning("Format '", format_name, "' is type '", format_obj$type,
-            "', not 'numeric'")
+    cli_warn("Format {.val {format_name}} is type {.val {format_obj$type}}, not {.val numeric}.")
   }
   fput(x, format_obj, ...)
 }
@@ -242,11 +249,10 @@ fputn <- function(x, format_name, ...) {
 fputc <- function(x, format_name, ...) {
   format_obj <- .format_get(format_name)
   if (!inherits(format_obj, "ks_format")) {
-    stop("'", format_name, "' is not a VALUE format (ks_format)")
+    cli_abort("{.val {format_name}} is not a VALUE format ({.cls ks_format}).")
   }
   if (!format_obj$type %in% c("character", "date", "time", "datetime")) {
-    warning("Format '", format_name, "' is type '", format_obj$type,
-            "', not 'character'")
+    cli_warn("Format {.val {format_name}} is type {.val {format_obj$type}}, not {.val character}.")
   }
   fput(x, format_obj, ...)
 }
@@ -287,12 +293,12 @@ fputc <- function(x, format_name, ...) {
 #' fclear()
 fput_all <- function(x, format, ..., keep_na = FALSE) {
   # Resolve format by name if string provided
-  if (is.character(format) && length(format) == 1) {
+  if (is.character(format) && length(format) == 1L) {
     format <- .format_get(format)
   }
 
   if (!inherits(format, "ks_format")) {
-    stop("format must be a ks_format object or a registered format name")
+    cli_abort("{.arg format} must be a {.cls ks_format} object or a registered format name.")
   }
 
   # Handle NULL input
@@ -306,117 +312,126 @@ fput_all <- function(x, format, ..., keep_na = FALSE) {
     return(as.list(result))
   }
 
-  # Capture extra arguments for expression labels
   extra_args <- list(...)
-
-  # Flags
   nocase <- isTRUE(format$ignore_case)
 
   n <- length(x)
   result <- vector("list", n)
-
-  # Identify missing values
   is_miss <- is.na(x) | is.nan(x)
 
-  # Pre-parse range keys for numeric formats
+  # Handle missing values
+  miss_idx <- which(is_miss)
+  for (idx in miss_idx) {
+    result[[idx]] <- if (!keep_na && !is.null(format$missing_label)) {
+      format$missing_label
+    } else {
+      NA_character_
+    }
+  }
+
+  non_miss <- which(!is_miss)
+  if (length(non_miss) == 0L) return(result)
+
+  # Init non-missing result slots
+  for (idx in non_miss) result[[idx]] <- character(0)
+
+  map_keys <- names(format$mappings)
+  map_labels <- unlist(format$mappings, use.names = FALSE)
+  val_str <- as.character(x[non_miss])
+  lookup_vals <- if (nocase) tolower(val_str) else val_str
+
+  # Pre-parse range entries
   range_entries <- list()
+  discrete_indices <- integer(0)
   if (format$type == "numeric") {
-    for (i in seq_along(format$mappings)) {
-      key <- names(format$mappings)[i]
-      parsed <- .parse_range_key(key)
+    for (i in seq_along(map_keys)) {
+      parsed <- .parse_range_key(map_keys[i])
       if (!is.null(parsed)) {
-        range_entries <- c(range_entries, list(list(
-          idx = i,
-          low = parsed$low,
-          high = parsed$high,
-          inc_low = parsed$inc_low,
-          inc_high = parsed$inc_high,
-          label = format$mappings[[i]]
-        )))
+        range_entries[[length(range_entries) + 1L]] <- list(
+          low = parsed$low, high = parsed$high,
+          inc_low = parsed$inc_low, inc_high = parsed$inc_high,
+          label = map_labels[i]
+        )
+      } else {
+        discrete_indices <- c(discrete_indices, i)
+      }
+    }
+  } else {
+    discrete_indices <- seq_along(map_keys)
+  }
+
+  expr_map <- list()
+  has_any_match <- logical(length(non_miss))
+
+  # Vectorized discrete matching: check each key against all values at once
+  for (i in discrete_indices) {
+    lookup_key <- if (nocase) tolower(map_keys[i]) else map_keys[i]
+    matched_pos <- which(lookup_vals == lookup_key)
+
+    if (length(matched_pos) > 0L) {
+      label <- map_labels[i]
+      has_any_match[matched_pos] <- TRUE
+      if (grepl("\\.x\\d+", label)) {
+        expr_map[[label]] <- c(expr_map[[label]], non_miss[matched_pos])
+      } else {
+        for (p in matched_pos) {
+          result[[non_miss[p]]] <- c(result[[non_miss[p]]], label)
+        }
       }
     }
   }
 
-  # Track expression labels: list of expr_str -> list(indices, positions_in_result)
-  expr_map <- list()
+  # Vectorized range matching
+  if (length(range_entries) > 0L) {
+    vals <- suppressWarnings(as.numeric(x[non_miss]))
+    valid_num <- !is.na(vals)
 
-  for (idx in seq_len(n)) {
-    # Handle missing
-    if (is_miss[idx]) {
-      if (!keep_na && !is.null(format$missing_label)) {
-        result[[idx]] <- format$missing_label
-      } else {
-        result[[idx]] <- NA_character_
-      }
-      next
-    }
+    for (re in range_entries) {
+      low_ok <- if (re$inc_low) vals >= re$low else vals > re$low
+      high_ok <- if (re$inc_high) vals <= re$high else vals < re$high
+      in_rng <- low_ok & high_ok & valid_num
 
-    value <- x[idx]
-    labels <- character(0)
-    expr_labels <- character(0)
-
-    # Collect ALL exact matches
-    for (i in seq_along(format$mappings)) {
-      key <- names(format$mappings)[i]
-
-      val_str <- as.character(value)
-      match_ok <- if (nocase) tolower(val_str) == tolower(key) else val_str == key
-
-      if (match_ok) {
-        label <- format$mappings[[i]]
-        if (.is_expr_label(label)) {
-          expr_labels <- c(expr_labels, label)
+      if (any(in_rng)) {
+        has_any_match[in_rng] <- TRUE
+        if (grepl("\\.x\\d+", re$label)) {
+          expr_map[[re$label]] <- c(expr_map[[re$label]], non_miss[which(in_rng)])
         } else {
-          labels <- c(labels, label)
-        }
-      }
-    }
-
-    # Collect ALL range matches for numeric values
-    if (format$type == "numeric" && is.numeric(value)) {
-      for (re in range_entries) {
-        low_ok <- if (re$inc_low) value >= re$low else value > re$low
-        high_ok <- if (re$inc_high) value <= re$high else value < re$high
-        if (low_ok && high_ok) {
-          if (.is_expr_label(re$label)) {
-            expr_labels <- c(expr_labels, re$label)
-          } else {
-            labels <- c(labels, re$label)
+          for (p in which(in_rng)) {
+            result[[non_miss[p]]] <- c(result[[non_miss[p]]], re$label)
           }
         }
       }
     }
-
-    # No match: use other_label or original value
-    if (length(labels) == 0 && length(expr_labels) == 0) {
-      if (!is.null(format$other_label)) {
-        if (.is_expr_label(format$other_label)) {
-          expr_labels <- c(expr_labels, format$other_label)
-        } else {
-          labels <- format$other_label
-        }
-      } else {
-        labels <- as.character(value)
-      }
-    }
-
-    # Record expression labels for deferred evaluation
-    for (el in expr_labels) {
-      if (is.null(expr_map[[el]])) expr_map[[el]] <- integer(0)
-      expr_map[[el]] <- c(expr_map[[el]], idx)
-    }
-
-    result[[idx]] <- labels
   }
 
   # Evaluate deferred expression labels and append to results
-  if (length(expr_map) > 0) {
+  if (length(expr_map) > 0L) {
     for (expr_str in names(expr_map)) {
       indices <- expr_map[[expr_str]]
       evaled <- .eval_expr_label(expr_str, extra_args, indices)
       for (k in seq_along(indices)) {
         result[[indices[k]]] <- c(result[[indices[k]]], evaled[k])
       }
+    }
+  }
+
+  # Unmatched: .other or original value
+  no_match <- non_miss[!has_any_match]
+  # Also check expr_map hasn't already matched these
+  if (length(expr_map) > 0L) {
+    expr_matched <- unique(unlist(expr_map, use.names = FALSE))
+    no_match <- setdiff(no_match, expr_matched)
+  }
+  for (idx in no_match) {
+    if (!is.null(format$other_label)) {
+      if (grepl("\\.x\\d+", format$other_label)) {
+        evaled <- .eval_expr_label(format$other_label, extra_args, idx)
+        result[[idx]] <- c(result[[idx]], evaled)
+      } else {
+        result[[idx]] <- format$other_label
+      }
+    } else {
+      result[[idx]] <- as.character(x[idx])
     }
   }
 
@@ -453,14 +468,14 @@ format_apply_df <- function(data, ..., suffix = "_fmt", replace = FALSE) {
   formats <- list(...)
 
   if (!is.data.frame(data)) {
-    stop("data must be a data frame")
+    cli_abort("{.arg data} must be a data frame.")
   }
 
   result <- data
 
   for (col_name in names(formats)) {
     if (!col_name %in% names(data)) {
-      warning("Column '", col_name, "' not found in data frame")
+      cli_warn("Column {.val {col_name}} not found in data frame.")
       next
     }
 

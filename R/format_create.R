@@ -41,13 +41,6 @@
 #' # Returns: "42" "15.0\%"
 #' }
 #'
-#' @details
-#' Special directives:
-#' \itemize{
-#'   \item \code{.missing}: Label for NA, NULL, NaN values
-#'   \item \code{.other}: Label for values not matching any rule
-#' }
-#'
 #' @export
 #'
 #' @examples
@@ -67,7 +60,7 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
   mappings <- list(...)
 
   if (length(mappings) == 0) {
-    stop("At least one value-label mapping must be provided")
+    cli_abort("At least one value-label mapping must be provided.")
   }
 
   # Extract special directives
@@ -114,51 +107,31 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
 
 #' Detect Format Type
 #'
-#' @param names Character vector of mapping names
-#' @param mappings List of mappings
+#' @param keys Character vector of mapping key names
+#' @param mappings List of mappings (unused, kept for API compatibility)
 #' @return Character: "character" or "numeric"
 #' @keywords internal
-detect_format_type <- function(names, mappings) {
-  # Check names for numeric values
-  if (any(!is.na(suppressWarnings(as.numeric(names))))) {
+detect_format_type <- function(keys, mappings) {
+  if (length(keys) == 0L) return("character")
+
+  # Check if any key parses as numeric
+  if (any(!is.na(suppressWarnings(as.numeric(keys))))) {
     return("numeric")
   }
 
-  # Check if any mapping key is numeric
-  for (key in names(mappings)) {
-    if (!is.na(suppressWarnings(as.numeric(key)))) {
-      return("numeric")
-    }
+  # Check for range-format keys (comma-separated bounds)
+  if (any(grepl(",", keys, fixed = TRUE))) {
+    return("numeric")
   }
 
-  # Check for vector keys (ranges)
-  for (i in seq_along(mappings)) {
-    key_expr <- names(mappings)[i]
-    if (is.null(key_expr) || key_expr == "") {
-      return("numeric")
-    }
+  # Check for unnamed/empty keys (positional args)
+  if (any(keys == "" | is.na(keys))) {
+    return("numeric")
   }
 
   return("character")
 }
 
-#' Validate Format Mappings
-#'
-#' @param mappings List of mappings
-#' @param type Format type
-#' @keywords internal
-validate_mappings <- function(mappings, type) {
-  if (length(mappings) == 0) {
-    return(invisible(TRUE))
-  }
-
-  labels <- unlist(mappings)
-  if (!all(sapply(labels, is.character))) {
-    stop("All labels must be character strings")
-  }
-
-  invisible(TRUE)
-}
 
 #' Print Format Object
 #'

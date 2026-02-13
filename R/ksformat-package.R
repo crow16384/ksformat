@@ -39,4 +39,5 @@
 #' @name ksformat-package
 #' @aliases ksformat
 #' @keywords package
+#' @importFrom cli cli_abort cli_warn cli_inform
 "_PACKAGE"

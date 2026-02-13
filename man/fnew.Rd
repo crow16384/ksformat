@@ -61,12 +61,6 @@ stat_fmt <- fnew("n" = "sprintf('\%s', .x1)",
 fput(c("n", "pct"), stat_fmt, c(42, 0.15))
 # Returns: "42" "15.0\%"
 }
-
-Special directives:
-\itemize{
-  \item \code{.missing}: Label for NA, NULL, NaN values
-  \item \code{.other}: Label for values not matching any rule
-}
 }
 \examples{
 # Discrete value format (auto-stored as "sex")

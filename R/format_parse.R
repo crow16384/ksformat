@@ -72,16 +72,16 @@
 fparse <- function(text = NULL, file = NULL) {
   # Validate inputs
   if (is.null(text) && is.null(file)) {
-    stop("Either 'text' or 'file' must be provided")
+    cli_abort("Either {.arg text} or {.arg file} must be provided.")
   }
   if (!is.null(text) && !is.null(file)) {
-    stop("Only one of 'text' or 'file' should be provided, not both")
+    cli_abort("Only one of {.arg text} or {.arg file} should be provided, not both.")
   }
 
   # Read input
   if (!is.null(file)) {
     if (!file.exists(file)) {
-      stop("File not found: ", file)
+      cli_abort("File not found: {.file {file}}")
     }
     lines <- readLines(file, warn = FALSE)
   } else {
@@ -138,14 +138,17 @@ format_export <- function(..., formats = NULL, file = NULL) {
   }
 
   if (length(formats) == 0) {
-    stop("At least one format object must be provided")
+    cli_abort("At least one format object must be provided.")
   }
 
   # Ensure all items are named
   fmt_names <- names(formats)
-  if (is.null(fmt_names) || any(fmt_names == "")) {
+  if (is.null(fmt_names)) {
+    fmt_names <- rep("", length(formats))
+  }
+  if (any(fmt_names == "")) {
     for (i in seq_along(formats)) {
-      if (is.null(fmt_names) || fmt_names[i] == "") {
+      if (fmt_names[i] == "") {
         obj_name <- formats[[i]]$name
         if (!is.null(obj_name)) {
           fmt_names[i] <- obj_name
@@ -166,7 +169,7 @@ format_export <- function(..., formats = NULL, file = NULL) {
     } else if (inherits(obj, "ks_invalue")) {
       text_blocks <- c(text_blocks, .invalue_to_text(obj, nm))
     } else {
-      warning("Skipping '", nm, "': not a ks_format or ks_invalue object")
+      cli_warn("Skipping {.val {nm}}: not a {.cls ks_format} or {.cls ks_invalue} object.")
     }
   }
 
@@ -174,7 +177,7 @@ format_export <- function(..., formats = NULL, file = NULL) {
 
   if (!is.null(file)) {
     writeLines(output, file)
-    message("Formats written to: ", file)
+    cli_inform("Formats written to: {.file {file}}")
     return(invisible(file))
   }
 
@@ -209,8 +212,10 @@ format_export <- function(..., formats = NULL, file = NULL) {
 
     if (length(block_match) >= 3) {
       if (in_block) {
-        warning("Line ", i, ": New block started before previous block ended with ';'. ",
-                "Closing previous block '", current_block$name, "'.")
+        cli_warn(c(
+          "Line {i}: New block started before previous block ended with {.val ;}.",
+          "i" = "Closing previous block {.val {current_block$name}}."
+        ))
         blocks <- c(blocks, list(current_block))
       }
 
@@ -285,7 +290,7 @@ format_export <- function(..., formats = NULL, file = NULL) {
 
   # Handle unclosed block
   if (in_block && !is.null(current_block)) {
-    warning("Block '", current_block$name, "' was not closed with ';'. Closing automatically.")
+    cli_warn("Block {.val {current_block$name}} was not closed with {.val ;}. Closing automatically.")
     blocks <- c(blocks, list(current_block))
   }
 
@@ -306,7 +311,7 @@ format_export <- function(..., formats = NULL, file = NULL) {
   # Split on '='
   eq_pos <- regexpr("=", line)
   if (eq_pos < 0) {
-    warning("Line ", line_num, ": Could not parse mapping (no '=' found): ", line)
+    cli_warn("Line {line_num}: Could not parse mapping (no {.val =} found): {.val {line}}")
     return(NULL)
   }
 
@@ -405,7 +410,7 @@ format_export <- function(..., formats = NULL, file = NULL) {
   } else if (block$type == "INVALUE") {
     return(.block_to_ks_invalue(block))
   } else {
-    stop("Unknown block type: ", block$type)
+    cli_abort("Unknown block type: {.val {block$type}}.")
   }
 }
 
@@ -485,8 +490,10 @@ format_export <- function(..., formats = NULL, file = NULL) {
   }
 
   if (is.null(pattern)) {
-    stop("Date/time format '", block$name,
-         "' must have a 'pattern' entry (e.g., pattern = \"DATE9.\")")
+    cli_abort(c(
+      "Date/time format {.val {block$name}} must have a {.val pattern} entry.",
+      "i" = 'e.g., pattern = "DATE9."'
+    ))
   }
 
   fmt <- fnew_date(

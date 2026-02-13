@@ -226,13 +226,15 @@ fnew_date <- function(pattern, name = NULL, type = "auto", .missing = NULL) {
     dt_toupper <- FALSE
     sas_name <- NULL
     if (type == "auto") {
-      stop("'type' must be specified for custom strftime patterns: ",
-           "'date', 'time', or 'datetime'")
+      cli_abort(c(
+        "{.arg type} must be specified for custom strftime patterns.",
+        "i" = "Use {.val date}, {.val time}, or {.val datetime}."
+      ))
     }
   }
 
   if (!type %in% c("date", "time", "datetime")) {
-    stop("'type' must be 'date', 'time', or 'datetime', got '", type, "'")
+    cli_abort("{.arg type} must be {.val date}, {.val time}, or {.val datetime}, got {.val {type}}.")
   }
 
   if (is.null(name)) {
@@ -293,7 +295,7 @@ fnew_date <- function(pattern, name = NULL, type = "auto", .missing = NULL) {
   } else if (format$type == "datetime") {
     result <- .format_datetime_values(x, pattern)
   } else {
-    stop("Unknown datetime type: ", format$type)
+    cli_abort("Unknown datetime type: {.val {format$type}}.")
   }
 
   # Apply toupper to non-NA results
@@ -342,24 +344,44 @@ fnew_date <- function(pattern, name = NULL, type = "auto", .missing = NULL) {
   }
 
   if (is.numeric(x)) {
-    result <- character(length(x))
-    for (i in seq_along(x)) {
-      if (is.na(x[i])) {
-        result[i] <- NA_character_
-      } else {
-        total_secs <- x[i]
-        h <- as.integer(total_secs %/% 3600)
-        m <- as.integer((total_secs %% 3600) %/% 60)
-        s <- total_secs %% 60
+    n <- length(x)
+    result <- rep(NA_character_, n)
+    not_na <- !is.na(x)
+    if (!any(not_na)) return(result)
 
-        r <- pattern
-        r <- gsub("%H", sprintf("%02d", h), r)
-        r <- gsub("%M", sprintf("%02d", m), r)
-        r <- gsub("%S", sprintf("%02d", floor(s)), r)
-        r <- gsub("%OS", sprintf("%.2f", s), r)
-        result[i] <- r
-      }
+    total_secs <- x[not_na]
+    h <- as.integer(total_secs %/% 3600)
+    m <- as.integer((total_secs %% 3600) %/% 60)
+    s <- total_secs %% 60
+
+    # Vectorized string assembly: build template then substitute
+    h_str <- sprintf("%02d", h)
+    m_str <- sprintf("%02d", m)
+    s_int_str <- sprintf("%02d", as.integer(s))
+    s_frac_str <- sprintf("%.2f", s)
+
+    # Substitute format codes into pattern (vectorized via mapply)
+    fmt <- rep(pattern, length(total_secs))
+    # %OS must be replaced before %S to avoid partial match
+    if (grepl("%OS", pattern, fixed = TRUE)) {
+      fmt <- mapply(function(f, v) sub("%OS", v, f, fixed = TRUE),
+                    fmt, s_frac_str, USE.NAMES = FALSE)
     }
+    if (grepl("%H", pattern, fixed = TRUE)) {
+      fmt <- mapply(function(f, v) sub("%H", v, f, fixed = TRUE),
+                    fmt, h_str, USE.NAMES = FALSE)
+    }
+    if (grepl("%M", pattern, fixed = TRUE)) {
+      fmt <- mapply(function(f, v) sub("%M", v, f, fixed = TRUE),
+                    fmt, m_str, USE.NAMES = FALSE)
+    }
+    if (grepl("%S", pattern, fixed = TRUE) &&
+        !grepl("%OS", pattern, fixed = TRUE)) {
+      fmt <- mapply(function(f, v) sub("%S", v, f, fixed = TRUE),
+                    fmt, s_int_str, USE.NAMES = FALSE)
+    }
+
+    result[not_na] <- fmt
     return(result)
   }
 
@@ -409,7 +431,7 @@ fnew_date <- function(pattern, name = NULL, type = "auto", .missing = NULL) {
     ))
     return(parsed)
   }
-  stop("Cannot convert to Date: unsupported type '", class(x)[1], "'")
+  cli_abort("Cannot convert to Date: unsupported type {.cls {class(x)[1]}}.")
 }
 
 
@@ -432,5 +454,5 @@ fnew_date <- function(pattern, name = NULL, type = "auto", .missing = NULL) {
     parsed <- as.POSIXct(x, tz = "UTC")
     return(parsed)
   }
-  stop("Cannot convert to datetime: unsupported type '", class(x)[1], "'")
+  cli_abort("Cannot convert to datetime: unsupported type {.cls {class(x)[1]}}.")
 }

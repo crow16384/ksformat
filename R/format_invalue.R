@@ -35,7 +35,7 @@ finput <- function(..., name = NULL, target_type = "numeric", missing_value = NA
   mappings <- list(...)
 
   if (length(mappings) == 0) {
-    stop("At least one label-value mapping must be provided")
+    cli_abort("At least one label-value mapping must be provided.")
   }
 
   # Create invalue object
@@ -59,27 +59,6 @@ finput <- function(..., name = NULL, target_type = "numeric", missing_value = NA
   return(invalue_obj)
 }
 
-#' Detect Invalue Target Type
-#'
-#' @param mappings List of label-value mappings
-#' @return Character: target type
-#' @keywords internal
-detect_invalue_type <- function(mappings) {
-  values <- unlist(mappings)
-
-  if (all(sapply(values, is.logical))) {
-    return("logical")
-  }
-
-  if (all(sapply(values, is.numeric))) {
-    if (all(sapply(values, function(x) x == as.integer(x)))) {
-      return("integer")
-    }
-    return("numeric")
-  }
-
-  return("numeric")
-}
 
 #' Apply Invalue Format (Reverse Formatting)
 #'
@@ -101,63 +80,65 @@ detect_invalue_type <- function(mappings) {
 #' fclear()
 invalue_apply <- function(x, invalue, na_if = NULL) {
   # Resolve invalue by name if string provided
-  if (is.character(invalue) && length(invalue) == 1) {
+  if (is.character(invalue) && length(invalue) == 1L) {
     invalue <- .format_get(invalue)
   }
 
   if (!inherits(invalue, "ks_invalue")) {
-    stop("invalue must be a ks_invalue object or a registered invalue name")
+    cli_abort("{.arg invalue} must be a {.cls ks_invalue} object or a registered invalue name.")
   }
 
   # Handle NULL input
   if (is.null(x)) {
-    return(vector(invalue$target_type, 0))
+    return(vector(invalue$target_type, 0L))
   }
 
-  # Initialize result vector with appropriate type
-  result <- vector(invalue$target_type, length(x))
+  n <- length(x)
+  result <- vector(invalue$target_type, n)
   result[] <- invalue$missing_value
 
   # Identify missing values
   is_miss <- is.na(x)
-
-  # Add na_if values to missing
   if (!is.null(na_if)) {
     is_miss <- is_miss | x %in% na_if
   }
 
-  # Process non-missing values
-  non_missing_idx <- which(!is_miss)
+  non_miss <- which(!is_miss)
+  if (length(non_miss) == 0L) return(result)
 
-  for (idx in non_missing_idx) {
-    label <- as.character(x[idx])
+  # Vectorized lookup using match()
+  labels <- as.character(x[non_miss])
+  map_keys <- names(invalue$mappings)
+  pos <- match(labels, map_keys)
+  found <- !is.na(pos)
 
-    # Look up label in mappings
-    if (label %in% names(invalue$mappings)) {
-      value <- invalue$mappings[[label]]
+  if (any(found)) {
+    values <- unlist(invalue$mappings[pos[found]], use.names = FALSE)
+    not_na_vals <- !is.na(values)
 
-      # Handle NA in mapping
-      if (is.na(value)) {
-        result[idx] <- invalue$missing_value
-      } else {
-        # Convert to target type
-        result[idx] <- switch(
-          invalue$target_type,
-          "numeric" = as.numeric(value),
-          "integer" = as.integer(value),
-          "character" = as.character(value),
-          "logical" = as.logical(value),
-          value
-        )
-      }
-    } else {
-      # No mapping found - try to convert directly for numeric types
-      if (invalue$target_type == "numeric" || invalue$target_type == "integer") {
-        converted <- suppressWarnings(as.numeric(label))
-        if (!is.na(converted)) {
-          result[idx] <- converted
-        }
-      }
+    converter <- switch(
+      invalue$target_type,
+      "numeric" = as.numeric,
+      "integer" = as.integer,
+      "character" = as.character,
+      "logical" = as.logical,
+      identity
+    )
+
+    target_idx <- non_miss[found]
+    if (any(not_na_vals)) {
+      result[target_idx[not_na_vals]] <- converter(values[not_na_vals])
+    }
+  }
+
+  # Unfound: try direct numeric conversion for numeric/integer types
+  not_found <- non_miss[!found]
+  if (length(not_found) > 0L &&
+      invalue$target_type %in% c("numeric", "integer")) {
+    converted <- suppressWarnings(as.numeric(labels[!found]))
+    valid <- !is.na(converted)
+    if (any(valid)) {
+      result[not_found[valid]] <- converted[valid]
     }
   }
 
@@ -184,7 +165,7 @@ invalue_apply <- function(x, invalue, na_if = NULL) {
 finputn <- function(x, invalue_name) {
   inv_obj <- .format_get(invalue_name)
   if (!inherits(inv_obj, "ks_invalue")) {
-    stop("'", invalue_name, "' is not an INVALUE format (ks_invalue)")
+    cli_abort("{.val {invalue_name}} is not an INVALUE format ({.cls ks_invalue}).")
   }
   result <- invalue_apply(x, inv_obj)
   as.numeric(result)
@@ -211,7 +192,7 @@ finputn <- function(x, invalue_name) {
 finputc <- function(x, invalue_name) {
   inv_obj <- .format_get(invalue_name)
   if (!inherits(inv_obj, "ks_invalue")) {
-    stop("'", invalue_name, "' is not an INVALUE format (ks_invalue)")
+    cli_abort("{.val {invalue_name}} is not an INVALUE format ({.cls ks_invalue}).")
   }
   result <- invalue_apply(x, inv_obj)
   as.character(result)

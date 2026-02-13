@@ -53,8 +53,10 @@ NULL
   result <- tryCatch(
     as.character(eval(parsed, envir = env)),
     error = function(e) {
-      warning("Expression evaluation failed: ", conditionMessage(e),
-              "\n  Expression: ", expr_str)
+      cli_warn(c(
+        "Expression evaluation failed: {conditionMessage(e)}",
+        "i" = "Expression: {expr_str}"
+      ))
       rep(NA_character_, length(indices))
     }
   )
@@ -64,8 +66,7 @@ NULL
     if (length(result) == 1) {
       result <- rep(result, length(indices))
     } else {
-      warning("Expression returned ", length(result), " values, expected ",
-              length(indices), ". Recycling/truncating.")
+      cli_warn("Expression returned {length(result)} values, expected {length(indices)}. Recycling/truncating.")
       result <- rep_len(result, length(indices))
     }
   }
@@ -97,7 +98,7 @@ is_missing <- function(x, include_empty = FALSE) {
   if (is.null(x)) return(logical(0))
   result <- is.na(x)
   if (include_empty) {
-    result <- result | (!result & as.character(x) == "")
+    result <- result | (as.character(x) == "")
   }
   result
 }
@@ -129,11 +130,11 @@ is_missing <- function(x, include_empty = FALSE) {
 #' range_spec(65, Inf, "Senior", inc_high = TRUE)  # [65, Inf]
 range_spec <- function(low, high, label, inc_low = TRUE, inc_high = FALSE) {
   if (!is.numeric(low) || !is.numeric(high)) {
-    stop("Range bounds must be numeric")
+    cli_abort("Range bounds must be numeric.")
   }
 
   if (low > high) {
-    stop("Lower bound must be less than or equal to upper bound")
+    cli_abort("Lower bound must be less than or equal to upper bound.")
   }
 
   structure(
@@ -223,7 +224,7 @@ in_range <- function(x, range_spec) {
 #' @noRd
 .format_register <- function(format, name = NULL, overwrite = TRUE) {
   if (!inherits(format, c("ks_format", "ks_invalue"))) {
-    stop("format must be a ks_format or ks_invalue object")
+    cli_abort("{.arg format} must be a {.cls ks_format} or {.cls ks_invalue} object.")
   }
 
   if (is.null(name)) {
@@ -235,7 +236,7 @@ in_range <- function(x, range_spec) {
   }
 
   if (exists(name, envir = .format_library) && !overwrite) {
-    stop("Format '", name, "' already exists. Use overwrite = TRUE to replace.")
+    cli_abort("Format {.val {name}} already exists. Use {.code overwrite = TRUE} to replace.")
   }
 
   assign(name, format, envir = .format_library)
@@ -257,10 +258,15 @@ in_range <- function(x, range_spec) {
     }
     available <- ls(envir = .format_library)
     if (length(available) == 0) {
-      stop("Format '", name, "' not found. Format library is empty.")
+      cli_abort(c(
+        "Format {.val {name}} not found.",
+        "i" = "Format library is empty."
+      ))
     }
-    stop("Format '", name, "' not found. Available: ",
-         paste(available, collapse = ", "))
+    cli_abort(c(
+      "Format {.val {name}} not found.",
+      "i" = "Available: {.val {available}}"
+    ))
   }
   get(name, envir = .format_library)
 }
@@ -310,7 +316,10 @@ fprint <- function(name = NULL) {
     }
   } else {
     if (!exists(name, envir = .format_library)) {
-      stop("Format '", name, "' not found. Use fprint() to see available formats.")
+      cli_abort(c(
+        "Format {.val {name}} not found.",
+        "i" = "Use {.fn fprint} to see available formats."
+      ))
     }
     obj <- get(name, envir = .format_library)
     print(obj)
@@ -341,14 +350,14 @@ fclear <- function(name = NULL) {
     if (length(nms) > 0) {
       rm(list = nms, envir = .format_library)
     }
-    message("All formats cleared from library")
+    cli_inform("All formats cleared from library.")
   } else {
     if (!exists(name, envir = .format_library)) {
-      warning("Format '", name, "' not found in library")
+      cli_warn("Format {.val {name}} not found in library.")
       return(invisible(NULL))
     }
     rm(list = name, envir = .format_library)
-    message("Format '", name, "' removed from library")
+    cli_inform("Format {.val {name}} removed from library.")
   }
   invisible(NULL)
 }
@@ -377,9 +386,10 @@ fclear <- function(name = NULL) {
       if (any(non_char)) {
         bad_idx <- which(non_char)
         bad_keys <- names(format_obj$mappings)[bad_idx]
-        stop("Format", name_str, ": All labels must be character strings. ",
-             "Non-character labels found for keys: ",
-             paste(bad_keys, collapse = ", "))
+        cli_abort(c(
+          "Format{name_str}: All labels must be character strings.",
+          "x" = "Non-character labels found for keys: {.val {bad_keys}}"
+        ))
       }
     }
 
@@ -387,8 +397,7 @@ fclear <- function(name = NULL) {
     keys <- names(format_obj$mappings)
     if (anyDuplicated(keys)) {
       dupes <- unique(keys[duplicated(keys)])
-      warning("Format", name_str, ": Duplicate keys: ",
-              paste(dupes, collapse = ", "))
+      cli_warn("Format{name_str}: Duplicate keys: {.val {dupes}}")
     }
 
     # For numeric type, validate that keys are valid numbers or ranges
@@ -396,8 +405,7 @@ fclear <- function(name = NULL) {
       for (key in keys) {
         parsed <- .parse_range_key(key)
         if (is.null(parsed) && is.na(suppressWarnings(as.numeric(key)))) {
-          warning("Format", name_str, ": Key '", key,
-                  "' is not a valid numeric value or range")
+          cli_warn("Format{name_str}: Key {.val {key}} is not a valid numeric value or range.")
         }
       }
     }
@@ -414,8 +422,7 @@ fclear <- function(name = NULL) {
       keys <- names(format_obj$mappings)
       if (anyDuplicated(keys)) {
         dupes <- unique(keys[duplicated(keys)])
-        warning("Invalue", name_str, ": Duplicate keys: ",
-                paste(dupes, collapse = ", "))
+        cli_warn("Invalue{name_str}: Duplicate keys: {.val {dupes}}")
       }
     }
   }

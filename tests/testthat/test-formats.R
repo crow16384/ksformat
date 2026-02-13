@@ -104,7 +104,7 @@ test_that("fputc applies character format by name", {
 test_that("fputn warns for non-numeric format", {
   fnew("M" = "Male", name = "char_fmt")
 
-  expect_warning(fputn("M", "char_fmt"), "not 'numeric'")
+  expect_warning(fputn("M", "char_fmt"), "not.*numeric")
 
   fclear()
 })
@@ -116,7 +116,7 @@ VALUE nums (numeric)
 ;
 ')
 
-  expect_warning(fputc("5", "nums"), "not 'character'")
+  expect_warning(fputc("5", "nums"), "not.*character")
 
   fclear()
 })
@@ -457,13 +457,13 @@ test_that("fparse reads from file", {
 })
 
 test_that("fparse errors with no input", {
-  expect_error(fparse(), "Either 'text' or 'file' must be provided")
+  expect_error(fparse(), "Either .text. or .file. must be provided")
 })
 
 test_that("fparse errors with both inputs", {
   expect_error(
     fparse(text = "x", file = "y"),
-    "Only one of 'text' or 'file'"
+    "Only one of .text. or .file."
   )
 })
 
@@ -1559,5 +1559,557 @@ VALUE stat (character)
   # Apply the parsed format
   out <- fput(c("n", "pct"), "stat", c(42, 0.15))
   expect_equal(out, c("42", "15.0%"))
+  fclear()
+})
+
+
+# ===========================================================================
+# Edge Case Tests
+# ===========================================================================
+
+context("Edge Cases: Format Creation")
+
+test_that("fnew errors with no mappings", {
+  expect_error(fnew(), "At least one")
+})
+
+test_that("fnew with default parameter overrides .other", {
+  fmt <- fnew("A" = "Alpha", .other = "Ignored", default = "Default-Win")
+  result <- fput(c("A", "Z"), fmt)
+  expect_equal(result, c("Alpha", "Default-Win"))
+})
+
+test_that("fnew with only .missing and .other", {
+  fmt <- fnew("X" = "Found", .missing = "Missing", .other = "Other")
+  result <- fput(c("X", NA, "Z"), fmt)
+  expect_equal(result, c("Found", "Missing", "Other"))
+})
+
+test_that("detect_format_type returns character for empty keys", {
+  expect_equal(detect_format_type(character(0), list()), "character")
+})
+
+test_that("detect_format_type returns numeric for comma keys", {
+  expect_equal(detect_format_type(c("0,18"), list()), "numeric")
+})
+
+test_that("detect_format_type returns numeric for NA keys", {
+  expect_equal(detect_format_type(c(NA_character_), list()), "numeric")
+})
+
+test_that("detect_format_type returns numeric for empty string keys", {
+  expect_equal(detect_format_type(c(""), list()), "numeric")
+})
+
+test_that("print.ks_format shows both multilabel and nocase flags", {
+  fmt <- fnew("A" = "Alpha", name = "dual",
+              type = "character", multilabel = TRUE, ignore_case = TRUE)
+  output <- capture.output(print(fmt))
+  expect_true(any(grepl("multilabel", output)))
+  expect_true(any(grepl("nocase", output)))
+  fclear()
+})
+
+test_that("print.ks_format shows range keys in interval notation", {
+  fmt <- fnew("0,18,TRUE,FALSE" = "Child",
+              "18,65,TRUE,FALSE" = "Adult",
+              name = "ranges_print", type = "numeric")
+  output <- capture.output(print(fmt))
+  expect_true(any(grepl("\\[0, 18\\)", output)))
+  expect_true(any(grepl("\\[18, 65\\)", output)))
+  fclear()
+})
+
+
+context("Edge Cases: Format Application")
+
+test_that("fput with empty vector returns empty character", {
+  fmt <- fnew("M" = "Male")
+  result <- fput(character(0), fmt)
+  expect_equal(result, character(0))
+})
+
+test_that("fput with all-NA vector uses missing label", {
+  fmt <- fnew("M" = "Male", .missing = "N/A")
+  result <- fput(c(NA, NA, NA), fmt)
+  expect_equal(result, c("N/A", "N/A", "N/A"))
+})
+
+test_that("fput with NaN uses missing label", {
+  fmt <- fnew("1" = "One", .missing = "Miss", type = "numeric")
+  result <- fput(c(1, NaN), fmt)
+  expect_equal(result, c("One", "Miss"))
+})
+
+test_that("fput with NaN and keep_na preserves NA", {
+  fmt <- fnew("1" = "One", .missing = "Miss", type = "numeric")
+  result <- fput(c(1, NaN), fmt, keep_na = TRUE)
+  expect_equal(result[1], "One")
+  expect_true(is.na(result[2]))
+})
+
+test_that("fput with single element vector", {
+  fmt <- fnew("A" = "Alpha")
+  expect_equal(fput("A", fmt), "Alpha")
+  expect_equal(fput("Z", fmt), "Z")
+  expect_equal(fput(NA, fmt), NA_character_)
+})
+
+test_that("fput errors on invalid format type", {
+  expect_error(fput(c("a", "b"), 42), "ks_format")
+  expect_error(fput(c("a", "b"), list(a = 1)), "ks_format")
+})
+
+test_that("fput with non-numeric strings in numeric format range matching", {
+  fmt <- fnew("0,100,TRUE,FALSE" = "Valid", type = "numeric",
+              .other = "Other")
+  result <- fput(c("50", "abc", "200"), fmt)
+  expect_equal(result, c("Valid", "Other", "Other"))
+})
+
+
+context("Edge Cases: format_apply_df")
+
+test_that("format_apply_df with replace = TRUE", {
+  df <- data.frame(sex = c("M", "F"), stringsAsFactors = FALSE)
+  fmt <- fnew("M" = "Male", "F" = "Female")
+  result <- format_apply_df(df, sex = fmt, replace = TRUE)
+
+  expect_equal(result$sex, c("Male", "Female"))
+  expect_false("sex_fmt" %in% names(result))
+})
+
+test_that("format_apply_df warns on missing column", {
+  df <- data.frame(x = 1:3)
+  fmt <- fnew("1" = "One", type = "numeric")
+  expect_warning(format_apply_df(df, nonexistent = fmt), "not found")
+})
+
+test_that("format_apply_df with custom suffix", {
+  df <- data.frame(sex = c("M", "F"), stringsAsFactors = FALSE)
+  fmt <- fnew("M" = "Male", "F" = "Female")
+  result <- format_apply_df(df, sex = fmt, suffix = "_label")
+
+  expect_true("sex_label" %in% names(result))
+  expect_equal(result$sex_label, c("Male", "Female"))
+})
+
+test_that("format_apply_df errors on non-data.frame", {
+  expect_error(format_apply_df(list(a = 1), a = fnew("1" = "x", type = "numeric")),
+               "data frame")
+})
+
+
+context("Edge Cases: Invalue")
+
+test_that("invalue_apply with na_if parameter", {
+  inv <- finput("Yes" = 1, "No" = 0)
+  result <- invalue_apply(c("Yes", "No", "Unknown", "N/A"), inv,
+                          na_if = c("Unknown", "N/A"))
+  expect_equal(result[1], 1)
+  expect_equal(result[2], 0)
+  expect_true(is.na(result[3]))
+  expect_true(is.na(result[4]))
+})
+
+test_that("invalue_apply falls back to numeric conversion for unknown labels", {
+  inv <- finput("Low" = 1, "High" = 2)
+  result <- invalue_apply(c("Low", "42", "High"), inv)
+  expect_equal(result, c(1, 42, 2))
+})
+
+test_that("invalue_apply with custom missing_value", {
+  inv <- finput("A" = 1, "B" = 2, missing_value = -999)
+  result <- invalue_apply(c("A", NA, "B"), inv)
+  expect_equal(result, c(1, -999, 2))
+})
+
+test_that("invalue_apply with NULL returns empty typed vector", {
+  inv <- finput("A" = 1)
+  result <- invalue_apply(NULL, inv)
+  expect_equal(length(result), 0)
+  expect_true(is.numeric(result))
+
+  inv_chr <- finput("A" = "x", target_type = "character")
+  result_chr <- invalue_apply(NULL, inv_chr)
+  expect_equal(length(result_chr), 0)
+  expect_true(is.character(result_chr))
+})
+
+test_that("invalue_apply with target_type integer", {
+  inv <- finput("One" = 1L, "Two" = 2L, target_type = "integer")
+  result <- invalue_apply(c("One", "Two"), inv)
+  expect_equal(result, c(1L, 2L))
+  expect_true(is.integer(result))
+})
+
+test_that("invalue_apply with target_type logical", {
+  inv <- finput("Yes" = TRUE, "No" = FALSE, target_type = "logical")
+  result <- invalue_apply(c("Yes", "No"), inv)
+  expect_equal(result, c(TRUE, FALSE))
+  expect_true(is.logical(result))
+})
+
+test_that("finputn errors for non-invalue", {
+  fnew("M" = "Male", name = "not_inv")
+  expect_error(finputn(c("Male"), "not_inv"), "INVALUE")
+  fclear()
+})
+
+test_that("finputc errors for non-invalue", {
+  fnew("M" = "Male", name = "not_inv2")
+  expect_error(finputc(c("Male"), "not_inv2"), "INVALUE")
+  fclear()
+})
+
+test_that("invalue_apply errors on invalid invalue type", {
+  expect_error(invalue_apply(c("a"), 123), "ks_invalue")
+})
+
+test_that("format_bidirectional without name", {
+  bi <- format_bidirectional("X" = "Ex", "Y" = "Why")
+  expect_s3_class(bi$format, "ks_format")
+  expect_s3_class(bi$invalue, "ks_invalue")
+  expect_null(bi$format$name)
+  expect_null(bi$invalue$name)
+})
+
+test_that("print.ks_invalue shows custom missing_value", {
+  inv <- finput("A" = 1, missing_value = -99)
+  output <- capture.output(print(inv))
+  expect_true(any(grepl("-99", output)))
+})
+
+test_that("print.ks_invalue hides NA missing_value", {
+  inv <- finput("A" = 1)
+  output <- capture.output(print(inv))
+  expect_false(any(grepl("Missing value", output)))
+})
+
+
+context("Edge Cases: Utilities and Validation")
+
+test_that("is_missing with NaN", {
+  expect_true(is_missing(NaN))
+})
+
+test_that("is_missing with empty string and include_empty", {
+  expect_false(is_missing(""))
+  expect_true(is_missing("", include_empty = TRUE))
+})
+
+test_that("is_missing with vector input", {
+  result <- is_missing(c(1, NA, NaN, 3))
+  expect_equal(result, c(FALSE, TRUE, TRUE, FALSE))
+})
+
+test_that("range_spec errors with non-numeric bounds", {
+  expect_error(range_spec("a", 10, "lbl"), "numeric")
+  expect_error(range_spec(1, "b", "lbl"), "numeric")
+})
+
+test_that("range_spec errors when low > high", {
+  expect_error(range_spec(100, 1, "lbl"), "less than")
+})
+
+test_that("in_range returns FALSE for non-range_spec", {
+  expect_false(in_range(5, list(low = 0, high = 10)))
+})
+
+test_that(".format_validate warns on duplicate keys", {
+  expect_warning(fnew("A" = "First", "A" = "Second"), "Duplicate")
+})
+
+test_that(".format_validate warns on invalid numeric keys", {
+  expect_warning(fnew("abc" = "Label", type = "numeric"),
+                 "not a valid numeric")
+})
+
+test_that("fclear warns for non-existent format name", {
+  fclear()
+  expect_warning(fclear("no_such_fmt"), "not found")
+})
+
+test_that("fprint errors for non-existent format name", {
+  fclear()
+  expect_error(fprint("no_such_fmt"), "not found")
+})
+
+test_that("fprint shows empty library message", {
+  fclear()
+  output <- capture.output(fprint())
+  expect_true(any(grepl("empty", output)))
+})
+
+test_that(".format_register errors with overwrite = FALSE", {
+  fnew("A" = "Alpha", name = "ow_test")
+  fmt2 <- fnew("B" = "Beta")
+  expect_error(
+    ksformat:::.format_register(fmt2, name = "ow_test", overwrite = FALSE),
+    "already exists"
+  )
+  fclear()
+})
+
+test_that(".format_register silently ignores NULL/empty name", {
+  fmt <- fnew("A" = "Alpha")
+  # Should not error
+  expect_silent(ksformat:::.format_register(fmt, name = NULL))
+  expect_silent(ksformat:::.format_register(fmt, name = ""))
+})
+
+test_that(".format_get errors with clear message on empty library", {
+  fclear()
+  expect_error(ksformat:::.format_get("nonexistent"), "empty")
+})
+
+test_that(".format_get errors listing available formats", {
+  fnew("A" = "Alpha", name = "avail")
+  expect_error(ksformat:::.format_get("nonexistent"), "avail")
+  fclear()
+})
+
+
+context("Edge Cases: Expression Labels")
+
+test_that("eval_expr_label warns and returns NA on error", {
+  fmt <- fnew("x" = "stop(.x1)", type = "character")
+  expect_warning(
+    result <- fput("x", fmt, "bad"),
+    "failed"
+  )
+  expect_true(is.na(result))
+})
+
+test_that("eval_expr_label with expression referencing .x1", {
+  fmt <- fnew("a" = "paste0('val=', .x1)", type = "character")
+  result <- fput(c("a", "a"), fmt, c(10, 20))
+  expect_equal(result, c("val=10", "val=20"))
+})
+
+
+context("Edge Cases: Format Parsing")
+
+test_that("fparse with text as character vector", {
+  txt <- c(
+    "VALUE test (character)",
+    "  \"A\" = \"Alpha\"",
+    "  \"B\" = \"Beta\"",
+    ";"
+  )
+  result <- fparse(text = txt)
+  expect_equal(result$test$mappings[["A"]], "Alpha")
+  expect_equal(result$test$mappings[["B"]], "Beta")
+  fclear()
+})
+
+test_that("fparse warns on unclosed block", {
+  txt <- '
+VALUE unclosed (character)
+  "A" = "Alpha"
+'
+  expect_warning(fparse(text = txt), "Closing automatically")
+  fclear()
+})
+
+test_that("fparse warns on new block before closing previous", {
+  txt <- '
+VALUE first (character)
+  "A" = "Alpha"
+VALUE second (character)
+  "B" = "Beta"
+;
+'
+  expect_warning(fparse(text = txt), "New block started")
+  fclear()
+})
+
+test_that("fparse handles inline comments", {
+  txt <- '
+VALUE test (character)
+  "A" = "Alpha"  // this is a comment
+  "B" = "Beta"   /* another comment */
+;
+'
+  result <- fparse(text = txt)
+  expect_equal(result$test$mappings[["A"]], "Alpha")
+  expect_equal(result$test$mappings[["B"]], "Beta")
+  fclear()
+})
+
+test_that("fparse handles multilabel + nocase together", {
+  txt <- '
+VALUE combo (numeric, multilabel, nocase)
+  [0, 50) = "Low"
+  [50, 100] = "High"
+;
+'
+  result <- fparse(text = txt)
+  expect_true(result$combo$multilabel)
+  expect_true(result$combo$ignore_case)
+  fclear()
+})
+
+test_that("fparse handles .missing in INVALUE block", {
+  txt <- '
+INVALUE inv_miss
+  "Cat" = 1
+  "Dog" = 2
+  .missing = 0
+;
+'
+  result <- fparse(text = txt)
+  # .missing in invalue should produce a missing_value
+  expect_true("inv_miss" %in% ls(envir = ksformat:::.format_library))
+  fclear()
+})
+
+
+context("Edge Cases: Format Export")
+
+test_that("format_export with formats parameter instead of ...", {
+  fmt1 <- fnew("A" = "Alpha", name = "exp1")
+  fmt2 <- fnew("B" = "Beta", name = "exp2")
+  txt <- format_export(formats = list(fmt1, fmt2))
+  expect_true(grepl("exp1", txt))
+  expect_true(grepl("exp2", txt))
+  fclear()
+})
+
+test_that("format_export warns for invalid object", {
+  fmt <- fnew("A" = "Alpha", name = "ok")
+  expect_warning(format_export(ok = fmt, bad = list(x = 1)), "not a.*ks_format")
+  fclear()
+})
+
+test_that("format_export errors with no objects", {
+  expect_error(format_export(), "At least one")
+})
+
+
+context("Edge Cases: Datetime Formats")
+
+test_that("fnew_date errors for invalid type", {
+  expect_error(fnew_date("%Y", type = "integer"), "date.*time.*datetime")
+})
+
+test_that("fnew_date with .missing parameter", {
+  fmt <- fnew_date("DATE9.", .missing = "No Date")
+  result <- fput(c(0, NA), fmt)
+  expect_equal(result[2], "No Date")
+})
+
+test_that("fput date with character date strings", {
+  fmt <- fnew_date("DATE9.")
+  result <- fput(as.Date("2024-01-15"), fmt)
+  expect_true(nchar(result) > 0)
+})
+
+test_that("fput date with POSIXct conversion to date", {
+  fmt <- fnew_date("DATE9.")
+  dt <- as.POSIXct("2024-01-15 10:30:00")
+  result <- fput(dt, fmt)
+  expect_true(nchar(result) > 0)
+})
+
+test_that("fput time with character time strings", {
+  fmt <- fnew_date("TIME8.", type = "time")
+  result <- fput("12:30:00", fmt)
+  expect_true(nchar(result) > 0)
+})
+
+test_that("fput datetime with numeric SAS datetime", {
+  fmt <- fnew_date("DATETIME20.")
+  # SAS datetime: seconds since 1960-01-01
+  result <- fput(0, fmt)
+  expect_true(grepl("1960", result))
+})
+
+test_that("SAS format name DDMMYY8 resolves correctly", {
+  fmt <- fnew_date("DDMMYY8.")
+  result <- fput(as.Date("2024-03-15"), fmt)
+  expect_true(nchar(result) > 0)
+})
+
+test_that("SAS format DOWNAME resolves correctly", {
+  fmt <- fnew_date("DOWNAME.")
+  result <- fput(as.Date("2024-01-15"), fmt)  # Monday
+  expect_true(nchar(result) > 0)
+})
+
+test_that("SAS format MONNAME resolves correctly", {
+  fmt <- fnew_date("MONNAME.")
+  result <- fput(as.Date("2024-03-15"), fmt)
+  expect_true(nchar(result) > 0)
+})
+
+test_that("fput_all with datetime format returns list", {
+  fmt <- fnew_date("DATE9.")
+  result <- fput_all(c(as.Date("2024-01-01"), as.Date("2024-06-15")), fmt)
+  expect_true(is.list(result))
+  expect_equal(length(result), 2)
+})
+
+
+context("Edge Cases: fput_all")
+
+test_that("fput_all with empty vector returns empty list", {
+  fmt <- fnew("A" = "Alpha", type = "character")
+  result <- fput_all(character(0), fmt)
+  expect_equal(result, list())
+})
+
+test_that("fput_all with all-NA vector", {
+  fmt <- fnew("A" = "Alpha", .missing = "N/A")
+  result <- fput_all(c(NA, NA), fmt)
+  expect_equal(result[[1]], "N/A")
+  expect_equal(result[[2]], "N/A")
+})
+
+test_that("fput_all with NaN uses missing label", {
+  fmt <- fnew("1" = "One", .missing = "Miss", type = "numeric")
+  result <- fput_all(NaN, fmt)
+  expect_equal(result[[1]], "Miss")
+})
+
+test_that("fput_all unmatched without .other returns original value", {
+  fmt <- fnew("A" = "Alpha", type = "character")
+  result <- fput_all("Z", fmt)
+  expect_equal(result[[1]], "Z")
+})
+
+test_that("fput_all errors on invalid format", {
+  expect_error(fput_all(c(1, 2), 42), "ks_format")
+})
+
+
+context("Edge Cases: Library Management")
+
+test_that("fclear on already empty library does not error", {
+  fclear()
+  expect_message(fclear(), "cleared")
+})
+
+test_that("fclear single format leaves others intact", {
+  fnew("A" = "Alpha", name = "keep_me")
+  fnew("B" = "Beta", name = "remove_me")
+  expect_message(fclear("remove_me"), "removed")
+  expect_true("keep_me" %in% ls(envir = ksformat:::.format_library))
+  expect_false("remove_me" %in% ls(envir = ksformat:::.format_library))
+  fclear()
+})
+
+test_that("format_bidirectional registers both format and invalue", {
+  bi <- format_bidirectional("X" = "Ex", name = "bi_test")
+  expect_true("bi_test" %in% ls(envir = ksformat:::.format_library))
+  expect_true("bi_test_inv" %in% ls(envir = ksformat:::.format_library))
+  fclear()
+})
+
+test_that(".format_get resolves SAS datetime format on the fly", {
+  fclear()
+  # SAS format name not registered, but should auto-create via fallback
+  result <- fput(as.Date("2024-01-15"), "DATE9.")
+  expect_true(nchar(result) > 0)
   fclear()
 })
