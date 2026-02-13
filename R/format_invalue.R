@@ -71,14 +71,14 @@ finput <- function(..., name = NULL, target_type = "numeric", missing_value = NA
 #'
 #' @return Vector with values (type depends on invalue's \code{target_type})
 #'
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' inv <- finput("Male" = 1, "Female" = 2, name = "sex_inv")
-#' invalue_apply(c("Male", "Female", "Unknown"), inv)
+#' .invalue_apply(c("Male", "Female", "Unknown"), inv)
 #' # Returns: 1 2 NA
 #' fclear()
-invalue_apply <- function(x, invalue, na_if = NULL) {
+.invalue_apply <- function(x, invalue, na_if = NULL) {
   # Resolve invalue by name if string provided
   if (is.character(invalue) && length(invalue) == 1L) {
     invalue <- .format_get(invalue)
@@ -167,7 +167,7 @@ finputn <- function(x, invalue_name) {
   if (!inherits(inv_obj, "ks_invalue")) {
     cli_abort("{.val {invalue_name}} is not an INVALUE format ({.cls ks_invalue}).")
   }
-  result <- invalue_apply(x, inv_obj)
+  result <- .invalue_apply(x, inv_obj)
   as.numeric(result)
 }
 
@@ -194,7 +194,7 @@ finputc <- function(x, invalue_name) {
   if (!inherits(inv_obj, "ks_invalue")) {
     cli_abort("{.val {invalue_name}} is not an INVALUE format ({.cls ks_invalue}).")
   }
-  result <- invalue_apply(x, inv_obj)
+  result <- .invalue_apply(x, inv_obj)
   as.character(result)
 }
 
@@ -215,7 +215,7 @@ finputc <- function(x, invalue_name) {
 #' @export
 #'
 #' @examples
-#' sex_bi <- format_bidirectional(
+#' sex_bi <- fnew_bid(
 #'   "M" = "Male",
 #'   "F" = "Female",
 #'   name = "sex"
@@ -225,9 +225,9 @@ finputc <- function(x, invalue_name) {
 #' fput("M", sex_bi$format)
 #'
 #' # Invalue: Male -> M
-#' invalue_apply("Male", sex_bi$invalue)
+#' .invalue_apply("Male", sex_bi$invalue)
 #' fclear()
-format_bidirectional <- function(..., name = NULL, type = "auto") {
+fnew_bid <- function(..., name = NULL, type = "auto") {
   mappings <- list(...)
 
   # Create format (value -> label)

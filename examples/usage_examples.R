@@ -131,7 +131,7 @@ print(data.frame(
 
 cat("\n=== Example 6: Bidirectional Formatting ===\n")
 
-status_bi <- format_bidirectional(
+status_bi <- fnew_bid(
   "A" = "Active",
   "I" = "Inactive",
   "P" = "Pending",
@@ -186,7 +186,7 @@ cat("\n=== Example 8: Export Formats to Text ===\n")
 
 # Retrieve format from library and export
 bmi_fmt <- ksformat:::.format_get("bmi")
-cat(format_export(bmi = bmi_fmt))
+cat(fexport(bmi = bmi_fmt))
 cat("\n")
 
 # ============================================================================
@@ -223,7 +223,7 @@ print(df)
 sex_f <- ksformat:::.format_get("sex")
 age_f <- ksformat:::.format_get("age")
 
-df_formatted <- format_apply_df(
+df_formatted <- fput_df(
   df,
   sex = sex_f,
   age = age_f,
@@ -245,11 +245,11 @@ print(fput(c("M", "F", NA), "sex"))
 cat("\nWith keep_na = TRUE:\n")
 print(fput(c("M", "F", NA), sex_f, keep_na = TRUE))
 
-cat("\nis_missing():\n")
+cat("\nis_missing() (include_empty = TRUE by default):\n")
 cat("  NA:            ", is_missing(NA), "\n")
 cat("  NaN:           ", is_missing(NaN), "\n")
-cat("  '':            ", is_missing(""), "\n")
-cat("  '' (w/ empty): ", is_missing("", include_empty = TRUE), "\n")
+cat("  '':            ", is_missing(""), "\n")                     # TRUE (default)
+cat("  '' (no empty): ", is_missing("", include_empty = FALSE), "\n")  # FALSE
 
 # ============================================================================
 # Example 12: Date/Time Formats (SAS-style)
@@ -347,7 +347,7 @@ patients <- data.frame(
 )
 
 visit_fmt <- fnew_date("DATE9.", name = "visit_fmt", .missing = "NOT RECORDED")
-patients_fmt <- format_apply_df(patients, visit_date = visit_fmt)
+patients_fmt <- fput_df(patients, visit_date = visit_fmt)
 print(patients_fmt)
 
 # --- 12g: Parse date format from text ---
@@ -378,7 +378,7 @@ cat("stamp:", fput(as.POSIXct("2025-03-01 10:00:00", tz = "UTC"), "stamp"), "\n"
 # Export back to text
 enrl_obj <- ksformat:::.format_get("enrldt")
 cat("\nExported text:\n")
-cat(format_export(enrldt = enrl_obj))
+cat(fexport(enrldt = enrl_obj))
 cat("\n")
 
 fclear()
@@ -466,7 +466,7 @@ for (i in seq_along(risk_scores)) {
 cat("\n--- Multilabel Export ---\n")
 
 risk_obj <- ksformat:::.format_get("risk")
-cat(format_export(risk = risk_obj))
+cat(fexport(risk = risk_obj))
 cat("\n")
 
 # Show format object

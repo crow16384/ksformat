@@ -17,7 +17,7 @@ Main features:
   \item Create value-to-label mappings (formats) with \code{\link{fnew}}
   \item Apply formats to vectors using \code{\link{fput}}
   \item Apply formats by name: \code{\link{fputn}} (numeric), \code{\link{fputc}} (character)
-  \item Reverse formatting with \code{\link{finput}} and \code{\link{invalue_apply}}
+  \item Reverse formatting with \code{\link{finput}}, \code{\link{finputn}}, \code{\link{finputc}}
   \item Apply invalues by name: \code{\link{finputn}} (numeric), \code{\link{finputc}} (character)
   \item Parse SAS-like format definitions from text with \code{\link{fparse}}
   \item Global format library with auto-registration

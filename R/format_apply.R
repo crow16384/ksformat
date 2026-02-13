@@ -462,9 +462,9 @@ fput_all <- function(x, format, ..., keep_na = FALSE) {
 #'
 #' sex_f <- fnew("M" = "Male", "F" = "Female", .missing = "Unknown")
 #' status_f <- fnew("A" = "Active", "I" = "Inactive", "P" = "Pending")
-#' format_apply_df(df, sex = sex_f, status = status_f)
+#' fput_df(df, sex = sex_f, status = status_f)
 #' fclear()
-format_apply_df <- function(data, ..., suffix = "_fmt", replace = FALSE) {
+fput_df <- function(data, ..., suffix = "_fmt", replace = FALSE) {
   formats <- list(...)
 
   if (!is.data.frame(data)) {

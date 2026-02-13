@@ -130,9 +130,9 @@ fparse <- function(text = NULL, file = NULL) {
 #' @examples
 #' sex_fmt <- fnew("M" = "Male", "F" = "Female",
 #'                 .missing = "Unknown", name = "sex")
-#' cat(format_export(sex = sex_fmt))
+#' cat(fexport(sex = sex_fmt))
 #' fclear()
-format_export <- function(..., formats = NULL, file = NULL) {
+fexport <- function(..., formats = NULL, file = NULL) {
   if (is.null(formats)) {
     formats <- list(...)
   }

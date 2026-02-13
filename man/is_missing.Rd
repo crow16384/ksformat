@@ -4,13 +4,13 @@
 \alias{is_missing}
 \title{Check if Value is Missing}
 \usage{
-is_missing(x, include_empty = FALSE)
+is_missing(x, include_empty = TRUE)
 }
 \arguments{
 \item{x}{Value to check}
 
 \item{include_empty}{Logical. If \code{TRUE}, treat empty strings as missing.
-Default is \code{FALSE}.}
+Default is \code{TRUE}.}
 }
 \value{
 Logical vector. NULL input returns \code{logical(0)}.
@@ -22,7 +22,7 @@ Optionally treats empty strings as missing.
 \examples{
 is_missing(NA)          # TRUE
 is_missing(NaN)         # TRUE
-is_missing("")          # FALSE
-is_missing("", include_empty = TRUE)  # TRUE
+is_missing("")          # TRUE (include_empty = TRUE by default)
+is_missing("", include_empty = FALSE)  # FALSE
 is_missing("text")      # FALSE
 }

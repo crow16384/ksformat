@@ -142,14 +142,14 @@ test_that("finputc applies character invalue by name", {
 
 context("Invalue Creation and Application (finput)")
 
-test_that("invalue_apply reverses formatting", {
+test_that(".invalue_apply reverses formatting", {
   sex_inv <- finput(
     "Male" = 1,
     "Female" = 2,
     name = "sex_inv"
   )
 
-  result <- invalue_apply(c("Male", "Female", "Unknown"), sex_inv)
+  result <- ksformat:::.invalue_apply(c("Male", "Female", "Unknown"), sex_inv)
 
   expect_equal(result[1], 1)
   expect_equal(result[2], 2)
@@ -158,10 +158,10 @@ test_that("invalue_apply reverses formatting", {
   fclear()
 })
 
-test_that("invalue_apply accepts name from library", {
+test_that(".invalue_apply accepts name from library", {
   finput("Male" = 1, "Female" = 2, name = "sex_inv")
 
-  result <- invalue_apply(c("Male", "Female"), "sex_inv")
+  result <- ksformat:::.invalue_apply(c("Male", "Female"), "sex_inv")
   expect_equal(result, c(1, 2))
 
   fclear()
@@ -187,7 +187,7 @@ INVALUE score_inv
   expect_equal(inv$target_type, "numeric")
 
   # Apply it
-  applied <- invalue_apply(c("Low", "High"), inv)
+  applied <- ksformat:::.invalue_apply(c("Low", "High"), inv)
   expect_equal(applied, c(1, 10))
 
   fclear()
@@ -198,8 +198,8 @@ context("Utility Functions")
 test_that("is_missing detects various missing types", {
   expect_true(is_missing(NA))
   expect_true(is_missing(NaN))
-  expect_false(is_missing(""))
-  expect_true(is_missing("", include_empty = TRUE))
+  expect_true(is_missing(""))              # include_empty = TRUE by default
+  expect_false(is_missing("", include_empty = FALSE))
   expect_false(is_missing("text"))
 })
 
@@ -239,8 +239,8 @@ test_that("fprint shows format list", {
   fclear()
 })
 
-test_that("format_bidirectional creates both format and invalue", {
-  bi <- format_bidirectional(
+test_that("fnew_bid creates both format and invalue", {
+  bi <- fnew_bid(
     "M" = "Male",
     "F" = "Female",
     name = "sex_bi"
@@ -254,7 +254,7 @@ test_that("format_bidirectional creates both format and invalue", {
   expect_equal(formatted, "Male")
 
   # Test reverse
-  original <- invalue_apply("Male", bi$invalue)
+  original <- ksformat:::.invalue_apply("Male", bi$invalue)
   expect_equal(original, "M")
 
   fclear()
@@ -485,7 +485,7 @@ VALUE yn (character)
 
 context("Format Export (SAS-like syntax)")
 
-test_that("format_export produces valid SAS-like text for VALUE", {
+test_that("fexport produces valid SAS-like text for VALUE", {
   sex_fmt <- fnew(
     "M" = "Male",
     "F" = "Female",
@@ -494,7 +494,7 @@ test_that("format_export produces valid SAS-like text for VALUE", {
     name = "sex"
   )
 
-  txt <- format_export(sex = sex_fmt)
+  txt <- fexport(sex = sex_fmt)
 
   expect_true(grepl("VALUE sex", txt))
   expect_true(grepl('"M" = "Male"', txt))
@@ -506,14 +506,14 @@ test_that("format_export produces valid SAS-like text for VALUE", {
   fclear()
 })
 
-test_that("format_export produces valid SAS-like text for INVALUE", {
+test_that("fexport produces valid SAS-like text for INVALUE", {
   sex_inv <- finput(
     "Male" = 1,
     "Female" = 2,
     name = "sex_inv"
   )
 
-  txt <- format_export(sex_inv = sex_inv)
+  txt <- fexport(sex_inv = sex_inv)
 
   expect_true(grepl("INVALUE sex_inv", txt))
   expect_true(grepl('"Male" = "1"', txt))
@@ -521,7 +521,7 @@ test_that("format_export produces valid SAS-like text for INVALUE", {
   fclear()
 })
 
-test_that("format_export roundtrips with fparse", {
+test_that("fexport roundtrips with fparse", {
   original_fmt <- fnew(
     "A" = "Active",
     "I" = "Inactive",
@@ -529,7 +529,7 @@ test_that("format_export roundtrips with fparse", {
     name = "status"
   )
 
-  txt <- format_export(status = original_fmt)
+  txt <- fexport(status = original_fmt)
   fclear()
   parsed <- fparse(text = txt)
 
@@ -540,11 +540,11 @@ test_that("format_export roundtrips with fparse", {
   fclear()
 })
 
-test_that("format_export writes to file", {
+test_that("fexport writes to file", {
   sex_fmt <- fnew("M" = "Male", "F" = "Female", name = "sex")
   tmp <- tempfile(fileext = ".fmt")
 
-  result <- format_export(sex = sex_fmt, file = tmp)
+  result <- fexport(sex = sex_fmt, file = tmp)
 
   expect_true(file.exists(tmp))
   content <- readLines(tmp)
@@ -554,11 +554,11 @@ test_that("format_export writes to file", {
   fclear()
 })
 
-test_that("format_export handles multiple formats", {
+test_that("fexport handles multiple formats", {
   fmt1 <- fnew("M" = "Male", "F" = "Female", name = "sex")
   fmt2 <- fnew("Y" = "Yes", "N" = "No", name = "yn")
 
-  txt <- format_export(sex = fmt1, yn = fmt2)
+  txt <- fexport(sex = fmt1, yn = fmt2)
 
   expect_true(grepl("VALUE sex", txt))
   expect_true(grepl("VALUE yn", txt))
@@ -733,7 +733,7 @@ VALUE temp (numeric)
   fclear()
 })
 
-test_that("format_export roundtrips interval notation", {
+test_that("fexport roundtrips interval notation", {
   txt_in <- '
 VALUE bmi (numeric)
   [0, 18.5) = "Underweight"
@@ -742,7 +742,7 @@ VALUE bmi (numeric)
 ;
 '
   parsed <- fparse(text = txt_in)
-  exported <- format_export(bmi = parsed$bmi)
+  exported <- fexport(bmi = parsed$bmi)
 
   expect_true(grepl("\\[0, 18\\.5\\)", exported))
   expect_true(grepl("\\[18\\.5, 25\\)", exported))
@@ -802,7 +802,7 @@ INVALUE age_inv
 
   expect_equal(inv$target_type, "numeric")
 
-  applied <- invalue_apply(c("Child", "Adult", "Senior"), inv)
+  applied <- ksformat:::.invalue_apply(c("Child", "Adult", "Senior"), inv)
   expect_equal(applied, c(10, 40, 75))
   expect_true(is.numeric(applied))
 
@@ -814,18 +814,18 @@ test_that("finput creates numeric invalue by default", {
 
   expect_equal(inv$target_type, "numeric")
 
-  result <- invalue_apply(c("Low", "High"), inv)
+  result <- ksformat:::.invalue_apply(c("Low", "High"), inv)
   expect_equal(result, c(1, 10))
   expect_true(is.numeric(result))
 })
 
 # ===================================================================
-# format_apply_df
+# fput_df
 # ===================================================================
 
 context("Data Frame Formatting")
 
-test_that("format_apply_df works with fput", {
+test_that("fput_df works with fput", {
   sex_fmt <- fnew("M" = "Male", "F" = "Female", .missing = "Unknown")
   status_fmt <- fnew("A" = "Active", "I" = "Inactive", "P" = "Pending")
 
@@ -835,7 +835,7 @@ test_that("format_apply_df works with fput", {
     stringsAsFactors = FALSE
   )
 
-  result <- format_apply_df(df, sex = sex_fmt, status = status_fmt)
+  result <- fput_df(df, sex = sex_fmt, status = status_fmt)
 
   expect_true("sex_fmt" %in% names(result))
   expect_true("status_fmt" %in% names(result))
@@ -850,7 +850,7 @@ context("INVALUE Export")
 
 test_that("INVALUE export omits numeric type (default)", {
   inv <- finput("X" = 1, "Y" = 2, name = "test_inv")
-  txt <- format_export(test_inv = inv)
+  txt <- fexport(test_inv = inv)
 
   # Should say "INVALUE test_inv" without "(numeric)"
   expect_true(grepl("INVALUE test_inv$", txt, perl = TRUE) ||
@@ -863,7 +863,7 @@ test_that("INVALUE export omits numeric type (default)", {
 test_that("INVALUE export includes non-default type", {
   inv <- finput("X" = "a", "Y" = "b",
                 name = "test_inv", target_type = "character")
-  txt <- format_export(test_inv = inv)
+  txt <- fexport(test_inv = inv)
 
   expect_true(grepl("(character)", txt, fixed = TRUE))
 
@@ -1302,24 +1302,24 @@ VALUE test (multilabel)
   fclear()
 })
 
-test_that("format_export: datetime format round-trip", {
+test_that("fexport: datetime format round-trip", {
   fnew_date("DATE9.", name = "rtdate")
   fmt <- ksformat:::.format_get("rtdate")
-  txt <- format_export(rtdate = fmt)
+  txt <- fexport(rtdate = fmt)
   expect_true(grepl("VALUE rtdate (date)", txt, fixed = TRUE))
   expect_true(grepl("pattern = \"DATE9.\"", txt, fixed = TRUE))
   fclear()
 })
 
-test_that("format_export: multilabel format includes flag", {
+test_that("fexport: multilabel format includes flag", {
   fmt <- fnew("1" = "A", "2" = "B", name = "ml_exp",
               type = "character", multilabel = TRUE)
-  txt <- format_export(ml_exp = fmt)
+  txt <- fexport(ml_exp = fmt)
   expect_true(grepl("multilabel", txt))
   fclear()
 })
 
-test_that("format_export: date format parse round-trip", {
+test_that("fexport: date format parse round-trip", {
   txt_in <- '
 VALUE mydate (date)
   pattern = "DATE9."
@@ -1327,7 +1327,7 @@ VALUE mydate (date)
 '
   fparse(text = txt_in)
   fmt <- ksformat:::.format_get("mydate")
-  txt_out <- format_export(mydate = fmt)
+  txt_out <- fexport(mydate = fmt)
   expect_true(grepl("pattern", txt_out))
   expect_true(grepl("DATE9", txt_out))
 
@@ -1394,10 +1394,10 @@ VALUE sex (character, nocase)
   fclear()
 })
 
-test_that("format_export with nocase flag", {
+test_that("fexport with nocase flag", {
   fmt <- fnew("M" = "Male", "F" = "Female",
               name = "sex_nc", type = "character", ignore_case = TRUE)
-  txt <- format_export(sex_nc = fmt)
+  txt <- fexport(sex_nc = fmt)
   expect_true(grepl("nocase", txt))
   fclear()
 })
@@ -1668,43 +1668,43 @@ test_that("fput with non-numeric strings in numeric format range matching", {
 })
 
 
-context("Edge Cases: format_apply_df")
+context("Edge Cases: fput_df")
 
-test_that("format_apply_df with replace = TRUE", {
+test_that("fput_df with replace = TRUE", {
   df <- data.frame(sex = c("M", "F"), stringsAsFactors = FALSE)
   fmt <- fnew("M" = "Male", "F" = "Female")
-  result <- format_apply_df(df, sex = fmt, replace = TRUE)
+  result <- fput_df(df, sex = fmt, replace = TRUE)
 
   expect_equal(result$sex, c("Male", "Female"))
   expect_false("sex_fmt" %in% names(result))
 })
 
-test_that("format_apply_df warns on missing column", {
+test_that("fput_df warns on missing column", {
   df <- data.frame(x = 1:3)
   fmt <- fnew("1" = "One", type = "numeric")
-  expect_warning(format_apply_df(df, nonexistent = fmt), "not found")
+  expect_warning(fput_df(df, nonexistent = fmt), "not found")
 })
 
-test_that("format_apply_df with custom suffix", {
+test_that("fput_df with custom suffix", {
   df <- data.frame(sex = c("M", "F"), stringsAsFactors = FALSE)
   fmt <- fnew("M" = "Male", "F" = "Female")
-  result <- format_apply_df(df, sex = fmt, suffix = "_label")
+  result <- fput_df(df, sex = fmt, suffix = "_label")
 
   expect_true("sex_label" %in% names(result))
   expect_equal(result$sex_label, c("Male", "Female"))
 })
 
-test_that("format_apply_df errors on non-data.frame", {
-  expect_error(format_apply_df(list(a = 1), a = fnew("1" = "x", type = "numeric")),
+test_that("fput_df errors on non-data.frame", {
+  expect_error(fput_df(list(a = 1), a = fnew("1" = "x", type = "numeric")),
                "data frame")
 })
 
 
 context("Edge Cases: Invalue")
 
-test_that("invalue_apply with na_if parameter", {
+test_that(".invalue_apply with na_if parameter", {
   inv <- finput("Yes" = 1, "No" = 0)
-  result <- invalue_apply(c("Yes", "No", "Unknown", "N/A"), inv,
+  result <- ksformat:::.invalue_apply(c("Yes", "No", "Unknown", "N/A"), inv,
                           na_if = c("Unknown", "N/A"))
   expect_equal(result[1], 1)
   expect_equal(result[2], 0)
@@ -1712,40 +1712,40 @@ test_that("invalue_apply with na_if parameter", {
   expect_true(is.na(result[4]))
 })
 
-test_that("invalue_apply falls back to numeric conversion for unknown labels", {
+test_that(".invalue_apply falls back to numeric conversion for unknown labels", {
   inv <- finput("Low" = 1, "High" = 2)
-  result <- invalue_apply(c("Low", "42", "High"), inv)
+  result <- ksformat:::.invalue_apply(c("Low", "42", "High"), inv)
   expect_equal(result, c(1, 42, 2))
 })
 
-test_that("invalue_apply with custom missing_value", {
+test_that(".invalue_apply with custom missing_value", {
   inv <- finput("A" = 1, "B" = 2, missing_value = -999)
-  result <- invalue_apply(c("A", NA, "B"), inv)
+  result <- ksformat:::.invalue_apply(c("A", NA, "B"), inv)
   expect_equal(result, c(1, -999, 2))
 })
 
-test_that("invalue_apply with NULL returns empty typed vector", {
+test_that(".invalue_apply with NULL returns empty typed vector", {
   inv <- finput("A" = 1)
-  result <- invalue_apply(NULL, inv)
+  result <- ksformat:::.invalue_apply(NULL, inv)
   expect_equal(length(result), 0)
   expect_true(is.numeric(result))
 
   inv_chr <- finput("A" = "x", target_type = "character")
-  result_chr <- invalue_apply(NULL, inv_chr)
+  result_chr <- ksformat:::.invalue_apply(NULL, inv_chr)
   expect_equal(length(result_chr), 0)
   expect_true(is.character(result_chr))
 })
 
-test_that("invalue_apply with target_type integer", {
+test_that(".invalue_apply with target_type integer", {
   inv <- finput("One" = 1L, "Two" = 2L, target_type = "integer")
-  result <- invalue_apply(c("One", "Two"), inv)
+  result <- ksformat:::.invalue_apply(c("One", "Two"), inv)
   expect_equal(result, c(1L, 2L))
   expect_true(is.integer(result))
 })
 
-test_that("invalue_apply with target_type logical", {
+test_that(".invalue_apply with target_type logical", {
   inv <- finput("Yes" = TRUE, "No" = FALSE, target_type = "logical")
-  result <- invalue_apply(c("Yes", "No"), inv)
+  result <- ksformat:::.invalue_apply(c("Yes", "No"), inv)
   expect_equal(result, c(TRUE, FALSE))
   expect_true(is.logical(result))
 })
@@ -1762,12 +1762,12 @@ test_that("finputc errors for non-invalue", {
   fclear()
 })
 
-test_that("invalue_apply errors on invalid invalue type", {
-  expect_error(invalue_apply(c("a"), 123), "ks_invalue")
+test_that(".invalue_apply errors on invalid invalue type", {
+  expect_error(ksformat:::.invalue_apply(c("a"), 123), "ks_invalue")
 })
 
-test_that("format_bidirectional without name", {
-  bi <- format_bidirectional("X" = "Ex", "Y" = "Why")
+test_that("fnew_bid without name", {
+  bi <- fnew_bid("X" = "Ex", "Y" = "Why")
   expect_s3_class(bi$format, "ks_format")
   expect_s3_class(bi$invalue, "ks_invalue")
   expect_null(bi$format$name)
@@ -1794,8 +1794,8 @@ test_that("is_missing with NaN", {
 })
 
 test_that("is_missing with empty string and include_empty", {
-  expect_false(is_missing(""))
-  expect_true(is_missing("", include_empty = TRUE))
+  expect_true(is_missing(""))              # include_empty = TRUE by default
+  expect_false(is_missing("", include_empty = FALSE))
 })
 
 test_that("is_missing with vector input", {
@@ -1967,23 +1967,23 @@ INVALUE inv_miss
 
 context("Edge Cases: Format Export")
 
-test_that("format_export with formats parameter instead of ...", {
+test_that("fexport with formats parameter instead of ...", {
   fmt1 <- fnew("A" = "Alpha", name = "exp1")
   fmt2 <- fnew("B" = "Beta", name = "exp2")
-  txt <- format_export(formats = list(fmt1, fmt2))
+  txt <- fexport(formats = list(fmt1, fmt2))
   expect_true(grepl("exp1", txt))
   expect_true(grepl("exp2", txt))
   fclear()
 })
 
-test_that("format_export warns for invalid object", {
+test_that("fexport warns for invalid object", {
   fmt <- fnew("A" = "Alpha", name = "ok")
-  expect_warning(format_export(ok = fmt, bad = list(x = 1)), "not a.*ks_format")
+  expect_warning(fexport(ok = fmt, bad = list(x = 1)), "not a.*ks_format")
   fclear()
 })
 
-test_that("format_export errors with no objects", {
-  expect_error(format_export(), "At least one")
+test_that("fexport errors with no objects", {
+  expect_error(fexport(), "At least one")
 })
 
 
@@ -2099,8 +2099,8 @@ test_that("fclear single format leaves others intact", {
   fclear()
 })
 
-test_that("format_bidirectional registers both format and invalue", {
-  bi <- format_bidirectional("X" = "Ex", name = "bi_test")
+test_that("fnew_bid registers both format and invalue", {
+  bi <- fnew_bid("X" = "Ex", name = "bi_test")
   expect_true("bi_test" %in% ls(envir = ksformat:::.format_library))
   expect_true("bi_test_inv" %in% ls(envir = ksformat:::.format_library))
   fclear()

@@ -19,9 +19,9 @@
 - **Purpose**: Apply `ks_format` to a vector (like SAS PUT).
 - `format` can be a `ks_format` object OR a character string (name from library).
 
-### `fputn(x, format_name)` — Apply numeric format by name (like SAS PUTN).
-### `fputc(x, format_name)` — Apply character format by name (like SAS PUTC).
-### `format_apply_df(data, ..., suffix = "_fmt", replace = FALSE)` — Apply formats to data frame columns.
+### `fputn(x, format_name)` — Apply numeric format by name (SAS PUTN).
+### `fputc(x, format_name)` — Apply character format by name (SAS PUTC).
+### `fput_df(data, ..., suffix = "_fmt", replace = FALSE)` — Apply formats to data frame columns.
 
 ---
 
@@ -31,12 +31,12 @@
 - **Purpose**: Create `ks_invalue`. Default target is NUMERIC.
 - Auto-registers in library if named.
 
-### `invalue_apply(x, invalue, na_if = NULL)`
+### `.invalue_apply(x, invalue, na_if = NULL)` (internal)
 - Convert labels to values. `invalue` can be object or name string.
 
 ### `finputn(x, invalue_name)` — Apply numeric invalue by name (like SAS INPUTN).
 ### `finputc(x, invalue_name)` — Apply character invalue by name (like SAS INPUTC).
-### `format_bidirectional(..., name, type)` — Creates both ks_format and ks_invalue.
+### `fnew_bid(..., name, type)` — Creates both ks_format and ks_invalue.
 ### `print.ks_invalue(x, ...)`
 
 ---
@@ -44,13 +44,13 @@
 ## format_parse.R
 
 ### `fparse(text = NULL, file = NULL)` — Parse SAS-like text. Always auto-registers.
-### `format_export(..., formats = NULL, file = NULL)` — Export to SAS-like text.
+### `fexport(..., formats = NULL, file = NULL)` — Export to SAS-like text.
 
 ---
 
 ## utilities.R
 
-### `is_missing(x, include_empty = FALSE)` — Check for NA/NaN, optionally empty strings.
+### `is_missing(x, include_empty = TRUE)` — Check for NA/NaN; empty strings treated as missing by default.
 ### `range_spec(low, high, label, inc_low, inc_high)` — Create range spec.
 ### `fprint(name = NULL)` — Display format(s). Returns invisible(NULL).
 ### `fclear(name = NULL)` — Remove one or all formats from library.
