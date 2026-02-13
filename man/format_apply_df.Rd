@@ -9,7 +9,7 @@ format_apply_df(data, ..., suffix = "_fmt", replace = FALSE)
 \arguments{
 \item{data}{Data frame}
 
-\item{...}{Named format specifications: column_name = format_object}
+\item{...}{Named format specifications: \code{column_name = format_object_or_name}}
 
 \item{suffix}{Character. Suffix to add to formatted column names (default: "_fmt")}
 
@@ -27,8 +27,11 @@ df <- data.frame(
   status = c("A", "I", "A", "P")
 )
 
-sex_fmt <- format_create("M" = "Male", "F" = "Female", .missing = "Unknown")
-status_fmt <- format_create("A" = "Active", "I" = "Inactive", "P" = "Pending")
+fnew("M" = "Male", "F" = "Female", .missing = "Unknown", name = "sex_fmt")
+fnew("A" = "Active", "I" = "Inactive", "P" = "Pending", name = "status_fmt")
 
-format_apply_df(df, sex = sex_fmt, status = status_fmt)
+sex_f <- fnew("M" = "Male", "F" = "Female", .missing = "Unknown")
+status_f <- fnew("A" = "Active", "I" = "Inactive", "P" = "Pending")
+format_apply_df(df, sex = sex_f, status = status_f)
+fclear()
 }

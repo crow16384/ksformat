@@ -9,18 +9,20 @@ invalue_apply(x, invalue, na_if = NULL)
 \arguments{
 \item{x}{Character vector of labels to convert}
 
-\item{invalue}{A ks_invalue object created by \code{\link{format_invalue}}}
+\item{invalue}{A \code{ks_invalue} object or a character string naming an
+invalue format in the global format library.}
 
 \item{na_if}{Character vector. Additional values to treat as NA}
 }
 \value{
-Vector with original values (type depends on invalue$target_type)
+Vector with values (type depends on invalue's \code{target_type})
 }
 \description{
-Applies an invalue format to convert formatted labels back to original values.
+Applies an invalue format to convert formatted labels back to values.
 }
 \examples{
-sex_inv <- format_invalue("Male" = "M", "Female" = "F", "Unknown" = NA)
-invalue_apply(c("Male", "Female", "Unknown", NA), sex_inv)
-# Returns: "M" "F" NA NA
+inv <- finput("Male" = 1, "Female" = 2, name = "sex_inv")
+invalue_apply(c("Male", "Female", "Unknown"), inv)
+# Returns: 1 2 NA
+fclear()
 }

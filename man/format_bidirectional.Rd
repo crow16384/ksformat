@@ -9,15 +9,19 @@ format_bidirectional(..., name = NULL, type = "auto")
 \arguments{
 \item{...}{Named arguments for format mappings}
 
-\item{name}{Character. Base name for both formats}
+\item{name}{Character. Base name for both formats. The invalue will be
+named \code{paste0(name, "_inv")}.}
 
 \item{type}{Character. Format type}
 }
 \value{
-List with 'format' and 'invalue' components
+List with \code{format} (ks_format) and \code{invalue} (ks_invalue)
+  components.
 }
 \description{
 Creates both a format and its corresponding invalue for bidirectional conversion.
+Both are automatically stored in the global format library if \code{name}
+is provided.
 }
 \examples{
 sex_bi <- format_bidirectional(
@@ -27,8 +31,9 @@ sex_bi <- format_bidirectional(
 )
 
 # Format: M -> Male
-format_apply("M", sex_bi$format)
+fput("M", sex_bi$format)
 
 # Invalue: Male -> M
 invalue_apply("Male", sex_bi$invalue)
+fclear()
 }

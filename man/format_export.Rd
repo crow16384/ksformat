@@ -24,7 +24,8 @@ Converts \code{ks_format} and/or \code{ks_invalue} objects to
 human-readable SAS-like text representation.
 }
 \examples{
-sex_fmt <- format_create("M" = "Male", "F" = "Female",
-                         .missing = "Unknown", name = "sex")
+sex_fmt <- fnew("M" = "Male", "F" = "Female",
+                .missing = "Unknown", name = "sex")
 cat(format_export(sex = sex_fmt))
+fclear()
 }

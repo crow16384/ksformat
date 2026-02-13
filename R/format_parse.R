@@ -2,16 +2,16 @@
 #'
 #' Reads format definitions written in a human-friendly SAS-like syntax
 #' and returns a list of \code{ks_format} and/or \code{ks_invalue} objects.
+#' All parsed formats are automatically stored in the global format library.
 #'
 #' @param text Character string or character vector containing format definitions.
 #'   If a character vector, lines are concatenated with newlines.
 #' @param file Path to a text file containing format definitions.
 #'   Exactly one of \code{text} or \code{file} must be provided.
-#' @param register Logical. If \code{TRUE}, parsed formats are automatically
-#'   registered in the global format library. Default is \code{FALSE}.
 #'
 #' @return A named list of \code{ks_format} and/or \code{ks_invalue} objects.
 #'   Names correspond to the format names defined in the text.
+#'   All formats are automatically registered in the global format library.
 #'
 #' @details
 #' The syntax supports two block types:
@@ -28,30 +28,25 @@
 #' ;
 #' }
 #'
-#' \strong{INVALUE} blocks define reverse formats (label -> value):
+#' \strong{INVALUE} blocks define reverse formats (label -> numeric value):
 #' \preformatted{
-#' INVALUE name (target_type)
-#'   "Label 1" = "value1"
-#'   "Label 2" = "value2"
+#' INVALUE name
+#'   "Label 1" = 1
+#'   "Label 2" = 2
 #' ;
 #' }
 #'
 #' \strong{Syntax rules:}
 #' \itemize{
 #'   \item Blocks start with \code{VALUE} or \code{INVALUE} keyword and end with \code{;}
-#'   \item The type in parentheses is optional; defaults to \code{"auto"}
+#'   \item The type in parentheses is optional; defaults to \code{"auto"} for VALUE,
+#'         \code{"numeric"} for INVALUE
 #'   \item Values can be quoted or unquoted
-#'   \item Ranges use interval notation with explicit bounds:
-#'     \code{[0, 18)} (inclusive low, exclusive high),
-#'     \code{(0, 100]} (exclusive low, inclusive high),
-#'     \code{[0, 100]} (both inclusive),
-#'     \code{(0, 100)} (both exclusive)
-#'   \item Legacy range syntax \code{low - high} is also supported and defaults to \code{[low, high)}
-#'   \item Decimal numbers are fully supported: \code{[0.5, 1.5)}
+#'   \item Ranges use interval notation with explicit bounds
+#'   \item Legacy range syntax \code{low - high} is also supported
 #'   \item Special range keywords: \code{LOW} (-Inf) and \code{HIGH} (Inf)
 #'   \item \code{.missing} and \code{.other} are special directives
-#'   \item Lines starting with \code{/*} or \code{*} or \code{//} are comments
-#'   \item Blank lines are ignored
+#'   \item Lines starting with \code{/*}, \code{*}, \code{//}, or \code{#} are comments
 #' }
 #'
 #' @export
@@ -70,9 +65,11 @@
 #' ;
 #' '
 #'
-#' formats <- format_parse(text = txt)
-#' format_apply(c("M", "F", NA), formats$sex)
-format_parse <- function(text = NULL, file = NULL, register = FALSE) {
+#' fparse(text = txt)
+#' fput(c("M", "F", NA), "sex")
+#' fputn(c(5, 25, 70), "age")
+#' fclear()
+fparse <- function(text = NULL, file = NULL) {
   # Validate inputs
   if (is.null(text) && is.null(file)) {
     stop("Either 'text' or 'file' must be provided")
@@ -97,15 +94,18 @@ format_parse <- function(text = NULL, file = NULL, register = FALSE) {
   # Parse into blocks
   blocks <- .parse_blocks(lines)
 
-  # Convert blocks to format objects
+  # Convert blocks to format objects and auto-register
   result <- list()
   for (block in blocks) {
     obj <- .block_to_format(block)
-    result[[block$name]] <- obj
 
-    if (register) {
-      format_register(obj, name = block$name, overwrite = TRUE)
-    }
+    # Validate
+    .format_validate(obj)
+
+    # Auto-register in library
+    .format_register(obj, name = block$name, overwrite = TRUE)
+
+    result[[block$name]] <- obj
   }
 
   return(result)
@@ -128,9 +128,10 @@ format_parse <- function(text = NULL, file = NULL, register = FALSE) {
 #'
 #' @export
 #' @examples
-#' sex_fmt <- format_create("M" = "Male", "F" = "Female",
-#'                          .missing = "Unknown", name = "sex")
+#' sex_fmt <- fnew("M" = "Male", "F" = "Female",
+#'                 .missing = "Unknown", name = "sex")
 #' cat(format_export(sex = sex_fmt))
+#' fclear()
 format_export <- function(..., formats = NULL, file = NULL) {
   if (is.null(formats)) {
     formats <- list(...)
@@ -143,7 +144,6 @@ format_export <- function(..., formats = NULL, file = NULL) {
   # Ensure all items are named
   fmt_names <- names(formats)
   if (is.null(fmt_names) || any(fmt_names == "")) {
-    # Try to get names from the objects themselves
     for (i in seq_along(formats)) {
       if (is.null(fmt_names) || fmt_names[i] == "") {
         obj_name <- formats[[i]]$name
@@ -219,7 +219,8 @@ format_export <- function(..., formats = NULL, file = NULL) {
       block_subtype <- if (length(block_match) >= 4 && block_match[4] != "") {
         trimws(block_match[4])
       } else {
-        "auto"
+        # Default: "auto" for VALUE, "numeric" for INVALUE
+        if (block_type == "INVALUE") "numeric" else "auto"
       }
 
       current_block <- list(
@@ -394,7 +395,6 @@ format_export <- function(..., formats = NULL, file = NULL) {
     } else if (entry$type == "discrete") {
       mappings[[entry$key]] <- entry$label
     } else if (entry$type == "range") {
-      # Store range as "low,high,inc_low,inc_high" key
       inc_low <- if (!is.null(entry$inc_low)) entry$inc_low else TRUE
       inc_high <- if (!is.null(entry$inc_high)) entry$inc_high else FALSE
       range_key <- paste0(entry$low, ",", entry$high, ",",
@@ -441,8 +441,6 @@ format_export <- function(..., formats = NULL, file = NULL) {
     if (entry$type == "discrete") {
       mappings[[entry$key]] <- entry$label
     } else if (entry$type == "missing") {
-      # For invalue, .missing sets the missing_value
-      # The value side is the target
       mappings[[".missing_marker"]] <- entry$value
     }
   }
@@ -459,6 +457,7 @@ format_export <- function(..., formats = NULL, file = NULL) {
     mappings[[".missing_marker"]] <- NULL
   }
 
+  # Use block subtype; for INVALUE blocks, default is "numeric"
   target_type <- block$subtype
 
   invalue_obj <- structure(
@@ -471,11 +470,6 @@ format_export <- function(..., formats = NULL, file = NULL) {
     ),
     class = "ks_invalue"
   )
-
-  # Auto-detect type if needed
-  if (target_type == "auto") {
-    invalue_obj$target_type <- detect_invalue_type(mappings)
-  }
 
   return(invalue_obj)
 }
@@ -535,8 +529,8 @@ format_export <- function(..., formats = NULL, file = NULL) {
 .invalue_to_text <- function(inv, name) {
   lines <- character(0)
 
-  # Header
-  type_part <- if (!is.null(inv$target_type) && inv$target_type != "auto") {
+  # Header — omit type for numeric (default)
+  type_part <- if (!is.null(inv$target_type) && inv$target_type != "numeric") {
     paste0(" (", inv$target_type, ")")
   } else {
     ""

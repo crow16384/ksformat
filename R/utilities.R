@@ -8,33 +8,30 @@ NULL
 
 #' Check if Value is Missing
 #'
-#' Comprehensive check for missing values including NA, NULL, NaN, and optionally empty strings.
+#' Element-wise check for missing values including NA and NaN.
+#' Optionally treats empty strings as missing.
 #'
 #' @param x Value to check
-#' @param include_empty Logical. If TRUE, treat empty strings as missing
+#' @param include_empty Logical. If \code{TRUE}, treat empty strings as missing.
+#'   Default is \code{FALSE}.
 #'
-#' @return Logical vector
+#' @return Logical vector. NULL input returns \code{logical(0)}.
 #'
 #' @export
 #'
 #' @examples
-#' is_missing_value(NA)          # TRUE
-#' is_missing_value(NULL)        # TRUE (length 0)
-#' is_missing_value(NaN)         # TRUE
-#' is_missing_value("")          # FALSE
-#' is_missing_value("", TRUE)    # TRUE
-is_missing_value <- function(x, include_empty = FALSE) {
-  if (is.null(x)) {
-    return(logical(0))
+#' is_missing(NA)          # TRUE
+#' is_missing(NaN)         # TRUE
+#' is_missing("")          # FALSE
+#' is_missing("", include_empty = TRUE)  # TRUE
+#' is_missing("text")      # FALSE
+is_missing <- function(x, include_empty = FALSE) {
+  if (is.null(x)) return(logical(0))
+  result <- is.na(x)
+  if (include_empty) {
+    result <- result | (!result & as.character(x) == "")
   }
-
-  result <- is.na(x) | is.nan(x)
-
-  if (include_empty && is.character(x)) {
-    result <- result | (x == "")
-  }
-
-  return(result)
+  result
 }
 
 #' Create Range Specification
@@ -96,10 +93,10 @@ in_range <- function(x, range_spec) {
     return(FALSE)
   }
 
-  low_ok <- if (range_spec$inc_low) x >= range_spec$low else x > range_spec$low
-  high_ok <- if (range_spec$inc_high) x <= range_spec$high else x < range_spec$high
+  low_ok <- ifelse(range_spec$inc_low, x >= range_spec$low, x > range_spec$low)
+  high_ok <- ifelse(range_spec$inc_high, x <= range_spec$high, x < range_spec$high)
 
-  return(low_ok & high_ok)
+  low_ok & high_ok
 }
 
 
@@ -137,7 +134,7 @@ in_range <- function(x, range_spec) {
     }
   }
 
-  return(NULL)
+  NULL
 }
 
 #' Format Library (Global Environment for Storing Formats)
@@ -145,25 +142,18 @@ in_range <- function(x, range_spec) {
 #' @keywords internal
 .format_library <- new.env(parent = emptyenv())
 
-#' Register Format in Library
+#' Register Format in Library (Internal)
 #'
-#' Stores a format definition in the global format library for later retrieval.
+#' Stores a format definition in the global format library.
 #'
 #' @param format A ks_format or ks_invalue object
 #' @param name Character. Name to store format under (uses format$name if NULL)
-#' @param overwrite Logical. Allow overwriting existing format
+#' @param overwrite Logical. Allow overwriting existing format. Default TRUE.
 #'
 #' @return Invisibly returns the format object
-#'
-#' @export
-#'
-#' @examples
-#' sex_fmt <- format_create("M" = "Male", "F" = "Female", name = "sex")
-#' format_register(sex_fmt)
-#'
-#' # Later retrieve it
-#' fmt <- format_get("sex")
-format_register <- function(format, name = NULL, overwrite = FALSE) {
+#' @keywords internal
+#' @noRd
+.format_register <- function(format, name = NULL, overwrite = TRUE) {
   if (!inherits(format, c("ks_format", "ks_invalue"))) {
     stop("format must be a ks_format or ks_invalue object")
   }
@@ -173,7 +163,7 @@ format_register <- function(format, name = NULL, overwrite = FALSE) {
   }
 
   if (is.null(name) || name == "") {
-    stop("Format must have a name to be registered")
+    return(invisible(format))
   }
 
   if (exists(name, envir = .format_library) && !overwrite) {
@@ -181,147 +171,176 @@ format_register <- function(format, name = NULL, overwrite = FALSE) {
   }
 
   assign(name, format, envir = .format_library)
-
-  message("Format '", name, "' registered successfully")
   invisible(format)
 }
 
-#' Retrieve Format from Library
-#'
-#' Gets a format definition from the global format library.
+#' Retrieve Format from Library (Internal)
 #'
 #' @param name Character. Name of the format to retrieve
-#'
 #' @return A ks_format or ks_invalue object
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' sex_fmt <- format_get("sex")
-#' }
-format_get <- function(name) {
+#' @keywords internal
+#' @noRd
+.format_get <- function(name) {
   if (!exists(name, envir = .format_library)) {
-    stop("Format '", name, "' not found in library. Available formats: ",
-         paste(format_list(), collapse = ", "))
+    available <- ls(envir = .format_library)
+    if (length(available) == 0) {
+      stop("Format '", name, "' not found. Format library is empty.")
+    }
+    stop("Format '", name, "' not found. Available: ",
+         paste(available, collapse = ", "))
   }
-  
-  return(get(name, envir = .format_library))
+  get(name, envir = .format_library)
 }
 
-#' List Available Formats in Library
+#' Print Format(s) from Library
 #'
-#' Returns names of all formats stored in the global format library.
+#' Displays format information from the global format library.
+#' When called without arguments, lists all registered format names.
+#' When called with a name, displays the full definition of that format.
 #'
-#' @return Character vector of format names
+#' @param name Character. Optional name of a specific format to display.
+#'   If \code{NULL} (default), lists all registered formats.
+#'
+#' @return Invisible \code{NULL}. This function is for display only.
 #'
 #' @export
 #'
 #' @examples
-#' format_list()
-format_list <- function() {
-  return(ls(envir = .format_library))
-}
-
-#' Remove Format from Library
-#'
-#' Removes a format from the global format library.
-#'
-#' @param name Character. Name of format to remove
-#'
-#' @return Logical indicating success
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' format_remove("sex")
-#' }
-format_remove <- function(name) {
-  if (!exists(name, envir = .format_library)) {
-    warning("Format '", name, "' not found in library")
-    return(FALSE)
+#' fnew("M" = "Male", "F" = "Female", name = "sex")
+#' fprint()         # list all formats
+#' fprint("sex")    # show specific format
+#' fclear()
+fprint <- function(name = NULL) {
+  if (is.null(name)) {
+    fnames <- ls(envir = .format_library)
+    if (length(fnames) == 0) {
+      cat("Format library is empty\n")
+    } else {
+      cat("Registered formats:\n")
+      for (nm in fnames) {
+        obj <- get(nm, envir = .format_library)
+        type_str <- if (inherits(obj, "ks_format")) {
+          paste0("VALUE (", obj$type, ")")
+        } else if (inherits(obj, "ks_invalue")) {
+          paste0("INVALUE (", obj$target_type, ")")
+        } else {
+          "unknown"
+        }
+        n_mappings <- length(obj$mappings)
+        cat("  ", nm, " - ", type_str, ", ", n_mappings, " mapping(s)\n", sep = "")
+      }
+    }
+  } else {
+    if (!exists(name, envir = .format_library)) {
+      stop("Format '", name, "' not found. Use fprint() to see available formats.")
+    }
+    obj <- get(name, envir = .format_library)
+    print(obj)
   }
-
-  rm(list = name, envir = .format_library)
-  message("Format '", name, "' removed from library")
-  return(TRUE)
-}
-
-#' Clear All Formats from Library
-#'
-#' Removes all formats from the global format library.
-#'
-#' @return Invisible NULL
-#'
-#' @export
-format_clear <- function() {
-  rm(list = ls(envir = .format_library), envir = .format_library)
-  message("All formats cleared from library")
   invisible(NULL)
 }
 
-#' Validate Vector Against Format
+#' Remove Format(s) from Library
 #'
-#' Checks which values in a vector match format definitions.
+#' Removes one or all formats from the global format library.
+#' When called without arguments, clears all formats.
+#' When called with a name, removes only that format.
 #'
-#' @param x Vector to validate
-#' @param format A ks_format object
+#' @param name Character. Optional name of a specific format to remove.
+#'   If \code{NULL} (default), removes all formats.
 #'
-#' @return Data frame with columns: value, matched, label
+#' @return Invisible \code{NULL}
 #'
 #' @export
 #'
 #' @examples
-#' sex_fmt <- format_create("M" = "Male", "F" = "Female")
-#' format_validate(c("M", "F", "X", NA), sex_fmt)
-format_validate <- function(x, format) {
-  if (!inherits(format, "ks_format")) {
-    stop("format must be a ks_format object")
+#' fnew("M" = "Male", "F" = "Female", name = "sex")
+#' fclear("sex")   # remove one format
+#' fclear()        # remove all formats
+fclear <- function(name = NULL) {
+  if (is.null(name)) {
+    nms <- ls(envir = .format_library)
+    if (length(nms) > 0) {
+      rm(list = nms, envir = .format_library)
+    }
+    message("All formats cleared from library")
+  } else {
+    if (!exists(name, envir = .format_library)) {
+      warning("Format '", name, "' not found in library")
+      return(invisible(NULL))
+    }
+    rm(list = name, envir = .format_library)
+    message("Format '", name, "' removed from library")
   }
+  invisible(NULL)
+}
 
-  formatted <- format_apply(x, format)
+#' Validate Format Object (Internal)
+#'
+#' Validates the structure and content of a format object during
+#' creation or parsing. Provides clear error descriptions for the user.
+#'
+#' @param format_obj A ks_format or ks_invalue object to validate
+#' @return Invisibly returns the format object if valid
+#' @keywords internal
+#' @noRd
+.format_validate <- function(format_obj) {
+  if (inherits(format_obj, "ks_format")) {
+    name_str <- if (!is.null(format_obj$name)) {
+      paste0(" '", format_obj$name, "'")
+    } else {
+      ""
+    }
 
-  # Check which values were actually matched vs using .other label
-  matched <- rep(FALSE, length(x))
-
-  # Pre-parse range keys for numeric formats
-  range_entries <- list()
-  if (format$type == "numeric") {
-    for (i in seq_along(format$mappings)) {
-      key <- names(format$mappings)[i]
-      parsed <- .parse_range_key(key)
-      if (!is.null(parsed)) {
-        range_entries <- c(range_entries, list(parsed))
+    # Check that all labels are character strings
+    if (length(format_obj$mappings) > 0) {
+      labels <- unlist(format_obj$mappings)
+      non_char <- !sapply(labels, is.character)
+      if (any(non_char)) {
+        bad_idx <- which(non_char)
+        bad_keys <- names(format_obj$mappings)[bad_idx]
+        stop("Format", name_str, ": All labels must be character strings. ",
+             "Non-character labels found for keys: ",
+             paste(bad_keys, collapse = ", "))
       }
     }
-  }
 
-  for (i in seq_along(x)) {
-    if (is.na(x[i])) {
-      matched[i] <- !is.null(format$missing_label)
-    } else {
-      # Check exact match
-      if (as.character(x[i]) %in% names(format$mappings)) {
-        matched[i] <- TRUE
-      } else if (format$type == "numeric" && is.numeric(x[i])) {
-        # Check range match
-        for (re in range_entries) {
-          low_ok <- if (re$inc_low) x[i] >= re$low else x[i] > re$low
-          high_ok <- if (re$inc_high) x[i] <= re$high else x[i] < re$high
-          if (low_ok && high_ok) {
-            matched[i] <- TRUE
-            break
-          }
+    # Check for duplicate keys
+    keys <- names(format_obj$mappings)
+    if (anyDuplicated(keys)) {
+      dupes <- unique(keys[duplicated(keys)])
+      warning("Format", name_str, ": Duplicate keys: ",
+              paste(dupes, collapse = ", "))
+    }
+
+    # For numeric type, validate that keys are valid numbers or ranges
+    if (format_obj$type == "numeric" && length(format_obj$mappings) > 0) {
+      for (key in keys) {
+        parsed <- .parse_range_key(key)
+        if (is.null(parsed) && is.na(suppressWarnings(as.numeric(key)))) {
+          warning("Format", name_str, ": Key '", key,
+                  "' is not a valid numeric value or range")
         }
       }
     }
+
+  } else if (inherits(format_obj, "ks_invalue")) {
+    name_str <- if (!is.null(format_obj$name)) {
+      paste0(" '", format_obj$name, "'")
+    } else {
+      ""
+    }
+
+    # Check for duplicate keys
+    if (length(format_obj$mappings) > 0) {
+      keys <- names(format_obj$mappings)
+      if (anyDuplicated(keys)) {
+        dupes <- unique(keys[duplicated(keys)])
+        warning("Invalue", name_str, ": Duplicate keys: ",
+                paste(dupes, collapse = ", "))
+      }
+    }
   }
 
-  return(data.frame(
-    value = x,
-    matched = matched,
-    label = formatted,
-    stringsAsFactors = FALSE
-  ))
+  invisible(format_obj)
 }

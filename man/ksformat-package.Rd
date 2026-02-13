@@ -14,32 +14,30 @@ of missing values (NA, NULL, NaN).
 \details{
 Main features:
 \itemize{
-  \item Create value-to-label mappings (formats)
-  \item Apply formats to vectors and data frames
-  \item Reverse formatting (label-to-value conversion)
-  \item Comprehensive missing value handling
-  \item Global format library
+  \item Create value-to-label mappings (formats) with \code{\link{fnew}}
+  \item Apply formats to vectors using \code{\link{fput}}
+  \item Apply formats by name: \code{\link{fputn}} (numeric), \code{\link{fputc}} (character)
+  \item Reverse formatting with \code{\link{finput}} and \code{\link{invalue_apply}}
+  \item Apply invalues by name: \code{\link{finputn}} (numeric), \code{\link{finputc}} (character)
+  \item Parse SAS-like format definitions from text with \code{\link{fparse}}
+  \item Global format library with auto-registration
   \item Range-based formatting for numeric data
-}
-
-Key functions:
-\itemize{
-  \item \code{\link{format_create}} - Create format definitions
-  \item \code{\link{format_apply}} - Apply formats to data
-  \item \code{\link{format_invalue}} - Create reverse formats
-  \item \code{\link{invalue_apply}} - Apply reverse formats
-  \item \code{\link{format_register}} - Store formats in library
 }
 }
 \examples{
 \dontrun{
 # Create and apply a format
-sex_fmt <- format_create(
-  "M" = "Male",
-  "F" = "Female",
-  .missing = "Unknown"
-)
-format_apply(c("M", "F", NA), sex_fmt)
+fnew("M" = "Male", "F" = "Female", .missing = "Unknown", name = "sex")
+fput(c("M", "F", NA), "sex")
+
+# Parse from SAS-like text (auto-registered)
+fparse(text = '
+VALUE age (numeric)
+  [0, 18) = "Child"
+  [18, 65) = "Adult"
+;
+')
+fputn(c(5, 25), "age")
 }
 
 }
