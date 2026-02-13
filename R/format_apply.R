@@ -6,6 +6,9 @@
 #' @param x Vector of values to format
 #' @param format A \code{ks_format} object or a character string naming a format
 #'   in the global format library.
+#' @param ... Additional arguments for expression labels. Positional arguments
+#'   are mapped to \code{.x1}, \code{.x2}, etc. inside expression labels.
+#'   Can be vectors of the same length as \code{x} or scalars (recycled).
 #' @param keep_na Logical. If TRUE, preserve NA in output instead of applying
 #'   missing label.
 #'
@@ -20,6 +23,20 @@
 #'   \item No match -> Uses format's other_label or returns original value
 #' }
 #'
+#' \strong{Expression labels:} If a label string contains \code{.x1}, \code{.x2},
+#' etc., it is evaluated as an R expression at apply-time. Extra data is passed
+#' as positional arguments:
+#'
+#' \preformatted{
+#' stat_fmt <- fnew("n" = "sprintf('\%s', .x1)",
+#'                  "pct" = "sprintf('\%.1f\%\%', .x1 * 100)")
+#' fput(c("n", "pct"), stat_fmt, c(42, 0.15))
+#' # Returns: "42" "15.0\%"
+#' }
+#'
+#' \strong{Case-insensitive matching:} When a format has \code{ignore_case = TRUE},
+#' key matching is case-insensitive for character formats.
+#'
 #' @export
 #'
 #' @examples
@@ -27,7 +44,7 @@
 #' fput(c("M", "F", NA, "X"), "sex")
 #' # Returns: "Male" "Female" "Unknown" "X"
 #' fclear()
-fput <- function(x, format, keep_na = FALSE) {
+fput <- function(x, format, ..., keep_na = FALSE) {
   # Resolve format by name if string provided
   if (is.character(format) && length(format) == 1) {
     format <- .format_get(format)
@@ -47,8 +64,17 @@ fput <- function(x, format, keep_na = FALSE) {
     return(.apply_datetime_format(x, format, keep_na = keep_na))
   }
 
+  # Capture extra arguments for expression labels
+  extra_args <- list(...)
+
+  # Flags
+  nocase <- isTRUE(format$ignore_case)
+
   # Initialize result vector
   result <- rep(NA_character_, length(x))
+
+  # Track expression-label assignments: list of expr_str -> indices
+  expr_map <- list()
 
   # Identify missing values (NA, NaN)
   is_miss <- is.na(x) | is.nan(x)
@@ -89,9 +115,23 @@ fput <- function(x, format, keep_na = FALSE) {
     # Try exact match first
     for (i in seq_along(format$mappings)) {
       key <- names(format$mappings)[i]
+      val_str <- as.character(value)
 
-      if (as.character(value) == key) {
-        result[idx] <- format$mappings[[i]]
+      match_ok <- if (nocase) {
+        tolower(val_str) == tolower(key)
+      } else {
+        val_str == key
+      }
+
+      if (match_ok) {
+        label <- format$mappings[[i]]
+        if (.is_expr_label(label)) {
+          # Defer expression evaluation: record index
+          if (is.null(expr_map[[label]])) expr_map[[label]] <- integer(0)
+          expr_map[[label]] <- c(expr_map[[label]], idx)
+        } else {
+          result[idx] <- label
+        }
         matched <- TRUE
         break
       }
@@ -103,7 +143,13 @@ fput <- function(x, format, keep_na = FALSE) {
         low_ok <- if (re$inc_low) value >= re$low else value > re$low
         high_ok <- if (re$inc_high) value <= re$high else value < re$high
         if (low_ok && high_ok) {
-          result[idx] <- re$label
+          label <- re$label
+          if (.is_expr_label(label)) {
+            if (is.null(expr_map[[label]])) expr_map[[label]] <- integer(0)
+            expr_map[[label]] <- c(expr_map[[label]], idx)
+          } else {
+            result[idx] <- label
+          }
           matched <- TRUE
           break
         }
@@ -113,10 +159,24 @@ fput <- function(x, format, keep_na = FALSE) {
     # Apply other label if no match
     if (!matched) {
       if (!is.null(format$other_label)) {
-        result[idx] <- format$other_label
+        if (.is_expr_label(format$other_label)) {
+          label <- format$other_label
+          if (is.null(expr_map[[label]])) expr_map[[label]] <- integer(0)
+          expr_map[[label]] <- c(expr_map[[label]], idx)
+        } else {
+          result[idx] <- format$other_label
+        }
       } else {
         result[idx] <- as.character(value)
       }
+    }
+  }
+
+  # Evaluate deferred expression labels
+  if (length(expr_map) > 0) {
+    for (expr_str in names(expr_map)) {
+      indices <- expr_map[[expr_str]]
+      result[indices] <- .eval_expr_label(expr_str, extra_args, indices)
     }
   }
 
@@ -130,6 +190,8 @@ fput <- function(x, format, keep_na = FALSE) {
 #'
 #' @param x Numeric vector of values to format
 #' @param format_name Character. Name of a registered numeric format.
+#' @param ... Additional arguments passed to \code{\link{fput}} for expression
+#'   labels (mapped to \code{.x1}, \code{.x2}, etc.).
 #'
 #' @return Character vector with formatted labels
 #'
@@ -146,7 +208,7 @@ fput <- function(x, format, keep_na = FALSE) {
 #' ')
 #' fputn(c(5, 25, 70), "age")
 #' }
-fputn <- function(x, format_name) {
+fputn <- function(x, format_name, ...) {
   format_obj <- .format_get(format_name)
   if (!inherits(format_obj, "ks_format")) {
     stop("'", format_name, "' is not a VALUE format (ks_format)")
@@ -155,7 +217,7 @@ fputn <- function(x, format_name) {
     warning("Format '", format_name, "' is type '", format_obj$type,
             "', not 'numeric'")
   }
-  fput(x, format_obj)
+  fput(x, format_obj, ...)
 }
 
 #' Apply Character Format by Name (like SAS PUTC)
@@ -165,6 +227,8 @@ fputn <- function(x, format_name) {
 #'
 #' @param x Character vector of values to format
 #' @param format_name Character. Name of a registered character format.
+#' @param ... Additional arguments passed to \code{\link{fput}} for expression
+#'   labels (mapped to \code{.x1}, \code{.x2}, etc.).
 #'
 #' @return Character vector with formatted labels
 #'
@@ -175,7 +239,7 @@ fputn <- function(x, format_name) {
 #' fnew("M" = "Male", "F" = "Female", name = "sex")
 #' fputc(c("M", "F"), "sex")
 #' }
-fputc <- function(x, format_name) {
+fputc <- function(x, format_name, ...) {
   format_obj <- .format_get(format_name)
   if (!inherits(format_obj, "ks_format")) {
     stop("'", format_name, "' is not a VALUE format (ks_format)")
@@ -184,7 +248,7 @@ fputc <- function(x, format_name) {
     warning("Format '", format_name, "' is type '", format_obj$type,
             "', not 'character'")
   }
-  fput(x, format_obj)
+  fput(x, format_obj, ...)
 }
 
 #' Apply Format and Return All Matches (Multilabel)
@@ -196,6 +260,8 @@ fputc <- function(x, format_name) {
 #' @param x Vector of values to format
 #' @param format A \code{ks_format} object or a character string naming a format
 #'   in the global format library.
+#' @param ... Additional arguments for expression labels (mapped to \code{.x1},
+#'   \code{.x2}, etc.).
 #' @param keep_na Logical. If TRUE, preserve NA in output.
 #'
 #' @return A list of character vectors. Each element contains all matching labels
@@ -219,7 +285,7 @@ fputc <- function(x, format_name) {
 #' # [[2]] "Teen" "Minor"
 #' # [[3]] "Adult"
 #' fclear()
-fput_all <- function(x, format, keep_na = FALSE) {
+fput_all <- function(x, format, ..., keep_na = FALSE) {
   # Resolve format by name if string provided
   if (is.character(format) && length(format) == 1) {
     format <- .format_get(format)
@@ -239,6 +305,12 @@ fput_all <- function(x, format, keep_na = FALSE) {
     result <- .apply_datetime_format(x, format, keep_na = keep_na)
     return(as.list(result))
   }
+
+  # Capture extra arguments for expression labels
+  extra_args <- list(...)
+
+  # Flags
+  nocase <- isTRUE(format$ignore_case)
 
   n <- length(x)
   result <- vector("list", n)
@@ -265,6 +337,9 @@ fput_all <- function(x, format, keep_na = FALSE) {
     }
   }
 
+  # Track expression labels: list of expr_str -> list(indices, positions_in_result)
+  expr_map <- list()
+
   for (idx in seq_len(n)) {
     # Handle missing
     if (is_miss[idx]) {
@@ -278,12 +353,22 @@ fput_all <- function(x, format, keep_na = FALSE) {
 
     value <- x[idx]
     labels <- character(0)
+    expr_labels <- character(0)
 
     # Collect ALL exact matches
     for (i in seq_along(format$mappings)) {
       key <- names(format$mappings)[i]
-      if (as.character(value) == key) {
-        labels <- c(labels, format$mappings[[i]])
+
+      val_str <- as.character(value)
+      match_ok <- if (nocase) tolower(val_str) == tolower(key) else val_str == key
+
+      if (match_ok) {
+        label <- format$mappings[[i]]
+        if (.is_expr_label(label)) {
+          expr_labels <- c(expr_labels, label)
+        } else {
+          labels <- c(labels, label)
+        }
       }
     }
 
@@ -293,21 +378,46 @@ fput_all <- function(x, format, keep_na = FALSE) {
         low_ok <- if (re$inc_low) value >= re$low else value > re$low
         high_ok <- if (re$inc_high) value <= re$high else value < re$high
         if (low_ok && high_ok) {
-          labels <- c(labels, re$label)
+          if (.is_expr_label(re$label)) {
+            expr_labels <- c(expr_labels, re$label)
+          } else {
+            labels <- c(labels, re$label)
+          }
         }
       }
     }
 
     # No match: use other_label or original value
-    if (length(labels) == 0) {
+    if (length(labels) == 0 && length(expr_labels) == 0) {
       if (!is.null(format$other_label)) {
-        labels <- format$other_label
+        if (.is_expr_label(format$other_label)) {
+          expr_labels <- c(expr_labels, format$other_label)
+        } else {
+          labels <- format$other_label
+        }
       } else {
         labels <- as.character(value)
       }
     }
 
+    # Record expression labels for deferred evaluation
+    for (el in expr_labels) {
+      if (is.null(expr_map[[el]])) expr_map[[el]] <- integer(0)
+      expr_map[[el]] <- c(expr_map[[el]], idx)
+    }
+
     result[[idx]] <- labels
+  }
+
+  # Evaluate deferred expression labels and append to results
+  if (length(expr_map) > 0) {
+    for (expr_str in names(expr_map)) {
+      indices <- expr_map[[expr_str]]
+      evaled <- .eval_expr_label(expr_str, extra_args, indices)
+      for (k in seq_along(indices)) {
+        result[[indices[k]]] <- c(result[[indices[k]]], evaled[k])
+      }
+    }
   }
 
   return(result)

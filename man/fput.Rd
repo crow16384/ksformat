@@ -4,13 +4,17 @@
 \alias{fput}
 \title{Apply Format to Data (like SAS PUT function)}
 \usage{
-fput(x, format, keep_na = FALSE)
+fput(x, format, ..., keep_na = FALSE)
 }
 \arguments{
 \item{x}{Vector of values to format}
 
 \item{format}{A \code{ks_format} object or a character string naming a format
 in the global format library.}
+
+\item{...}{Additional arguments for expression labels. Positional arguments
+are mapped to \code{.x1}, \code{.x2}, etc. inside expression labels.
+Can be vectors of the same length as \code{x} or scalars (recycled).}
 
 \item{keep_na}{Logical. If TRUE, preserve NA in output instead of applying
 missing label.}
@@ -30,6 +34,20 @@ The function handles missing values in the following order:
   \item Range matches (for numeric) -> Uses range label
   \item No match -> Uses format's other_label or returns original value
 }
+
+\strong{Expression labels:} If a label string contains \code{.x1}, \code{.x2},
+etc., it is evaluated as an R expression at apply-time. Extra data is passed
+as positional arguments:
+
+\preformatted{
+stat_fmt <- fnew("n" = "sprintf('\%s', .x1)",
+                 "pct" = "sprintf('\%.1f\%\%', .x1 * 100)")
+fput(c("n", "pct"), stat_fmt, c(42, 0.15))
+# Returns: "42" "15.0\%"
+}
+
+\strong{Case-insensitive matching:} When a format has \code{ignore_case = TRUE},
+key matching is case-insensitive for character formats.
 }
 \examples{
 fnew("M" = "Male", "F" = "Female", .missing = "Unknown", name = "sex")

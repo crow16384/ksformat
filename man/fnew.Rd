@@ -4,7 +4,14 @@
 \alias{fnew}
 \title{Create a Format Definition (like SAS PROC FORMAT)}
 \usage{
-fnew(..., name = NULL, type = "auto", default = NULL, multilabel = FALSE)
+fnew(
+  ...,
+  name = NULL,
+  type = "auto",
+  default = NULL,
+  multilabel = FALSE,
+  ignore_case = FALSE
+)
 }
 \arguments{
 \item{...}{Named arguments defining value-label mappings. Can be:
@@ -24,6 +31,9 @@ or \code{"auto"} (default) for auto-detection.}
 \item{multilabel}{Logical. If \code{TRUE}, the format supports overlapping
 ranges where a single value can match multiple labels. Used with
 \code{\link{fput_all}} to retrieve all matching labels. Default \code{FALSE}.}
+
+\item{ignore_case}{Logical. If \code{TRUE}, key matching for character formats
+is case-insensitive. Default \code{FALSE}.}
 }
 \value{
 An object of class \code{"ks_format"} containing the format definition.
@@ -36,6 +46,22 @@ The format is automatically stored in the global format library if \code{name}
 is provided.
 }
 \details{
+Special directives:
+\itemize{
+  \item \code{.missing}: Label for NA, NULL, NaN values
+  \item \code{.other}: Label for values not matching any rule
+}
+
+\strong{Expression labels:} If a label contains \code{.x1}, \code{.x2}, etc.,
+it is treated as an R expression that is evaluated at apply-time. Extra arguments
+are passed positionally via \code{...} in \code{\link{fput}}:
+\preformatted{
+stat_fmt <- fnew("n" = "sprintf('\%s', .x1)",
+                 "pct" = "sprintf('\%.1f\%\%', .x1 * 100)")
+fput(c("n", "pct"), stat_fmt, c(42, 0.15))
+# Returns: "42" "15.0\%"
+}
+
 Special directives:
 \itemize{
   \item \code{.missing}: Label for NA, NULL, NaN values

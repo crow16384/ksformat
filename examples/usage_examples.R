@@ -498,4 +498,127 @@ for (i in seq_along(grades)) {
 
 # Clean up
 fclear()
+
+# ===========================================================================
+# Example 14: Case-Insensitive Matching
+# ===========================================================================
+cat("\n=== Example 14: Case-Insensitive Matching ===\n\n")
+
+# Create a character format with ignore_case = TRUE
+sex_nc <- fnew(
+  "M" = "Male",
+  "F" = "Female",
+  .missing = "Unknown",
+  name = "sex_nc",
+  type = "character",
+  ignore_case = TRUE
+)
+
+
+# Mixed-case input is matched regardless of case
+input <- c("m", "F", "M", "f", NA)
+cat("Input:  ", paste(input, collapse = ", "), "\n")
+cat("Result: ", paste(fput(input, sex_nc), collapse = ", "), "\n\n")
+
+# Show the format - note the [nocase] flag
+fprint("sex_nc")
+
+# Also works with fputc
+cat("\nfputc('m', 'sex_nc'):", fputc("m", "sex_nc"), "\n")
+
+fclear()
+
+# ===========================================================================
+# Example 15: Expression Labels in Formats
+# ===========================================================================
+cat("\n=== Example 15: Expression Labels in Formats ===\n\n")
+
+# Expression labels contain .x1, .x2, ... which reference extra arguments
+# passed to fput(). This lets you compute labels dynamically.
+
+# --- Example 15a: Simple sprintf expression ---
+cat("--- 15a: sprintf expression ---\n")
+stat_fmt <- fnew(
+  "n"   = "sprintf('%s', .x1)",
+  "pct" = "sprintf('%.1f%%', .x1 * 100)",
+  name = "stat",
+  type = "character"
+)
+
+types  <- c("n",  "pct",  "n",   "pct")
+values <- c(42,   0.053,  100,   0.255)
+
+cat("Types:  ", paste(types, collapse = ", "), "\n")
+cat("Values: ", paste(values, collapse = ", "), "\n")
+# Pass values as extra positional arg -> .x1
+cat("Result: ", paste(fput(types, stat_fmt, values), collapse = ", "), "\n\n")
+
+# --- Example 15b: Expressions with two extra args ---
+cat("--- 15b: Two extra arguments (.x1, .x2) ---\n")
+ratio_fmt <- fnew(
+  "ratio" = "sprintf('%s/%s', .x1, .x2)",
+  name = "ratio",
+  type = "character"
+)
+
+cat("fput('ratio', ratio_fmt, 3, 10):", fput("ratio", ratio_fmt, 3, 10), "\n")
+cat("fput(c('ratio','ratio'), ratio_fmt, c(3,7), c(10,20)):",
+    paste(fput(c("ratio", "ratio"), ratio_fmt, c(3, 7), c(10, 20)),
+          collapse = ", "), "\n\n")
+
+# --- Example 15c: ifelse expression ---
+cat("--- 15c: ifelse expression ---\n")
+sign_fmt <- fnew(
+  "val" = "ifelse(.x1 > 0, paste0('+', .x1), as.character(.x1))",
+  name = "sign",
+  type = "character"
+)
+
+nums <- c(5, 0, -3)
+cat("Values: ", paste(nums, collapse = ", "), "\n")
+cat("Result: ", paste(fput(rep("val", 3), sign_fmt, nums), collapse = ", "), "\n\n")
+
+# --- Example 15d: Mixed static and expression labels ---
+cat("--- 15d: Mixed static and expression labels ---\n")
+mixed_fmt <- fnew(
+  "header" = "HEADER",
+  "n"      = "sprintf('N=%s', .x1)",
+  "pct"    = "sprintf('%.1f%%', .x1 * 100)",
+  name = "mixed",
+  type = "character"
+)
+
+keys <- c("header", "n", "pct", "header", "n")
+vals <- c(0,        42,  0.15,  0,        100)
+cat("Keys:   ", paste(keys, collapse = ", "), "\n")
+cat("Values: ", paste(vals, collapse = ", "), "\n")
+cat("Result: ", paste(fput(keys, mixed_fmt, vals), collapse = ", "), "\n\n")
+
+# --- Example 15e: Expression in .other ---
+cat("--- 15e: Expression in .other fallback ---\n")
+known_fmt <- fnew(
+  "ok" = "OK",
+  .other = "sprintf('Error(%s)', .x1)",
+  name = "err_fmt",
+  type = "character"
+)
+
+codes   <- c("ok", "E01", "ok", "E99")
+details <- c("",   "timeout", "", "overflow")
+cat("Codes:  ", paste(codes, collapse = ", "), "\n")
+cat("Result: ", paste(fput(codes, known_fmt, details), collapse = ", "), "\n\n")
+
+# --- Example 15f: Scalar recycling ---
+cat("--- 15f: Scalar recycling ---\n")
+label_fmt <- fnew(
+  "val" = "sprintf('%s (N=%s)', .x1, .x2)",
+  name = "recycle",
+  type = "character"
+)
+
+cat("fput(c('val','val'), label_fmt, c(42, 55), 100):\n")
+cat("  ", paste(fput(c("val", "val"), label_fmt, c(42, 55), 100),
+               collapse = ", "), "\n")
+
+fclear()
 cat("\n=== Examples completed ===\n")

@@ -4,12 +4,15 @@
 \alias{fputc}
 \title{Apply Character Format by Name (like SAS PUTC)}
 \usage{
-fputc(x, format_name)
+fputc(x, format_name, ...)
 }
 \arguments{
 \item{x}{Character vector of values to format}
 
 \item{format_name}{Character. Name of a registered character format.}
+
+\item{...}{Additional arguments passed to \code{\link{fput}} for expression
+labels (mapped to \code{.x1}, \code{.x2}, etc.).}
 }
 \value{
 Character vector with formatted labels

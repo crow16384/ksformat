@@ -42,7 +42,7 @@ fputn(c(5, 25), "age")
 
 }
 \author{
-\strong{Maintainer}: Developer Vladimir Larchenko \email{vladimir.larchenko@keystatsolutions.com}
+\strong{Maintainer}: Vladimir Larchenko \email{vladimir.larchenko@keystatsolutions.com}
 
 }
 \keyword{package}

@@ -1344,3 +1344,220 @@ test_that("custom strftime date format with fput", {
   expect_equal(result, "15.06.2020")
   fclear()
 })
+
+
+# ===========================================================================
+# Case-Insensitive Matching Tests
+# ===========================================================================
+
+test_that("ignore_case in fnew creates format with flag", {
+  fmt <- fnew("M" = "Male", "F" = "Female", ignore_case = TRUE)
+  expect_true(fmt$ignore_case)
+  fclear()
+})
+
+test_that("fput with ignore_case matches case-insensitively", {
+  fmt <- fnew("M" = "Male", "F" = "Female", ignore_case = TRUE)
+  result <- fput(c("m", "f", "M", "F"), fmt)
+  expect_equal(result, c("Male", "Female", "Male", "Female"))
+  fclear()
+})
+
+test_that("fput without ignore_case is case-sensitive (default)", {
+  fmt <- fnew("M" = "Male", "F" = "Female")
+  result <- fput(c("m", "M"), fmt)
+  expect_equal(result, c("m", "Male"))
+  fclear()
+})
+
+test_that("fput_all with ignore_case", {
+  fmt <- fnew("a" = "Alpha", "b" = "Beta",
+              type = "character", ignore_case = TRUE, multilabel = TRUE)
+  result <- fput_all(c("A", "b"), fmt)
+  expect_equal(result[[1]], "Alpha")
+  expect_equal(result[[2]], "Beta")
+  fclear()
+})
+
+test_that("fparse with nocase keyword", {
+  txt <- '
+VALUE sex (character, nocase)
+  "M" = "Male"
+  "F" = "Female"
+;
+'
+  result <- fparse(text = txt)
+  expect_true(result$sex$ignore_case)
+
+  # Test case-insensitive apply
+  expect_equal(fput(c("m", "F"), "sex"), c("Male", "Female"))
+  fclear()
+})
+
+test_that("format_export with nocase flag", {
+  fmt <- fnew("M" = "Male", "F" = "Female",
+              name = "sex_nc", type = "character", ignore_case = TRUE)
+  txt <- format_export(sex_nc = fmt)
+  expect_true(grepl("nocase", txt))
+  fclear()
+})
+
+test_that("print.ks_format shows nocase flag", {
+  fmt <- fnew("M" = "Male", name = "nc_test", ignore_case = TRUE)
+  out <- capture.output(print(fmt))
+  expect_true(any(grepl("nocase", out)))
+  fclear()
+})
+
+test_that("ignore_case combined with .other and .missing", {
+  fmt <- fnew("Y" = "Yes", "N" = "No",
+              .missing = "Unknown", .other = "Invalid",
+              ignore_case = TRUE)
+  result <- fput(c("y", "N", NA, "x"), fmt)
+  expect_equal(result, c("Yes", "No", "Unknown", "Invalid"))
+  fclear()
+})
+
+
+# ===========================================================================
+# Expression Label Tests
+# ===========================================================================
+
+test_that("expression label detected by .is_expr_label", {
+  expect_true(ksformat:::.is_expr_label("sprintf('%s', .x1)"))
+  expect_true(ksformat:::.is_expr_label("paste0(.x1, '%')"))
+  expect_false(ksformat:::.is_expr_label("Male"))
+  expect_false(ksformat:::.is_expr_label("x1"))  # no dot
+  fclear()
+})
+
+test_that("fput with expression label and positional arg", {
+  fmt <- fnew("n" = "sprintf('%s', .x1)",
+              name = "stat", type = "character")
+  result <- fput(c("n", "n"), fmt, c(42, 100))
+  expect_equal(result, c("42", "100"))
+  fclear()
+})
+
+test_that("fput with multiple expression labels", {
+  fmt <- fnew(
+    "n" = "sprintf('%s', .x1)",
+    "pct" = "sprintf('%.1f%%', .x1 * 100)",
+    name = "stat2", type = "character"
+  )
+  result <- fput(c("n", "pct", "n", "pct"), fmt, c(42, 0.15, 100, 0.255))
+  expect_equal(result, c("42", "15.0%", "100", "25.5%"))
+  fclear()
+})
+
+test_that("fput with mixed static and expression labels", {
+  fmt <- fnew(
+    "label" = "LABEL",
+    "n" = "sprintf('%s', .x1)",
+    name = "mixed", type = "character"
+  )
+  result <- fput(c("label", "n", "label"), fmt, c(0, 42, 0))
+  expect_equal(result, c("LABEL", "42", "LABEL"))
+  fclear()
+})
+
+test_that("fput expression with two extra args", {
+  fmt <- fnew(
+    "ratio" = "sprintf('%s/%s', .x1, .x2)",
+    name = "two_arg", type = "character"
+  )
+  result <- fput(c("ratio", "ratio"), fmt, c(3, 7), c(10, 20))
+  expect_equal(result, c("3/10", "7/20"))
+  fclear()
+})
+
+test_that("fput expression with scalar extra arg (recycled)", {
+  fmt <- fnew(
+    "val" = "sprintf('%s (N=%s)', .x1, .x2)",
+    name = "scalar", type = "character"
+  )
+  result <- fput(c("val", "val"), fmt, c(42, 55), 100)
+  expect_equal(result, c("42 (N=100)", "55 (N=100)"))
+  fclear()
+})
+
+test_that("fput expression with no extra args warns", {
+  fmt <- fnew("n" = "sprintf('%s', .x1)", type = "character")
+  expect_warning(result <- fput("n", fmt))
+  expect_true(is.na(result))
+  fclear()
+})
+
+test_that("fput expression preserves NA handling", {
+  fmt <- fnew(
+    "n" = "sprintf('%s', .x1)",
+    .missing = "MISS",
+    name = "expr_na", type = "character"
+  )
+  result <- fput(c("n", NA), fmt, c(42, 0))
+  expect_equal(result[1], "42")
+  expect_equal(result[2], "MISS")
+  fclear()
+})
+
+test_that("fputn passes extra args to expression labels", {
+  fnew("1" = "sprintf('%.1f', .x1)", name = "expr_num", type = "numeric")
+  result <- fputn(1, "expr_num", 3.14159)
+  expect_equal(result, "3.1")
+  fclear()
+})
+
+test_that("fputc passes extra args to expression labels", {
+  fnew("a" = "paste0(.x1, '!')", name = "expr_chr", type = "character")
+  result <- fputc("a", "expr_chr", "hello")
+  expect_equal(result, "hello!")
+  fclear()
+})
+
+test_that("fput_all with expression labels", {
+  fmt <- fnew(
+    "0,100,TRUE,TRUE" = "sprintf('Score: %s', .x1)",
+    name = "expr_ml", type = "numeric"
+  )
+  result <- fput_all(50, fmt, 99)
+  expect_type(result, "list")
+  expect_equal(result[[1]], "Score: 99")
+  fclear()
+})
+
+test_that("expression with ifelse", {
+  fmt <- fnew(
+    "val" = "ifelse(.x1 > 0, paste0('+', .x1), as.character(.x1))",
+    name = "sign_fmt", type = "character"
+  )
+  result <- fput(c("val", "val", "val"), fmt, c(5, 0, -3))
+  expect_equal(result, c("+5", "0", "-3"))
+  fclear()
+})
+
+test_that("expression with .other label", {
+  fmt <- fnew(
+    "known" = "YES",
+    .other = "sprintf('Unknown: %s', .x1)",
+    name = "other_expr", type = "character"
+  )
+  result <- fput(c("known", "xyz"), fmt, c(1, 2))
+  expect_equal(result, c("YES", "Unknown: 2"))
+  fclear()
+})
+
+test_that("fparse roundtrip preserves expression labels", {
+  txt <- '
+VALUE stat (character)
+  "n" = "sprintf(\'%s\', .x1)"
+  "pct" = "sprintf(\'%.1f%%\', .x1 * 100)"
+;
+'
+  result <- fparse(text = txt)
+  expect_equal(result$stat$mappings[["n"]], "sprintf('%s', .x1)")
+
+  # Apply the parsed format
+  out <- fput(c("n", "pct"), "stat", c(42, 0.15))
+  expect_equal(out, c("42", "15.0%"))
+  fclear()
+})

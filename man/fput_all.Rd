@@ -4,13 +4,16 @@
 \alias{fput_all}
 \title{Apply Format and Return All Matches (Multilabel)}
 \usage{
-fput_all(x, format, keep_na = FALSE)
+fput_all(x, format, ..., keep_na = FALSE)
 }
 \arguments{
 \item{x}{Vector of values to format}
 
 \item{format}{A \code{ks_format} object or a character string naming a format
 in the global format library.}
+
+\item{...}{Additional arguments for expression labels (mapped to \code{.x1},
+\code{.x2}, etc.).}
 
 \item{keep_na}{Logical. If TRUE, preserve NA in output.}
 }

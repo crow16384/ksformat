@@ -237,11 +237,26 @@ format_export <- function(..., formats = NULL, file = NULL) {
         }
       }
 
+      # Parse nocase flag from subtype
+      block_nocase <- FALSE
+      if (grepl("nocase", block_subtype, ignore.case = TRUE)) {
+        block_nocase <- TRUE
+        block_subtype <- gsub(",?\\s*nocase", "", block_subtype,
+                              ignore.case = TRUE)
+        block_subtype <- gsub("nocase\\s*,?", "", block_subtype,
+                              ignore.case = TRUE)
+        block_subtype <- trimws(block_subtype)
+        if (block_subtype == "") {
+          block_subtype <- if (block_type == "INVALUE") "numeric" else "auto"
+        }
+      }
+
       current_block <- list(
         type = block_type,
         name = block_name,
         subtype = block_subtype,
         multilabel = block_multilabel,
+        nocase = block_nocase,
         entries = list(),
         line_start = i
       )
@@ -434,6 +449,7 @@ format_export <- function(..., formats = NULL, file = NULL) {
       missing_label = missing_label,
       other_label = other_label,
       multilabel = isTRUE(block$multilabel),
+      ignore_case = isTRUE(block$nocase),
       created = Sys.time()
     ),
     class = "ks_format"
@@ -547,7 +563,8 @@ format_export <- function(..., formats = NULL, file = NULL) {
   # Build type annotation
   type_str <- if (!is.null(fmt$type) && fmt$type != "auto") fmt$type else NULL
   ml_str <- if (isTRUE(fmt$multilabel)) "multilabel" else NULL
-  annot_parts <- c(type_str, ml_str)
+  nc_str <- if (isTRUE(fmt$ignore_case)) "nocase" else NULL
+  annot_parts <- c(type_str, ml_str, nc_str)
   type_part <- if (length(annot_parts) > 0) {
     paste0(" (", paste(annot_parts, collapse = ", "), ")")
   } else {

@@ -18,9 +18,28 @@
 #' @param multilabel Logical. If \code{TRUE}, the format supports overlapping
 #'   ranges where a single value can match multiple labels. Used with
 #'   \code{\link{fput_all}} to retrieve all matching labels. Default \code{FALSE}.
+#' @param ignore_case Logical. If \code{TRUE}, key matching for character formats
+#'   is case-insensitive. Default \code{FALSE}.
 #'
 #' @return An object of class \code{"ks_format"} containing the format definition.
 #'   The object is also stored in the format library if \code{name} is given.
+#'
+#' @details
+#' Special directives:
+#' \itemize{
+#'   \item \code{.missing}: Label for NA, NULL, NaN values
+#'   \item \code{.other}: Label for values not matching any rule
+#' }
+#'
+#' \strong{Expression labels:} If a label contains \code{.x1}, \code{.x2}, etc.,
+#' it is treated as an R expression that is evaluated at apply-time. Extra arguments
+#' are passed positionally via \code{...} in \code{\link{fput}}:
+#' \preformatted{
+#' stat_fmt <- fnew("n" = "sprintf('\%s', .x1)",
+#'                  "pct" = "sprintf('\%.1f\%\%', .x1 * 100)")
+#' fput(c("n", "pct"), stat_fmt, c(42, 0.15))
+#' # Returns: "42" "15.0\%"
+#' }
 #'
 #' @details
 #' Special directives:
@@ -44,7 +63,7 @@
 #' fput(c("M", "F", NA), "sex")
 #' fclear()
 fnew <- function(..., name = NULL, type = "auto", default = NULL,
-                 multilabel = FALSE) {
+                 multilabel = FALSE, ignore_case = FALSE) {
   mappings <- list(...)
 
   if (length(mappings) == 0) {
@@ -78,6 +97,7 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
       missing_label = missing_label,
       other_label = other_label,
       multilabel = multilabel,
+      ignore_case = ignore_case,
       created = Sys.time()
     ),
     class = "ks_format"
@@ -146,9 +166,12 @@ validate_mappings <- function(mappings, type) {
 #' @param ... Additional arguments (unused)
 #' @export
 print.ks_format <- function(x, ...) {
-  ml_str <- if (isTRUE(x$multilabel)) " (multilabel)" else ""
+  flags <- character(0)
+  if (isTRUE(x$multilabel)) flags <- c(flags, "multilabel")
+  if (isTRUE(x$ignore_case)) flags <- c(flags, "nocase")
+  flags_str <- if (length(flags) > 0) paste0(" (", paste(flags, collapse = ", "), ")") else ""
   cat("KS Format:", if (!is.null(x$name)) x$name else "(unnamed)",
-      ml_str, "\n", sep = "")
+      flags_str, "\n", sep = "")
   cat("Type:", x$type, "\n")
 
   # Date/time formats show pattern instead of mappings

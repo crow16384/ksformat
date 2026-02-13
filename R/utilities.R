@@ -6,6 +6,74 @@
 #' @keywords internal
 NULL
 
+
+# ===========================================================================
+# Expression label helpers
+# ===========================================================================
+
+#' Check if a label string is an R expression
+#'
+#' A label is treated as an expression if it references
+#' \code{.x1}, \code{.x2}, etc.
+#'
+#' @param label Character string (the label/value side of a mapping)
+#' @return Logical
+#' @keywords internal
+#' @noRd
+.is_expr_label <- function(label) {
+  grepl("\\.x\\d+", label)
+}
+
+
+#' Evaluate an expression label with extra arguments
+#'
+#' Parses the expression string and evaluates it in an environment
+#' containing \code{.x1}, \code{.x2}, etc. subsetted to the given indices.
+#'
+#' @param expr_str Character. The expression string.
+#' @param extra_args List. Positional arguments from \code{fput(x, fmt, ...)}.
+#' @param indices Integer vector. Indices in the original vector that matched.
+#' @return Character vector of evaluated results.
+#' @keywords internal
+#' @noRd
+.eval_expr_label <- function(expr_str, extra_args, indices) {
+  env <- new.env(parent = globalenv())
+
+  for (j in seq_along(extra_args)) {
+    arg_name <- paste0(".x", j)
+    arg_val <- extra_args[[j]]
+    if (length(arg_val) == 1) {
+      assign(arg_name, arg_val, envir = env)
+    } else {
+      assign(arg_name, arg_val[indices], envir = env)
+    }
+  }
+
+  parsed <- parse(text = expr_str)
+  result <- tryCatch(
+    as.character(eval(parsed, envir = env)),
+    error = function(e) {
+      warning("Expression evaluation failed: ", conditionMessage(e),
+              "\n  Expression: ", expr_str)
+      rep(NA_character_, length(indices))
+    }
+  )
+
+  # Ensure result length matches indices
+  if (length(result) != length(indices)) {
+    if (length(result) == 1) {
+      result <- rep(result, length(indices))
+    } else {
+      warning("Expression returned ", length(result), " values, expected ",
+              length(indices), ". Recycling/truncating.")
+      result <- rep_len(result, length(indices))
+    }
+  }
+
+  return(result)
+}
+
+
 #' Check if Value is Missing
 #'
 #' Element-wise check for missing values including NA and NaN.
