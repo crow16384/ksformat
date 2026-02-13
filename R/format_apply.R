@@ -40,9 +40,26 @@
 #' @export
 #'
 #' @examples
+#' # Basic discrete formatting
 #' fnew("M" = "Male", "F" = "Female", .missing = "Unknown", name = "sex")
 #' fput(c("M", "F", NA, "X"), "sex")
-#' # Returns: "Male" "Female" "Unknown" "X"
+#' # [1] "Male" "Female" "Unknown" "X"
+#'
+#' # Preserve NA instead of applying missing label
+#' sex_f <- fnew("M" = "Male", "F" = "Female", .missing = "Unknown")
+#' fput(c("M", "F", NA), sex_f, keep_na = TRUE)
+#' # [1] "Male" "Female" NA
+#'
+#' # Numeric range formatting
+#' fparse(text = '
+#' VALUE score (numeric)
+#'   (0, 50]  = "Low"
+#'   (50, 100] = "High"
+#'   .other   = "Out of range"
+#' ;
+#' ')
+#' fput(c(0, 1, 50, 51, 100, 101), "score")
+#' # [1] "Out of range" "Low" "Low" "High" "High" "Out of range"
 #' fclear()
 fput <- function(x, format, ..., keep_na = FALSE) {
   # Resolve format by name if string provided
@@ -238,16 +255,26 @@ fput <- function(x, format, ..., keep_na = FALSE) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' # Numeric range formatting
 #' fparse(text = '
 #' VALUE age (numeric)
-#'   [0, 18) = "Child"
-#'   [18, 65) = "Adult"
-#'   [65, HIGH] = "Senior"
+#'   [0, 18)    = "Child"
+#'   [18, 65)   = "Adult"
+#'   [65, HIGH]  = "Senior"
+#'   .missing   = "Age Unknown"
 #' ;
 #' ')
-#' fputn(c(5, 25, 70), "age")
-#' }
+#' fputn(c(5, 25, 70, NA), "age")
+#' # [1] "Child" "Adult" "Senior" "Age Unknown"
+#'
+#' # SAS date format (auto-resolved, no pre-creation needed)
+#' fputn(as.Date("2025-01-15"), "DATE9.")
+#' # [1] "15JAN2025"
+#'
+#' # Time format (seconds since midnight)
+#' fputn(c(0, 3600, 45000), "TIME8.")
+#' # [1] "00:00:00" "01:00:00" "12:30:00"
+#' fclear()
 fputn <- function(x, format_name, ...) {
   # Support vectorized format names (like SAS PUTN with variable format)
   if (length(format_name) > 1L) {
@@ -283,10 +310,21 @@ fputn <- function(x, format_name, ...) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' # Apply character format by name
 #' fnew("M" = "Male", "F" = "Female", name = "sex")
 #' fputc(c("M", "F"), "sex")
-#' }
+#' # [1] "Male" "Female"
+#'
+#' # Bidirectional: forward direction
+#' fnew_bid(
+#'   "A" = "Active",
+#'   "I" = "Inactive",
+#'   "P" = "Pending",
+#'   name = "status"
+#' )
+#' fputc(c("A", "I", "P", "A"), "status")
+#' # [1] "Active" "Inactive" "Pending" "Active"
+#' fclear()
 fputc <- function(x, format_name, ...) {
   # Support vectorized format names (like SAS PUTC with variable format)
   if (length(format_name) > 1L) {
@@ -324,6 +362,7 @@ fputc <- function(x, format_name, ...) {
 #' @export
 #'
 #' @examples
+#' # Basic multilabel: a value can match multiple labels
 #' age_ml <- fnew(
 #'   "0,5,TRUE,TRUE" = "Infant",
 #'   "6,11,TRUE,TRUE" = "Child",
@@ -338,6 +377,36 @@ fputc <- function(x, format_name, ...) {
 #' # [[1]] "Infant" "Minor"
 #' # [[2]] "Teen" "Minor"
 #' # [[3]] "Adult"
+#'
+#' # Multilabel with .missing and .other
+#' fnew(
+#'   "0,100,TRUE,TRUE"  = "Valid Score",
+#'   "0,49,TRUE,TRUE"   = "Below Average",
+#'   "50,100,TRUE,TRUE" = "Above Average",
+#'   "90,100,TRUE,TRUE" = "Excellent",
+#'   .missing = "No Score",
+#'   .other = "Out of Range",
+#'   name = "score_ml", type = "numeric", multilabel = TRUE
+#' )
+#' fput_all(c(95, 45, NA, 150), "score_ml")
+#' # [[1]] "Valid Score" "Above Average" "Excellent"
+#' # [[2]] "Valid Score" "Below Average"
+#' # [[3]] "No Score"
+#' # [[4]] "Out of Range"
+#'
+#' # Parse multilabel from text
+#' fparse(text = '
+#' VALUE risk (numeric, multilabel)
+#'   [0, 3]  = "Low Risk"
+#'   [0, 7]  = "Monitored"
+#'   (3, 7]  = "Medium Risk"
+#'   (7, 10] = "High Risk"
+#' ;
+#' ')
+#' fput_all(c(2, 5, 9), "risk")
+#' # [[1]] "Low Risk" "Monitored"
+#' # [[2]] "Monitored" "Medium Risk"
+#' # [[3]] "High Risk"
 #' fclear()
 fput_all <- function(x, format, ..., keep_na = FALSE) {
   # Resolve format by name if string provided
@@ -500,17 +569,35 @@ fput_all <- function(x, format, ..., keep_na = FALSE) {
 #' @export
 #'
 #' @examples
+#' # Apply formats to multiple columns
 #' df <- data.frame(
-#'   sex = c("M", "F", "M", NA),
-#'   status = c("A", "I", "A", "P")
+#'   id = 1:6,
+#'   sex = c("M", "F", "M", "F", NA, "X"),
+#'   age = c(15, 25, 45, 70, 35, NA),
+#'   stringsAsFactors = FALSE
 #' )
 #'
-#' fnew("M" = "Male", "F" = "Female", .missing = "Unknown", name = "sex_fmt")
-#' fnew("A" = "Active", "I" = "Inactive", "P" = "Pending", name = "status_fmt")
-#'
 #' sex_f <- fnew("M" = "Male", "F" = "Female", .missing = "Unknown")
-#' status_f <- fnew("A" = "Active", "I" = "Inactive", "P" = "Pending")
-#' fput_df(df, sex = sex_f, status = status_f)
+#' fparse(text = '
+#' VALUE age (numeric)
+#'   [0, 18)   = "Child"
+#'   [18, 65)  = "Adult"
+#'   [65, HIGH] = "Senior"
+#'   .missing  = "Age Unknown"
+#' ;
+#' ')
+#' age_f <- ksformat:::.format_get("age")
+#'
+#' fput_df(df, sex = sex_f, age = age_f, suffix = "_label")
+#'
+#' # Date formatting in data frames
+#' patients <- data.frame(
+#'   id = 1:4,
+#'   visit_date = as.Date(c("2025-01-10", "2025-02-15", "2025-03-20", NA)),
+#'   stringsAsFactors = FALSE
+#' )
+#' visit_fmt <- fnew_date("DATE9.", name = "visit_fmt", .missing = "NOT RECORDED")
+#' fput_df(patients, visit_date = visit_fmt)
 #' fclear()
 fput_df <- function(data, ..., suffix = "_fmt", replace = FALSE) {
   formats <- list(...)

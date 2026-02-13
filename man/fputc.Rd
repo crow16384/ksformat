@@ -24,8 +24,19 @@ Looks up a character VALUE format by name from the global format library
 and applies it to the input vector.
 }
 \examples{
-\dontrun{
+# Apply character format by name
 fnew("M" = "Male", "F" = "Female", name = "sex")
 fputc(c("M", "F"), "sex")
-}
+# [1] "Male" "Female"
+
+# Bidirectional: forward direction
+fnew_bid(
+  "A" = "Active",
+  "I" = "Inactive",
+  "P" = "Pending",
+  name = "status"
+)
+fputc(c("A", "I", "P", "A"), "status")
+# [1] "Active" "Inactive" "Pending" "Active"
+fclear()
 }

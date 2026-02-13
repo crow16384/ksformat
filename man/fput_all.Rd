@@ -27,6 +27,7 @@ Regular \code{\link{fput}} returns only the first match; this function
 returns all matches as a list of character vectors.
 }
 \examples{
+# Basic multilabel: a value can match multiple labels
 age_ml <- fnew(
   "0,5,TRUE,TRUE" = "Infant",
   "6,11,TRUE,TRUE" = "Child",
@@ -41,5 +42,35 @@ fput_all(c(3, 15, 25), age_ml)
 # [[1]] "Infant" "Minor"
 # [[2]] "Teen" "Minor"
 # [[3]] "Adult"
+
+# Multilabel with .missing and .other
+fnew(
+  "0,100,TRUE,TRUE"  = "Valid Score",
+  "0,49,TRUE,TRUE"   = "Below Average",
+  "50,100,TRUE,TRUE" = "Above Average",
+  "90,100,TRUE,TRUE" = "Excellent",
+  .missing = "No Score",
+  .other = "Out of Range",
+  name = "score_ml", type = "numeric", multilabel = TRUE
+)
+fput_all(c(95, 45, NA, 150), "score_ml")
+# [[1]] "Valid Score" "Above Average" "Excellent"
+# [[2]] "Valid Score" "Below Average"
+# [[3]] "No Score"
+# [[4]] "Out of Range"
+
+# Parse multilabel from text
+fparse(text = '
+VALUE risk (numeric, multilabel)
+  [0, 3]  = "Low Risk"
+  [0, 7]  = "Monitored"
+  (3, 7]  = "Medium Risk"
+  (7, 10] = "High Risk"
+;
+')
+fput_all(c(2, 5, 9), "risk")
+# [[1]] "Low Risk" "Monitored"
+# [[2]] "Monitored" "Medium Risk"
+# [[3]] "High Risk"
 fclear()
 }

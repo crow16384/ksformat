@@ -49,11 +49,32 @@
 #'   "M" = "Male",
 #'   "F" = "Female",
 #'   .missing = "Unknown",
+#'   .other = "Other Gender",
 #'   name = "sex"
 #' )
 #'
 #' # Apply immediately
-#' fput(c("M", "F", NA), "sex")
+#' fput(c("M", "F", NA, "X"), "sex")
+#' # [1] "Male" "Female" "Unknown" "Other Gender"
+#' fclear()
+#'
+#' # Multilabel format: a value can match multiple labels
+#' fnew(
+#'   "0,5,TRUE,TRUE"   = "Infant",
+#'   "6,11,TRUE,TRUE"  = "Child",
+#'   "12,17,TRUE,TRUE" = "Adolescent",
+#'   "0,17,TRUE,TRUE"  = "Pediatric",
+#'   "18,64,TRUE,TRUE" = "Adult",
+#'   "65,Inf,TRUE,TRUE" = "Elderly",
+#'   "18,Inf,TRUE,TRUE" = "Non-Pediatric",
+#'   name = "age_categories",
+#'   type = "numeric",
+#'   multilabel = TRUE
+#' )
+#'
+#' # fput returns first match; fput_all returns all matches
+#' fput(c(3, 14, 25, 70), "age_categories")
+#' fput_all(c(3, 14, 25, 70), "age_categories")
 #' fclear()
 fnew <- function(..., name = NULL, type = "auto", default = NULL,
                  multilabel = FALSE, ignore_case = FALSE) {

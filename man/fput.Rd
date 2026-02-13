@@ -50,8 +50,25 @@ fput(c("n", "pct"), stat_fmt, c(42, 0.15))
 key matching is case-insensitive for character formats.
 }
 \examples{
+# Basic discrete formatting
 fnew("M" = "Male", "F" = "Female", .missing = "Unknown", name = "sex")
 fput(c("M", "F", NA, "X"), "sex")
-# Returns: "Male" "Female" "Unknown" "X"
+# [1] "Male" "Female" "Unknown" "X"
+
+# Preserve NA instead of applying missing label
+sex_f <- fnew("M" = "Male", "F" = "Female", .missing = "Unknown")
+fput(c("M", "F", NA), sex_f, keep_na = TRUE)
+# [1] "Male" "Female" NA
+
+# Numeric range formatting
+fparse(text = '
+VALUE score (numeric)
+  (0, 50]  = "Low"
+  (50, 100] = "High"
+  .other   = "Out of range"
+;
+')
+fput(c(0, 1, 50, 51, 100, 101), "score")
+# [1] "Out of range" "Low" "Low" "High" "High" "Out of range"
 fclear()
 }

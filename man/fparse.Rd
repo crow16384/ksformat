@@ -60,7 +60,8 @@ INVALUE name
 }
 }
 \examples{
-txt <- '
+# Parse multiple format definitions from text
+fparse(text = '
 VALUE sex (character)
   "M" = "Male"
   "F" = "Female"
@@ -68,14 +69,56 @@ VALUE sex (character)
 ;
 
 VALUE age (numeric)
-  [0, 18) = "Child"
-  [18, 65) = "Adult"
-  [65, HIGH] = "Senior"
+  [0, 18)    = "Child"
+  [18, 65)   = "Adult"
+  [65, HIGH]  = "Senior"
+  .missing   = "Age Unknown"
 ;
-'
 
-fparse(text = txt)
+// Invalue block
+INVALUE race_inv
+  "White" = 1
+  "Black" = 2
+  "Asian" = 3
+;
+')
+
 fput(c("M", "F", NA), "sex")
-fputn(c(5, 25, 70), "age")
+fputn(c(5, 25, 70, NA), "age")
+finputn(c("White", "Black"), "race_inv")
+fprint()
+fclear()
+
+# Parse date/time/datetime format definitions
+fparse(text = '
+VALUE enrldt (date)
+  pattern = "DATE9."
+  .missing = "Not Enrolled"
+;
+
+VALUE visit_time (time)
+  pattern = "TIME8."
+;
+
+VALUE stamp (datetime)
+  pattern = "DATETIME20."
+;
+')
+
+fput(as.Date("2025-03-01"), "enrldt")
+fput(36000, "visit_time")
+fput(as.POSIXct("2025-03-01 10:00:00", tz = "UTC"), "stamp")
+fclear()
+
+# Parse multilabel format
+fparse(text = '
+VALUE risk (numeric, multilabel)
+  [0, 3]  = "Low Risk"
+  [0, 7]  = "Monitored"
+  (3, 7]  = "Medium Risk"
+  (7, 10] = "High Risk"
+;
+')
+fput_all(c(2, 5, 9), "risk")
 fclear()
 }

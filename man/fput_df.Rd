@@ -22,16 +22,34 @@ Data frame with formatted columns
 Applies formats to one or more columns in a data frame.
 }
 \examples{
+# Apply formats to multiple columns
 df <- data.frame(
-  sex = c("M", "F", "M", NA),
-  status = c("A", "I", "A", "P")
+  id = 1:6,
+  sex = c("M", "F", "M", "F", NA, "X"),
+  age = c(15, 25, 45, 70, 35, NA),
+  stringsAsFactors = FALSE
 )
 
-fnew("M" = "Male", "F" = "Female", .missing = "Unknown", name = "sex_fmt")
-fnew("A" = "Active", "I" = "Inactive", "P" = "Pending", name = "status_fmt")
-
 sex_f <- fnew("M" = "Male", "F" = "Female", .missing = "Unknown")
-status_f <- fnew("A" = "Active", "I" = "Inactive", "P" = "Pending")
-fput_df(df, sex = sex_f, status = status_f)
+fparse(text = '
+VALUE age (numeric)
+  [0, 18)   = "Child"
+  [18, 65)  = "Adult"
+  [65, HIGH] = "Senior"
+  .missing  = "Age Unknown"
+;
+')
+age_f <- ksformat:::.format_get("age")
+
+fput_df(df, sex = sex_f, age = age_f, suffix = "_label")
+
+# Date formatting in data frames
+patients <- data.frame(
+  id = 1:4,
+  visit_date = as.Date(c("2025-01-10", "2025-02-15", "2025-03-20", NA)),
+  stringsAsFactors = FALSE
+)
+visit_fmt <- fnew_date("DATE9.", name = "visit_fmt", .missing = "NOT RECORDED")
+fput_df(patients, visit_date = visit_fmt)
 fclear()
 }

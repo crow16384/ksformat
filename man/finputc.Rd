@@ -19,9 +19,20 @@ Looks up an INVALUE format by name from the global format library
 and applies it to convert labels to character values.
 }
 \examples{
-\dontrun{
-finput("Male" = "M", "Female" = "F", name = "sex_inv",
-       target_type = "character")
-finputc(c("Male", "Female"), "sex_inv")
-}
+# Bidirectional: use finputc for reverse direction
+fnew_bid(
+  "A" = "Active",
+  "I" = "Inactive",
+  "P" = "Pending",
+  name = "status"
+)
+
+# Forward: code -> label
+fputc(c("A", "I", "P"), "status")
+# [1] "Active" "Inactive" "Pending"
+
+# Reverse: label -> code
+finputc(c("Active", "Pending", "Inactive"), "status_inv")
+# [1] "A" "P" "I"
+fclear()
 }

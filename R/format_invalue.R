@@ -28,8 +28,9 @@
 #'   name = "sex_inv"
 #' )
 #'
-#' invalue_apply(c("Male", "Female", "Unknown"), "sex_inv")
-#' # Returns: 1 2 NA
+#' # Apply using finputn (numeric invalue by name)
+#' finputn(c("Male", "Female", "Unknown"), "sex_inv")
+#' # [1]  1  2 NA
 #' fclear()
 finput <- function(..., name = NULL, target_type = "numeric", missing_value = NA) {
   mappings <- list(...)
@@ -75,7 +76,7 @@ finput <- function(..., name = NULL, target_type = "numeric", missing_value = NA
 #'
 #' @examples
 #' inv <- finput("Male" = 1, "Female" = 2, name = "sex_inv")
-#' .invalue_apply(c("Male", "Female", "Unknown"), inv)
+#' ksformat:::.invalue_apply(c("Male", "Female", "Unknown"), inv)
 #' # Returns: 1 2 NA
 #' fclear()
 .invalue_apply <- function(x, invalue, na_if = NULL) {
@@ -158,10 +159,27 @@ finput <- function(..., name = NULL, target_type = "numeric", missing_value = NA
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' finput("Male" = 1, "Female" = 2, name = "sex_inv")
-#' finputn(c("Male", "Female"), "sex_inv")
-#' }
+#' # Create numeric invalue and apply
+#' finput(
+#'   "Male" = 1,
+#'   "Female" = 2,
+#'   name = "sex_inv"
+#' )
+#' finputn(c("Male", "Female", "Male", "Unknown", "Female"), "sex_inv")
+#' # [1]  1  2  1 NA  2
+#' fclear()
+#'
+#' # Parse invalue from text and apply
+#' fparse(text = '
+#' INVALUE race_inv
+#'   "White" = 1
+#'   "Black" = 2
+#'   "Asian" = 3
+#' ;
+#' ')
+#' finputn(c("White", "Black"), "race_inv")
+#' # [1] 1 2
+#' fclear()
 finputn <- function(x, invalue_name) {
   inv_obj <- .format_get(invalue_name)
   if (!inherits(inv_obj, "ks_invalue")) {
@@ -184,11 +202,22 @@ finputn <- function(x, invalue_name) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' finput("Male" = "M", "Female" = "F", name = "sex_inv",
-#'        target_type = "character")
-#' finputc(c("Male", "Female"), "sex_inv")
-#' }
+#' # Bidirectional: use finputc for reverse direction
+#' fnew_bid(
+#'   "A" = "Active",
+#'   "I" = "Inactive",
+#'   "P" = "Pending",
+#'   name = "status"
+#' )
+#'
+#' # Forward: code -> label
+#' fputc(c("A", "I", "P"), "status")
+#' # [1] "Active" "Inactive" "Pending"
+#'
+#' # Reverse: label -> code
+#' finputc(c("Active", "Pending", "Inactive"), "status_inv")
+#' # [1] "A" "P" "I"
+#' fclear()
 finputc <- function(x, invalue_name) {
   inv_obj <- .format_get(invalue_name)
   if (!inherits(inv_obj, "ks_invalue")) {
@@ -215,17 +244,21 @@ finputc <- function(x, invalue_name) {
 #' @export
 #'
 #' @examples
-#' sex_bi <- fnew_bid(
-#'   "M" = "Male",
-#'   "F" = "Female",
-#'   name = "sex"
+#' # Bidirectional status format
+#' status_bi <- fnew_bid(
+#'   "A" = "Active",
+#'   "I" = "Inactive",
+#'   "P" = "Pending",
+#'   name = "status"
 #' )
 #'
-#' # Format: M -> Male
-#' fput("M", sex_bi$format)
+#' # Forward: code -> label
+#' fputc(c("A", "I", "P", "A"), "status")
+#' # [1] "Active" "Inactive" "Pending" "Active"
 #'
-#' # Invalue: Male -> M
-#' .invalue_apply("Male", sex_bi$invalue)
+#' # Reverse: label -> code
+#' finputc(c("Active", "Pending", "Inactive"), "status_inv")
+#' # [1] "A" "P" "I"
 #' fclear()
 fnew_bid <- function(..., name = NULL, type = "auto") {
   mappings <- list(...)

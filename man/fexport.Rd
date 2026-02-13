@@ -24,8 +24,36 @@ Converts \code{ks_format} and/or \code{ks_invalue} objects to
 human-readable SAS-like text representation.
 }
 \examples{
+# Export a character format
 sex_fmt <- fnew("M" = "Male", "F" = "Female",
                 .missing = "Unknown", name = "sex")
 cat(fexport(sex = sex_fmt))
+
+# Export a numeric range format
+fparse(text = '
+VALUE bmi (numeric)
+  [0, 18.5)  = "Underweight"
+  [18.5, 25) = "Normal"
+  [25, 30)   = "Overweight"
+  [30, HIGH] = "Obese"
+  .missing   = "No data"
+;
+')
+bmi_fmt <- ksformat:::.format_get("bmi")
+cat(fexport(bmi = bmi_fmt))
+
+# Export a multilabel format
+risk_fmt <- fnew(
+  "0,3,TRUE,TRUE" = "Low Risk",
+  "0,7,TRUE,TRUE" = "Monitored",
+  "3,7,FALSE,TRUE" = "Medium Risk",
+  "7,10,FALSE,TRUE" = "High Risk",
+  name = "risk", type = "numeric", multilabel = TRUE
+)
+cat(fexport(risk = risk_fmt))
+
+# Export a date format
+enrl_fmt <- fnew_date("DATE9.", name = "enrldt", .missing = "Not Enrolled")
+cat(fexport(enrldt = enrl_fmt))
 fclear()
 }

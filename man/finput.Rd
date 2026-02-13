@@ -38,7 +38,8 @@ finput(
   name = "sex_inv"
 )
 
-invalue_apply(c("Male", "Female", "Unknown"), "sex_inv")
-# Returns: 1 2 NA
+# Apply using finputn (numeric invalue by name)
+finputn(c("Male", "Female", "Unknown"), "sex_inv")
+# [1]  1  2 NA
 fclear()
 }

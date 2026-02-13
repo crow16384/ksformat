@@ -19,8 +19,25 @@ Looks up a numeric INVALUE format by name from the global format library
 and applies it to convert labels to numeric values.
 }
 \examples{
-\dontrun{
-finput("Male" = 1, "Female" = 2, name = "sex_inv")
-finputn(c("Male", "Female"), "sex_inv")
-}
+# Create numeric invalue and apply
+finput(
+  "Male" = 1,
+  "Female" = 2,
+  name = "sex_inv"
+)
+finputn(c("Male", "Female", "Male", "Unknown", "Female"), "sex_inv")
+# [1]  1  2  1 NA  2
+fclear()
+
+# Parse invalue from text and apply
+fparse(text = '
+INVALUE race_inv
+  "White" = 1
+  "Black" = 2
+  "Asian" = 3
+;
+')
+finputn(c("White", "Black"), "race_inv")
+# [1] 1 2
+fclear()
 }

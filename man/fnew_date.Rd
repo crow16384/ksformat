@@ -64,21 +64,37 @@ fput(as.Date("2020-01-01"), "mydate")
 fputn(as.Date("2020-06-15"), "MMDDYY10.")
 # [1] "06/15/2020"
 
-# Custom strftime pattern
-fnew_date("\%Y/\%m/\%d", name = "custom_date", type = "date")
-fput(as.Date("2020-01-01"), "custom_date")
-# [1] "2020/01/01"
+# Custom strftime pattern (e.g., Russian style: DD.MM.YYYY)
+fnew_date("\%d.\%m.\%Y", name = "ru_date", type = "date")
+fput(as.Date(c("1990-03-25", "1985-11-03", "2000-07-14")), "ru_date")
+
+# Custom format with missing value label
+fnew_date("MMDDYY10.", name = "us_date", .missing = "NO DATE")
+fput(c(as.Date("2025-01-01"), NA, as.Date("2025-12-31")), "us_date")
+# [1] "01/01/2025" "NO DATE" "12/31/2025"
 
 # SAS numeric date (days since 1960-01-01) — specify origin explicitly
 fnew_date("DATE9.", name = "sas_date", origin = "1960-01-01")
-fput(21915, "sas_date")
-# [1] "01JAN2020"
+sas_days <- as.numeric(as.Date("2025-01-01") - as.Date("1960-01-01"))
+fput(sas_days, "sas_date")
 
-# R numeric date (days since 1970-01-01) — default origin
-fputn(as.numeric(as.Date("2020-01-01")), "DATE9.")
+# Multiple SAS date formats applied directly
+today <- Sys.Date()
+fputn(today, "DATE9.")
+fputn(today, "MMDDYY10.")
+fputn(today, "YYMMDD10.")
+fputn(today, "MONYY7.")
+fputn(today, "WORDDATE.")
+fputn(today, "QTR.")
 
-# Time formatting (seconds since midnight, origin not used)
-fputn(45000, "TIME8.")
-# [1] "12:30:00"
+# Time formatting (seconds since midnight)
+fputn(c(0, 3600, 45000, 86399), "TIME8.")
+fputn(c(0, 3600, 45000), "HHMM.")
+
+# Datetime formatting
+now <- Sys.time()
+fputn(now, "DATETIME20.")
+fputn(now, "DTDATE.")
+fputn(now, "DTYYMMDD.")
 fclear()
 }

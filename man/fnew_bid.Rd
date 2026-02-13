@@ -24,16 +24,20 @@ Both are automatically stored in the global format library if \code{name}
 is provided.
 }
 \examples{
-sex_bi <- fnew_bid(
-  "M" = "Male",
-  "F" = "Female",
-  name = "sex"
+# Bidirectional status format
+status_bi <- fnew_bid(
+  "A" = "Active",
+  "I" = "Inactive",
+  "P" = "Pending",
+  name = "status"
 )
 
-# Format: M -> Male
-fput("M", sex_bi$format)
+# Forward: code -> label
+fputc(c("A", "I", "P", "A"), "status")
+# [1] "Active" "Inactive" "Pending" "Active"
 
-# Invalue: Male -> M
-.invalue_apply("Male", sex_bi$invalue)
+# Reverse: label -> code
+finputc(c("Active", "Pending", "Inactive"), "status_inv")
+# [1] "A" "P" "I"
 fclear()
 }
