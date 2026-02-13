@@ -223,10 +223,25 @@ format_export <- function(..., formats = NULL, file = NULL) {
         if (block_type == "INVALUE") "numeric" else "auto"
       }
 
+      # Parse multilabel flag from subtype
+      block_multilabel <- FALSE
+      if (grepl("multilabel", block_subtype, ignore.case = TRUE)) {
+        block_multilabel <- TRUE
+        block_subtype <- gsub(",?\\s*multilabel", "", block_subtype,
+                              ignore.case = TRUE)
+        block_subtype <- gsub("multilabel\\s*,?", "", block_subtype,
+                              ignore.case = TRUE)
+        block_subtype <- trimws(block_subtype)
+        if (block_subtype == "") {
+          block_subtype <- if (block_type == "INVALUE") "numeric" else "auto"
+        }
+      }
+
       current_block <- list(
         type = block_type,
         name = block_name,
         subtype = block_subtype,
+        multilabel = block_multilabel,
         entries = list(),
         line_start = i
       )
@@ -383,6 +398,11 @@ format_export <- function(..., formats = NULL, file = NULL) {
 #' Convert VALUE block to ks_format
 #' @keywords internal
 .block_to_ks_format <- function(block) {
+  # Handle date/time/datetime blocks
+  if (tolower(block$subtype) %in% c("date", "time", "datetime")) {
+    return(.block_to_ks_datetime_format(block))
+  }
+
   mappings <- list()
   missing_label <- NULL
   other_label <- NULL
@@ -413,6 +433,7 @@ format_export <- function(..., formats = NULL, file = NULL) {
       mappings = mappings,
       missing_label = missing_label,
       other_label = other_label,
+      multilabel = isTRUE(block$multilabel),
       created = Sys.time()
     ),
     class = "ks_format"
@@ -429,6 +450,40 @@ format_export <- function(..., formats = NULL, file = NULL) {
   }
 
   return(format_obj)
+}
+
+
+#' Convert VALUE block with date/time/datetime type to ks_format
+#' @keywords internal
+.block_to_ks_datetime_format <- function(block) {
+  # Look for a pattern entry (discrete mapping with key "pattern")
+  pattern <- NULL
+  missing_label <- NULL
+
+  for (entry in block$entries) {
+    if (entry$type == "discrete" && tolower(entry$key) == "pattern") {
+      pattern <- entry$label
+    } else if (entry$type == "missing") {
+      missing_label <- entry$value
+    }
+  }
+
+  if (is.null(pattern)) {
+    stop("Date/time format '", block$name,
+         "' must have a 'pattern' entry (e.g., pattern = \"DATE9.\")")
+  }
+
+  fmt <- fnew_date(
+    pattern = pattern,
+    name = block$name,
+    type = tolower(block$subtype)
+  )
+
+  if (!is.null(missing_label)) {
+    fmt$missing_label <- missing_label
+  }
+
+  return(fmt)
 }
 
 
@@ -482,11 +537,19 @@ format_export <- function(..., formats = NULL, file = NULL) {
 #' Convert ks_format to SAS-like text
 #' @keywords internal
 .format_to_text <- function(fmt, name) {
+  # Handle date/time/datetime formats
+  if (fmt$type %in% c("date", "time", "datetime")) {
+    return(.datetime_format_to_text(fmt, name))
+  }
+
   lines <- character(0)
 
-  # Header
-  type_part <- if (!is.null(fmt$type) && fmt$type != "auto") {
-    paste0(" (", fmt$type, ")")
+  # Build type annotation
+  type_str <- if (!is.null(fmt$type) && fmt$type != "auto") fmt$type else NULL
+  ml_str <- if (isTRUE(fmt$multilabel)) "multilabel" else NULL
+  annot_parts <- c(type_str, ml_str)
+  type_part <- if (length(annot_parts) > 0) {
+    paste0(" (", paste(annot_parts, collapse = ", "), ")")
   } else {
     ""
   }
@@ -517,6 +580,32 @@ format_export <- function(..., formats = NULL, file = NULL) {
   }
   if (!is.null(fmt$other_label)) {
     lines <- c(lines, paste0("  .other = \"", fmt$other_label, "\""))
+  }
+
+  lines <- c(lines, ";")
+  return(paste(lines, collapse = "\n"))
+}
+
+
+#' Convert datetime ks_format to SAS-like text
+#' @keywords internal
+.datetime_format_to_text <- function(fmt, name) {
+  lines <- character(0)
+
+  # Header
+  lines <- c(lines, paste0("VALUE ", name, " (", fmt$type, ")"))
+
+  # Pattern entry
+  pattern_str <- if (!is.null(fmt$sas_name)) {
+    paste0(fmt$sas_name, ".")
+  } else {
+    fmt$dt_pattern
+  }
+  lines <- c(lines, paste0("  pattern = \"", pattern_str, "\""))
+
+  # Missing label
+  if (!is.null(fmt$missing_label)) {
+    lines <- c(lines, paste0("  .missing = \"", fmt$missing_label, "\""))
   }
 
   lines <- c(lines, ";")

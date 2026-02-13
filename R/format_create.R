@@ -15,6 +15,9 @@
 #' @param type Character. Type of format: \code{"character"}, \code{"numeric"},
 #'   or \code{"auto"} (default) for auto-detection.
 #' @param default Character. Default label for unmatched values (overrides .other)
+#' @param multilabel Logical. If \code{TRUE}, the format supports overlapping
+#'   ranges where a single value can match multiple labels. Used with
+#'   \code{\link{fput_all}} to retrieve all matching labels. Default \code{FALSE}.
 #'
 #' @return An object of class \code{"ks_format"} containing the format definition.
 #'   The object is also stored in the format library if \code{name} is given.
@@ -40,7 +43,8 @@
 #' # Apply immediately
 #' fput(c("M", "F", NA), "sex")
 #' fclear()
-fnew <- function(..., name = NULL, type = "auto", default = NULL) {
+fnew <- function(..., name = NULL, type = "auto", default = NULL,
+                 multilabel = FALSE) {
   mappings <- list(...)
 
   if (length(mappings) == 0) {
@@ -73,6 +77,7 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL) {
       mappings = mappings,
       missing_label = missing_label,
       other_label = other_label,
+      multilabel = multilabel,
       created = Sys.time()
     ),
     class = "ks_format"
@@ -141,25 +146,37 @@ validate_mappings <- function(mappings, type) {
 #' @param ... Additional arguments (unused)
 #' @export
 print.ks_format <- function(x, ...) {
-  cat("KS Format:", if (!is.null(x$name)) x$name else "(unnamed)", "\n")
+  ml_str <- if (isTRUE(x$multilabel)) " (multilabel)" else ""
+  cat("KS Format:", if (!is.null(x$name)) x$name else "(unnamed)",
+      ml_str, "\n", sep = "")
   cat("Type:", x$type, "\n")
-  cat("Mappings:\n")
 
-  for (i in seq_along(x$mappings)) {
-    key <- names(x$mappings)[i]
-    value <- x$mappings[[i]]
+  # Date/time formats show pattern instead of mappings
+  if (x$type %in% c("date", "time", "datetime")) {
+    pattern_str <- x$dt_pattern
+    if (!is.null(x$sas_name)) {
+      pattern_str <- paste0(pattern_str, " (", x$sas_name, ".)")
+    }
+    cat("Pattern:", pattern_str, "\n")
+  } else {
+    cat("Mappings:\n")
 
-    # Try to display range keys in interval notation
-    parsed <- .parse_range_key(key)
-    if (!is.null(parsed)) {
-      left_bracket <- if (parsed$inc_low) "[" else "("
-      right_bracket <- if (parsed$inc_high) "]" else ")"
-      low_str <- if (is.infinite(parsed$low) && parsed$low < 0) "LOW" else as.character(parsed$low)
-      high_str <- if (is.infinite(parsed$high) && parsed$high > 0) "HIGH" else as.character(parsed$high)
-      cat("  ", left_bracket, low_str, ", ", high_str, right_bracket,
-          " => ", value, "\n", sep = "")
-    } else {
-      cat("  ", key, " => ", value, "\n", sep = "")
+    for (i in seq_along(x$mappings)) {
+      key <- names(x$mappings)[i]
+      value <- x$mappings[[i]]
+
+      # Try to display range keys in interval notation
+      parsed <- .parse_range_key(key)
+      if (!is.null(parsed)) {
+        left_bracket <- if (parsed$inc_low) "[" else "("
+        right_bracket <- if (parsed$inc_high) "]" else ")"
+        low_str <- if (is.infinite(parsed$low) && parsed$low < 0) "LOW" else as.character(parsed$low)
+        high_str <- if (is.infinite(parsed$high) && parsed$high > 0) "HIGH" else as.character(parsed$high)
+        cat("  ", left_bracket, low_str, ", ", high_str, right_bracket,
+            " => ", value, "\n", sep = "")
+      } else {
+        cat("  ", key, " => ", value, "\n", sep = "")
+      }
     }
   }
 

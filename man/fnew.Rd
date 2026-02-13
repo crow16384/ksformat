@@ -4,7 +4,7 @@
 \alias{fnew}
 \title{Create a Format Definition (like SAS PROC FORMAT)}
 \usage{
-fnew(..., name = NULL, type = "auto", default = NULL)
+fnew(..., name = NULL, type = "auto", default = NULL, multilabel = FALSE)
 }
 \arguments{
 \item{...}{Named arguments defining value-label mappings. Can be:
@@ -20,6 +20,10 @@ is automatically registered in the global format library.}
 or \code{"auto"} (default) for auto-detection.}
 
 \item{default}{Character. Default label for unmatched values (overrides .other)}
+
+\item{multilabel}{Logical. If \code{TRUE}, the format supports overlapping
+ranges where a single value can match multiple labels. Used with
+\code{\link{fput_all}} to retrieve all matching labels. Default \code{FALSE}.}
 }
 \value{
 An object of class \code{"ks_format"} containing the format definition.

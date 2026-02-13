@@ -251,6 +251,251 @@ cat("  NaN:           ", is_missing(NaN), "\n")
 cat("  '':            ", is_missing(""), "\n")
 cat("  '' (w/ empty): ", is_missing("", include_empty = TRUE), "\n")
 
+# ============================================================================
+# Example 12: Date/Time Formats (SAS-style)
+# ============================================================================
+
+cat("\n=== Example 12: Date/Time Formats ===\n")
+
+# --- 12a: SAS date formats ---
+cat("\n--- SAS Date Formats ---\n")
+
+# Apply SAS date format directly by name (auto-resolved, no pre-creation needed)
+today <- Sys.Date()
+cat("DATE9.  :", fputn(today, "DATE9."), "\n")
+cat("MMDDYY10.:", fputn(today, "MMDDYY10."), "\n")
+cat("DDMMYY10.:", fputn(today, "DDMMYY10."), "\n")
+cat("YYMMDD10.:", fputn(today, "YYMMDD10."), "\n")
+cat("MONYY7. :", fputn(today, "MONYY7."), "\n")
+cat("WORDDATE.:", fputn(today, "WORDDATE."), "\n")
+cat("YEAR4.  :", fputn(today, "YEAR4."), "\n")
+cat("QTR.    :", fputn(today, "QTR."), "\n")
+
+# Multiple dates at once
+dates <- as.Date(c("2020-01-15", "2020-06-30", "2020-12-25"))
+cat("\nDATE9 vector:", fputn(dates, "DATE9."), "\n")
+
+# --- 12b: SAS numeric dates (days since 1960-01-01) ---
+cat("\n--- SAS Numeric Dates (epoch 1960-01-01) ---\n")
+
+sas_days <- as.numeric(as.Date("2025-01-01") - as.Date("1960-01-01"))
+cat("SAS days for 2025-01-01:", sas_days, "\n")
+cat("DATE9 from SAS days:    ", fputn(sas_days, "DATE9."), "\n")
+cat("MMDDYY10 from SAS days: ", fputn(sas_days, "MMDDYY10."), "\n")
+
+# --- 12c: Time formats ---
+cat("\n--- Time Formats ---\n")
+
+# Time as seconds since midnight
+seconds <- c(0, 3600, 45000, 86399)
+cat("TIME8.  :", fputn(seconds, "TIME8."), "\n")
+cat("TIME5.  :", fputn(seconds, "TIME5."), "\n")
+cat("HHMM.   :", fputn(seconds, "HHMM."), "\n")
+
+cat("\nMeaning:\n")
+print(data.frame(
+  seconds = seconds,
+  time8 = fputn(seconds, "TIME8."),
+  time5 = fputn(seconds, "TIME5.")
+))
+
+# --- 12d: Datetime formats ---
+cat("\n--- Datetime Formats ---\n")
+
+now <- Sys.time()
+cat("DATETIME20.:", fputn(now, "DATETIME20."), "\n")
+cat("DATETIME13.:", fputn(now, "DATETIME13."), "\n")
+cat("DTDATE.    :", fputn(now, "DTDATE."), "\n")
+cat("DTYYMMDD.  :", fputn(now, "DTYYMMDD."), "\n")
+
+# SAS numeric datetime (seconds since 1960-01-01 00:00:00)
+sas_secs <- as.numeric(difftime(
+  as.POSIXct("2025-06-15 14:30:00", tz = "UTC"),
+  as.POSIXct("1960-01-01 00:00:00", tz = "UTC"),
+  units = "secs"
+))
+cat("\nSAS seconds for 2025-06-15 14:30:00:", sas_secs, "\n")
+cat("DATETIME20 from SAS secs:", fputn(sas_secs, "DATETIME20."), "\n")
+
+# --- 12e: Create named date format with fnew_date ---
+cat("\n--- Custom Date Formats ---\n")
+
+# SAS-named format
+fnew_date("DATE9.", name = "bday_fmt")
+birthdays <- as.Date(c("1990-03-25", "1985-11-03", "2000-07-14"))
+cat("Birthdays (DATE9):", fput(birthdays, "bday_fmt"), "\n")
+
+# Custom strftime pattern (e.g., Russian style: DD.MM.YYYY)
+fnew_date("%d.%m.%Y", name = "ru_date", type = "date")
+cat("Birthdays (DD.MM.YYYY):", fput(birthdays, "ru_date"), "\n")
+
+# Custom pattern with missing label
+fnew_date("MMDDYY10.", name = "us_date", .missing = "NO DATE")
+mixed <- c(as.Date("2025-01-01"), NA, as.Date("2025-12-31"))
+cat("Mixed (with NA):", fput(mixed, "us_date"), "\n")
+
+# Show the datetime format object
+fprint("bday_fmt")
+
+# --- 12f: Date formats in data frames ---
+cat("\n--- Date Formats in Data Frame ---\n")
+
+patients <- data.frame(
+  id = 1:4,
+  visit_date = as.Date(c("2025-01-10", "2025-02-15", "2025-03-20", NA)),
+  stringsAsFactors = FALSE
+)
+
+visit_fmt <- fnew_date("DATE9.", name = "visit_fmt", .missing = "NOT RECORDED")
+patients_fmt <- format_apply_df(patients, visit_date = visit_fmt)
+print(patients_fmt)
+
+# --- 12g: Parse date format from text ---
+cat("\n--- Parse Date Format from Text ---\n")
+
+fparse(text = '
+VALUE enrldt (date)
+  pattern = "DATE9."
+  .missing = "Not Enrolled"
+;
+
+VALUE visit_time (time)
+  pattern = "TIME8."
+;
+
+VALUE stamp (datetime)
+  pattern = "DATETIME20."
+;
+')
+
+fprint()
+
+# Apply the parsed formats
+cat("enrldt:", fput(as.Date("2025-03-01"), "enrldt"), "\n")
+cat("visit_time:", fput(36000, "visit_time"), "\n")
+cat("stamp:", fput(as.POSIXct("2025-03-01 10:00:00", tz = "UTC"), "stamp"), "\n")
+
+# Export back to text
+enrl_obj <- ksformat:::.format_get("enrldt")
+cat("\nExported text:\n")
+cat(format_export(enrldt = enrl_obj))
+cat("\n")
+
+fclear()
+
+# ============================================================================
+# Example 13: Multilabel Formats
+# ============================================================================
+
+cat("\n=== Example 13: Multilabel Formats ===\n")
+
+# --- 13a: Basic multilabel with overlapping ranges ---
+cat("\n--- Overlapping Age Categories ---\n")
+
+# In clinical data, a patient can belong to multiple categories
+fnew(
+  "0,5,TRUE,TRUE"   = "Infant",
+  "6,11,TRUE,TRUE"  = "Child",
+  "12,17,TRUE,TRUE" = "Adolescent",
+  "0,17,TRUE,TRUE"  = "Pediatric",
+  "18,64,TRUE,TRUE" = "Adult",
+  "65,Inf,TRUE,TRUE" = "Elderly",
+  "18,Inf,TRUE,TRUE" = "Non-Pediatric",
+  name = "age_categories",
+  type = "numeric",
+  multilabel = TRUE
+)
+
+ages <- c(3, 14, 25, 70)
+
+# fput returns first match only
+cat("fput (first match):\n")
+cat("  ", fput(ages, "age_categories"), "\n")
+
+# fput_all returns ALL matching labels
+cat("\nfput_all (all matches):\n")
+all_labels <- fput_all(ages, "age_categories")
+for (i in seq_along(ages)) {
+  cat("  Age", ages[i], "->", paste(all_labels[[i]], collapse = ", "), "\n")
+}
+
+# --- 13b: Multilabel with missing values ---
+cat("\n--- Multilabel with Missing Values ---\n")
+
+fnew(
+  "0,100,TRUE,TRUE"    = "Valid Score",
+  "0,49,TRUE,TRUE"     = "Below Average",
+  "50,100,TRUE,TRUE"   = "Above Average",
+  "90,100,TRUE,TRUE"   = "Excellent",
+  .missing = "No Score",
+  .other = "Out of Range",
+  name = "score_ml",
+  type = "numeric",
+  multilabel = TRUE
+)
+
+scores <- c(95, 45, NA, 150)
+ml_result <- fput_all(scores, "score_ml")
+
+for (i in seq_along(scores)) {
+  cat("  Score", ifelse(is.na(scores[i]), "NA", scores[i]),
+      "->", paste(ml_result[[i]], collapse = ", "), "\n")
+}
+
+# --- 13c: Parse multilabel from text ---
+cat("\n--- Parse Multilabel from Text ---\n")
+
+fparse(text = '
+VALUE risk (numeric, multilabel)
+  [0, 3]   = "Low Risk"
+  [0, 7]   = "Monitored"
+  (3, 7]   = "Medium Risk"
+  (7, 10]  = "High Risk"
+;
+')
+
+risk_scores <- c(2, 5, 9)
+cat("Risk scores:\n")
+risk_labels <- fput_all(risk_scores, "risk")
+for (i in seq_along(risk_scores)) {
+  cat("  Score", risk_scores[i], "->",
+      paste(risk_labels[[i]], collapse = " | "), "\n")
+}
+
+# --- 13d: Multilabel export ---
+cat("\n--- Multilabel Export ---\n")
+
+risk_obj <- ksformat:::.format_get("risk")
+cat(format_export(risk = risk_obj))
+cat("\n")
+
+# Show format object
+fprint("risk")
+
+# --- 13e: Practical example: adverse event severity grading ---
+cat("\n--- AE Severity Grading (Multilabel) ---\n")
+
+fnew(
+  "1,1,TRUE,TRUE" = "Mild",
+  "2,2,TRUE,TRUE" = "Moderate",
+  "3,3,TRUE,TRUE" = "Severe",
+  "4,4,TRUE,TRUE" = "Life-threatening",
+  "5,5,TRUE,TRUE" = "Fatal",
+  "3,5,TRUE,TRUE" = "Serious",
+  "1,2,TRUE,TRUE" = "Non-serious",
+  name = "ae_grade",
+  type = "numeric",
+  multilabel = TRUE
+)
+
+grades <- c(1, 2, 3, 4, 5)
+cat("Grade classifications:\n")
+ae_labels <- fput_all(grades, "ae_grade")
+for (i in seq_along(grades)) {
+  cat("  Grade", grades[i], ":",
+      paste(ae_labels[[i]], collapse = " + "), "\n")
+}
+
 # Clean up
 fclear()
 cat("\n=== Examples completed ===\n")

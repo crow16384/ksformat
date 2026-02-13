@@ -182,6 +182,11 @@ in_range <- function(x, range_spec) {
 #' @noRd
 .format_get <- function(name) {
   if (!exists(name, envir = .format_library)) {
+    # Fallback: check if it's a built-in SAS datetime format
+    if (.is_sas_datetime_format(name)) {
+      fmt <- fnew_date(pattern = name, name = name)
+      return(fmt)
+    }
     available <- ls(envir = .format_library)
     if (length(available) == 0) {
       stop("Format '", name, "' not found. Format library is empty.")
@@ -220,7 +225,12 @@ fprint <- function(name = NULL) {
       for (nm in fnames) {
         obj <- get(nm, envir = .format_library)
         type_str <- if (inherits(obj, "ks_format")) {
-          paste0("VALUE (", obj$type, ")")
+          if (obj$type %in% c("date", "time", "datetime")) {
+            sas_info <- if (!is.null(obj$sas_name)) paste0(", ", obj$sas_name, ".") else ""
+            paste0("VALUE (", obj$type, sas_info, ")")
+          } else {
+            paste0("VALUE (", obj$type, ")")
+          }
         } else if (inherits(obj, "ks_invalue")) {
           paste0("INVALUE (", obj$target_type, ")")
         } else {

@@ -1,10 +1,10 @@
 Package: ksformat
 Type: Package
 Title: SAS-Style PROC FORMAT for R
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: c(
     person(
-      "Developer", "Vladimir Larchenko",
+      "Vladimir", "Larchenko",
       email = "vladimir.larchenko@keystatsolutions.com",
       role = c("aut", "cre")
     )

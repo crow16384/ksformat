@@ -869,3 +869,478 @@ test_that("INVALUE export includes non-default type", {
 
   fclear()
 })
+
+
+# ===========================================================================
+# Date/Time Format Tests
+# ===========================================================================
+
+test_that("fnew_date creates date format from SAS name", {
+  fmt <- fnew_date("DATE9.", name = "mydate")
+  expect_s3_class(fmt, "ks_format")
+  expect_equal(fmt$type, "date")
+  expect_equal(fmt$dt_pattern, "%d%b%Y")
+  expect_true(fmt$dt_toupper)
+  expect_equal(fmt$sas_name, "DATE9")
+  fclear()
+})
+
+test_that("fnew_date creates time format", {
+  fmt <- fnew_date("TIME8.", name = "mytime")
+  expect_s3_class(fmt, "ks_format")
+  expect_equal(fmt$type, "time")
+  expect_equal(fmt$dt_pattern, "%H:%M:%S")
+  fclear()
+})
+
+test_that("fnew_date creates datetime format", {
+  fmt <- fnew_date("DATETIME20.", name = "mydt")
+  expect_s3_class(fmt, "ks_format")
+  expect_equal(fmt$type, "datetime")
+  expect_equal(fmt$dt_pattern, "%d%b%Y:%H:%M:%S")
+  expect_true(fmt$dt_toupper)
+  fclear()
+})
+
+test_that("fnew_date with custom strftime pattern", {
+  fmt <- fnew_date("%Y/%m/%d", name = "custom", type = "date")
+  expect_equal(fmt$type, "date")
+  expect_equal(fmt$dt_pattern, "%Y/%m/%d")
+  expect_false(fmt$dt_toupper)
+  expect_null(fmt$sas_name)
+  fclear()
+})
+
+test_that("fnew_date auto-registers in library", {
+  fnew_date("DATE9.", name = "testdate")
+  expect_true("testdate" %in% ls(envir = ksformat:::.format_library))
+  fclear()
+})
+
+test_that("fnew_date requires type for custom patterns", {
+  expect_error(fnew_date("%Y-%m-%d"), "type")
+  fclear()
+})
+
+test_that("fnew_date handles default widths", {
+  fmt <- fnew_date("DATE.", name = "d1")
+  expect_equal(fmt$dt_pattern, "%d%b%Y")  # DATE. defaults to DATE9.
+  fmt2 <- fnew_date("TIME.", name = "t1")
+  expect_equal(fmt2$dt_pattern, "%H:%M:%S")  # TIME. defaults to TIME8.
+  fclear()
+})
+
+test_that("fput with Date objects and date format", {
+  fmt <- fnew_date("DATE9.", name = "datefmt")
+  result <- fput(as.Date("2020-01-15"), fmt)
+  expect_equal(result, "15JAN2020")
+  fclear()
+})
+
+test_that("fput with numeric SAS dates", {
+  fmt <- fnew_date("DATE9.", name = "datefmt")
+  # as.Date("2020-01-01") - as.Date("1960-01-01") = 21915 days
+  sas_date <- as.numeric(as.Date("2020-01-01") - as.Date("1960-01-01"))
+  result <- fput(sas_date, fmt)
+  expect_equal(result, "01JAN2020")
+  fclear()
+})
+
+test_that("fput with MMDDYY10 format", {
+  fmt <- fnew_date("MMDDYY10.", name = "usfmt")
+  result <- fput(as.Date("2020-06-15"), fmt)
+  expect_equal(result, "06/15/2020")
+  fclear()
+})
+
+test_that("fput with YYMMDD10 format", {
+  fmt <- fnew_date("YYMMDD10.", name = "isofmt")
+  result <- fput(as.Date("2020-06-15"), fmt)
+  expect_equal(result, "2020-06-15")
+  fclear()
+})
+
+test_that("fput with DDMMYY10 format", {
+  fmt <- fnew_date("DDMMYY10.", name = "eufmt")
+  result <- fput(as.Date("2020-06-15"), fmt)
+  expect_equal(result, "15/06/2020")
+  fclear()
+})
+
+test_that("fput with MONYY7 format", {
+  fmt <- fnew_date("MONYY7.", name = "myfmt")
+  result <- fput(as.Date("2020-06-15"), fmt)
+  expect_equal(result, "JUN2020")
+  fclear()
+})
+
+test_that("fput with YEAR4 format", {
+  fmt <- fnew_date("YEAR4.", name = "yrfmt")
+  result <- fput(as.Date("2020-06-15"), fmt)
+  expect_equal(result, "2020")
+  fclear()
+})
+
+test_that("fput date format handles NA", {
+  fmt <- fnew_date("DATE9.", name = "dfmt", .missing = "No Date")
+  result <- fput(c(as.Date("2020-01-01"), NA), fmt)
+  expect_equal(result[2], "No Date")
+  fclear()
+})
+
+test_that("fput date format NA with keep_na", {
+  fmt <- fnew_date("DATE9.", name = "dfmt", .missing = "No Date")
+  result <- fput(c(as.Date("2020-01-01"), NA), fmt, keep_na = TRUE)
+  expect_true(is.na(result[2]))
+  fclear()
+})
+
+test_that("fput date with vector of dates", {
+  fmt <- fnew_date("DATE9.", name = "dfmt")
+  dates <- as.Date(c("2020-01-01", "2020-06-15", "2020-12-31"))
+  result <- fput(dates, fmt)
+  expect_equal(result, c("01JAN2020", "15JUN2020", "31DEC2020"))
+  fclear()
+})
+
+test_that("fput time format with numeric seconds", {
+  fmt <- fnew_date("TIME8.", name = "tfmt")
+  result <- fput(c(0, 3600, 45000), fmt)
+  expect_equal(result, c("00:00:00", "01:00:00", "12:30:00"))
+  fclear()
+})
+
+test_that("fput time format TIME5 (HH:MM)", {
+  fmt <- fnew_date("TIME5.", name = "t5fmt")
+  result <- fput(c(0, 45000), fmt)
+  expect_equal(result, c("00:00", "12:30"))
+  fclear()
+})
+
+test_that("fput datetime format with POSIXct", {
+  fmt <- fnew_date("DATETIME20.", name = "dtfmt")
+  dt <- as.POSIXct("2020-01-15 12:30:45", tz = "UTC")
+  result <- fput(dt, fmt)
+  expect_equal(result, "15JAN2020:12:30:45")
+  fclear()
+})
+
+test_that("fput datetime with SAS numeric", {
+  fmt <- fnew_date("DATETIME20.", name = "dtfmt")
+  # SAS epoch: seconds since 1960-01-01 00:00:00
+  sas_dt <- as.numeric(difftime(
+    as.POSIXct("2020-01-01 12:00:00", tz = "UTC"),
+    as.POSIXct("1960-01-01 00:00:00", tz = "UTC"),
+    units = "secs"
+  ))
+  result <- fput(sas_dt, fmt)
+  expect_equal(result, "01JAN2020:12:00:00")
+  fclear()
+})
+
+test_that("fputn auto-resolves SAS format names", {
+  # No need to create format first
+  result <- fputn(as.Date("2020-01-01"), "DATE9.")
+  expect_equal(result, "01JAN2020")
+  fclear()
+})
+
+test_that("fputn with SAS numeric dates", {
+  sas_date <- as.numeric(as.Date("2020-06-15") - as.Date("1960-01-01"))
+  result <- fputn(sas_date, "MMDDYY10.")
+  expect_equal(result, "06/15/2020")
+  fclear()
+})
+
+test_that("fputc with date format", {
+  result <- fputc("2020-01-01", "DATE9.")
+  expect_equal(result, "01JAN2020")
+  fclear()
+})
+
+test_that("fputn with time format", {
+  result <- fputn(45000, "TIME8.")
+  expect_equal(result, "12:30:00")
+  fclear()
+})
+
+test_that("fputn and fputc don't warn for datetime types", {
+  expect_silent(fputn(as.Date("2020-01-01"), "DATE9."))
+  expect_silent(fputc("2020-01-01", "YYMMDD10."))
+  fclear()
+})
+
+test_that("fput with NULL returns empty character", {
+  fmt <- fnew_date("DATE9.", name = "dfmt")
+  expect_equal(fput(NULL, fmt), character(0))
+  fclear()
+})
+
+test_that("fput QTR format", {
+  fmt <- fnew_date("QTR.", name = "qfmt")
+  dates <- as.Date(c("2020-01-15", "2020-04-15", "2020-07-15", "2020-10-15"))
+  result <- fput(dates, fmt)
+  expect_equal(result, c("1", "2", "3", "4"))
+  fclear()
+})
+
+test_that("print.ks_format for datetime format", {
+  fmt <- fnew_date("DATE9.", name = "pfmt")
+  out <- capture.output(print(fmt))
+  expect_true(any(grepl("date", out)))
+  expect_true(any(grepl("Pattern:", out)))
+  expect_true(any(grepl("DATE9", out)))
+  fclear()
+})
+
+test_that("fprint shows datetime format info", {
+  fnew_date("DATE9.", name = "printdate")
+  out <- capture.output(fprint())
+  expect_true(any(grepl("date", out)))
+  fclear()
+})
+
+
+# ===========================================================================
+# Multilabel Format Tests
+# ===========================================================================
+
+test_that("fnew with multilabel flag", {
+  fmt <- fnew("1" = "A", "2" = "B", name = "ml_test",
+              type = "character", multilabel = TRUE)
+  expect_true(fmt$multilabel)
+  fclear()
+})
+
+test_that("print.ks_format shows multilabel flag", {
+  fmt <- fnew("1" = "A", "2" = "B", name = "ml_test",
+              type = "character", multilabel = TRUE)
+  out <- capture.output(print(fmt))
+  expect_true(any(grepl("multilabel", out)))
+  fclear()
+})
+
+test_that("fput_all returns all matching labels for multilabel ranges", {
+  fmt <- fnew(
+    "0,5,TRUE,TRUE" = "Infant",
+    "6,11,TRUE,TRUE" = "Child",
+    "12,17,TRUE,TRUE" = "Teen",
+    "0,17,TRUE,TRUE" = "Minor",
+    "18,64,TRUE,TRUE" = "Adult",
+    "65,Inf,TRUE,TRUE" = "Senior",
+    name = "age_ml", type = "numeric", multilabel = TRUE
+  )
+
+  result <- fput_all(c(3, 15, 25), fmt)
+  expect_type(result, "list")
+  expect_length(result, 3)
+  expect_true("Infant" %in% result[[1]])
+  expect_true("Minor" %in% result[[1]])
+  expect_true("Teen" %in% result[[2]])
+  expect_true("Minor" %in% result[[2]])
+  expect_equal(result[[3]], "Adult")
+  fclear()
+})
+
+test_that("fput_all handles NA values", {
+  fmt <- fnew(
+    "0,10,TRUE,TRUE" = "Low",
+    "0,100,TRUE,TRUE" = "All",
+    .missing = "Unknown",
+    name = "ml_na", type = "numeric", multilabel = TRUE
+  )
+
+  result <- fput_all(c(5, NA), fmt)
+  expect_true("Low" %in% result[[1]])
+  expect_true("All" %in% result[[1]])
+  expect_equal(result[[2]], "Unknown")
+  fclear()
+})
+
+test_that("fput_all with keep_na=TRUE", {
+  fmt <- fnew(
+    "0,10,TRUE,TRUE" = "Low",
+    .missing = "Unknown",
+    name = "ml_kna", type = "numeric"
+  )
+  result <- fput_all(c(5, NA), fmt, keep_na = TRUE)
+  expect_true(is.na(result[[2]]))
+  fclear()
+})
+
+test_that("fput_all with NULL returns empty list", {
+  fmt <- fnew("1" = "A", name = "ml_null")
+  result <- fput_all(NULL, fmt)
+  expect_equal(result, list())
+  fclear()
+})
+
+test_that("fput_all with other_label", {
+  fmt <- fnew("1" = "A", .other = "Unknown",
+              name = "ml_other", type = "character")
+  result <- fput_all(c("1", "X"), fmt)
+  expect_equal(result[[1]], "A")
+  expect_equal(result[[2]], "Unknown")
+  fclear()
+})
+
+test_that("fput returns first match for multilabel format", {
+  fmt <- fnew(
+    "0,5,TRUE,TRUE" = "Infant",
+    "0,17,TRUE,TRUE" = "Minor",
+    name = "ml_first", type = "numeric", multilabel = TRUE
+  )
+  result <- fput(3, fmt)
+  # fput should return first match only
+  expect_length(result, 1)
+  expect_true(result %in% c("Infant", "Minor"))
+  fclear()
+})
+
+test_that("fput_all with format name string", {
+  fnew("0,10,TRUE,TRUE" = "Low", "0,100,TRUE,TRUE" = "All",
+       name = "ml_name", type = "numeric", multilabel = TRUE)
+  result <- fput_all(5, "ml_name")
+  expect_true("Low" %in% result[[1]])
+  expect_true("All" %in% result[[1]])
+  fclear()
+})
+
+test_that("fput_all with date format returns list", {
+  fnew_date("DATE9.", name = "dt_ml")
+  result <- fput_all(as.Date("2020-01-01"), "dt_ml")
+  expect_type(result, "list")
+  expect_equal(result[[1]], "01JAN2020")
+  fclear()
+})
+
+
+# ===========================================================================
+# Parser: Date/Time and Multilabel Support
+# ===========================================================================
+
+test_that("fparse: date format block", {
+  txt <- '
+VALUE mydate (date)
+  pattern = "DATE9."
+;
+'
+  result <- fparse(text = txt)
+  expect_s3_class(result$mydate, "ks_format")
+  expect_equal(result$mydate$type, "date")
+  expect_equal(result$mydate$dt_pattern, "%d%b%Y")
+  fclear()
+})
+
+test_that("fparse: time format block", {
+  txt <- '
+VALUE mytime (time)
+  pattern = "TIME8."
+;
+'
+  result <- fparse(text = txt)
+  expect_equal(result$mytime$type, "time")
+  fclear()
+})
+
+test_that("fparse: datetime format block", {
+  txt <- '
+VALUE mydt (datetime)
+  pattern = "DATETIME20."
+;
+'
+  result <- fparse(text = txt)
+  expect_equal(result$mydt$type, "datetime")
+  fclear()
+})
+
+test_that("fparse: date format with .missing", {
+  txt <- '
+VALUE mydate (date)
+  pattern = "DATE9."
+  .missing = "No Date"
+;
+'
+  result <- fparse(text = txt)
+  expect_equal(result$mydate$missing_label, "No Date")
+  fclear()
+})
+
+test_that("fparse: date format block without pattern errors", {
+  txt <- '
+VALUE mydate (date)
+  "x" = "y"
+;
+'
+  expect_error(fparse(text = txt), "pattern")
+  fclear()
+})
+
+test_that("fparse: multilabel block", {
+  txt <- '
+VALUE ageml (numeric, multilabel)
+  [0, 5] = "Infant"
+  [0, 17] = "Minor"
+  [18, 64] = "Adult"
+;
+'
+  result <- fparse(text = txt)
+  expect_true(result$ageml$multilabel)
+  expect_equal(result$ageml$type, "numeric")
+  fclear()
+})
+
+test_that("fparse: multilabel without type", {
+  txt <- '
+VALUE test (multilabel)
+  "A" = "Label A"
+  "B" = "Label B"
+;
+'
+  result <- fparse(text = txt)
+  expect_true(result$test$multilabel)
+  fclear()
+})
+
+test_that("format_export: datetime format round-trip", {
+  fnew_date("DATE9.", name = "rtdate")
+  fmt <- ksformat:::.format_get("rtdate")
+  txt <- format_export(rtdate = fmt)
+  expect_true(grepl("VALUE rtdate (date)", txt, fixed = TRUE))
+  expect_true(grepl("pattern = \"DATE9.\"", txt, fixed = TRUE))
+  fclear()
+})
+
+test_that("format_export: multilabel format includes flag", {
+  fmt <- fnew("1" = "A", "2" = "B", name = "ml_exp",
+              type = "character", multilabel = TRUE)
+  txt <- format_export(ml_exp = fmt)
+  expect_true(grepl("multilabel", txt))
+  fclear()
+})
+
+test_that("format_export: date format parse round-trip", {
+  txt_in <- '
+VALUE mydate (date)
+  pattern = "DATE9."
+;
+'
+  fparse(text = txt_in)
+  fmt <- ksformat:::.format_get("mydate")
+  txt_out <- format_export(mydate = fmt)
+  expect_true(grepl("pattern", txt_out))
+  expect_true(grepl("DATE9", txt_out))
+
+  # Round-trip: parse the exported text
+  fclear()
+  result <- fparse(text = txt_out)
+  expect_equal(result$mydate$type, "date")
+  fclear()
+})
+
+test_that("custom strftime date format with fput", {
+  fmt <- fnew_date("%d.%m.%Y", name = "ru_date", type = "date")
+  result <- fput(as.Date("2020-06-15"), fmt)
+  expect_equal(result, "15.06.2020")
+  fclear()
+})

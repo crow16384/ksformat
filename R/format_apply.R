@@ -42,6 +42,11 @@ fput <- function(x, format, keep_na = FALSE) {
     return(character(0))
   }
 
+  # Delegate to datetime formatter for date/time/datetime types
+  if (format$type %in% c("date", "time", "datetime")) {
+    return(.apply_datetime_format(x, format, keep_na = keep_na))
+  }
+
   # Initialize result vector
   result <- rep(NA_character_, length(x))
 
@@ -146,7 +151,7 @@ fputn <- function(x, format_name) {
   if (!inherits(format_obj, "ks_format")) {
     stop("'", format_name, "' is not a VALUE format (ks_format)")
   }
-  if (format_obj$type != "numeric") {
+  if (!format_obj$type %in% c("numeric", "date", "time", "datetime")) {
     warning("Format '", format_name, "' is type '", format_obj$type,
             "', not 'numeric'")
   }
@@ -175,11 +180,137 @@ fputc <- function(x, format_name) {
   if (!inherits(format_obj, "ks_format")) {
     stop("'", format_name, "' is not a VALUE format (ks_format)")
   }
-  if (format_obj$type != "character") {
+  if (!format_obj$type %in% c("character", "date", "time", "datetime")) {
     warning("Format '", format_name, "' is type '", format_obj$type,
             "', not 'character'")
   }
   fput(x, format_obj)
+}
+
+#' Apply Format and Return All Matches (Multilabel)
+#'
+#' For multilabel formats, returns all matching labels for each input value.
+#' Regular \code{\link{fput}} returns only the first match; this function
+#' returns all matches as a list of character vectors.
+#'
+#' @param x Vector of values to format
+#' @param format A \code{ks_format} object or a character string naming a format
+#'   in the global format library.
+#' @param keep_na Logical. If TRUE, preserve NA in output.
+#'
+#' @return A list of character vectors. Each element contains all matching labels
+#'   for the corresponding input value.
+#'
+#' @export
+#'
+#' @examples
+#' age_ml <- fnew(
+#'   "0,5,TRUE,TRUE" = "Infant",
+#'   "6,11,TRUE,TRUE" = "Child",
+#'   "12,17,TRUE,TRUE" = "Teen",
+#'   "0,17,TRUE,TRUE" = "Minor",
+#'   "18,64,TRUE,TRUE" = "Adult",
+#'   "65,Inf,TRUE,TRUE" = "Senior",
+#'   name = "age_ml", type = "numeric", multilabel = TRUE
+#' )
+#'
+#' fput_all(c(3, 15, 25), age_ml)
+#' # [[1]] "Infant" "Minor"
+#' # [[2]] "Teen" "Minor"
+#' # [[3]] "Adult"
+#' fclear()
+fput_all <- function(x, format, keep_na = FALSE) {
+  # Resolve format by name if string provided
+  if (is.character(format) && length(format) == 1) {
+    format <- .format_get(format)
+  }
+
+  if (!inherits(format, "ks_format")) {
+    stop("format must be a ks_format object or a registered format name")
+  }
+
+  # Handle NULL input
+  if (is.null(x)) {
+    return(list())
+  }
+
+  # Date/time formats delegate to normal fput (no multilabel concept)
+  if (format$type %in% c("date", "time", "datetime")) {
+    result <- .apply_datetime_format(x, format, keep_na = keep_na)
+    return(as.list(result))
+  }
+
+  n <- length(x)
+  result <- vector("list", n)
+
+  # Identify missing values
+  is_miss <- is.na(x) | is.nan(x)
+
+  # Pre-parse range keys for numeric formats
+  range_entries <- list()
+  if (format$type == "numeric") {
+    for (i in seq_along(format$mappings)) {
+      key <- names(format$mappings)[i]
+      parsed <- .parse_range_key(key)
+      if (!is.null(parsed)) {
+        range_entries <- c(range_entries, list(list(
+          idx = i,
+          low = parsed$low,
+          high = parsed$high,
+          inc_low = parsed$inc_low,
+          inc_high = parsed$inc_high,
+          label = format$mappings[[i]]
+        )))
+      }
+    }
+  }
+
+  for (idx in seq_len(n)) {
+    # Handle missing
+    if (is_miss[idx]) {
+      if (!keep_na && !is.null(format$missing_label)) {
+        result[[idx]] <- format$missing_label
+      } else {
+        result[[idx]] <- NA_character_
+      }
+      next
+    }
+
+    value <- x[idx]
+    labels <- character(0)
+
+    # Collect ALL exact matches
+    for (i in seq_along(format$mappings)) {
+      key <- names(format$mappings)[i]
+      if (as.character(value) == key) {
+        labels <- c(labels, format$mappings[[i]])
+      }
+    }
+
+    # Collect ALL range matches for numeric values
+    if (format$type == "numeric" && is.numeric(value)) {
+      for (re in range_entries) {
+        low_ok <- if (re$inc_low) value >= re$low else value > re$low
+        high_ok <- if (re$inc_high) value <= re$high else value < re$high
+        if (low_ok && high_ok) {
+          labels <- c(labels, re$label)
+        }
+      }
+    }
+
+    # No match: use other_label or original value
+    if (length(labels) == 0) {
+      if (!is.null(format$other_label)) {
+        labels <- format$other_label
+      } else {
+        labels <- as.character(value)
+      }
+    }
+
+    result[[idx]] <- labels
+  }
+
+  return(result)
 }
 
 #' Apply Format to Data Frame Columns
