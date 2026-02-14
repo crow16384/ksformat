@@ -41,6 +41,15 @@
 
 ---
 
+## format_datetime.R
+
+### `fnew_date(pattern, name = NULL, type = "auto", .missing = NULL)`
+- **Purpose**: Create date/time format using SAS format name or strftime pattern. Auto-registers.
+- No `origin` parameter — always uses R epoch (1970-01-01). SAS epoch is NOT supported.
+- `type`: "date", "time", "datetime", or "auto" (auto-detect from SAS name).
+
+---
+
 ## format_parse.R
 
 ### `fparse(text = NULL, file = NULL)` — Parse SAS-like text. Always auto-registers.

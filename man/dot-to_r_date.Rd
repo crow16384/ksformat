@@ -10,13 +10,13 @@
 \item{x}{Input vector}
 
 \item{origin}{Character. Origin date for numeric conversion.
-Default \code{"1970-01-01"} (R epoch).}
+Always \code{"1970-01-01"} (R epoch).}
 }
 \value{
 Date vector
 }
 \description{
-Handles Date, POSIXct, numeric (using specified epoch origin),
+Handles Date, POSIXct, numeric (days since 1970-01-01),
 and character inputs.
 }
 \keyword{internal}

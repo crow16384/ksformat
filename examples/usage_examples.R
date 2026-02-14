@@ -275,13 +275,13 @@ cat("QTR.    :", fputn(today, "QTR."), "\n")
 dates <- as.Date(c("2020-01-15", "2020-06-30", "2020-12-25"))
 cat("\nDATE9 vector:", fputn(dates, "DATE9."), "\n")
 
-# --- 12b: SAS numeric dates (days since 1960-01-01) ---
-cat("\n--- SAS Numeric Dates (epoch 1960-01-01) ---\n")
+# --- 12b: R numeric dates (days since 1970-01-01) ---
+cat("\n--- R Numeric Dates (epoch 1970-01-01) ---\n")
 
-sas_days <- as.numeric(as.Date("2025-01-01") - as.Date("1960-01-01"))
-cat("SAS days for 2025-01-01:", sas_days, "\n")
-cat("DATE9 from SAS days:    ", fputn(sas_days, "DATE9."), "\n")
-cat("MMDDYY10 from SAS days: ", fputn(sas_days, "MMDDYY10."), "\n")
+r_days <- as.numeric(as.Date("2025-01-01"))
+cat("R days for 2025-01-01:", r_days, "\n")
+cat("DATE9 from R days:    ", fputn(r_days, "DATE9."), "\n")
+cat("MMDDYY10 from R days: ", fputn(r_days, "MMDDYY10."), "\n")
 
 # --- 12c: Time formats ---
 cat("\n--- Time Formats ---\n")
@@ -308,14 +308,10 @@ cat("DATETIME13.:", fputn(now, "DATETIME13."), "\n")
 cat("DTDATE.    :", fputn(now, "DTDATE."), "\n")
 cat("DTYYMMDD.  :", fputn(now, "DTYYMMDD."), "\n")
 
-# SAS numeric datetime (seconds since 1960-01-01 00:00:00)
-sas_secs <- as.numeric(difftime(
-  as.POSIXct("2025-06-15 14:30:00", tz = "UTC"),
-  as.POSIXct("1960-01-01 00:00:00", tz = "UTC"),
-  units = "secs"
-))
-cat("\nSAS seconds for 2025-06-15 14:30:00:", sas_secs, "\n")
-cat("DATETIME20 from SAS secs:", fputn(sas_secs, "DATETIME20."), "\n")
+# R numeric datetime (seconds since 1970-01-01 00:00:00)
+r_secs <- as.numeric(as.POSIXct("2025-06-15 14:30:00", tz = "UTC"))
+cat("\nR seconds for 2025-06-15 14:30:00:", r_secs, "\n")
+cat("DATETIME20 from R secs:", fputn(r_secs, "DATETIME20."), "\n")
 
 # --- 12e: Create named date format with fnew_date ---
 cat("\n--- Custom Date Formats ---\n")
@@ -686,12 +682,12 @@ cat("\n=== Example 17: Working with Dates and Formats (SAS PUTN) ===\n\n")
 fnew("1" = "date9.", "2" = "mmddyy10.",
      name = "writfmt", type = "numeric")
 
-# Step 2: Register the SAS date formats with SAS epoch (days since 1960-01-01)
-fnew_date("date9.", origin = "1960-01-01")
-fnew_date("mmddyy10.", origin = "1960-01-01")
+# Step 2: Register the SAS date formats (R epoch, days since 1970-01-01)
+fnew_date("date9.")
+fnew_date("mmddyy10.")
 
-# Input data (SAS date numbers = days since 1960-01-01)
-number <- c(15756, 14552)
+# Input data (R date numbers = days since 1970-01-01)
+number <- c(12103, 10899)
 key    <- c(1, 2)
 
 # Step 3: Look up format name per observation (like SAS PUT(key, writfmt.))

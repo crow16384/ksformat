@@ -167,9 +167,6 @@ NULL
 #' @param type Character. Type of format: \code{"date"}, \code{"time"},
 #'   \code{"datetime"}, or \code{"auto"} (auto-detect from SAS name).
 #'   Must be specified for custom strftime patterns.
-#' @param origin Character. Origin date for converting numeric values to dates.
-#'   Default \code{"1970-01-01"} (R epoch). Use \code{"1960-01-01"} for SAS
-#'   numeric dates (days/seconds since January 1, 1960).
 #' @param .missing Character. Label for missing values (NA). Default \code{NULL}.
 #'
 #' @return A \code{ks_format} object with date/time type, registered in the library.
@@ -183,17 +180,17 @@ NULL
 #'   \item \strong{Datetime:} DATETIME20., DATETIME13., etc.
 #' }
 #'
-#' \strong{Numeric input} is converted using the \code{origin} parameter:
+#' \strong{Numeric input} is converted using R epoch (\code{"1970-01-01"}):
 #' \itemize{
-#'   \item Default \code{"1970-01-01"}: R epoch (standard for R numeric dates)
-#'   \item \code{"1960-01-01"}: SAS epoch (for SAS numeric date values)
-#'   \item Times: always treated as seconds since midnight (origin not used)
+#'   \item Dates: numeric values are interpreted as days since 1970-01-01
+#'   \item Datetimes: numeric values are interpreted as seconds since 1970-01-01
+#'   \item Times: always treated as seconds since midnight
 #' }
 #'
 #' @export
 #'
 #' @examples
-#' # Use a SAS format name (R epoch by default)
+#' # Use a SAS format name
 #' fnew_date("DATE9.", name = "mydate")
 #' fput(as.Date("2020-01-01"), "mydate")
 #' # [1] "01JAN2020"
@@ -211,10 +208,9 @@ NULL
 #' fput(c(as.Date("2025-01-01"), NA, as.Date("2025-12-31")), "us_date")
 #' # [1] "01/01/2025" "NO DATE" "12/31/2025"
 #'
-#' # SAS numeric date (days since 1960-01-01) — specify origin explicitly
-#' fnew_date("DATE9.", name = "sas_date", origin = "1960-01-01")
-#' sas_days <- as.numeric(as.Date("2025-01-01") - as.Date("1960-01-01"))
-#' fput(sas_days, "sas_date")
+#' # Numeric dates (days since 1970-01-01, R epoch)
+#' r_days <- as.numeric(as.Date("2025-01-01"))
+#' fputn(r_days, "DATE9.")
 #'
 #' # Multiple SAS date formats applied directly
 #' today <- Sys.Date()
@@ -235,7 +231,7 @@ NULL
 #' fputn(now, "DTDATE.")
 #' fputn(now, "DTYYMMDD.")
 #' fclear()
-fnew_date <- function(pattern, name = NULL, type = "auto", origin = "1970-01-01",
+fnew_date <- function(pattern, name = NULL, type = "auto",
                       .missing = NULL) {
   # Try to resolve as SAS format
   sas_def <- .resolve_sas_format_def(pattern)
@@ -262,12 +258,6 @@ fnew_date <- function(pattern, name = NULL, type = "auto", origin = "1970-01-01"
     cli_abort("{.arg type} must be {.val date}, {.val time}, or {.val datetime}, got {.val {type}}.")
   }
 
-  # Validate origin
-  tryCatch(
-    as.Date(origin),
-    error = function(e) cli_abort("{.arg origin} must be a valid date string, got {.val {origin}}.")
-  )
-
   if (is.null(name)) {
     name <- if (!is.null(sas_name)) paste0(sas_name, ".") else pattern
   }
@@ -278,7 +268,6 @@ fnew_date <- function(pattern, name = NULL, type = "auto", origin = "1970-01-01"
       type = type,
       dt_pattern = r_pattern,
       dt_toupper = dt_toupper,
-      dt_origin = origin,
       sas_name = sas_name,
       mappings = list(),
       missing_label = .missing,
@@ -302,7 +291,7 @@ fnew_date <- function(pattern, name = NULL, type = "auto", origin = "1970-01-01"
 
 #' Apply a date/time format to a vector
 #'
-#' Handles Date, POSIXct, numeric (SAS epoch), and character inputs.
+#' Handles Date, POSIXct, numeric (R epoch), and character inputs.
 #'
 #' @param x Input vector
 #' @param format A ks_format object with date/time/datetime type
@@ -314,7 +303,7 @@ fnew_date <- function(pattern, name = NULL, type = "auto", origin = "1970-01-01"
 
   pattern <- format$dt_pattern
   do_upper <- isTRUE(format$dt_toupper)
-  origin <- if (!is.null(format$dt_origin)) format$dt_origin else "1970-01-01"
+  origin <- "1970-01-01"
   n <- length(x)
 
   # Determine what's missing in original input
@@ -438,17 +427,17 @@ fnew_date <- function(pattern, name = NULL, type = "auto", origin = "1970-01-01"
 
 
 # ===========================================================================
-# Type conversion helpers (SAS epoch support)
+# Type conversion helpers
 # ===========================================================================
 
 #' Convert input to R Date
 #'
-#' Handles Date, POSIXct, numeric (using specified epoch origin),
+#' Handles Date, POSIXct, numeric (days since 1970-01-01),
 #' and character inputs.
 #'
 #' @param x Input vector
 #' @param origin Character. Origin date for numeric conversion.
-#'   Default \code{"1970-01-01"} (R epoch).
+#'   Always \code{"1970-01-01"} (R epoch).
 #' @return Date vector
 #' @keywords internal
 .to_r_date <- function(x, origin = "1970-01-01") {
@@ -471,12 +460,12 @@ fnew_date <- function(pattern, name = NULL, type = "auto", origin = "1970-01-01"
 
 #' Convert input to R POSIXct
 #'
-#' Handles POSIXct, Date, numeric (using specified epoch origin),
+#' Handles POSIXct, Date, numeric (seconds since 1970-01-01),
 #' and character inputs.
 #'
 #' @param x Input vector
 #' @param origin Character. Origin date for numeric conversion.
-#'   Default \code{"1970-01-01"} (R epoch).
+#'   Always \code{"1970-01-01"} (R epoch).
 #' @return POSIXct vector
 #' @keywords internal
 .to_r_datetime <- function(x, origin = "1970-01-01") {

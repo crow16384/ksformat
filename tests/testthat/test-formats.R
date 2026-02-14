@@ -930,15 +930,15 @@ test_that("fnew_date handles default widths", {
   fclear()
 })
 
-test_that("fnew_date default origin is R epoch (1970-01-01)", {
+test_that("fnew_date uses R epoch (1970-01-01)", {
   fmt <- fnew_date("DATE9.", name = "dorigin")
-  expect_equal(fmt$dt_origin, "1970-01-01")
+  # dt_origin is no longer stored; epoch is always R's 1970-01-01
+  expect_null(fmt$dt_origin)
   fclear()
 })
 
-test_that("fnew_date accepts explicit origin", {
-  fmt <- fnew_date("DATE9.", name = "dsas", origin = "1960-01-01")
-  expect_equal(fmt$dt_origin, "1960-01-01")
+test_that("fnew_date does not accept origin parameter", {
+  expect_error(fnew_date("DATE9.", name = "dsas", origin = "1960-01-01"))
   fclear()
 })
 
@@ -949,11 +949,11 @@ test_that("fput with Date objects and date format", {
   fclear()
 })
 
-test_that("fput with numeric SAS dates", {
-  fmt <- fnew_date("DATE9.", name = "datefmt", origin = "1960-01-01")
-  # as.Date("2020-01-01") - as.Date("1960-01-01") = 21915 days
-  sas_date <- as.numeric(as.Date("2020-01-01") - as.Date("1960-01-01"))
-  result <- fput(sas_date, fmt)
+test_that("fput with numeric R-epoch dates", {
+  fmt <- fnew_date("DATE9.", name = "datefmt")
+  # R epoch: days since 1970-01-01
+  r_date <- as.numeric(as.Date("2020-01-01"))
+  result <- fput(r_date, fmt)
   expect_equal(result, "01JAN2020")
   fclear()
 })
@@ -1046,15 +1046,11 @@ test_that("fput datetime format with POSIXct", {
   fclear()
 })
 
-test_that("fput datetime with SAS numeric", {
-  fmt <- fnew_date("DATETIME20.", name = "dtfmt", origin = "1960-01-01")
-  # SAS epoch: seconds since 1960-01-01 00:00:00
-  sas_dt <- as.numeric(difftime(
-    as.POSIXct("2020-01-01 12:00:00", tz = "UTC"),
-    as.POSIXct("1960-01-01 00:00:00", tz = "UTC"),
-    units = "secs"
-  ))
-  result <- fput(sas_dt, fmt)
+test_that("fput datetime with R-epoch numeric", {
+  fmt <- fnew_date("DATETIME20.", name = "dtfmt")
+  # R epoch: seconds since 1970-01-01 00:00:00
+  r_dt <- as.numeric(as.POSIXct("2020-01-01 12:00:00", tz = "UTC"))
+  result <- fput(r_dt, fmt)
   expect_equal(result, "01JAN2020:12:00:00")
   fclear()
 })
@@ -1066,10 +1062,9 @@ test_that("fputn auto-resolves SAS format names", {
   fclear()
 })
 
-test_that("fputn with SAS numeric dates", {
-  fnew_date("MMDDYY10.", origin = "1960-01-01")
-  sas_date <- as.numeric(as.Date("2020-06-15") - as.Date("1960-01-01"))
-  result <- fputn(sas_date, "MMDDYY10.")
+test_that("fputn with R-epoch numeric dates", {
+  r_date <- as.numeric(as.Date("2020-06-15"))
+  result <- fputn(r_date, "MMDDYY10.")
   expect_equal(result, "06/15/2020")
   fclear()
 })
@@ -2052,13 +2047,6 @@ test_that("fput datetime with numeric R-epoch (default)", {
   # R epoch: 0 = 1970-01-01
   result <- fput(0, fmt)
   expect_true(grepl("1970", result))
-})
-
-test_that("fput datetime with numeric SAS datetime (explicit origin)", {
-  fmt <- fnew_date("DATETIME20.", name = "dtfmt_sas", origin = "1960-01-01")
-  # SAS datetime: seconds since 1960-01-01
-  result <- fput(0, fmt)
-  expect_true(grepl("1960", result))
 })
 
 test_that("SAS format name DDMMYY8 resolves correctly", {

@@ -4,13 +4,7 @@
 \alias{fnew_date}
 \title{Create Date/Time Format}
 \usage{
-fnew_date(
-  pattern,
-  name = NULL,
-  type = "auto",
-  origin = "1970-01-01",
-  .missing = NULL
-)
+fnew_date(pattern, name = NULL, type = "auto", .missing = NULL)
 }
 \arguments{
 \item{pattern}{Character. Either a SAS format name (e.g., \code{"DATE9."},
@@ -23,10 +17,6 @@ the SAS format name (with period) or the pattern itself.}
 \item{type}{Character. Type of format: \code{"date"}, \code{"time"},
 \code{"datetime"}, or \code{"auto"} (auto-detect from SAS name).
 Must be specified for custom strftime patterns.}
-
-\item{origin}{Character. Origin date for converting numeric values to dates.
-Default \code{"1970-01-01"} (R epoch). Use \code{"1960-01-01"} for SAS
-numeric dates (days/seconds since January 1, 1960).}
 
 \item{.missing}{Character. Label for missing values (NA). Default \code{NULL}.}
 }
@@ -47,15 +37,15 @@ registered in the global format library.
   \item \strong{Datetime:} DATETIME20., DATETIME13., etc.
 }
 
-\strong{Numeric input} is converted using the \code{origin} parameter:
+\strong{Numeric input} is converted using R epoch (\code{"1970-01-01"}):
 \itemize{
-  \item Default \code{"1970-01-01"}: R epoch (standard for R numeric dates)
-  \item \code{"1960-01-01"}: SAS epoch (for SAS numeric date values)
-  \item Times: always treated as seconds since midnight (origin not used)
+  \item Dates: numeric values are interpreted as days since 1970-01-01
+  \item Datetimes: numeric values are interpreted as seconds since 1970-01-01
+  \item Times: always treated as seconds since midnight
 }
 }
 \examples{
-# Use a SAS format name (R epoch by default)
+# Use a SAS format name
 fnew_date("DATE9.", name = "mydate")
 fput(as.Date("2020-01-01"), "mydate")
 # [1] "01JAN2020"
@@ -73,10 +63,9 @@ fnew_date("MMDDYY10.", name = "us_date", .missing = "NO DATE")
 fput(c(as.Date("2025-01-01"), NA, as.Date("2025-12-31")), "us_date")
 # [1] "01/01/2025" "NO DATE" "12/31/2025"
 
-# SAS numeric date (days since 1960-01-01) — specify origin explicitly
-fnew_date("DATE9.", name = "sas_date", origin = "1960-01-01")
-sas_days <- as.numeric(as.Date("2025-01-01") - as.Date("1960-01-01"))
-fput(sas_days, "sas_date")
+# Numeric dates (days since 1970-01-01, R epoch)
+r_days <- as.numeric(as.Date("2025-01-01"))
+fputn(r_days, "DATE9.")
 
 # Multiple SAS date formats applied directly
 today <- Sys.Date()

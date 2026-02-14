@@ -180,3 +180,8 @@ When adding package dependencies:
 1. Add to `DESCRIPTION` under `Imports:` (runtime) or `Suggests:` (optional/tests)
 2. Import specific functions in `NAMESPACE` or use `package::function()` notation
 3. With roxygen2: use `#' @importFrom package function` in any R file
+
+## Local package installation
+```sh
+R CMD INSTALL --library=~/R/x86_64-pc-linux-gnu-library/4.5 .
+```

@@ -17,6 +17,6 @@
 Character vector of formatted values
 }
 \description{
-Handles Date, POSIXct, numeric (SAS epoch), and character inputs.
+Handles Date, POSIXct, numeric (R epoch), and character inputs.
 }
 \keyword{internal}
