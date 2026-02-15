@@ -99,7 +99,7 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
 
   # Determine format type
   if (type == "auto") {
-    type <- detect_format_type(names(mappings), mappings)
+    type <- detect_format_type(names(mappings))
   }
 
   # Create format object
@@ -129,10 +129,9 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
 #' Detect Format Type
 #'
 #' @param keys Character vector of mapping key names
-#' @param mappings List of mappings (unused, kept for API compatibility)
 #' @return Character: "character" or "numeric"
 #' @keywords internal
-detect_format_type <- function(keys, mappings) {
+detect_format_type <- function(keys) {
   if (length(keys) == 0L) return("character")
 
   # Check if any key parses as numeric

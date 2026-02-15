@@ -538,7 +538,7 @@ fexport <- function(..., formats = NULL, file = NULL) {
     if (has_ranges) {
       format_obj$type <- "numeric"
     } else {
-      format_obj$type <- detect_format_type(names(mappings), mappings)
+      format_obj$type <- detect_format_type(names(mappings))
     }
   }
 

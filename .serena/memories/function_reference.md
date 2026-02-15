@@ -1,68 +1,67 @@
-# Function Reference — Signatures & Behavior
+# ksformat Function Reference (updated 2026-02-15)
 
-## format_create.R
+## Exported Functions
 
-### `fnew(..., name = NULL, type = "auto", default = NULL)`
-- **Purpose**: Create a `ks_format` object (value→label mapping). Auto-registers in library if named.
-- **Params**: `...` named mappings; `.missing` and `.other` are special directives.
-  `name` — optional (auto-stores in library); `type` — `"auto"`, `"character"`, or `"numeric"`; `default` — alias for `.other`.
-- **Returns**: `ks_format` S3 object.
+| Function | File | Purpose |
+|----------|------|---------|
+| `fnew(...)` | format_create.R | Create ks_format (value→label mapping) |
+| `fput(x, format, ..., keep_na)` | format_apply.R | Apply format to vector |
+| `fputn(x, format_name, ...)` | format_apply.R | Apply numeric format by name |
+| `fputc(x, format_name, ...)` | format_apply.R | Apply character format by name |
+| `fput_all(x, format, ..., keep_na)` | format_apply.R | Multilabel: all matching labels |
+| `fput_df(data, ..., suffix, replace)` | format_apply.R | Apply formats to data frame cols |
+| `finput(...)` | format_invalue.R | Create ks_invalue (label→value) |
+| `finputn(x, invalue_name)` | format_invalue.R | Apply numeric invalue by name |
+| `finputc(x, invalue_name)` | format_invalue.R | Apply character invalue by name |
+| `fnew_bid(...)` | format_invalue.R | Create bidirectional format+invalue |
+| `fnew_date(pattern, name, type, .missing)` | format_datetime.R | Create date/time format |
+| `fparse(text, file)` | format_parse.R | Parse SAS-like text definitions |
+| `fexport(..., formats, file)` | format_parse.R | Export formats to SAS-like text |
+| `fprint(name)` | utilities.R | Print/list formats from library |
+| `fclear(name)` | utilities.R | Remove format(s) from library |
+| `is_missing(x)` | utilities.R | Check for missing values |
+| `range_spec(low, high, label)` | utilities.R | Create range specification |
+| `detect_format_type(keys)` | format_create.R | Auto-detect format type |
 
-### `print.ks_format(x, ...)`
-- Pretty-prints a `ks_format` object with interval notation for ranges.
+## Internal Functions
 
----
+| Function | File | Purpose |
+|----------|------|---------|
+| `.fput_vectorized()` | format_apply.R | Per-element format application |
+| `.invalue_apply()` | format_invalue.R | Apply invalue format |
+| `.is_expr_label()` | utilities.R | Check expression label |
+| `.eval_expr_label()` | utilities.R | Evaluate expression label |
+| `.parse_range_key()` | utilities.R | Parse range key string |
+| `.format_library` | utilities.R | Global format storage env |
+| `.format_register()` | utilities.R | Register format in library |
+| `.format_get()` | utilities.R | Retrieve format from library |
+| `.format_validate()` | utilities.R | Validate format structure |
+| `in_range()` | utilities.R | Check if value in range |
+| `.sas_datetime_formats` | format_datetime.R | SAS format definitions |
+| `.sas_format_defaults` | format_datetime.R | Default SAS widths |
+| `.normalize_sas_format_name()` | format_datetime.R | Normalize SAS name |
+| `.resolve_sas_format_def()` | format_datetime.R | Resolve SAS format def |
+| `.is_sas_datetime_format()` | format_datetime.R | Check if SAS datetime |
+| `.apply_datetime_format()` | format_datetime.R | Apply datetime format |
+| `.format_date_values()` | format_datetime.R | Format date values |
+| `.format_time_values()` | format_datetime.R | Format time values |
+| `.format_datetime_values()` | format_datetime.R | Format datetime values |
+| `.to_r_date()` | format_datetime.R | Convert to R Date |
+| `.to_r_datetime()` | format_datetime.R | Convert to R POSIXct |
+| `.parse_blocks()` | format_parse.R | Parse text to blocks |
+| `.parse_mapping_line()` | format_parse.R | Parse mapping line |
+| `.parse_range_bound()` | format_parse.R | Parse range bound |
+| `.unquote()` | format_parse.R | Remove quotes |
+| `.block_to_format()` | format_parse.R | Block → format dispatch |
+| `.block_to_ks_format()` | format_parse.R | Block → ks_format |
+| `.block_to_ks_datetime_format()` | format_parse.R | Block → datetime format |
+| `.block_to_ks_invalue()` | format_parse.R | Block → ks_invalue |
+| `.format_to_text()` | format_parse.R | ks_format → text |
+| `.datetime_format_to_text()` | format_parse.R | datetime format → text |
+| `.invalue_to_text()` | format_parse.R | ks_invalue → text |
+| `.format_range_bound()` | format_parse.R | Format range bound for text |
 
-## format_apply.R
-
-### `fput(x, format, keep_na = FALSE)`
-- **Purpose**: Apply `ks_format` to a vector (like SAS PUT).
-- `format` can be a `ks_format` object OR a character string (name from library).
-
-### `fputn(x, format_name)` — Apply numeric format by name (SAS PUTN).
-### `fputc(x, format_name)` — Apply character format by name (SAS PUTC).
-### `fput_df(data, ..., suffix = "_fmt", replace = FALSE)` — Apply formats to data frame columns.
-
----
-
-## format_invalue.R
-
-### `finput(..., name = NULL, target_type = "numeric", missing_value = NA)`
-- **Purpose**: Create `ks_invalue`. Default target is NUMERIC.
-- Auto-registers in library if named.
-
-### `.invalue_apply(x, invalue, na_if = NULL)` (internal)
-- Convert labels to values. `invalue` can be object or name string.
-
-### `finputn(x, invalue_name)` — Apply numeric invalue by name (like SAS INPUTN).
-### `finputc(x, invalue_name)` — Apply character invalue by name (like SAS INPUTC).
-### `fnew_bid(..., name, type)` — Creates both ks_format and ks_invalue.
-### `print.ks_invalue(x, ...)`
-
----
-
-## format_datetime.R
-
-### `fnew_date(pattern, name = NULL, type = "auto", .missing = NULL)`
-- **Purpose**: Create date/time format using SAS format name or strftime pattern. Auto-registers.
-- No `origin` parameter — always uses R epoch (1970-01-01). SAS epoch is NOT supported.
-- `type`: "date", "time", "datetime", or "auto" (auto-detect from SAS name).
-
----
-
-## format_parse.R
-
-### `fparse(text = NULL, file = NULL)` — Parse SAS-like text. Always auto-registers.
-### `fexport(..., formats = NULL, file = NULL)` — Export to SAS-like text.
-
----
-
-## utilities.R
-
-### `is_missing(x, include_empty = TRUE)` — Check for NA/NaN; empty strings treated as missing by default.
-### `range_spec(low, high, label, inc_low, inc_high)` — Create range spec.
-### `fprint(name = NULL)` — Display format(s). Returns invisible(NULL).
-### `fclear(name = NULL)` — Remove one or all formats from library.
-### `.format_register(format, name, overwrite)` — Internal: store format.
-### `.format_get(name)` — Internal: retrieve format.
-### `.format_validate(format_obj)` — Internal: validate format structure.
+## Class Hierarchy
+- `ks_format` — VALUE format (value→label). Fields: name, type, mappings, missing_label, other_label, multilabel, ignore_case, created. For datetime: dt_pattern, dt_toupper, sas_name.
+- `ks_invalue` — INVALUE format (label→value). Fields: name, target_type, mappings, missing_value, created.
+- `range_spec` — Range specification. Fields: low, high, label, inc_low, inc_high.

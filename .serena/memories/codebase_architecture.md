@@ -1,58 +1,91 @@
-# Codebase Architecture
+# ksformat Codebase Architecture (updated 2026-02-15)
 
-## File Layout
+## Package Overview
+R package providing SAS PROC FORMAT-like functionality. Version 0.2.6.
+Depends on: cli. Suggests: testthat (>= 3.0.0).
+
+## File Structure
 
 ### R/format_create.R
-- `fnew` (exported) — Create `ks_format`, auto-register if named
-- `detect_format_type` (internal) — Auto-detect "numeric" vs "character"
-- `validate_mappings` (internal) — Check labels are character
-- `print.ks_format` (S3method) — Pretty-print format
+- `fnew(...)` — Create format (ks_format). Supports discrete, range, .missing, .other, multilabel, ignore_case.
+- `detect_format_type(keys)` — Auto-detect "character" or "numeric" from key names.
+- `print.ks_format(x, ...)` — Print method for ks_format. Shows interval notation for ranges, date patterns.
 
 ### R/format_apply.R
-- `fput` (exported) — Apply format to vector (accepts object or name)
-- `fputn` (exported) — Apply numeric format by library name (SAS PUTN)
-- `fputc` (exported) — Apply character format by library name (SAS PUTC)
-- `fput_df` (exported) — Apply formats to data frame columns
+- `fput(x, format, ..., keep_na)` — Apply format to vector. Handles missing → exact match → range match → .other. Expression labels (.x1, .x2) evaluated lazily.
+- `.fput_vectorized(x, format_names, type_check, ...)` — Per-element format application (different format per element).
+- `fputn(x, format_name, ...)` — Apply numeric format by name (like SAS PUTN). Supports vectorized format_name.
+- `fputc(x, format_name, ...)` — Apply character format by name (like SAS PUTC). Supports vectorized format_name.
+- `fput_all(x, format, ..., keep_na)` — Multilabel: returns list of all matching labels per element.
+- `fput_df(data, ..., suffix, replace)` — Apply formats to data frame columns.
 
 ### R/format_invalue.R
-- `finput` (exported) — Create `ks_invalue`, default numeric, auto-register
-- `detect_invalue_type` (internal) — Detect target type
-- `.invalue_apply` (internal) — Apply invalue (accepts object or name)
-- `finputn` (exported) — Apply numeric invalue by name (SAS INPUTN)
-- `finputc` (exported) — Apply character invalue by name (SAS INPUTC)
-- `fnew_bid` (exported) — Create format + invalue pair
-- `print.ks_invalue` (S3method) — Pretty-print invalue
+- `finput(...)` — Create invalue (ks_invalue) for reverse formatting (label → value).
+- `.invalue_apply(x, invalue, na_if)` — Apply invalue to convert labels to values. Vectorized match().
+- `finputn(x, invalue_name)` — Apply numeric invalue by name (like SAS INPUTN).
+- `finputc(x, invalue_name)` — Apply character invalue by name (like SAS INPUTC).
+- `fnew_bid(...)` — Create bidirectional format+invalue pair. Invalue named {name}_inv.
+- `print.ks_invalue(x, ...)` — Print method for ks_invalue.
+
+### R/format_datetime.R
+- `.sas_datetime_formats` — Named list of all SAS date/time/datetime format definitions.
+- `.sas_format_defaults` — Default widths for SAS format names without explicit width.
+- `.normalize_sas_format_name(name)` — Strip trailing period, uppercase.
+- `.resolve_sas_format_def(name)` — Lookup in .sas_datetime_formats.
+- `.is_sas_datetime_format(name)` — Check if name is built-in SAS datetime format.
+- `fnew_date(pattern, name, type, .missing)` — Create date/time/datetime format.
+- `.apply_datetime_format(x, format, keep_na)` — Apply dt format to vector.
+- `.format_date_values(x, pattern, origin)` — Format Date values. Special quarter handling.
+- `.format_time_values(x, pattern)` — Format time values (seconds since midnight → HH:MM:SS).
+- `.format_datetime_values(x, pattern, origin)` — Format datetime values.
+- `.to_r_date(x, origin)` — Convert various inputs to R Date.
+- `.to_r_datetime(x, origin)` — Convert various inputs to R POSIXct.
 
 ### R/format_parse.R
-- `fparse` (exported) — Parse SAS-like text, always auto-registers
-- `fexport` (exported) — Export formats to SAS-like text
-- `.parse_blocks`, `.parse_mapping_line`, `.parse_range_bound`, `.unquote` (internal parsers)
-- `.block_to_format`, `.block_to_ks_format`, `.block_to_ks_invalue` (internal builders)
-- `.format_to_text`, `.invalue_to_text`, `.format_range_bound` (internal exporters)
+- `fparse(text, file)` — Parse SAS-like text into format/invalue objects. Auto-registers.
+- `fexport(..., formats, file)` — Export formats to SAS-like text.
+- `.parse_blocks(lines)` — Parse text lines into block structures.
+- `.parse_mapping_line(line, line_num)` — Parse single mapping line (LHS = RHS).
+- `.parse_range_bound(s, is_low)` — Parse range bound (LOW→-Inf, HIGH→Inf).
+- `.unquote(s)` — Remove surrounding quotes.
+- `.block_to_format(block)` — Dispatch to ks_format or ks_invalue converter.
+- `.block_to_ks_format(block)` — Convert VALUE block to ks_format.
+- `.block_to_ks_datetime_format(block)` — Convert datetime VALUE block.
+- `.block_to_ks_invalue(block)` — Convert INVALUE block to ks_invalue.
+- `.format_to_text(fmt, name)` — Convert ks_format to SAS-like text.
+- `.datetime_format_to_text(fmt, name)` — Convert datetime format to text.
+- `.invalue_to_text(inv, name)` — Convert ks_invalue to text.
+- `.format_range_bound(val, is_low)` — Format numeric bound for text output.
 
 ### R/utilities.R
-- `is_missing` (exported) — Check NA/NaN, empty strings treated as missing by default (include_empty=TRUE)
-- `range_spec` (exported) — Create range_spec S3 object
-- `in_range` (internal) — Test value against range_spec
-- `.parse_range_key` (internal) — Parse range key string
-- `.format_library` (environment) — Global format store
-- `.format_register` (internal) — Store format in library
-- `.format_get` (internal) — Retrieve format from library
-- `fprint` (exported) — Display format(s), returns invisible(NULL)
-- `fclear` (exported) — Remove format(s) from library
-- `.format_validate` (internal) — Validate format structure
+- `.is_expr_label(label)` — Check if label contains .x1, .x2, etc.
+- `.eval_expr_label(expr_str, extra_args, indices)` — Evaluate expression label.
+- `is_missing(x)` — Check for NA, NaN, "", "NaN". Returns logical vector.
+- `range_spec(low, high, label, inc_low, inc_high)` — Create range_spec object.
+- `in_range(x, range_spec)` — Check if value falls in range.
+- `.parse_range_key(key)` — Parse "low,high,inc_low,inc_high" or "low,high" range key string.
+- `.format_library` — Global environment for storing formats.
+- `.format_register(format, name, overwrite)` — Register format in library.
+- `.format_get(name)` — Retrieve format from library. Case-insensitive fallback. SAS datetime auto-resolve.
+- `fprint(name)` — Print/list format(s) from library.
+- `fclear(name)` — Remove format(s) from library.
+- `.format_validate(format_obj)` — Validate format structure.
 
 ### R/ksformat-package.R
-- Package-level roxygen2 documentation
+- Package-level documentation (empty, roxygen2-generated).
 
-## S3 Classes
-- `ks_format` — value→label mapping (VALUE)
-- `ks_invalue` — label→value mapping (INVALUE), default numeric
-- `range_spec` — range bound specification
+## Key Design Patterns
 
-## Key Design Decisions
-- Formats auto-register in `.format_library` on creation/parsing
-- INVALUE defaults to numeric target_type
-- `fput`/`.invalue_apply` accept both objects and name strings
-- `fprint` is display-only (invisible(NULL)), not for retrieval
-- `fclear(name)` replaces both old format_remove and format_clear
+1. **Format resolution**: `fput` accepts both ks_format objects and string names (resolved via `.format_get`).
+2. **Auto-registration**: `fnew`, `finput`, `fnew_date`, `fparse` auto-register named formats in `.format_library`.
+3. **SAS datetime auto-resolve**: `.format_get` auto-creates SAS datetime formats on first use.
+4. **Vectorized matching**: `fput` uses `match()` for exact lookups, then iterates range entries.
+5. **Expression labels**: Labels with `.x1`, `.x2` are deferred and evaluated in batch.
+6. **Multilabel**: `fput_all` allows overlapping range matches, returns list of character vectors.
+
+## Performance Notes
+- `fput` Phase 1: vectorized `match()` for discrete keys (O(n) amortized).
+- `fput` Phase 2: iterative range matching — each range entry scanned against unmatched values.
+- `fput_all` iterates all keys/ranges against all values (no early exit).
+- `.fput_vectorized` groups by format name for efficiency.
+- No caching of parsed range keys — `.parse_range_key` called per invocation.

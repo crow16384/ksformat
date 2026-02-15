@@ -198,8 +198,7 @@ context("Utility Functions")
 test_that("is_missing detects various missing types", {
   expect_true(is_missing(NA))
   expect_true(is_missing(NaN))
-  expect_true(is_missing(""))              # include_empty = TRUE by default
-  expect_false(is_missing("", include_empty = FALSE))
+  expect_true(is_missing(""))
   expect_false(is_missing("text"))
 })
 
@@ -1610,19 +1609,19 @@ test_that("fnew with only .missing and .other", {
 })
 
 test_that("detect_format_type returns character for empty keys", {
-  expect_equal(detect_format_type(character(0), list()), "character")
+  expect_equal(detect_format_type(character(0)), "character")
 })
 
 test_that("detect_format_type returns numeric for comma keys", {
-  expect_equal(detect_format_type(c("0,18"), list()), "numeric")
+  expect_equal(detect_format_type(c("0,18")), "numeric")
 })
 
 test_that("detect_format_type returns numeric for NA keys", {
-  expect_equal(detect_format_type(c(NA_character_), list()), "numeric")
+  expect_equal(detect_format_type(c(NA_character_)), "numeric")
 })
 
 test_that("detect_format_type returns numeric for empty string keys", {
-  expect_equal(detect_format_type(c(""), list()), "numeric")
+  expect_equal(detect_format_type(c("")), "numeric")
 })
 
 test_that("print.ks_format shows both multilabel and nocase flags", {
@@ -1818,8 +1817,7 @@ test_that("is_missing with NaN", {
 })
 
 test_that("is_missing with empty string and include_empty", {
-  expect_true(is_missing(""))              # include_empty = TRUE by default
-  expect_false(is_missing("", include_empty = FALSE))
+  expect_true(is_missing(""))
 })
 
 test_that("is_missing with vector input", {

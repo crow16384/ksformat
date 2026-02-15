@@ -81,8 +81,6 @@ NULL
 #' Optionally treats empty strings as missing.
 #'
 #' @param x Value to check
-#' @param include_empty Logical. If \code{TRUE}, treat empty strings as missing.
-#'   Default is \code{TRUE}.
 #'
 #' @return Logical vector. NULL input returns \code{logical(0)}.
 #'
@@ -91,16 +89,11 @@ NULL
 #' @examples
 #' is_missing(NA)          # TRUE
 #' is_missing(NaN)         # TRUE
-#' is_missing("")          # TRUE (include_empty = TRUE by default)
-#' is_missing("", include_empty = FALSE)  # FALSE
+#' is_missing("")          # TRUE
 #' is_missing("text")      # FALSE
-is_missing <- function(x, include_empty = TRUE) {
+is_missing <- function(x) {
   if (is.null(x)) return(logical(0))
-  result <- is.na(x)
-  if (include_empty) {
-    result <- result | (as.character(x) == "")
-  }
-  result
+  is.na(x) | is.nan(x) | x == "" | x == "NaN"
 }
 
 #' Create Range Specification

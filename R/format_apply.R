@@ -68,7 +68,9 @@ fput <- function(x, format, ..., keep_na = FALSE) {
   }
 
   if (!inherits(format, "ks_format")) {
-    cli_abort("{.arg format} must be a {.cls ks_format} object or a registered format name.")
+    cli_abort(
+      "{.arg format} must be a {.cls ks_format} object or a registered format name."
+    )
   }
 
   # Handle NULL input
@@ -88,7 +90,7 @@ fput <- function(x, format, ..., keep_na = FALSE) {
   result <- rep(NA_character_, n)
 
   # Identify missing values (NA, NaN)
-  is_miss <- is.na(x) | is.nan(x)
+  is_miss <- is_missing(x)
 
   # Apply missing label
   if (!is.null(format$missing_label) && !keep_na) {
@@ -205,7 +207,7 @@ fput <- function(x, format, ..., keep_na = FALSE) {
     }
   }
 
-  return(result)
+  result
 }
 
 # ---------------------------------------------------------------------------
