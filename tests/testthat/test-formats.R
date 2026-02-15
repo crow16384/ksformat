@@ -888,7 +888,15 @@ test_that("fnew_date creates time format", {
   fmt <- fnew_date("TIME8.", name = "mytime")
   expect_s3_class(fmt, "ks_format")
   expect_equal(fmt$type, "time")
-  expect_equal(fmt$dt_pattern, "%H:%M:%S")
+  expect_equal(fmt$dt_pattern, "%-H:%M:%S")  # TIME has no leading zero
+  fclear()
+})
+
+test_that("fnew_date creates TOD format with leading zero", {
+  fmt <- fnew_date("TOD8.", name = "mytod")
+  expect_s3_class(fmt, "ks_format")
+  expect_equal(fmt$type, "time")
+  expect_equal(fmt$dt_pattern, "%H:%M:%S")  # TOD has leading zero
   fclear()
 })
 
@@ -925,7 +933,7 @@ test_that("fnew_date handles default widths", {
   fmt <- fnew_date("DATE.", name = "d1")
   expect_equal(fmt$dt_pattern, "%d%b%Y")  # DATE. defaults to DATE9.
   fmt2 <- fnew_date("TIME.", name = "t1")
-  expect_equal(fmt2$dt_pattern, "%H:%M:%S")  # TIME. defaults to TIME8.
+  expect_equal(fmt2$dt_pattern, "%-H:%M:%S")  # TIME. defaults to TIME8. (no leading zero)
   fclear()
 })
 
@@ -1026,14 +1034,31 @@ test_that("fput date with vector of dates", {
 test_that("fput time format with numeric seconds", {
   fmt <- fnew_date("TIME8.", name = "tfmt")
   result <- fput(c(0, 3600, 45000), fmt)
-  expect_equal(result, c("00:00:00", "01:00:00", "12:30:00"))
+  expect_equal(result, c("0:00:00", "1:00:00", "12:30:00"))  # TIME: no leading zero
   fclear()
 })
 
-test_that("fput time format TIME5 (HH:MM)", {
+test_that("fput time format TIME5 (H:MM)", {
   fmt <- fnew_date("TIME5.", name = "t5fmt")
   result <- fput(c(0, 45000), fmt)
-  expect_equal(result, c("00:00", "12:30"))
+  expect_equal(result, c("0:00", "12:30"))  # TIME: no leading zero
+  fclear()
+})
+
+test_that("fput TOD format with leading zero", {
+  fmt <- fnew_date("TOD8.", name = "todfmt")
+  result <- fput(c(0, 3600, 45000), fmt)
+  expect_equal(result, c("00:00:00", "01:00:00", "12:30:00"))  # TOD: leading zero
+  fclear()
+})
+
+test_that("fput dynamic TIME widths work", {
+  result4 <- fputn(c(0, 3600, 45000), "time4.")
+  expect_equal(result4, c("0", "1", "12"))  # width < 5 → hours only
+  result6 <- fputn(c(0, 3600, 45000), "time6.")
+  expect_equal(result6, c("0:00", "1:00", "12:30"))  # 5 ≤ width < 8 → H:MM
+  result9 <- fputn(c(0, 3600, 45000), "time9.")
+  expect_equal(result9, c("0:00:00", "1:00:00", "12:30:00"))  # 8 ≤ width < 11
   fclear()
 })
 

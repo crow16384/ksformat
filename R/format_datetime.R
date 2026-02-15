@@ -59,14 +59,17 @@ NULL
   "JULIAN"   = list(r_fmt = "%j",         type = "date", toupper = FALSE),
   "QTR"      = list(r_fmt = "quarter",    type = "date", toupper = FALSE),
 
-  # ---- Time formats ----
-  "TIME5"    = list(r_fmt = "%H:%M",      type = "time", toupper = FALSE),
-  "TIME8"    = list(r_fmt = "%H:%M:%S",   type = "time", toupper = FALSE),
-  "TIME11"   = list(r_fmt = "%H:%M:%OS",  type = "time", toupper = FALSE),
-  "HHMM"     = list(r_fmt = "%H:%M",      type = "time", toupper = FALSE),
-  "HOUR"     = list(r_fmt = "%H",         type = "time", toupper = FALSE),
-  "MMSS"     = list(r_fmt = "%M:%S",      type = "time", toupper = FALSE),
-  "TOD"      = list(r_fmt = "%H:%M:%S",   type = "time", toupper = FALSE),
+  # ---- Time formats (no leading zero for hours, like SAS) ----
+  "TIME5"    = list(r_fmt = "%-H:%M",      type = "time", toupper = FALSE),
+  "TIME8"    = list(r_fmt = "%-H:%M:%S",   type = "time", toupper = FALSE),
+  "TIME11"   = list(r_fmt = "%-H:%M:%OS",  type = "time", toupper = FALSE),
+  "HHMM"     = list(r_fmt = "%H:%M",       type = "time", toupper = FALSE),
+  "HOUR"     = list(r_fmt = "%-H",          type = "time", toupper = FALSE),
+  "MMSS"     = list(r_fmt = "%M:%S",       type = "time", toupper = FALSE),
+  # ---- TOD formats (leading zero for hours, like SAS) ----
+  "TOD5"     = list(r_fmt = "%H:%M",       type = "time", toupper = FALSE),
+  "TOD8"     = list(r_fmt = "%H:%M:%S",    type = "time", toupper = FALSE),
+  "TOD11"    = list(r_fmt = "%H:%M:%OS",   type = "time", toupper = FALSE),
 
   # ---- Datetime formats ----
   "DATETIME13" = list(r_fmt = "%d%b%y:%H:%M",     type = "datetime", toupper = TRUE),
@@ -94,7 +97,7 @@ NULL
   "HHMM"     = "HHMM",
   "HOUR"     = "HOUR",
   "MMSS"     = "MMSS",
-  "TOD"      = "TOD",
+  "TOD"      = "TOD8",
   "DTDATE"   = "DTDATE",
   "DTMONYY"  = "DTMONYY",
   "DTYEAR"   = "DTYEAR",
@@ -133,6 +136,25 @@ NULL
     if (default_name %in% names(.sas_datetime_formats)) {
       return(.sas_datetime_formats[[default_name]])
     }
+  }
+
+  # Dynamic resolution for TIME/TOD families (any width)
+  time_match <- regmatches(norm, regexec("^(TIME|TOD)(\\d+)$", norm))[[1]]
+  if (length(time_match) == 3L) {
+    family <- time_match[2]
+    width  <- as.integer(time_match[3])
+    # TIME: no leading zero (%-H); TOD: leading zero (%H)
+    h_code <- if (family == "TIME") "%-H" else "%H"
+    if (width < 5L) {
+      r_fmt <- h_code
+    } else if (width < 8L) {
+      r_fmt <- paste0(h_code, ":%M")
+    } else if (width < 11L) {
+      r_fmt <- paste0(h_code, ":%M:%S")
+    } else {
+      r_fmt <- paste0(h_code, ":%M:%OS")
+    }
+    return(list(r_fmt = r_fmt, type = "time", toupper = FALSE))
   }
 
   return(NULL)
@@ -361,8 +383,14 @@ fnew_date <- function(pattern, name = NULL, type = "auto",
 #' Format time values
 #' @keywords internal
 .format_time_values <- function(x, pattern) {
+  # Detect %-H (no leading zero for hours, SAS TIME-style)
+  no_lz_hour <- grepl("%-H", pattern, fixed = TRUE)
+
   if (inherits(x, c("POSIXct", "POSIXlt"))) {
-    return(format(x, pattern))
+    use_pattern <- if (no_lz_hour) sub("%-H", "%H", pattern, fixed = TRUE) else pattern
+    result <- format(x, use_pattern)
+    if (no_lz_hour) result <- sub("^0(\\d)", "\\1", result)
+    return(result)
   }
 
   if (is.numeric(x)) {
@@ -377,7 +405,7 @@ fnew_date <- function(pattern, name = NULL, type = "auto",
     s <- total_secs %% 60
 
     # Vectorized string assembly: build template then substitute
-    h_str <- sprintf("%02d", h)
+    h_str <- if (no_lz_hour) sprintf("%d", h) else sprintf("%02d", h)
     m_str <- sprintf("%02d", m)
     s_int_str <- sprintf("%02d", as.integer(s))
     s_frac_str <- sprintf("%.2f", s)
@@ -389,7 +417,11 @@ fnew_date <- function(pattern, name = NULL, type = "auto",
       fmt <- mapply(function(f, v) sub("%OS", v, f, fixed = TRUE),
                     fmt, s_frac_str, USE.NAMES = FALSE)
     }
-    if (grepl("%H", pattern, fixed = TRUE)) {
+    # %-H must be replaced before %H to avoid partial match
+    if (no_lz_hour) {
+      fmt <- mapply(function(f, v) sub("%-H", v, f, fixed = TRUE),
+                    fmt, h_str, USE.NAMES = FALSE)
+    } else if (grepl("%H", pattern, fixed = TRUE)) {
       fmt <- mapply(function(f, v) sub("%H", v, f, fixed = TRUE),
                     fmt, h_str, USE.NAMES = FALSE)
     }
@@ -410,7 +442,10 @@ fnew_date <- function(pattern, name = NULL, type = "auto",
   # Character or other - try as POSIXct
   dts <- tryCatch(as.POSIXct(x, tz = "UTC"), error = function(e) NULL)
   if (!is.null(dts)) {
-    return(format(dts, pattern))
+    use_pattern <- if (no_lz_hour) sub("%-H", "%H", pattern, fixed = TRUE) else pattern
+    result <- format(dts, use_pattern)
+    if (no_lz_hour) result <- sub("^0(\\d)", "\\1", result)
+    return(result)
   }
 
   as.character(x)
