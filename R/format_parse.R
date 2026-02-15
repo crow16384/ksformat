@@ -256,6 +256,409 @@ fexport <- function(..., formats = NULL, file = NULL) {
 }
 
 
+#' Import Formats from SAS PROC FORMAT CNTLOUT CSV
+#'
+#' Reads a CSV file produced by the SAS \code{PROC FORMAT} with
+#' \code{CNTLOUT=} option (typically exported via \code{PROC EXPORT})
+#' and converts compatible format definitions into \code{ks_format} and
+#' \code{ks_invalue} objects.
+#'
+#' @details
+#' The SAS format catalogue CSV is expected to contain the standard CNTLOUT
+#' columns: \code{FMTNAME}, \code{START}, \code{END}, \code{LABEL},
+#' \code{TYPE}, \code{HLO}, \code{SEXCL}, \code{EEXCL}.
+#'
+#' \strong{Supported SAS format types:}
+#' \describe{
+#'   \item{\code{N}}{Numeric VALUE format \eqn{\to} \code{ks_format} with
+#'     \code{type = "numeric"}}
+#'   \item{\code{C}}{Character VALUE format \eqn{\to} \code{ks_format} with
+#'     \code{type = "character"}}
+#'   \item{\code{I}}{Numeric INVALUE (informat) \eqn{\to} \code{ks_invalue}
+#'     with \code{target_type = "numeric"}}
+#'   \item{\code{J}}{Character INVALUE (informat) \eqn{\to} \code{ks_invalue}
+#'     with \code{target_type = "character"}}
+#' }
+#'
+#' \strong{Incompatible types (logged with a warning):}
+#' \describe{
+#'   \item{\code{P}}{PICTURE formats \eqn{-} no equivalent in ksformat}
+#' }
+#'
+#' Rows with SAS special missing values (\code{.A}\eqn{-}\code{.Z},
+#' \code{._}) in the HLO field are logged as incompatible entries and skipped
+#' because R has no equivalent concept.
+#'
+#' @param file Path to the CSV file exported from a SAS format catalogue.
+#' @param register Logical; if \code{TRUE} (default), each imported format is
+#'   registered in the global format library.
+#' @param overwrite Logical; if \code{TRUE} (default), existing library entries
+#'   with the same name are overwritten.
+#'
+#' @return A named list of \code{ks_format} and \code{ks_invalue} objects that
+#'   were successfully imported. Returned invisibly.
+#'
+#' @export
+#' @examples
+#' \dontrun{
+#' # In SAS:
+#' # proc format library=work cntlout=fmts; run;
+#' # proc export data=fmts outfile="formats.csv" dbms=csv replace; run;
+#'
+#' # In R:
+#' imported <- fimport("formats.csv")
+#' fprint()
+#' }
+fimport <- function(file, register = TRUE, overwrite = TRUE) {
+  if (!file.exists(file)) {
+    cli_abort("File not found: {.file {file}}")
+  }
+
+  data <- utils::read.csv(file, stringsAsFactors = FALSE, na.strings = "")
+
+  # Normalize column names to uppercase
+  names(data) <- toupper(names(data))
+
+  # Validate required columns
+  required <- c("FMTNAME", "START", "END", "LABEL", "TYPE")
+  missing_cols <- setdiff(required, names(data))
+  if (length(missing_cols) > 0) {
+    cli_abort(c(
+      "Required column{?s} missing from CSV: {.val {missing_cols}}",
+      "i" = "Expected a SAS {.code PROC FORMAT CNTLOUT=} export."
+    ))
+  }
+
+  # Supply defaults for optional columns
+  if (!"HLO"   %in% names(data)) data$HLO   <- ""
+  if (!"SEXCL" %in% names(data)) data$SEXCL <- "N"
+  if (!"EEXCL" %in% names(data)) data$EEXCL <- "N"
+
+  # Ensure character types for key fields
+  data$FMTNAME <- trimws(as.character(data$FMTNAME))
+  data$START   <- as.character(ifelse(is.na(data$START), "", data$START))
+  data$END     <- as.character(ifelse(is.na(data$END),   "", data$END))
+  data$LABEL   <- as.character(ifelse(is.na(data$LABEL), "", data$LABEL))
+  data$TYPE    <- trimws(toupper(as.character(data$TYPE)))
+  data$HLO     <- toupper(as.character(ifelse(is.na(data$HLO), "", data$HLO)))
+  data$SEXCL   <- toupper(as.character(ifelse(is.na(data$SEXCL), "N", data$SEXCL)))
+  data$EEXCL   <- toupper(as.character(ifelse(is.na(data$EEXCL), "N", data$EEXCL)))
+
+  # ---- Classify format types ----
+  supported_types <- c("N", "C", "I", "J")
+  all_types <- unique(data$TYPE)
+  unsupported <- setdiff(all_types, supported_types)
+
+  if (length(unsupported) > 0) {
+    # Identify formats with unsupported types
+    for (utype in unsupported) {
+      affected <- unique(data$FMTNAME[data$TYPE == utype])
+      type_desc <- switch(utype,
+        "P" = "PICTURE",
+        paste0("unknown (", utype, ")")
+      )
+      cli_warn(c(
+        "Skipping {type_desc} format{?s}: {.val {affected}}",
+        "i" = "TYPE={.val {utype}} is not supported by ksformat."
+      ))
+    }
+    data <- data[data$TYPE %in% supported_types, , drop = FALSE]
+  }
+
+  if (nrow(data) == 0) {
+    cli_inform("No compatible formats found in {.file {file}}.")
+    return(invisible(list()))
+  }
+
+  # ---- Group by FMTNAME + TYPE and build format objects ----
+  format_key <- paste(data$FMTNAME, data$TYPE, sep = "|")
+  groups <- split(seq_len(nrow(data)), format_key)
+
+  result <- list()
+  skipped_entries <- list()
+
+  for (gname in names(groups)) {
+    idx <- groups[[gname]]
+    rows <- data[idx, , drop = FALSE]
+    fmt_name   <- rows$FMTNAME[1]
+    fmt_type   <- rows$TYPE[1]
+
+    if (fmt_type %in% c("N", "C")) {
+      obj <- .cntlout_to_ks_format(rows, fmt_name, fmt_type, skipped_entries)
+      skipped_entries <- obj$skipped
+      obj <- obj$format
+    } else {
+      obj <- .cntlout_to_ks_invalue(rows, fmt_name, fmt_type, skipped_entries)
+      skipped_entries <- obj$skipped
+      obj <- obj$invalue
+    }
+
+    if (is.null(obj)) next
+
+    # Validate
+    tryCatch(
+      .format_validate(obj),
+      error = function(e) {
+        cli_warn(c(
+          "Format {.val {fmt_name}} failed validation and was skipped.",
+          "x" = conditionMessage(e)
+        ))
+        obj <<- NULL
+      }
+    )
+    if (is.null(obj)) next
+
+    # Register
+    if (register) {
+      .format_register(obj, name = fmt_name, overwrite = overwrite)
+    }
+
+    result[[fmt_name]] <- obj
+  }
+
+  # ---- Report skipped entries ----
+  if (length(skipped_entries) > 0) {
+    for (entry in skipped_entries) {
+      cli_warn(c(
+        "Skipped incompatible entry in format {.val {entry$format}}:",
+        "x" = entry$reason
+      ))
+    }
+  }
+
+  n_fmt <- sum(vapply(result, inherits, logical(1), "ks_format"))
+  n_inv <- sum(vapply(result, inherits, logical(1), "ks_invalue"))
+  cli_inform(c(
+    "v" = "Imported {n_fmt} format{?s} and {n_inv} invalue{?s} from {.file {file}}."
+  ))
+
+  return(invisible(result))
+}
+
+
+#' Convert CNTLOUT rows to ks_format
+#' @keywords internal
+.cntlout_to_ks_format <- function(rows, fmt_name, fmt_type, skipped) {
+  type <- if (fmt_type == "N") "numeric" else "character"
+  mappings <- list()
+  missing_label <- NULL
+  other_label   <- NULL
+  multilabel    <- FALSE
+
+  for (i in seq_len(nrow(rows))) {
+    hlo   <- rows$HLO[i]
+    start <- rows$START[i]
+    end   <- rows$END[i]
+    label <- rows$LABEL[i]
+    sexcl <- rows$SEXCL[i]
+    eexcl <- rows$EEXCL[i]
+
+    # Check for multilabel flag
+    if (grepl("T", hlo, fixed = TRUE)) {
+      multilabel <- TRUE
+    }
+
+    # OTHER entry
+    if (grepl("O", hlo, fixed = TRUE)) {
+      other_label <- label
+      next
+    }
+
+    # Special missing values (.A-.Z, ._) — no R equivalent
+    if (grepl("S", hlo, fixed = TRUE)) {
+      skipped <- c(skipped, list(list(
+        format = fmt_name,
+        reason = paste0(
+          "SAS special missing value '", start,
+          "' (HLO='", hlo, "') has no R equivalent."
+        )
+      )))
+      next
+    }
+
+    # Standard missing (numeric: START is ".", character: blank)
+    if (type == "numeric" && start == ".") {
+      missing_label <- label
+      next
+    }
+    if (type == "character" && start == "" && end == "" &&
+        !grepl("[LH]", hlo)) {
+      missing_label <- label
+      next
+    }
+
+    # ---- Range vs discrete ----
+    has_low  <- grepl("L", hlo, fixed = TRUE)
+    has_high <- grepl("H", hlo, fixed = TRUE)
+
+    is_range <- FALSE
+    if (has_low || has_high) {
+      is_range <- TRUE
+    } else if (type == "numeric" && start != end) {
+      is_range <- TRUE
+    }
+
+    if (is_range && type == "numeric") {
+      low  <- if (has_low)  -Inf else suppressWarnings(as.numeric(start))
+      high <- if (has_high)  Inf else suppressWarnings(as.numeric(end))
+
+      if (is.na(low) || is.na(high)) {
+        skipped <- c(skipped, list(list(
+          format = fmt_name,
+          reason = paste0(
+            "Could not parse range bounds: START='", start,
+            "', END='", end, "'."
+          )
+        )))
+        next
+      }
+
+      inc_low  <- (sexcl != "Y")
+      inc_high <- (eexcl != "Y")
+
+      range_key <- paste0(low, ",", high, ",", toupper(inc_low), ",",
+                          toupper(inc_high))
+      mappings[[range_key]] <- label
+    } else {
+      # Discrete mapping
+      key <- if (type == "numeric") {
+        # Keep numeric-looking keys as-is
+        trimws(start)
+      } else {
+        trimws(start)
+      }
+      mappings[[key]] <- label
+    }
+  }
+
+  if (length(mappings) == 0 && is.null(missing_label) && is.null(other_label)) {
+    skipped <- c(skipped, list(list(
+      format = fmt_name,
+      reason = "No valid mappings could be extracted."
+    )))
+    return(list(format = NULL, skipped = skipped))
+  }
+
+  format_obj <- structure(
+    list(
+      name         = fmt_name,
+      type         = type,
+      mappings     = mappings,
+      missing_label = missing_label,
+      other_label  = other_label,
+      multilabel   = multilabel,
+      ignore_case  = FALSE,
+      created      = Sys.time()
+    ),
+    class = "ks_format"
+  )
+
+  list(format = format_obj, skipped = skipped)
+}
+
+
+#' Convert CNTLOUT rows to ks_invalue
+#' @keywords internal
+.cntlout_to_ks_invalue <- function(rows, fmt_name, fmt_type, skipped) {
+  target_type   <- if (fmt_type == "I") "numeric" else "character"
+  mappings      <- list()
+  missing_value <- NA
+
+  for (i in seq_len(nrow(rows))) {
+    hlo   <- rows$HLO[i]
+    start <- rows$START[i]
+    label <- rows$LABEL[i]
+
+    # OTHER — ks_invalue doesn't support .other, skip
+    if (grepl("O", hlo, fixed = TRUE)) {
+      skipped <- c(skipped, list(list(
+        format = fmt_name,
+        reason = "OTHER directive in INVALUE is not supported; entry skipped."
+      )))
+      next
+    }
+
+    # Special missing
+    if (grepl("S", hlo, fixed = TRUE)) {
+      skipped <- c(skipped, list(list(
+        format = fmt_name,
+        reason = paste0(
+          "SAS special missing value '", start,
+          "' in INVALUE has no R equivalent."
+        )
+      )))
+      next
+    }
+
+    # Range entries — ks_invalue doesn't support ranges
+    has_low  <- grepl("L", hlo, fixed = TRUE)
+    has_high <- grepl("H", hlo, fixed = TRUE)
+    if (has_low || has_high || (start != rows$END[i] && start != "")) {
+      skipped <- c(skipped, list(list(
+        format = fmt_name,
+        reason = paste0(
+          "Range entry '", start, "'-'", rows$END[i],
+          "' in INVALUE is not supported."
+        )
+      )))
+      next
+    }
+
+    # Standard missing value
+    if (start == "." || start == "") {
+      # Convert label to the appropriate target type
+      if (target_type == "numeric") {
+        missing_value <- suppressWarnings(as.numeric(label))
+      } else {
+        missing_value <- label
+      }
+      next
+    }
+
+    # Discrete mapping: key = input text, value = output value
+    val <- if (target_type == "numeric") {
+      suppressWarnings(as.numeric(label))
+    } else {
+      label
+    }
+
+    if (target_type == "numeric" && is.na(val) && label != "") {
+      skipped <- c(skipped, list(list(
+        format = fmt_name,
+        reason = paste0(
+          "INVALUE label '", label, "' for key '", start,
+          "' could not be converted to numeric."
+        )
+      )))
+      next
+    }
+
+    mappings[[start]] <- val
+  }
+
+  if (length(mappings) == 0 && is.na(missing_value)) {
+    skipped <- c(skipped, list(list(
+      format = fmt_name,
+      reason = "No valid INVALUE mappings could be extracted."
+    )))
+    return(list(invalue = NULL, skipped = skipped))
+  }
+
+  invalue_obj <- structure(
+    list(
+      name          = fmt_name,
+      target_type   = target_type,
+      mappings      = mappings,
+      missing_value = missing_value,
+      created       = Sys.time()
+    ),
+    class = "ks_invalue"
+  )
+
+  list(invalue = invalue_obj, skipped = skipped)
+}
+
+
 # ---------------------------------------------------------------------------
 # Internal parser helpers
 # ---------------------------------------------------------------------------
