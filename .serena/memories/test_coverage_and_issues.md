@@ -1,75 +1,48 @@
-# Test Coverage & Known Issues
+# Test Coverage & Known Issues (updated 2026-02-18)
 
 ## Test File: tests/testthat/test-formats.R
-Single test file, 7 test cases, using `context("Format Creation and Application")`.
+Single test file, ~130+ test cases, ~2162 lines.
 
-### Tests Present
+### Test Contexts
+1. **Format Creation (fnew)** — discrete values, auto-registration, unnamed formats
+2. **Format Application (fput)** — missing values, keep_na, format name from library
+3. **SAS-like Functions (fputn, fputc, finputn, finputc)** — numeric/char format by name, type warnings
+4. **Invalue Creation and Application (finput)** — reverse formatting, name from library, default numeric type
+5. **Utility Functions** — is_missing detection
+6. **Format Library (fprint, fclear)** — register/retrieve/remove cycle, show format list
+7. **Bidirectional** — fnew_bid creates both format and invalue
+8. **Format Parsing (fparse)** — VALUE/INVALUE blocks, ranges, LOW keyword, comments, auto-detect type, file input, errors, unquoted
+9. **Format Export** — SAS-like text for VALUE/INVALUE, roundtrips, file output, multiple formats
+10. **Range Bounds and Decimal Support** — interval notation, exclusive/inclusive bounds, decimal ranges, range matching
+11. **INVALUE Numeric Default** — INVALUE without type defaults numeric
+12. **Data Frame Formatting** — fput_df
+13. **INVALUE Export** — omit numeric type, include non-default type
+14. **Datetime** — fnew_date (date/time/TOD/datetime), auto-register, default widths, R-epoch, fput with various SAS formats
+15. **Multilabel** — fput_all with overlapping ranges, NA, keep_na, .other
+16. **Date format parsing** — fparse date/time/datetime blocks
+17. **ignore_case / nocase** — fnew, fput, fparse, fexport with case-insensitive matching
+18. **Expression labels** — .is_expr_label, fput with .x1/.x2, mixed labels, ifelse, .other
+19. **Edge Cases: Format Creation** — empty mappings, default param, detect_format_type edge cases
+20. **Edge Cases: Format Application** — empty vector, all-NA, NaN, single element, invalid format, non-numeric in range
+21. **Edge Cases: fput_df** — replace mode, missing column warning, custom suffix, non-data.frame error
+22. **Edge Cases: Invalue** — na_if, unknown labels fallback, custom missing_value, NULL input, target_type int/logical, errors
+23. **Edge Cases: Utilities and Validation** — is_missing edge cases, range_spec errors, .format_validate warnings, fclear/fprint for non-existent
+24. **Edge Cases: Expression Labels** — eval error handling
+25. **Edge Cases: Format Parsing** — text as character vector, unclosed block, inline comments, multilabel+nocase, .missing in INVALUE
+26. **Edge Cases: Format Export** — formats parameter, invalid object warning, no objects error
+27. **Edge Cases: Datetime Formats** — invalid type, .missing, character dates, time strings, SAS format resolution
+28. **Edge Cases: fput_all** — empty vector, all-NA, NaN, unmatched, invalid format
+29. **Edge Cases: Library Management** — empty library fclear, single format removal, fnew_bid registration, SAS datetime auto-resolve
 
-| # | Test name | Functions tested | What's checked |
-|---|-----------|-----------------|----------------|
-| 1 | `format_create works with discrete values` | `format_create` | S3 class, name, type="character", mapping count |
-| 2 | `format_apply handles missing values correctly` | `format_create`, `format_apply` | NA→"Unknown", exact match, unmatched returns original |
-| 3 | `format_apply preserves NA when keep_na = TRUE` | `format_create`, `format_apply` | keep_na=TRUE preserves NA |
-| 4 | `invalue_apply reverses formatting` | `format_invalue`, `invalue_apply` | label→value, NA mapping |
-| 5 | `is_missing_value detects various missing types` | `is_missing_value` | NA, NaN, empty string, include_empty |
-| 6 | `format_register and format_get work` | `format_create`, `format_register`, `format_list`, `format_get`, `format_remove` | register/retrieve/remove cycle |
-| 7 | `format_bidirectional creates both format and invalue` | `format_bidirectional`, `format_apply`, `invalue_apply` | forward + reverse roundtrip |
+### Functions Well Tested
+- fnew, fput, fputn, fputc, fput_all, fput_df
+- finput, .invalue_apply, finputn, finputc, fnew_bid
+- fnew_date, datetime formatting
+- fparse, fexport, fimport (via CNTLOUT CSV)
+- fprint, fclear
+- is_missing, range_spec, in_range
+- Expression labels, ignore_case, multilabel
+- print.ks_format, print.ks_invalue
 
-### Parse/Export Tests (test-formats.R, context "Format Parsing" + "Format Export")
-
-| # | Test name | Functions tested |
-|---|-----------|-----------------|
-| 8 | `format_parse parses a basic VALUE block` | `format_parse` |
-| 9 | `format_parse handles numeric ranges` | `format_parse` |
-| 10 | `format_parse handles LOW keyword` | `format_parse` |
-| 11 | `format_parse parses INVALUE block` | `format_parse` |
-| 12 | `format_parse handles multiple blocks` | `format_parse` |
-| 13 | `format_parse skips comments` | `format_parse` |
-| 14 | `format_parse auto-detects type from ranges` | `format_parse` |
-| 15 | `format_parse with register = TRUE stores formats` | `format_parse`, `format_list`, `format_get`, `format_remove` |
-| 16 | `format_parse reads from file` | `format_parse` |
-| 17 | `format_parse errors with no input` | `format_parse` |
-| 18 | `format_parse errors with both inputs` | `format_parse` |
-| 19 | `format_parse handles unquoted values` | `format_parse` |
-| 20 | `format_export produces valid text for VALUE` | `format_create`, `format_export` |
-| 21 | `format_export produces valid text for INVALUE` | `format_invalue`, `format_export` |
-| 22 | `format_export roundtrips with format_parse` | `format_create`, `format_export`, `format_parse` |
-| 23 | `format_export writes to file` | `format_create`, `format_export` |
-| 24 | `format_export handles multiple formats` | `format_create`, `format_export` |
-
-### Functions NOT Tested
-- `detect_format_type` — called indirectly via format_create, but no explicit edge cases tested
-- `detect_invalue_type` — called indirectly, no explicit tests
-- `validate_mappings` — called indirectly, no error-path tests
-- `format_apply_df` — **not tested at all**
-- `format_put` — stub, not tested
-- `format_validate` — **not tested at all**
-- `format_clear` — **not tested at all**
-- `range_spec` — **not tested at all**
-- `in_range` — **not tested at all** (internal)
-- `print.ks_format` — **not tested at all**
-- `print.ks_invalue` — **not tested at all**
-
-### Known Issues / Incomplete Features
-
-1. **Range matching not implemented** in `format_apply` (R/format_apply.R lines 69–76):
-   The loop for numeric range matching exists but has an empty body — range-based formats will never match.
-
-2. **`format_put` is a stub** (R/format_apply.R lines 155–158):
-   Always calls `stop()`. Intended to look up format by name from library and apply it.
-
-3. **`detect_format_type` dead code** (R/format_create.R line 93):
-   `has_ranges` is always FALSE because `sapply(mappings, function(x) FALSE)` is used.
-
-4. **No negative/edge case tests**: No tests for error paths (invalid inputs, duplicate keys, empty vectors, etc.).
-
-5. **`is_missing_value(NULL)` returns `logical(0)`**: This behavior is tested implicitly but may surprise users.
-
-6. **No integration test for data frame workflow**: `format_apply_df` with `suffix`/`replace` modes untested.
-
-7. **`in_range` and `range_spec` now support `inc_low`/`inc_high`** parameters. Default is `[low, high)` matching SAS semantics. RESOLVED.
-
-## NAMESPACE
-17 exported functions + 2 S3 methods. All match the functions defined in R/ files.
-`detect_format_type`, `detect_invalue_type`, `validate_mappings` are exported (arguably should be internal).
-`in_range` is NOT exported (correct — internal helper).
+### Known Issues
+- None currently tracked. Previous issues (range matching not implemented, stub functions) have been resolved.

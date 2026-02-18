@@ -1,12 +1,13 @@
 # Code Style and Conventions
 
 ## Naming
-- **Functions**: snake_case (e.g., `format_create`, `format_apply_df`, `is_missing_value`)
+- **Functions**: SAS-inspired short names: `fnew`, `fput`, `finput`, `fputn`, `fputc`, `fnew_bid`, `fnew_date`, `fparse`, `fexport`, `fimport`, `fprint`, `fclear`
+- **Utility functions**: snake_case (e.g., `is_missing`, `range_spec`, `in_range`, `detect_format_type`)
 - **S3 classes**: snake_case with `ks_` prefix (e.g., `ks_format`, `ks_invalue`)
 - **S3 methods**: `generic.class` (e.g., `print.ks_format`)
-- **Internal variables**: snake_case
-- **Constants/environments**: dot-prefixed for internal (`.format_library`)
-- **Parameters**: snake_case (e.g., `keep_na`, `include_empty`, `target_type`)
+- **Internal functions**: dot-prefixed (e.g., `.format_register`, `.format_get`, `.invalue_apply`, `.parse_range_key`)
+- **Internal environments**: dot-prefixed (`.format_library`)
+- **Parameters**: snake_case (e.g., `keep_na`, `target_type`, `inc_low`)
 
 ## Documentation
 - **roxygen2** comments above each exported function
@@ -16,18 +17,23 @@
 
 ## Code Patterns
 - S3 classes created via `structure(list(...), class = "ks_classname")`
-- Input validation with `stop()` for errors, `warning()` for non-fatal issues
+- Input validation with `cli_abort()` for errors, `cli_warn()` for warnings, `cli_inform()` for messages
 - `...` (dots) for flexible mapping arguments in creation functions
 - Special directives accessed via named list elements (`.missing`, `.other`)
 - Global format library uses a dedicated R environment (`.format_library`)
-- Functions return values explicitly via `return()`
+- Functions return values explicitly (though some use implicit last-expression return)
 
 ## File Organization
-- One file per functional area (create, apply, invalue, utilities)
+- One file per functional area (create, apply, invalue, datetime, parse, utilities)
 - Package documentation in separate `ksformat-package.R`
 - All R source in `R/` directory, tests in `tests/testthat/`
 
 ## Testing
 - testthat framework (>= 3.0.0)
 - Tests use `context()`, `test_that()`, `expect_*()` functions
-- Single test file currently: `test-formats.R`
+- Single test file: `test-formats.R` (~2162 lines, ~130+ test cases)
+- Organized by context blocks covering all major functionality and edge cases
+
+## Error Handling
+- Uses `cli` package: `cli_abort()`, `cli_warn()`, `cli_inform()`
+- Consistent error messages with `{.arg param}`, `{.cls class}`, `{.file file}` glue syntax

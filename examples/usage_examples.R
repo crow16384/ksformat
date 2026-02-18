@@ -701,4 +701,147 @@ result <- data.frame(number = number, key = key, datefmt = datefmt, date = date)
 print(result)
 
 fclear()
+
+# ============================================================================
+# Example 18: Import SAS Formats from CNTLOUT CSV (fimport)
+# ============================================================================
+#
+# SAS equivalent:
+#   /* Export format catalogue to CSV */
+#   proc format library=work cntlout=fmtlib; run;
+#   proc export data=fmtlib outfile="formats.csv" dbms=csv replace; run;
+#
+# The CNTLOUT dataset contains all format definitions from a SAS format
+# catalogue. Each row describes one entry (discrete value or range bound)
+# of a format. Column TYPE indicates the format kind:
+#   N = numeric VALUE format  -> ks_format  (type = "numeric")
+#   C = character VALUE format -> ks_format  (type = "character")
+#   I = numeric INVALUE       -> ks_invalue (target_type = "numeric")
+#   J = character INVALUE     -> ks_invalue (target_type = "character")
+#   P = PICTURE format        -> skipped (no R equivalent)
+#
+# Rows with SAS special missing values (.A-.Z, ._) are skipped with a
+# warning because R has no equivalent concept.
+
+cat("\n=== Example 18: Import SAS Formats from CNTLOUT CSV ===\n\n")
+
+# The package ships with a sample CNTLOUT CSV for testing.
+# In real use, point to the CSV exported from your SAS environment.
+csv_path <- system.file("tests/testthat/test_cntlout.csv",
+                        package = "ksformat")
+# Fallback for running from source tree:
+if (csv_path == "") {
+  csv_path <- file.path(
+    dirname(dirname(normalizePath(".", mustWork = FALSE))),
+    "tests", "testthat", "test_cntlout.csv"
+  )
+}
+if (!file.exists(csv_path)) {
+  csv_path <- "../tests/testthat/test_cntlout.csv"
+}
+
+cat("Importing from:", csv_path, "\n\n")
+
+# --- 18a: Import all compatible formats ---
+cat("--- 18a: Import all compatible formats ---\n")
+
+# fimport reads the CSV, creates ks_format / ks_invalue objects,
+# and registers them in the global format library (by default).
+imported <- fimport(csv_path)
+
+cat("Imported formats:\n")
+print(names(imported))
+
+# Show what's in the library now
+fprint()
+
+# --- 18b: Use the imported character format (GENDER) ---
+cat("\n--- 18b: Use imported GENDER format ---\n")
+
+gender_codes <- c("M", "F", NA, "X")
+gender_labels <- fputc(gender_codes, "GENDER")
+
+print(data.frame(
+  code = gender_codes,
+  label = gender_labels
+))
+
+# --- 18c: Use the imported numeric format (AGEGRP) ---
+cat("\n--- 18c: Use imported AGEGRP format ---\n")
+
+ages <- c(5, 17, 18, 45, 65, 100, NA, -1)
+age_labels <- fputn(ages, "AGEGRP")
+
+print(data.frame(
+  age = ages,
+  group = age_labels
+))
+
+# --- 18d: Use the imported numeric format (BMICAT) ---
+cat("\n--- 18d: Use imported BMICAT format ---\n")
+
+bmi_values <- c(15.0, 18.5, 22.3, 25.0, 28.7, 30.0, 35.5)
+bmi_labels <- fputn(bmi_values, "BMICAT")
+
+print(data.frame(
+  bmi = bmi_values,
+  category = bmi_labels
+))
+
+# --- 18e: Use the imported invalue (RACEIN) ---
+cat("\n--- 18e: Use imported RACEIN invalue ---\n")
+
+race_labels <- c("White", "Black", "Asian", "Other")
+race_codes <- finputn(race_labels, "RACEIN")
+
+print(data.frame(
+  label = race_labels,
+  code = race_codes
+))
+
+# --- 18f: Apply imported formats to a data frame ---
+cat("\n--- 18f: Apply imported formats to data frame ---\n")
+
+df <- data.frame(
+  id = 1:5,
+  sex = c("M", "F", "M", NA, "F"),
+  age = c(10, 30, 70, NA, 50),
+  stringsAsFactors = FALSE
+)
+
+cat("Original data:\n")
+print(df)
+
+gender_fmt <- imported[["GENDER"]]
+age_fmt    <- imported[["AGEGRP"]]
+
+df_fmt <- fput_df(df, sex = gender_fmt, age = age_fmt, suffix = "_label")
+
+cat("\nFormatted data:\n")
+print(df_fmt)
+
+# --- 18g: Export an imported format back to text ---
+cat("\n--- 18g: Export imported format back to text ---\n")
+
+cat(fexport(AGEGRP = age_fmt))
+cat("\n")
+cat(fexport(GENDER = gender_fmt))
+cat("\n")
+
+# --- 18h: Selective import (register = FALSE) ---
+cat("\n--- 18h: Selective import (no auto-register) ---\n")
+
+fclear()
+
+# Import without registering — returns list of objects to use manually
+manual <- fimport(csv_path, register = FALSE)
+
+cat("Library after import with register=FALSE:\n")
+fprint()  # should be empty
+
+# Use objects directly from the returned list
+cat("\nUsing GENDER format from returned list:\n")
+cat(fput(c("M", "F"), manual[["GENDER"]]), "\n")
+
+fclear()
 cat("\n=== Examples completed ===\n")

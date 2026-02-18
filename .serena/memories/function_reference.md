@@ -1,4 +1,4 @@
-# ksformat Function Reference (updated 2026-02-15)
+# ksformat Function Reference (updated 2026-02-18)
 
 ## Exported Functions
 
@@ -17,6 +17,7 @@
 | `fnew_date(pattern, name, type, .missing)` | format_datetime.R | Create date/time format |
 | `fparse(text, file)` | format_parse.R | Parse SAS-like text definitions |
 | `fexport(..., formats, file)` | format_parse.R | Export formats to SAS-like text |
+| `fimport(file, register, overwrite)` | format_parse.R | Import SAS CNTLOUT CSV |
 | `fprint(name)` | utilities.R | Print/list formats from library |
 | `fclear(name)` | utilities.R | Remove format(s) from library |
 | `is_missing(x)` | utilities.R | Check for missing values |
@@ -60,6 +61,8 @@
 | `.datetime_format_to_text()` | format_parse.R | datetime format → text |
 | `.invalue_to_text()` | format_parse.R | ks_invalue → text |
 | `.format_range_bound()` | format_parse.R | Format range bound for text |
+| `.cntlout_to_ks_format()` | format_parse.R | CNTLOUT → ks_format |
+| `.cntlout_to_ks_invalue()` | format_parse.R | CNTLOUT → ks_invalue |
 
 ## Class Hierarchy
 - `ks_format` — VALUE format (value→label). Fields: name, type, mappings, missing_label, other_label, multilabel, ignore_case, created. For datetime: dt_pattern, dt_toupper, sas_name.

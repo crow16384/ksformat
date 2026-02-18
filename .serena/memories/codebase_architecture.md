@@ -1,17 +1,17 @@
-# ksformat Codebase Architecture (updated 2026-02-15)
+# ksformat Codebase Architecture (updated 2026-02-18)
 
 ## Package Overview
-R package providing SAS PROC FORMAT-like functionality. Version 0.2.6.
+R package providing SAS PROC FORMAT-like functionality. Version 0.3.1.
 Depends on: cli. Suggests: testthat (>= 3.0.0).
 
 ## File Structure
 
-### R/format_create.R
-- `fnew(...)` — Create format (ks_format). Supports discrete, range, .missing, .other, multilabel, ignore_case.
+### R/format_create.R (lines ~126)
+- `fnew(...)` — Create format (ks_format). Supports discrete, range, .missing, .other, multilabel, ignore_case. Auto-registers named formats.
 - `detect_format_type(keys)` — Auto-detect "character" or "numeric" from key names.
 - `print.ks_format(x, ...)` — Print method for ks_format. Shows interval notation for ranges, date patterns.
 
-### R/format_apply.R
+### R/format_apply.R (lines ~210+)
 - `fput(x, format, ..., keep_na)` — Apply format to vector. Handles missing → exact match → range match → .other. Expression labels (.x1, .x2) evaluated lazily.
 - `.fput_vectorized(x, format_names, type_check, ...)` — Per-element format application (different format per element).
 - `fputn(x, format_name, ...)` — Apply numeric format by name (like SAS PUTN). Supports vectorized format_name.
@@ -41,9 +41,12 @@ Depends on: cli. Suggests: testthat (>= 3.0.0).
 - `.to_r_date(x, origin)` — Convert various inputs to R Date.
 - `.to_r_datetime(x, origin)` — Convert various inputs to R POSIXct.
 
-### R/format_parse.R
+### R/format_parse.R (lines ~1154)
 - `fparse(text, file)` — Parse SAS-like text into format/invalue objects. Auto-registers.
 - `fexport(..., formats, file)` — Export formats to SAS-like text.
+- `fimport(file, register, overwrite)` — Import formats from SAS CNTLOUT CSV file.
+- `.cntlout_to_ks_format(...)` — Convert CNTLOUT data to ks_format objects.
+- `.cntlout_to_ks_invalue(...)` — Convert CNTLOUT data to ks_invalue objects.
 - `.parse_blocks(lines)` — Parse text lines into block structures.
 - `.parse_mapping_line(line, line_num)` — Parse single mapping line (LHS = RHS).
 - `.parse_range_bound(s, is_low)` — Parse range bound (LOW→-Inf, HIGH→Inf).
@@ -77,15 +80,15 @@ Depends on: cli. Suggests: testthat (>= 3.0.0).
 ## Key Design Patterns
 
 1. **Format resolution**: `fput` accepts both ks_format objects and string names (resolved via `.format_get`).
-2. **Auto-registration**: `fnew`, `finput`, `fnew_date`, `fparse` auto-register named formats in `.format_library`.
+2. **Auto-registration**: `fnew`, `finput`, `fnew_date`, `fparse`, `fimport` auto-register named formats in `.format_library`.
 3. **SAS datetime auto-resolve**: `.format_get` auto-creates SAS datetime formats on first use.
 4. **Vectorized matching**: `fput` uses `match()` for exact lookups, then iterates range entries.
 5. **Expression labels**: Labels with `.x1`, `.x2` are deferred and evaluated in batch.
 6. **Multilabel**: `fput_all` allows overlapping range matches, returns list of character vectors.
+7. **CNTLOUT import**: `fimport` reads SAS format catalogue CSV exports.
 
 ## Performance Notes
 - `fput` Phase 1: vectorized `match()` for discrete keys (O(n) amortized).
 - `fput` Phase 2: iterative range matching — each range entry scanned against unmatched values.
 - `fput_all` iterates all keys/ranges against all values (no early exit).
 - `.fput_vectorized` groups by format name for efficiency.
-- No caching of parsed range keys — `.parse_range_key` called per invocation.
