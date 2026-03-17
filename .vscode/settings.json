@@ -1,9 +1,0 @@
-{
-  "chat.mcp.discovery.enabled": {
-    "claude-desktop": true,
-    "windsurf": true,
-    "cursor-global": true,
-    "cursor-workspace": true
-  },
-  "r.rpath.linux": "/usr/local/bin/R"
-}
