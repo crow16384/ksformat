@@ -131,4 +131,4 @@ When bumping the package version, update `DESCRIPTION` and then run
 
 ## License
 
-GPL-3. See [LICENSE](LICENSE) for the full text.
+GPL-3. See <https://www.gnu.org/licenses/gpl-3.0.html>.
