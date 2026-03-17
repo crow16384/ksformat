@@ -78,9 +78,25 @@
 #' fclear()
 fnew <- function(..., name = NULL, type = "auto", default = NULL,
                  multilabel = FALSE, ignore_case = FALSE) {
+  type <- match.arg(type, c("auto", "character", "numeric"))
+  if (!is.null(name)) {
+    if (!is.character(name) || length(name) != 1L || is.na(name) || !nzchar(name)) {
+      cli_abort("{.arg name} must be a single non-empty character string.")
+    }
+  }
+  if (!is.null(default) && (!is.character(default) || length(default) != 1L)) {
+    cli_abort("{.arg default} must be a single character string.")
+  }
+  if (!is.logical(multilabel) || length(multilabel) != 1L) {
+    cli_abort("{.arg multilabel} must be TRUE or FALSE.")
+  }
+  if (!is.logical(ignore_case) || length(ignore_case) != 1L) {
+    cli_abort("{.arg ignore_case} must be TRUE or FALSE.")
+  }
+
   mappings <- list(...)
 
-  if (length(mappings) == 0) {
+  if (length(mappings) == 0L) {
     cli_abort("At least one value-label mapping must be provided.")
   }
 
@@ -98,7 +114,7 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
   }
 
   # Determine format type
-  if (type == "auto") {
+  if (identical(type, "auto")) {
     type <- detect_format_type(names(mappings))
   }
 
@@ -123,7 +139,7 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
   # Auto-register in library if named
   .format_register(format_obj)
 
-  return(format_obj)
+  format_obj
 }
 
 #' Detect Format Type
@@ -134,22 +150,21 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
 detect_format_type <- function(keys) {
   if (length(keys) == 0L) return("character")
 
-  # Check if any key parses as numeric
-  if (any(!is.na(suppressWarnings(as.numeric(keys))))) {
+  non_empty <- keys[!is.na(keys) & nzchar(keys)]
+  if (length(non_empty) > 0L &&
+      all(!is.na(suppressWarnings(as.numeric(non_empty))))) {
     return("numeric")
   }
 
-  # Check for range-format keys (comma-separated bounds)
   if (any(grepl(",", keys, fixed = TRUE))) {
     return("numeric")
   }
 
-  # Check for unnamed/empty keys (positional args)
   if (any(keys == "" | is.na(keys))) {
     return("numeric")
   }
 
-  return("character")
+  "character"
 }
 
 

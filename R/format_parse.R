@@ -113,15 +113,19 @@
 #' fput_all(c(2, 5, 9), "risk")
 #' fclear()
 fparse <- function(text = NULL, file = NULL) {
-  # Validate inputs
   if (is.null(text) && is.null(file)) {
     cli_abort("Either {.arg text} or {.arg file} must be provided.")
   }
   if (!is.null(text) && !is.null(file)) {
     cli_abort("Only one of {.arg text} or {.arg file} should be provided, not both.")
   }
+  if (!is.null(text) && !is.character(text)) {
+    cli_abort("{.arg text} must be a character string or character vector.")
+  }
+  if (!is.null(file) && (!is.character(file) || length(file) != 1L)) {
+    cli_abort("{.arg file} must be a single file path string.")
+  }
 
-  # Read input
   if (!is.null(file)) {
     if (!file.exists(file)) {
       cli_abort("File not found: {.file {file}}")
@@ -151,7 +155,7 @@ fparse <- function(text = NULL, file = NULL) {
     result[[block$name]] <- obj
   }
 
-  return(result)
+  result
 }
 
 
@@ -520,14 +524,7 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
                           toupper(inc_high))
       mappings[[range_key]] <- label
     } else {
-      # Discrete mapping
-      key <- if (type == "numeric") {
-        # Keep numeric-looking keys as-is
-        trimws(start)
-      } else {
-        trimws(start)
-      }
-      mappings[[key]] <- label
+      mappings[[trimws(start)]] <- label
     }
   }
 
@@ -870,10 +867,11 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
 #' Remove surrounding quotes from a string
 #' @keywords internal
 .unquote <- function(s) {
-  if (grepl("^[\"'].*[\"']$", s)) {
+  if (is.na(s) || nchar(s) < 2L) return(s)
+  if (grepl("^([\"']).*\\1$", s)) {
     return(substring(s, 2, nchar(s) - 1))
   }
-  return(s)
+  s
 }
 
 
@@ -937,7 +935,7 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
 
   # Auto-detect type if needed
   if (type == "auto") {
-    has_ranges <- any(sapply(block$entries, function(e) e$type == "range"))
+    has_ranges <- any(vapply(block$entries, function(e) identical(e$type, "range"), logical(1L)))
     if (has_ranges) {
       format_obj$type <- "numeric"
     } else {
@@ -1035,110 +1033,99 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
 #' Convert ks_format to SAS-like text
 #' @keywords internal
 .format_to_text <- function(fmt, name) {
-  # Handle date/time/datetime formats
   if (fmt$type %in% c("date", "time", "datetime")) {
     return(.datetime_format_to_text(fmt, name))
   }
 
-  lines <- character(0)
+  parts <- vector("list", length(fmt$mappings) + 4L)
+  idx <- 1L
 
-  # Build type annotation
   type_str <- if (!is.null(fmt$type) && fmt$type != "auto") fmt$type else NULL
   ml_str <- if (isTRUE(fmt$multilabel)) "multilabel" else NULL
   nc_str <- if (isTRUE(fmt$ignore_case)) "nocase" else NULL
   annot_parts <- c(type_str, ml_str, nc_str)
-  type_part <- if (length(annot_parts) > 0) {
+  type_part <- if (length(annot_parts) > 0L) {
     paste0(" (", paste(annot_parts, collapse = ", "), ")")
   } else {
     ""
   }
-  lines <- c(lines, paste0("VALUE ", name, type_part))
+  parts[[idx]] <- paste0("VALUE ", name, type_part); idx <- idx + 1L
 
-  # Mappings
   for (i in seq_along(fmt$mappings)) {
     key <- names(fmt$mappings)[i]
     label <- fmt$mappings[[i]]
-
-    # Try to parse as a range key
     parsed <- .parse_range_key(key)
     if (!is.null(parsed)) {
       left_bracket <- if (parsed$inc_low) "[" else "("
       right_bracket <- if (parsed$inc_high) "]" else ")"
       low <- .format_range_bound(parsed$low, is_low = TRUE)
       high <- .format_range_bound(parsed$high, is_low = FALSE)
-      lines <- c(lines, paste0("  ", left_bracket, low, ", ", high,
-                                right_bracket, " = \"", label, "\""))
+      parts[[idx]] <- paste0("  ", left_bracket, low, ", ", high,
+                             right_bracket, " = \"", label, "\"")
     } else {
-      lines <- c(lines, paste0("  \"", key, "\" = \"", label, "\""))
+      parts[[idx]] <- paste0("  \"", key, "\" = \"", label, "\"")
     }
+    idx <- idx + 1L
   }
 
-  # Special directives
   if (!is.null(fmt$missing_label)) {
-    lines <- c(lines, paste0("  .missing = \"", fmt$missing_label, "\""))
+    parts[[idx]] <- paste0("  .missing = \"", fmt$missing_label, "\""); idx <- idx + 1L
   }
   if (!is.null(fmt$other_label)) {
-    lines <- c(lines, paste0("  .other = \"", fmt$other_label, "\""))
+    parts[[idx]] <- paste0("  .other = \"", fmt$other_label, "\""); idx <- idx + 1L
   }
-
-  lines <- c(lines, ";")
-  return(paste(lines, collapse = "\n"))
+  parts[[idx]] <- ";"
+  paste(unlist(parts[seq_len(idx)]), collapse = "\n")
 }
 
 
 #' Convert datetime ks_format to SAS-like text
 #' @keywords internal
 .datetime_format_to_text <- function(fmt, name) {
-  lines <- character(0)
+  parts <- vector("list", 4L)
+  idx <- 1L
 
-  # Header
-  lines <- c(lines, paste0("VALUE ", name, " (", fmt$type, ")"))
+  parts[[idx]] <- paste0("VALUE ", name, " (", fmt$type, ")"); idx <- idx + 1L
 
-  # Pattern entry
   pattern_str <- if (!is.null(fmt$sas_name)) {
     paste0(fmt$sas_name, ".")
   } else {
     fmt$dt_pattern
   }
-  lines <- c(lines, paste0("  pattern = \"", pattern_str, "\""))
+  parts[[idx]] <- paste0("  pattern = \"", pattern_str, "\""); idx <- idx + 1L
 
-  # Missing label
   if (!is.null(fmt$missing_label)) {
-    lines <- c(lines, paste0("  .missing = \"", fmt$missing_label, "\""))
+    parts[[idx]] <- paste0("  .missing = \"", fmt$missing_label, "\""); idx <- idx + 1L
   }
-
-  lines <- c(lines, ";")
-  return(paste(lines, collapse = "\n"))
+  parts[[idx]] <- ";"
+  paste(unlist(parts[seq_len(idx)]), collapse = "\n")
 }
 
 
 #' Convert ks_invalue to SAS-like text
 #' @keywords internal
 .invalue_to_text <- function(inv, name) {
-  lines <- character(0)
+  parts <- vector("list", length(inv$mappings) + 3L)
+  idx <- 1L
 
-  # Header — omit type for numeric (default)
   type_part <- if (!is.null(inv$target_type) && inv$target_type != "numeric") {
     paste0(" (", inv$target_type, ")")
   } else {
     ""
   }
-  lines <- c(lines, paste0("INVALUE ", name, type_part))
+  parts[[idx]] <- paste0("INVALUE ", name, type_part); idx <- idx + 1L
 
-  # Mappings
   for (i in seq_along(inv$mappings)) {
     key <- names(inv$mappings)[i]
     value <- inv$mappings[[i]]
-    lines <- c(lines, paste0("  \"", key, "\" = \"", value, "\""))
+    parts[[idx]] <- paste0("  \"", key, "\" = \"", value, "\""); idx <- idx + 1L
   }
 
-  # Missing value
-  if (!is.na(inv$missing_value)) {
-    lines <- c(lines, paste0("  .missing = \"", inv$missing_value, "\""))
+  if (!is.null(inv$missing_value) && !identical(inv$missing_value, NA)) {
+    parts[[idx]] <- paste0("  .missing = \"", inv$missing_value, "\""); idx <- idx + 1L
   }
-
-  lines <- c(lines, ";")
-  return(paste(lines, collapse = "\n"))
+  parts[[idx]] <- ";"
+  paste(unlist(parts[seq_len(idx)]), collapse = "\n")
 }
 
 

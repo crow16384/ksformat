@@ -21,4 +21,5 @@ is_missing(NA)          # TRUE
 is_missing(NaN)         # TRUE
 is_missing("")          # TRUE
 is_missing("text")      # FALSE
+is_missing(c(1, NA, NaN)) # FALSE TRUE TRUE
 }

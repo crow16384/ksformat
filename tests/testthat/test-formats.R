@@ -888,7 +888,7 @@ test_that("fnew_date creates time format", {
   fmt <- fnew_date("TIME8.", name = "mytime")
   expect_s3_class(fmt, "ks_format")
   expect_equal(fmt$type, "time")
-  expect_equal(fmt$dt_pattern, "%-H:%M:%S")  # TIME has no leading zero
+  expect_equal(fmt$dt_pattern, "%_H:%M:%S")  # TIME has no leading zero
   fclear()
 })
 
@@ -933,7 +933,7 @@ test_that("fnew_date handles default widths", {
   fmt <- fnew_date("DATE.", name = "d1")
   expect_equal(fmt$dt_pattern, "%d%b%Y")  # DATE. defaults to DATE9.
   fmt2 <- fnew_date("TIME.", name = "t1")
-  expect_equal(fmt2$dt_pattern, "%-H:%M:%S")  # TIME. defaults to TIME8. (no leading zero)
+  expect_equal(fmt2$dt_pattern, "%_H:%M:%S")  # TIME. defaults to TIME8. (no leading zero)
   fclear()
 })
 

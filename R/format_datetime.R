@@ -60,11 +60,11 @@ NULL
   "QTR"      = list(r_fmt = "quarter",    type = "date", toupper = FALSE),
 
   # ---- Time formats (no leading zero for hours, like SAS) ----
-  "TIME5"    = list(r_fmt = "%-H:%M",      type = "time", toupper = FALSE),
-  "TIME8"    = list(r_fmt = "%-H:%M:%S",   type = "time", toupper = FALSE),
-  "TIME11"   = list(r_fmt = "%-H:%M:%OS",  type = "time", toupper = FALSE),
+  "TIME5"    = list(r_fmt = "%_H:%M",      type = "time", toupper = FALSE, no_lz_hour = TRUE),
+  "TIME8"    = list(r_fmt = "%_H:%M:%S",   type = "time", toupper = FALSE, no_lz_hour = TRUE),
+  "TIME11"   = list(r_fmt = "%_H:%M:%OS",  type = "time", toupper = FALSE, no_lz_hour = TRUE),
   "HHMM"     = list(r_fmt = "%H:%M",       type = "time", toupper = FALSE),
-  "HOUR"     = list(r_fmt = "%-H",          type = "time", toupper = FALSE),
+  "HOUR"     = list(r_fmt = "%_H",          type = "time", toupper = FALSE, no_lz_hour = TRUE),
   "MMSS"     = list(r_fmt = "%M:%S",       type = "time", toupper = FALSE),
   # ---- TOD formats (leading zero for hours, like SAS) ----
   "TOD5"     = list(r_fmt = "%H:%M",       type = "time", toupper = FALSE),
@@ -144,7 +144,7 @@ NULL
     family <- time_match[2]
     width  <- as.integer(time_match[3])
     # TIME: no leading zero (%-H); TOD: leading zero (%H)
-    h_code <- if (family == "TIME") "%-H" else "%H"
+    h_code <- if (family == "TIME") "%_H" else "%H"
     if (width < 5L) {
       r_fmt <- h_code
     } else if (width < 8L) {
@@ -383,12 +383,11 @@ fnew_date <- function(pattern, name = NULL, type = "auto",
 #' Format time values
 #' @keywords internal
 .format_time_values <- function(x, pattern) {
-  # Detect %-H (no leading zero for hours, SAS TIME-style)
-  no_lz_hour <- grepl("%-H", pattern, fixed = TRUE)
+  no_lz_hour <- grepl("%_H", pattern, fixed = TRUE)
+  std_pattern <- if (no_lz_hour) sub("%_H", "%H", pattern, fixed = TRUE) else pattern
 
   if (inherits(x, c("POSIXct", "POSIXlt"))) {
-    use_pattern <- if (no_lz_hour) sub("%-H", "%H", pattern, fixed = TRUE) else pattern
-    result <- format(x, use_pattern)
+    result <- format(x, std_pattern)
     if (no_lz_hour) result <- sub("^0(\\d)", "\\1", result)
     return(result)
   }
@@ -404,46 +403,29 @@ fnew_date <- function(pattern, name = NULL, type = "auto",
     m <- as.integer((total_secs %% 3600) %/% 60)
     s <- total_secs %% 60
 
-    # Vectorized string assembly: build template then substitute
     h_str <- if (no_lz_hour) sprintf("%d", h) else sprintf("%02d", h)
     m_str <- sprintf("%02d", m)
     s_int_str <- sprintf("%02d", as.integer(s))
     s_frac_str <- sprintf("%.2f", s)
 
-    # Substitute format codes into pattern (vectorized via mapply)
-    fmt <- rep(pattern, length(total_secs))
-    # %OS must be replaced before %S to avoid partial match
-    if (grepl("%OS", pattern, fixed = TRUE)) {
-      fmt <- mapply(function(f, v) sub("%OS", v, f, fixed = TRUE),
-                    fmt, s_frac_str, USE.NAMES = FALSE)
-    }
-    # %-H must be replaced before %H to avoid partial match
-    if (no_lz_hour) {
-      fmt <- mapply(function(f, v) sub("%-H", v, f, fixed = TRUE),
-                    fmt, h_str, USE.NAMES = FALSE)
-    } else if (grepl("%H", pattern, fixed = TRUE)) {
-      fmt <- mapply(function(f, v) sub("%H", v, f, fixed = TRUE),
-                    fmt, h_str, USE.NAMES = FALSE)
-    }
-    if (grepl("%M", pattern, fixed = TRUE)) {
-      fmt <- mapply(function(f, v) sub("%M", v, f, fixed = TRUE),
-                    fmt, m_str, USE.NAMES = FALSE)
-    }
-    if (grepl("%S", pattern, fixed = TRUE) &&
-        !grepl("%OS", pattern, fixed = TRUE)) {
-      fmt <- mapply(function(f, v) sub("%S", v, f, fixed = TRUE),
-                    fmt, s_int_str, USE.NAMES = FALSE)
-    }
+    has_os  <- grepl("%OS", std_pattern, fixed = TRUE)
+    has_h   <- grepl("%H", std_pattern, fixed = TRUE)
+    has_m   <- grepl("%M", std_pattern, fixed = TRUE)
+    has_s   <- grepl("%S", std_pattern, fixed = TRUE) && !has_os
+
+    fmt <- rep(std_pattern, length(total_secs))
+    if (has_os) for (j in seq_along(fmt)) fmt[j] <- sub("%OS", s_frac_str[j], fmt[j], fixed = TRUE)
+    if (has_h)  for (j in seq_along(fmt)) fmt[j] <- sub("%H", h_str[j], fmt[j], fixed = TRUE)
+    if (has_m)  for (j in seq_along(fmt)) fmt[j] <- sub("%M", m_str[j], fmt[j], fixed = TRUE)
+    if (has_s)  for (j in seq_along(fmt)) fmt[j] <- sub("%S", s_int_str[j], fmt[j], fixed = TRUE)
 
     result[not_na] <- fmt
     return(result)
   }
 
-  # Character or other - try as POSIXct
   dts <- tryCatch(as.POSIXct(x, tz = "UTC"), error = function(e) NULL)
   if (!is.null(dts)) {
-    use_pattern <- if (no_lz_hour) sub("%-H", "%H", pattern, fixed = TRUE) else pattern
-    result <- format(dts, use_pattern)
+    result <- format(dts, std_pattern)
     if (no_lz_hour) result <- sub("^0(\\d)", "\\1", result)
     return(result)
   }
@@ -483,8 +465,7 @@ fnew_date <- function(pattern, name = NULL, type = "auto",
   }
   if (is.character(x)) {
     parsed <- as.Date(x, tryFormats = c(
-      "%Y-%m-%d", "%m/%d/%Y", "%d/%m/%Y",
-      "%Y/%m/%d", "%d-%m-%Y", "%m-%d-%Y",
+      "%Y-%m-%d", "%Y/%m/%d",
       "%d%b%Y", "%d%b%y"
     ))
     return(parsed)

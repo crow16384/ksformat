@@ -100,11 +100,10 @@ fput <- function(x, format, ..., keep_na = FALSE) {
   non_miss <- which(!is_miss)
   if (length(non_miss) == 0L) return(result)
 
-  # Vectorized mapping lookup
   map_keys <- names(format$mappings)
   map_labels <- unlist(format$mappings, use.names = FALSE)
+  is_expr_label <- grepl("\\.x\\d+", map_labels)
 
-  # Phase 1: Vectorized exact match using match()
   val_str <- as.character(x[non_miss])
   pos <- if (nocase) {
     match(tolower(val_str), tolower(map_keys))
@@ -119,7 +118,7 @@ fput <- function(x, format, ..., keep_na = FALSE) {
   if (any(found)) {
     found_labels <- map_labels[pos[found]]
     found_nm <- non_miss[found]
-    is_expr <- grepl("\\.x\\d+", found_labels)
+    is_expr <- is_expr_label[pos[found]]
 
     # Assign static labels in bulk
     static <- !is_expr
@@ -171,7 +170,7 @@ fput <- function(x, format, ..., keep_na = FALSE) {
 
           if (any(in_rng)) {
             target <- unmatched_nm[idx[in_rng]]
-            if (grepl("\\.x\\d+", re$label)) {
+            if (.is_expr_label(re$label)) {
               expr_map[[re$label]] <- c(expr_map[[re$label]], target)
             } else {
               result[target] <- re$label
@@ -187,7 +186,7 @@ fput <- function(x, format, ..., keep_na = FALSE) {
   unmatched_final <- non_miss[!matched[non_miss]]
   if (length(unmatched_final) > 0L) {
     if (!is.null(format$other_label)) {
-      if (grepl("\\.x\\d+", format$other_label)) {
+      if (.is_expr_label(format$other_label)) {
         expr_map[[format$other_label]] <- c(
           expr_map[[format$other_label]], unmatched_final
         )
@@ -436,44 +435,38 @@ fput_all <- function(x, format, ..., keep_na = FALSE) {
 
   n <- length(x)
   result <- vector("list", n)
-  is_miss <- is.na(x) | is.nan(x)
+  is_miss <- is_missing(x)
 
-  # Handle missing values
   miss_idx <- which(is_miss)
-  for (idx in miss_idx) {
-    result[[idx]] <- if (!keep_na && !is.null(format$missing_label)) {
-      format$missing_label
-    } else {
-      NA_character_
-    }
+  miss_val <- if (!keep_na && !is.null(format$missing_label)) {
+    format$missing_label
+  } else {
+    NA_character_
   }
+  result[miss_idx] <- list(miss_val)
 
   non_miss <- which(!is_miss)
   if (length(non_miss) == 0L) return(result)
 
-  # Init non-missing result slots
-  for (idx in non_miss) result[[idx]] <- character(0)
+  result[non_miss] <- list(character(0))
 
   map_keys <- names(format$mappings)
   map_labels <- unlist(format$mappings, use.names = FALSE)
   val_str <- as.character(x[non_miss])
   lookup_vals <- if (nocase) tolower(val_str) else val_str
 
-  # Pre-parse range entries
   range_entries <- list()
-  discrete_indices <- integer(0)
   if (format$type == "numeric") {
-    for (i in seq_along(map_keys)) {
+    is_range <- vapply(map_keys, function(k) !is.null(.parse_range_key(k)), logical(1L))
+    discrete_indices <- which(!is_range)
+    range_idx <- which(is_range)
+    for (i in range_idx) {
       parsed <- .parse_range_key(map_keys[i])
-      if (!is.null(parsed)) {
-        range_entries[[length(range_entries) + 1L]] <- list(
-          low = parsed$low, high = parsed$high,
-          inc_low = parsed$inc_low, inc_high = parsed$inc_high,
-          label = map_labels[i]
-        )
-      } else {
-        discrete_indices <- c(discrete_indices, i)
-      }
+      range_entries[[length(range_entries) + 1L]] <- list(
+        low = parsed$low, high = parsed$high,
+        inc_low = parsed$inc_low, inc_high = parsed$inc_high,
+        label = map_labels[i]
+      )
     }
   } else {
     discrete_indices <- seq_along(map_keys)
@@ -490,7 +483,7 @@ fput_all <- function(x, format, ..., keep_na = FALSE) {
     if (length(matched_pos) > 0L) {
       label <- map_labels[i]
       has_any_match[matched_pos] <- TRUE
-      if (grepl("\\.x\\d+", label)) {
+      if (.is_expr_label(label)) {
         expr_map[[label]] <- c(expr_map[[label]], non_miss[matched_pos])
       } else {
         for (p in matched_pos) {
@@ -512,7 +505,7 @@ fput_all <- function(x, format, ..., keep_na = FALSE) {
 
       if (any(in_rng)) {
         has_any_match[in_rng] <- TRUE
-        if (grepl("\\.x\\d+", re$label)) {
+        if (.is_expr_label(re$label)) {
           expr_map[[re$label]] <- c(expr_map[[re$label]], non_miss[which(in_rng)])
         } else {
           for (p in which(in_rng)) {
@@ -543,18 +536,18 @@ fput_all <- function(x, format, ..., keep_na = FALSE) {
   }
   for (idx in no_match) {
     if (!is.null(format$other_label)) {
-      if (grepl("\\.x\\d+", format$other_label)) {
+      if (.is_expr_label(format$other_label)) {
         evaled <- .eval_expr_label(format$other_label, extra_args, idx)
         result[[idx]] <- c(result[[idx]], evaled)
       } else {
-        result[[idx]] <- format$other_label
+        result[[idx]] <- c(result[[idx]], format$other_label)
       }
     } else {
       result[[idx]] <- as.character(x[idx])
     }
   }
 
-  return(result)
+  result
 }
 
 #' Apply Format to Data Frame Columns
@@ -588,7 +581,7 @@ fput_all <- function(x, format, ..., keep_na = FALSE) {
 #'   .missing  = "Age Unknown"
 #' ;
 #' ')
-#' age_f <- ksformat:::.format_get("age")
+#' age_f <- format_get("age")
 #'
 #' fput_df(df, sex = sex_f, age = age_f, suffix = "_label")
 #'
@@ -627,5 +620,5 @@ fput_df <- function(data, ..., suffix = "_fmt", replace = FALSE) {
     }
   }
 
-  return(result)
+  result
 }

@@ -33,9 +33,16 @@
 #' # [1]  1  2 NA
 #' fclear()
 finput <- function(..., name = NULL, target_type = "numeric", missing_value = NA) {
+  target_type <- match.arg(target_type, c("numeric", "integer", "character", "logical"))
+  if (!is.null(name)) {
+    if (!is.character(name) || length(name) != 1L || is.na(name) || !nzchar(name)) {
+      cli_abort("{.arg name} must be a single non-empty character string.")
+    }
+  }
+
   mappings <- list(...)
 
-  if (length(mappings) == 0) {
+  if (length(mappings) == 0L) {
     cli_abort("At least one label-value mapping must be provided.")
   }
 
@@ -57,7 +64,7 @@ finput <- function(..., name = NULL, target_type = "numeric", missing_value = NA
   # Auto-register in library if named
   .format_register(invalue_obj)
 
-  return(invalue_obj)
+  invalue_obj
 }
 
 
@@ -143,7 +150,7 @@ finput <- function(..., name = NULL, target_type = "numeric", missing_value = NA
     }
   }
 
-  return(result)
+  result
 }
 
 #' Apply Numeric Invalue by Name (like SAS INPUTN)
@@ -283,10 +290,7 @@ fnew_bid <- function(..., name = NULL, type = "auto") {
     ))
   )
 
-  return(list(
-    format = format_obj,
-    invalue = invalue_obj
-  ))
+  list(format = format_obj, invalue = invalue_obj)
 }
 
 #' Print Invalue Object
@@ -305,7 +309,7 @@ print.ks_invalue <- function(x, ...) {
     cat("  ", key, " => ", value, "\n", sep = "")
   }
 
-  if (!is.na(x$missing_value)) {
+  if (!is.null(x$missing_value) && !identical(x$missing_value, NA)) {
     cat("  Missing value: ", x$missing_value, "\n", sep = "")
   }
 

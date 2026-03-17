@@ -37,12 +37,12 @@ NULL
 #' @keywords internal
 #' @noRd
 .eval_expr_label <- function(expr_str, extra_args, indices) {
-  env <- new.env(parent = globalenv())
+  env <- new.env(parent = baseenv())
 
   for (j in seq_along(extra_args)) {
     arg_name <- paste0(".x", j)
     arg_val <- extra_args[[j]]
-    if (length(arg_val) == 1) {
+    if (length(arg_val) == 1L) {
       assign(arg_name, arg_val, envir = env)
     } else {
       assign(arg_name, arg_val[indices], envir = env)
@@ -71,7 +71,7 @@ NULL
     }
   }
 
-  return(result)
+  result
 }
 
 
@@ -91,9 +91,12 @@ NULL
 #' is_missing(NaN)         # TRUE
 #' is_missing("")          # TRUE
 #' is_missing("text")      # FALSE
+#' is_missing(c(1, NA, NaN)) # FALSE TRUE TRUE
 is_missing <- function(x) {
   if (is.null(x)) return(logical(0))
-  is.na(x) | is.nan(x) | x == "" | x == "NaN"
+  out <- is.na(x)
+  if (is.numeric(x)) return(out | is.nan(x))
+  out | nchar(x) == 0L
 }
 
 #' Create Range Specification
@@ -155,9 +158,8 @@ in_range <- function(x, range_spec) {
     return(FALSE)
   }
 
-  low_ok <- ifelse(range_spec$inc_low, x >= range_spec$low, x > range_spec$low)
-  high_ok <- ifelse(range_spec$inc_high, x <= range_spec$high, x < range_spec$high)
-
+  low_ok <- if (range_spec$inc_low) x >= range_spec$low else x > range_spec$low
+  high_ok <- if (range_spec$inc_high) x <= range_spec$high else x < range_spec$high
   low_ok & high_ok
 }
 
@@ -224,7 +226,7 @@ in_range <- function(x, range_spec) {
     name <- format$name
   }
 
-  if (is.null(name) || name == "") {
+  if (is.null(name) || is.na(name) || !nzchar(name)) {
     return(invisible(format))
   }
 
@@ -269,6 +271,25 @@ in_range <- function(x, range_spec) {
     ))
   }
   get(name, envir = .format_library)
+}
+
+#' Retrieve a Format from the Library
+#'
+#' Returns a format or invalue object by name. Used when you need the object
+#' (e.g. for \code{\link{fput_df}} or \code{\link{fexport}}) rather than
+#' applying by name with \code{\link{fput}}, \code{\link{fputn}}, or
+#' \code{\link{fputc}}.
+#'
+#' @param name Character. Name of a registered format or invalue.
+#' @return A \code{ks_format} or \code{ks_invalue} object.
+#' @export
+#' @examples
+#' fnew("M" = "Male", "F" = "Female", name = "sex")
+#' sex_fmt <- format_get("sex")
+#' fput_df(data.frame(sex = c("M", "F")), sex = sex_fmt)
+#' fclear()
+format_get <- function(name) {
+  .format_get(name)
 }
 
 #' Print Format(s) from Library
@@ -382,7 +403,7 @@ fclear <- function(name = NULL) {
     # Check that all labels are character strings
     if (length(format_obj$mappings) > 0) {
       labels <- unlist(format_obj$mappings)
-      non_char <- !sapply(labels, is.character)
+      non_char <- !vapply(labels, is.character, logical(1L))
       if (any(non_char)) {
         bad_idx <- which(non_char)
         bad_keys <- names(format_obj$mappings)[bad_idx]

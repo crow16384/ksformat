@@ -4,4 +4,11 @@
 ^examples$
 ^\.serena
 ^\.vscode$
+^\.git$
+^\.gitignore$
+^\.Rcheck$
+^\.serenaproject$
+^\.serena\.project$
+^cran-comments\.md$
+^scripts$
 

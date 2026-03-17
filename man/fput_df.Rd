@@ -39,7 +39,7 @@ VALUE age (numeric)
   .missing  = "Age Unknown"
 ;
 ')
-age_f <- ksformat:::.format_get("age")
+age_f <- format_get("age")
 
 fput_df(df, sex = sex_f, age = age_f, suffix = "_label")
 

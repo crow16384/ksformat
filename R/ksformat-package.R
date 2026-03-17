@@ -20,12 +20,9 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
-#' # Create and apply a format
 #' fnew("M" = "Male", "F" = "Female", .missing = "Unknown", name = "sex")
 #' fput(c("M", "F", NA), "sex")
 #'
-#' # Parse from SAS-like text (auto-registered)
 #' fparse(text = '
 #' VALUE age (numeric)
 #'   [0, 18) = "Child"
@@ -33,7 +30,7 @@
 #' ;
 #' ')
 #' fputn(c(5, 25), "age")
-#' }
+#' fclear()
 #'
 #' @docType package
 #' @name ksformat-package

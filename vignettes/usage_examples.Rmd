@@ -176,7 +176,7 @@ fprint()
 ## Example 8: Export Formats Back to Text
 
 ```{r export}
-bmi_fmt <- ksformat:::.format_get("bmi")
+bmi_fmt <- format_get("bmi")
 cat(fexport(bmi = bmi_fmt))
 ```
 
@@ -203,8 +203,8 @@ df <- data.frame(
   stringsAsFactors = FALSE
 )
 
-sex_f <- ksformat:::.format_get("sex")
-age_f <- ksformat:::.format_get("age")
+sex_f <- format_get("sex")
+age_f <- format_get("age")
 
 df_formatted <- fput_df(
   df,
@@ -360,7 +360,7 @@ fput(36000, "visit_time")
 fput(as.POSIXct("2025-03-01 10:00:00", tz = "UTC"), "stamp")
 
 # Export back to text
-enrl_obj <- ksformat:::.format_get("enrldt")
+enrl_obj <- format_get("enrldt")
 cat(fexport(enrldt = enrl_obj))
 
 fclear()
@@ -445,7 +445,7 @@ for (i in seq_along(risk_scores)) {
 ### Multilabel Export
 
 ```{r multilabel-export}
-risk_obj <- ksformat:::.format_get("risk")
+risk_obj <- format_get("risk")
 cat(fexport(risk = risk_obj))
 
 fprint("risk")
