@@ -843,6 +843,18 @@ fprint()  # should be empty
 cat("\nUsing GENDER format from returned list:\n")
 cat(fput(c("M", "F"), manual[["GENDER"]]), "\n")
 
+# --- 19: Bilingual format ---
+cat("\n--- 19: Create and apply bilingual format ---\n")
+sex_bi <- fnew(
+  "M" = "ifelse(.x1 == 'en', 'Male', 'Homme')",
+  "F" = "ifelse(.x1 == 'en', 'Female', 'Femme')",
+  .missing = "Unknown",   # single language only
+  name = "sex_bi"
+)
+fput(c("M", "F", "M"), sex_bi, c("en", "fr", "en"))
+# .x1 = language
+# → "Male" "Femme" "Male"
+
 fclear()
 cat("\n=== Examples completed ===\n")
 
