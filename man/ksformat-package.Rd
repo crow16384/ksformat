@@ -23,6 +23,8 @@ Main features:
   \item Global format library with auto-registration
   \item Range-based formatting for numeric data
 }
+
+Cheat sheet: run \code{\link{ksformat_cheatsheet}()} to open the HTML version in your browser, or see the files in \code{system.file("doc", package = "ksformat")}.
 }
 \examples{
 fnew("M" = "Male", "F" = "Female", .missing = "Unknown", name = "sex")

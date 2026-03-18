@@ -107,6 +107,11 @@ Priority order:
 
 Options: `keep_na = TRUE`, `na_if`, `include_empty = TRUE`.
 
+## Cheat sheet
+
+- **In R:** run `ksformat_cheatsheet()` to open the cheat sheet in your browser (HTML), or `ksformat_cheatsheet("pdf")` for the PDF.
+- **In this repo:** [HTML](inst/doc/ksformat-cheatsheet.html) | [PDF](inst/doc/ksformat-Cheat-Sheet.pdf)
+
 ## Function reference
 
 | Area | Functions |
@@ -116,6 +121,7 @@ Options: `keep_na = TRUE`, `na_if`, `include_empty = TRUE`.
 | **Reverse** | `finputn()`, `finputc()` |
 | **Library** | `format_get()`, `fprint()`, `fclear()`, `fexport()`, `fimport()` |
 | **Utilities** | `is_missing()`, `range_spec()` |
+| **Documentation** | `ksformat_cheatsheet()` — open cheat sheet |
 
 ## Development
 
