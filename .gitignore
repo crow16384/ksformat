@@ -10,3 +10,5 @@
 .vscode/
 .serena.project
 .serenaproject
+.DS_*
+._.DS_*

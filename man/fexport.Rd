@@ -39,7 +39,7 @@ VALUE bmi (numeric)
   .missing   = "No data"
 ;
 ')
-bmi_fmt <- ksformat:::.format_get("bmi")
+bmi_fmt <- format_get("bmi")
 cat(fexport(bmi = bmi_fmt))
 
 # Export a multilabel format

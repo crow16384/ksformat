@@ -185,7 +185,7 @@ fprint()
 cat("\n=== Example 8: Export Formats to Text ===\n")
 
 # Retrieve format from library and export
-bmi_fmt <- ksformat:::.format_get("bmi")
+bmi_fmt <- format_get("bmi")
 cat(fexport(bmi = bmi_fmt))
 cat("\n")
 
@@ -220,8 +220,8 @@ df <- data.frame(
 cat("Original data:\n")
 print(df)
 
-sex_f <- ksformat:::.format_get("sex")
-age_f <- ksformat:::.format_get("age")
+sex_f <- format_get("sex")
+age_f <- format_get("age")
 
 df_formatted <- fput_df(
   df,
@@ -245,11 +245,11 @@ print(fput(c("M", "F", NA), "sex"))
 cat("\nWith keep_na = TRUE:\n")
 print(fput(c("M", "F", NA), sex_f, keep_na = TRUE))
 
-cat("\nis_missing() (include_empty = TRUE by default):\n")
-cat("  NA:            ", is_missing(NA), "\n")
-cat("  NaN:           ", is_missing(NaN), "\n")
-cat("  '':            ", is_missing(""), "\n")                     # TRUE (default)
-cat("  '' (no empty): ", is_missing("", include_empty = FALSE), "\n")  # FALSE
+cat("\nis_missing() (NA, NaN, and empty string are missing):\n")
+cat("  NA:   ", is_missing(NA), "\n")
+cat("  NaN:  ", is_missing(NaN), "\n")
+cat("  '':   ", is_missing(""), "\n")
+cat("  'x':  ", is_missing("x"), "\n")
 
 # ============================================================================
 # Example 12: Date/Time Formats (SAS-style)
@@ -372,7 +372,7 @@ cat("visit_time:", fput(36000, "visit_time"), "\n")
 cat("stamp:", fput(as.POSIXct("2025-03-01 10:00:00", tz = "UTC"), "stamp"), "\n")
 
 # Export back to text
-enrl_obj <- ksformat:::.format_get("enrldt")
+enrl_obj <- format_get("enrldt")
 cat("\nExported text:\n")
 cat(fexport(enrldt = enrl_obj))
 cat("\n")
@@ -461,7 +461,7 @@ for (i in seq_along(risk_scores)) {
 # --- 13d: Multilabel export ---
 cat("\n--- Multilabel Export ---\n")
 
-risk_obj <- ksformat:::.format_get("risk")
+risk_obj <- format_get("risk")
 cat(fexport(risk = risk_obj))
 cat("\n")
 
@@ -845,3 +845,4 @@ cat(fput(c("M", "F"), manual[["GENDER"]]), "\n")
 
 fclear()
 cat("\n=== Examples completed ===\n")
+
