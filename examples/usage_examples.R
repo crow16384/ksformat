@@ -855,6 +855,14 @@ fput(c("M", "F", "M"), sex_bi, c("en", "fr", "en"))
 # .x1 = language
 # → "Male" "Femme" "Male"
 
+# Create one format per language
+fnew("M" = "Male",  "F" = "Female",  .missing = "Unknown", name = "sex_en")
+fnew("M" = "Homme", "F" = "Femme",   .missing = "Inconnu", name = "sex_fr")
+# Select language at apply-time
+lang <- "fr"
+fput(c("M", "F", NA), paste0("sex_", lang))
+# -> "Homme" "Femme" "Inconnu"
+
 fclear()
 cat("\n=== Examples completed ===\n")
 
