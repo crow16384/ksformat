@@ -1,6 +1,6 @@
-#' Parse Format Definitions from SAS-like Text
+#' Parse Format Definitions from 'SAS'-like Text
 #'
-#' Reads format definitions written in a human-friendly SAS-like syntax
+#' Reads format definitions written in a human-friendly 'SAS'-like syntax
 #' and returns a list of \code{ks_format} and/or \code{ks_invalue} objects.
 #' All parsed formats are automatically stored in the global format library.
 #'
@@ -159,10 +159,10 @@ fparse <- function(text = NULL, file = NULL) {
 }
 
 
-#' Export Formats to SAS-like Text
+#' Export Formats to 'SAS'-like Text
 #'
 #' Converts \code{ks_format} and/or \code{ks_invalue} objects to
-#' human-readable SAS-like text representation.
+#' human-readable 'SAS'-like text representation.
 #'
 #' @param ... Named \code{ks_format} or \code{ks_invalue} objects to export.
 #' @param formats A named list of format objects. Alternative to \code{...}.
@@ -170,7 +170,7 @@ fparse <- function(text = NULL, file = NULL) {
 #'   returns the text as a character string.
 #'
 #' @return If \code{file} is \code{NULL}, returns a character string with the
-#'   SAS-like text. If \code{file} is specified, writes to the file and returns
+#'   'SAS'-like text. If \code{file} is specified, writes to the file and returns
 #'   the path invisibly.
 #'
 #' @export
@@ -260,15 +260,15 @@ fexport <- function(..., formats = NULL, file = NULL) {
 }
 
 
-#' Import Formats from SAS PROC FORMAT CNTLOUT CSV
+#' Import Formats from 'SAS' PROC FORMAT CNTLOUT CSV
 #'
-#' Reads a CSV file produced by the SAS \code{PROC FORMAT} with
+#' Reads a CSV file produced by 'SAS' \code{PROC FORMAT} with
 #' \code{CNTLOUT=} option (typically exported via \code{PROC EXPORT})
 #' and converts compatible format definitions into \code{ks_format} and
 #' \code{ks_invalue} objects.
 #'
 #' @details
-#' The SAS format catalogue CSV is expected to contain the standard CNTLOUT
+#' The 'SAS' format catalogue CSV is expected to contain the standard CNTLOUT
 #' columns: \code{FMTNAME}, \code{START}, \code{END}, \code{LABEL},
 #' \code{TYPE}, \code{HLO}, \code{SEXCL}, \code{EEXCL}.
 #'
@@ -304,15 +304,14 @@ fexport <- function(..., formats = NULL, file = NULL) {
 #'
 #' @export
 #' @examples
-#' \dontrun{
 #' # In SAS:
 #' # proc format library=work cntlout=fmts; run;
 #' # proc export data=fmts outfile="formats.csv" dbms=csv replace; run;
 #'
-#' # In R:
-#' imported <- fimport("formats.csv")
+#' csv_file <- system.file("extdata", "test_cntlout.csv", package = "ksformat")
+#' imported <- fimport(csv_file)
 #' fprint()
-#' }
+#' fclear()
 fimport <- function(file, register = TRUE, overwrite = TRUE) {
   if (!file.exists(file)) {
     cli_abort("File not found: {.file {file}}")

@@ -2,7 +2,7 @@
 % Please edit documentation in R/format_create.R
 \name{fnew}
 \alias{fnew}
-\title{Create a Format Definition (like SAS PROC FORMAT)}
+\title{Create a Format Definition (like 'SAS' PROC FORMAT)}
 \usage{
 fnew(
   ...,
@@ -40,7 +40,7 @@ An object of class \code{"ks_format"} containing the format definition.
   The object is also stored in the format library if \code{name} is given.
 }
 \description{
-Creates a format object that maps values to labels, similar to SAS PROC FORMAT.
+Creates a format object that maps values to labels, similar to 'SAS' PROC FORMAT.
 Supports discrete value mapping, ranges, and special handling of missing values.
 The format is automatically stored in the global format library if \code{name}
 is provided.

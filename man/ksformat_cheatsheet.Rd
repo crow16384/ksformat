@@ -17,7 +17,7 @@ Opens the package cheat sheet in the default browser (HTML) or viewer (PDF).
 The files are installed under \code{system.file("doc", ..., package = "ksformat")}.
 }
 \examples{
-\dontrun{
+\donttest{
 ksformat_cheatsheet()           # open HTML in browser
 ksformat_cheatsheet("pdf")      # open PDF
 }

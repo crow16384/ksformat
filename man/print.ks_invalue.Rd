@@ -11,6 +11,9 @@
 
 \item{...}{Additional arguments (unused)}
 }
+\value{
+The input \code{x}, returned invisibly.
+}
 \description{
 Print Invalue Object
 }

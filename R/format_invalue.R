@@ -1,7 +1,7 @@
-#' Create Invalue Format (Reverse Formatting like SAS INVALUE)
+#' Create Invalue Format (Reverse Formatting like 'SAS' INVALUE)
 #'
 #' Creates an invalue format that converts formatted labels back to values.
-#' This is similar to SAS PROC FORMAT with INVALUE statement.
+#' This is similar to 'SAS' PROC FORMAT with INVALUE statement.
 #' The invalue is automatically stored in the global format library if \code{name}
 #' is provided.
 #'
@@ -80,12 +80,6 @@ finput <- function(..., name = NULL, target_type = "numeric", missing_value = NA
 #' @return Vector with values (type depends on invalue's \code{target_type})
 #'
 #' @keywords internal
-#'
-#' @examples
-#' inv <- finput("Male" = 1, "Female" = 2, name = "sex_inv")
-#' ksformat:::.invalue_apply(c("Male", "Female", "Unknown"), inv)
-#' # Returns: 1 2 NA
-#' fclear()
 .invalue_apply <- function(x, invalue, na_if = NULL) {
   # Resolve invalue by name if string provided
   if (is.character(invalue) && length(invalue) == 1L) {
@@ -153,7 +147,7 @@ finput <- function(..., name = NULL, target_type = "numeric", missing_value = NA
   result
 }
 
-#' Apply Numeric Invalue by Name (like SAS INPUTN)
+#' Apply Numeric Invalue by Name (like 'SAS' INPUTN)
 #'
 #' Looks up a numeric INVALUE format by name from the global format library
 #' and applies it to convert labels to numeric values.
@@ -196,7 +190,7 @@ finputn <- function(x, invalue_name) {
   as.numeric(result)
 }
 
-#' Apply Character Invalue by Name (like SAS INPUTC)
+#' Apply Character Invalue by Name (like 'SAS' INPUTC)
 #'
 #' Looks up an INVALUE format by name from the global format library
 #' and applies it to convert labels to character values.
@@ -297,6 +291,7 @@ fnew_bid <- function(..., name = NULL, type = "auto") {
 #'
 #' @param x A ks_invalue object
 #' @param ... Additional arguments (unused)
+#' @return The input \code{x}, returned invisibly.
 #' @export
 print.ks_invalue <- function(x, ...) {
   cat("KS Invalue:", if (!is.null(x$name)) x$name else "(unnamed)", "\n")

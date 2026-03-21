@@ -2,7 +2,7 @@
 % Please edit documentation in R/format_parse.R
 \name{fimport}
 \alias{fimport}
-\title{Import Formats from SAS PROC FORMAT CNTLOUT CSV}
+\title{Import Formats from 'SAS' PROC FORMAT CNTLOUT CSV}
 \usage{
 fimport(file, register = TRUE, overwrite = TRUE)
 }
@@ -20,13 +20,13 @@ A named list of \code{ks_format} and \code{ks_invalue} objects that
   were successfully imported. Returned invisibly.
 }
 \description{
-Reads a CSV file produced by the SAS \code{PROC FORMAT} with
+Reads a CSV file produced by 'SAS' \code{PROC FORMAT} with
 \code{CNTLOUT=} option (typically exported via \code{PROC EXPORT})
 and converts compatible format definitions into \code{ks_format} and
 \code{ks_invalue} objects.
 }
 \details{
-The SAS format catalogue CSV is expected to contain the standard CNTLOUT
+The 'SAS' format catalogue CSV is expected to contain the standard CNTLOUT
 columns: \code{FMTNAME}, \code{START}, \code{END}, \code{LABEL},
 \code{TYPE}, \code{HLO}, \code{SEXCL}, \code{EEXCL}.
 
@@ -52,13 +52,12 @@ Rows with SAS special missing values (\code{.A}\eqn{-}\code{.Z},
 because R has no equivalent concept.
 }
 \examples{
-\dontrun{
 # In SAS:
 # proc format library=work cntlout=fmts; run;
 # proc export data=fmts outfile="formats.csv" dbms=csv replace; run;
 
-# In R:
-imported <- fimport("formats.csv")
+csv_file <- system.file("extdata", "test_cntlout.csv", package = "ksformat")
+imported <- fimport(csv_file)
 fprint()
-}
+fclear()
 }

@@ -12,3 +12,6 @@
 .serenaproject
 .DS_*
 ._.DS_*
+._*
+/doc/
+/Meta/

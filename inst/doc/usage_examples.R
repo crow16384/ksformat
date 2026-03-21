@@ -1,28 +1,11 @@
----
-title: "ksformat Usage Examples"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{ksformat Usage Examples}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-
-```{r setup, include = FALSE}
+## ----setup, include = FALSE---------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 library(ksformat)
-```
 
-The **ksformat** package provides SAS PROC FORMAT-like functionality for R.
-This vignette walks through the most common use cases.
-
-## Example 1: Basic Discrete Formatting
-
-Create a format for gender codes (auto-stored in library as "sex"):
-
-```{r discrete}
+## ----discrete-----------------------------------------------------------------
 fnew(
   "M" = "Male",
   "F" = "Female",
@@ -40,13 +23,8 @@ data.frame(
 )
 
 fprint("sex")
-```
 
-## Example 2: Numeric Range Formatting
-
-Define formats in SAS-like text (auto-registered):
-
-```{r ranges}
+## ----ranges-------------------------------------------------------------------
 fparse(text = '
 VALUE age (numeric)
   [0, 18)     = "Child"
@@ -63,11 +41,8 @@ data.frame(
   age = ages,
   group = age_groups
 )
-```
 
-## Example 3: Decimal Ranges (BMI Categories)
-
-```{r bmi}
+## ----bmi----------------------------------------------------------------------
 fparse(text = '
 VALUE bmi (numeric)
   [0, 18.5)    = "Underweight"
@@ -85,11 +60,8 @@ data.frame(
   bmi = bmi_values,
   category = bmi_labels
 )
-```
 
-## Example 4: Exclusive/Inclusive Bounds
-
-```{r bounds}
+## ----bounds-------------------------------------------------------------------
 fparse(text = '
 VALUE score (numeric)
   (0, 50]    = "Low"
@@ -105,13 +77,8 @@ data.frame(
   score = scores,
   label = score_labels
 )
-```
 
-## Example 5: Reverse Formatting with Invalue
-
-Invalues convert labels back to values. The default `target_type` is `"numeric"`:
-
-```{r invalue}
+## ----invalue------------------------------------------------------------------
 finput(
   "Male" = 1,
   "Female" = 2,
@@ -125,13 +92,8 @@ data.frame(
   label = labels,
   code = codes
 )
-```
 
-## Example 6: Bidirectional Formatting
-
-`fnew_bid()` creates both a format and an invalue at once:
-
-```{r bidirectional}
+## ----bidirectional------------------------------------------------------------
 status_bi <- fnew_bid(
   "A" = "Active",
   "I" = "Inactive",
@@ -148,11 +110,8 @@ data.frame(code = status_codes, label = status_labels)
 test_labels <- c("Active", "Pending", "Inactive")
 test_codes <- finputc(test_labels, "status_inv")
 data.frame(label = test_labels, code = test_codes)
-```
 
-## Example 7: Parse Multiple Formats from Text
-
-```{r multiparse}
+## ----multiparse---------------------------------------------------------------
 fparse(text = '
 // Study format definitions
 
@@ -171,18 +130,12 @@ INVALUE race_inv
 ')
 
 fprint()
-```
 
-## Example 8: Export Formats Back to Text
-
-```{r export}
+## ----export-------------------------------------------------------------------
 bmi_fmt <- format_get("bmi")
 cat(fexport(bmi = bmi_fmt))
-```
 
-## Example 9: SAS-like PUT/INPUT Functions
-
-```{r sas-put-input}
+## ----sas-put-input------------------------------------------------------------
 # fputn — apply numeric format by name
 fputn(c(5, 30, 70), "age")
 
@@ -191,11 +144,8 @@ fputc(c("M", "F"), "sex")
 
 # finputn — apply numeric invalue by name
 finputn(c("White", "Black"), "race_inv")
-```
 
-## Example 10: Data Frame Formatting
-
-```{r df-format}
+## ----df-format----------------------------------------------------------------
 df <- data.frame(
   id = 1:6,
   sex = c("M", "F", "M", "F", NA, "X"),
@@ -214,11 +164,8 @@ df_formatted <- fput_df(
 )
 
 df_formatted
-```
 
-## Example 11: Missing Value Handling
-
-```{r missing}
+## ----missing------------------------------------------------------------------
 # With .missing label
 fput(c("M", "F", NA), "sex")
 
@@ -229,15 +176,8 @@ fput(c("M", "F", NA), sex_f, keep_na = TRUE)
 is_missing(NA)
 is_missing(NaN)
 is_missing("")   # TRUE — empty strings are treated as missing
-```
 
-## Example 12: Date/Time Formats (SAS-style)
-
-### SAS Date Formats
-
-SAS date format names are auto-resolved — no pre-creation needed:
-
-```{r date-formats}
+## ----date-formats-------------------------------------------------------------
 today <- Sys.Date()
 
 data.frame(
@@ -258,22 +198,14 @@ data.frame(
 # Multiple dates
 dates <- as.Date(c("2020-01-15", "2020-06-30", "2020-12-25"))
 fputn(dates, "DATE9.")
-```
 
-### R Numeric Dates (Days Since 1970-01-01)
-
-```{r date-numeric}
+## ----date-numeric-------------------------------------------------------------
 r_days <- as.numeric(as.Date("2025-01-01"))
 r_days
 fputn(r_days, "DATE9.")
 fputn(r_days, "MMDDYY10.")
-```
 
-### Time Formats
-
-Time is represented as seconds since midnight:
-
-```{r time-formats}
+## ----time-formats-------------------------------------------------------------
 seconds <- c(0, 3600, 45000, 86399)
 
 data.frame(
@@ -282,11 +214,8 @@ data.frame(
   TIME5 = fputn(seconds, "TIME5."),
   HHMM = fputn(seconds, "HHMM.")
 )
-```
 
-### Datetime Formats
-
-```{r datetime-formats}
+## ----datetime-formats---------------------------------------------------------
 now <- Sys.time()
 
 data.frame(
@@ -302,11 +231,8 @@ data.frame(
 # From numeric R-epoch seconds
 r_secs <- as.numeric(as.POSIXct("2025-06-15 14:30:00", tz = "UTC"))
 fputn(r_secs, "DATETIME20.")
-```
 
-### Custom Date Formats with `fnew_date()`
-
-```{r fnew-date}
+## ----fnew-date----------------------------------------------------------------
 # SAS-named format
 fnew_date("DATE9.", name = "bday_fmt")
 birthdays <- as.Date(c("1990-03-25", "1985-11-03", "2000-07-14"))
@@ -322,11 +248,8 @@ mixed <- c(as.Date("2025-01-01"), NA, as.Date("2025-12-31"))
 fput(mixed, "us_date")
 
 fprint("bday_fmt")
-```
 
-### Date Formats in Data Frames
-
-```{r date-df}
+## ----date-df------------------------------------------------------------------
 patients <- data.frame(
   id = 1:4,
   visit_date = as.Date(c("2025-01-10", "2025-02-15", "2025-03-20", NA)),
@@ -335,11 +258,8 @@ patients <- data.frame(
 
 visit_fmt <- fnew_date("DATE9.", name = "visit_fmt", .missing = "NOT RECORDED")
 fput_df(patients, visit_date = visit_fmt)
-```
 
-### Parse Date Formats from Text
-
-```{r date-parse}
+## ----date-parse---------------------------------------------------------------
 fparse(text = '
 VALUE enrldt (date)
   pattern = "DATE9."
@@ -364,15 +284,8 @@ enrl_obj <- format_get("enrldt")
 cat(fexport(enrldt = enrl_obj))
 
 fclear()
-```
 
-## Example 13: Multilabel Formats
-
-### Overlapping Age Categories
-
-With multilabel formats, a single value can match multiple labels:
-
-```{r multilabel-basic}
+## ----multilabel-basic---------------------------------------------------------
 fnew(
   "0,5,TRUE,TRUE"    = "Infant",
   "6,11,TRUE,TRUE"   = "Child",
@@ -396,11 +309,8 @@ all_labels <- fput_all(ages, "age_categories")
 for (i in seq_along(ages)) {
   cat("Age", ages[i], "->", paste(all_labels[[i]], collapse = ", "), "\n")
 }
-```
 
-### Multilabel with Missing Values
-
-```{r multilabel-missing}
+## ----multilabel-missing-------------------------------------------------------
 fnew(
   "0,100,TRUE,TRUE"   = "Valid Score",
   "0,49,TRUE,TRUE"    = "Below Average",
@@ -420,11 +330,8 @@ for (i in seq_along(scores)) {
   cat("Score", ifelse(is.na(scores[i]), "NA", scores[i]),
       "->", paste(ml_result[[i]], collapse = ", "), "\n")
 }
-```
 
-### Parse Multilabel from Text
-
-```{r multilabel-parse}
+## ----multilabel-parse---------------------------------------------------------
 fparse(text = '
 VALUE risk (numeric, multilabel)
   [0, 3]   = "Low Risk"
@@ -440,20 +347,14 @@ for (i in seq_along(risk_scores)) {
   cat("Score", risk_scores[i], "->",
       paste(risk_labels[[i]], collapse = " | "), "\n")
 }
-```
 
-### Multilabel Export
-
-```{r multilabel-export}
+## ----multilabel-export--------------------------------------------------------
 risk_obj <- format_get("risk")
 cat(fexport(risk = risk_obj))
 
 fprint("risk")
-```
 
-### Practical Example: Adverse Event Severity Grading
-
-```{r ae-grading}
+## ----ae-grading---------------------------------------------------------------
 fnew(
   "1,1,TRUE,TRUE" = "Mild",
   "2,2,TRUE,TRUE" = "Moderate",
@@ -475,11 +376,8 @@ for (i in seq_along(grades)) {
 }
 
 fclear()
-```
 
-## Example 14: Case-Insensitive Matching
-
-```{r nocase}
+## ----nocase-------------------------------------------------------------------
 sex_nc <- fnew(
   "M" = "Male",
   "F" = "Female",
@@ -499,16 +397,8 @@ fprint("sex_nc")
 fputc("m", "sex_nc")
 
 fclear()
-```
 
-## Example 15: Expression Labels in Formats
-
-Expression labels contain `.x1`, `.x2`, etc., which reference extra arguments
-passed to `fput()`. This lets you compute labels dynamically.
-
-### Simple `sprintf` Expression
-
-```{r expr-sprintf}
+## ----expr-sprintf-------------------------------------------------------------
 stat_fmt <- fnew(
   "n"   = "sprintf('%s', .x1)",
   "pct" = "sprintf('%.1f%%', .x1 * 100)",
@@ -520,11 +410,8 @@ types  <- c("n",  "pct",  "n",   "pct")
 values <- c(42,   0.053,  100,   0.255)
 
 fput(types, stat_fmt, values)
-```
 
-### Two Extra Arguments (`.x1`, `.x2`)
-
-```{r expr-twoargs}
+## ----expr-twoargs-------------------------------------------------------------
 ratio_fmt <- fnew(
   "ratio" = "sprintf('%s/%s', .x1, .x2)",
   name = "ratio",
@@ -533,11 +420,8 @@ ratio_fmt <- fnew(
 
 fput("ratio", ratio_fmt, 3, 10)
 fput(c("ratio", "ratio"), ratio_fmt, c(3, 7), c(10, 20))
-```
 
-### `ifelse` Expression
-
-```{r expr-ifelse}
+## ----expr-ifelse--------------------------------------------------------------
 sign_fmt <- fnew(
   "val" = "ifelse(.x1 > 0, paste0('+', .x1), as.character(.x1))",
   name = "sign",
@@ -546,11 +430,8 @@ sign_fmt <- fnew(
 
 nums <- c(5, 0, -3)
 fput(rep("val", 3), sign_fmt, nums)
-```
 
-### Mixed Static and Expression Labels
-
-```{r expr-mixed}
+## ----expr-mixed---------------------------------------------------------------
 mixed_fmt <- fnew(
   "header" = "HEADER",
   "n"      = "sprintf('N=%s', .x1)",
@@ -562,11 +443,8 @@ mixed_fmt <- fnew(
 keys <- c("header", "n", "pct", "header", "n")
 vals <- c(0,        42,  0.15,  0,        100)
 fput(keys, mixed_fmt, vals)
-```
 
-### Expression in `.other` Fallback
-
-```{r expr-other}
+## ----expr-other---------------------------------------------------------------
 known_fmt <- fnew(
   "ok" = "OK",
   .other = "sprintf('Error(%s)', .x1)",
@@ -577,11 +455,8 @@ known_fmt <- fnew(
 codes   <- c("ok", "E01", "ok", "E99")
 details <- c("",   "timeout", "", "overflow")
 fput(codes, known_fmt, details)
-```
 
-### Scalar Recycling
-
-```{r expr-recycle}
+## ----expr-recycle-------------------------------------------------------------
 label_fmt <- fnew(
   "val" = "sprintf('%s (N=%s)', .x1, .x2)",
   name = "recycle",
@@ -591,13 +466,8 @@ label_fmt <- fnew(
 fput(c("val", "val"), label_fmt, c(42, 55), 100)
 
 fclear()
-```
 
-## Example 16: Vectorized Format Names (SAS PUTC-style)
-
-Each element can use a different format, determined by a vector of format names:
-
-```{r vectorized}
+## ----vectorized---------------------------------------------------------------
 # Dispatch format: maps type code to format name
 fnew("1" = "groupx", "2" = "groupy", "3" = "groupz",
      name = "typefmt", type = "numeric")
@@ -624,13 +494,8 @@ word <- fputc(response, respfmt)
 data.frame(type = type, response = response, respfmt = respfmt, word = word)
 
 fclear()
-```
 
-## Example 17: Working with Dates and Formats — PUTN
-
-A SAS-style workflow where format names are looked up dynamically per observation:
-
-```{r dates-putn}
+## ----dates-putn---------------------------------------------------------------
 # Format that maps key codes to date format names
 fnew("1" = "date9.", "2" = "mmddyy10.",
      name = "writfmt", type = "numeric")
@@ -651,27 +516,17 @@ date <- fputn(number, datefmt)
 data.frame(number = number, key = key, datefmt = datefmt, date = date)
 
 fclear()
-```
 
-## Example 18: Import SAS Formats from CNTLOUT CSV
-
-The `fimport()` function reads a CSV file exported from a SAS format catalogue
-(`PROC FORMAT ... CNTLOUT=`):
-
-```{r cntlout-import}
+## ----cntlout-import-----------------------------------------------------------
 csv_path <- system.file("extdata", "test_cntlout.csv", package = "ksformat")
-```
 
-```{r cntlout-use}
+## ----cntlout-use--------------------------------------------------------------
 imported <- fimport(csv_path)
 names(imported)
 
 fprint()
-```
 
-### Use Imported Formats
-
-```{r cntlout-apply}
+## ----cntlout-apply------------------------------------------------------------
 # Character format (GENDER)
 gender_codes <- c("M", "F", NA, "X")
 data.frame(
@@ -699,11 +554,8 @@ data.frame(
   label = race_labels,
   code = finputn(race_labels, "RACEIN")
 )
-```
 
-### Apply to Data Frame
-
-```{r cntlout-df}
+## ----cntlout-df---------------------------------------------------------------
 df <- data.frame(
   id = 1:5,
   sex = c("M", "F", "M", NA, "F"),
@@ -715,18 +567,12 @@ gender_fmt <- imported[["GENDER"]]
 age_fmt    <- imported[["AGEGRP"]]
 
 fput_df(df, sex = gender_fmt, age = age_fmt, suffix = "_label")
-```
 
-### Export Imported Format
-
-```{r cntlout-export}
+## ----cntlout-export-----------------------------------------------------------
 cat(fexport(AGEGRP = age_fmt))
 cat(fexport(GENDER = gender_fmt))
-```
 
-### Selective Import (No Auto-register)
-
-```{r cntlout-manual}
+## ----cntlout-manual-----------------------------------------------------------
 fclear()
 
 manual <- fimport(csv_path, register = FALSE)
@@ -738,4 +584,4 @@ fprint()
 fput(c("M", "F"), manual[["GENDER"]])
 
 fclear()
-```
+

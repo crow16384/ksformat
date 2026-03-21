@@ -2,7 +2,7 @@
 % Please edit documentation in R/format_invalue.R
 \name{finput}
 \alias{finput}
-\title{Create Invalue Format (Reverse Formatting like SAS INVALUE)}
+\title{Create Invalue Format (Reverse Formatting like 'SAS' INVALUE)}
 \usage{
 finput(..., name = NULL, target_type = "numeric", missing_value = NA)
 }
@@ -26,7 +26,7 @@ An object of class \code{"ks_invalue"} containing the invalue definition.
 }
 \description{
 Creates an invalue format that converts formatted labels back to values.
-This is similar to SAS PROC FORMAT with INVALUE statement.
+This is similar to 'SAS' PROC FORMAT with INVALUE statement.
 The invalue is automatically stored in the global format library if \code{name}
 is provided.
 }

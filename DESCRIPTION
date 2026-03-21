@@ -1,7 +1,7 @@
 Package: ksformat
 Type: Package
-Title: SAS-Style PROC FORMAT for R
-Version: 0.3.4
+Title: 'SAS'-Style 'PROC FORMAT' for R
+Version: 0.3.5
 Author: Vladimir Larchenko [aut, cre]
 Maintainer: Vladimir Larchenko <vladimir.larchenko@keystatsolutions.com>
 Authors@R: c(
@@ -11,7 +11,7 @@ Authors@R: c(
       role = c("aut", "cre")
     )
   )
-Description: Provides SAS PROC FORMAT-like functionality for creating and applying
+Description: Provides 'SAS' 'PROC FORMAT'-like functionality for creating and applying
     value formats in R. Supports mapping values to labels, range-based formatting,
     reverse formatting (invalue), and proper handling of missing values (NA, NULL, NaN).
 License: GPL-3

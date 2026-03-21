@@ -1,4 +1,4 @@
-#' Apply Format to Data (like SAS PUT function)
+#' Apply Format to Data (like 'SAS' PUT function)
 #'
 #' Applies a format definition to a vector of values, returning formatted labels.
 #' Properly handles NA, NULL, NaN, and other missing values.
@@ -239,7 +239,7 @@ fput <- function(x, format, ..., keep_na = FALSE) {
 }
 
 
-#' Apply Numeric Format by Name (like SAS PUTN)
+#' Apply Numeric Format by Name (like 'SAS' PUTN)
 #'
 #' Looks up a numeric VALUE format by name from the global format library
 #' and applies it to the input vector.
@@ -247,7 +247,7 @@ fput <- function(x, format, ..., keep_na = FALSE) {
 #' @param x Numeric vector of values to format
 #' @param format_name Character. Name of a registered numeric format,
 #'   or a character vector of format names (same length as \code{x}) to apply
-#'   a different format per element (like SAS PUTN with a variable format).
+#'   a different format per element (like 'SAS' PUTN with a variable format).
 #' @param ... Additional arguments passed to \code{\link{fput}} for expression
 #'   labels (mapped to \code{.x1}, \code{.x2}, etc.).
 #'
@@ -294,7 +294,7 @@ fputn <- function(x, format_name, ...) {
   fput(x, format_obj, ...)
 }
 
-#' Apply Character Format by Name (like SAS PUTC)
+#' Apply Character Format by Name (like 'SAS' PUTC)
 #'
 #' Looks up a character VALUE format by name from the global format library
 #' and applies it to the input vector.
@@ -302,7 +302,7 @@ fputn <- function(x, format_name, ...) {
 #' @param x Character vector of values to format
 #' @param format_name Character. Name of a registered character format,
 #'   or a character vector of format names (same length as \code{x}) to apply
-#'   a different format per element (like SAS PUTC with a variable format).
+#'   a different format per element (like 'SAS' PUTC with a variable format).
 #' @param ... Additional arguments passed to \code{\link{fput}} for expression
 #'   labels (mapped to \code{.x1}, \code{.x2}, etc.).
 #'

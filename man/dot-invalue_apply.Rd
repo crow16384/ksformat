@@ -20,10 +20,4 @@ Vector with values (type depends on invalue's \code{target_type})
 \description{
 Applies an invalue format to convert formatted labels back to values.
 }
-\examples{
-inv <- finput("Male" = 1, "Female" = 2, name = "sex_inv")
-ksformat:::.invalue_apply(c("Male", "Female", "Unknown"), inv)
-# Returns: 1 2 NA
-fclear()
-}
 \keyword{internal}

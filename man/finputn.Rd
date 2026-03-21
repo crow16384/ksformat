@@ -2,7 +2,7 @@
 % Please edit documentation in R/format_invalue.R
 \name{finputn}
 \alias{finputn}
-\title{Apply Numeric Invalue by Name (like SAS INPUTN)}
+\title{Apply Numeric Invalue by Name (like 'SAS' INPUTN)}
 \usage{
 finputn(x, invalue_name)
 }

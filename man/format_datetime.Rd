@@ -2,10 +2,10 @@
 % Please edit documentation in R/format_datetime.R
 \name{format_datetime}
 \alias{format_datetime}
-\title{Date/Time Format Support (SAS-style)}
+\title{Date/Time Format Support ('SAS'-style)}
 \description{
-Provides SAS-compatible date, time, and datetime formatting capabilities.
-Built-in SAS format names (DATE9., MMDDYY10., TIME8., DATETIME20., etc.)
+Provides 'SAS'-compatible date, time, and datetime formatting capabilities.
+Built-in 'SAS' format names (DATE9., MMDDYY10., TIME8., DATETIME20., etc.)
 are auto-resolved and can be used directly with \code{\link{fput}},
 \code{\link{fputn}}, and \code{\link{fputc}}.
 }

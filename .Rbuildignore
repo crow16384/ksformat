@@ -12,3 +12,6 @@
 ^cran-comments\.md$
 ^scripts$
 
+^doc$
+^Meta$
+^.*\.Rcheck$

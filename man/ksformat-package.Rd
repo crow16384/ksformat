@@ -4,9 +4,9 @@
 \name{ksformat-package}
 \alias{ksformat-package}
 \alias{ksformat}
-\title{ksformat: SAS-Style PROC FORMAT for R}
+\title{ksformat: 'SAS'-Style 'PROC FORMAT' for R}
 \description{
-Provides SAS PROC FORMAT-like functionality for creating and applying
+Provides 'SAS' 'PROC FORMAT'-like functionality for creating and applying
 value formats in R. The package supports mapping values to labels,
 range-based formatting, reverse formatting (invalue), and proper handling
 of missing values (NA, NULL, NaN).
@@ -19,7 +19,7 @@ Main features:
   \item Apply formats by name: \code{\link{fputn}} (numeric), \code{\link{fputc}} (character)
   \item Reverse formatting with \code{\link{finput}}, \code{\link{finputn}}, \code{\link{finputc}}
   \item Apply invalues by name: \code{\link{finputn}} (numeric), \code{\link{finputc}} (character)
-  \item Parse SAS-like format definitions from text with \code{\link{fparse}}
+  \item Parse 'SAS'-like format definitions from text with \code{\link{fparse}}
   \item Global format library with auto-registration
   \item Range-based formatting for numeric data
 }

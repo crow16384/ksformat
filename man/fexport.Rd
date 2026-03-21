@@ -2,7 +2,7 @@
 % Please edit documentation in R/format_parse.R
 \name{fexport}
 \alias{fexport}
-\title{Export Formats to SAS-like Text}
+\title{Export Formats to 'SAS'-like Text}
 \usage{
 fexport(..., formats = NULL, file = NULL)
 }
@@ -16,12 +16,12 @@ returns the text as a character string.}
 }
 \value{
 If \code{file} is \code{NULL}, returns a character string with the
-  SAS-like text. If \code{file} is specified, writes to the file and returns
+  'SAS'-like text. If \code{file} is specified, writes to the file and returns
   the path invisibly.
 }
 \description{
 Converts \code{ks_format} and/or \code{ks_invalue} objects to
-human-readable SAS-like text representation.
+human-readable 'SAS'-like text representation.
 }
 \examples{
 # Export a character format

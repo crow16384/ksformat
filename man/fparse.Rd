@@ -2,7 +2,7 @@
 % Please edit documentation in R/format_parse.R
 \name{fparse}
 \alias{fparse}
-\title{Parse Format Definitions from SAS-like Text}
+\title{Parse Format Definitions from 'SAS'-like Text}
 \usage{
 fparse(text = NULL, file = NULL)
 }
@@ -19,7 +19,7 @@ A named list of \code{ks_format} and/or \code{ks_invalue} objects.
   All formats are automatically registered in the global format library.
 }
 \description{
-Reads format definitions written in a human-friendly SAS-like syntax
+Reads format definitions written in a human-friendly 'SAS'-like syntax
 and returns a list of \code{ks_format} and/or \code{ks_invalue} objects.
 All parsed formats are automatically stored in the global format library.
 }

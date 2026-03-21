@@ -1,6 +1,6 @@
-#' Create a Format Definition (like SAS PROC FORMAT)
+#' Create a Format Definition (like 'SAS' PROC FORMAT)
 #'
-#' Creates a format object that maps values to labels, similar to SAS PROC FORMAT.
+#' Creates a format object that maps values to labels, similar to 'SAS' PROC FORMAT.
 #' Supports discrete value mapping, ranges, and special handling of missing values.
 #' The format is automatically stored in the global format library if \code{name}
 #' is provided.
@@ -172,6 +172,7 @@ detect_format_type <- function(keys) {
 #'
 #' @param x A ks_format object
 #' @param ... Additional arguments (unused)
+#' @return The input \code{x}, returned invisibly.
 #' @export
 print.ks_format <- function(x, ...) {
   flags <- character(0)

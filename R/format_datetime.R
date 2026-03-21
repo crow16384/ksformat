@@ -1,7 +1,7 @@
-#' Date/Time Format Support (SAS-style)
+#' Date/Time Format Support ('SAS'-style)
 #'
-#' Provides SAS-compatible date, time, and datetime formatting capabilities.
-#' Built-in SAS format names (DATE9., MMDDYY10., TIME8., DATETIME20., etc.)
+#' Provides 'SAS'-compatible date, time, and datetime formatting capabilities.
+#' Built-in 'SAS' format names (DATE9., MMDDYY10., TIME8., DATETIME20., etc.)
 #' are auto-resolved and can be used directly with \code{\link{fput}},
 #' \code{\link{fputn}}, and \code{\link{fputc}}.
 #'

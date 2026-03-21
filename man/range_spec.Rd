@@ -27,7 +27,7 @@ Helper function to create range specifications for numeric formats.
 }
 \details{
 By default, ranges are half-open: \code{[low, high)} — the lower bound is
-included and the upper bound is excluded. This matches SAS PROC FORMAT
+included and the upper bound is excluded. This matches 'SAS' PROC FORMAT
 range semantics and prevents overlap between adjacent ranges.
 }
 \examples{

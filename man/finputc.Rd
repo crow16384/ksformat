@@ -2,7 +2,7 @@
 % Please edit documentation in R/format_invalue.R
 \name{finputc}
 \alias{finputc}
-\title{Apply Character Invalue by Name (like SAS INPUTC)}
+\title{Apply Character Invalue by Name (like 'SAS' INPUTC)}
 \usage{
 finputc(x, invalue_name)
 }

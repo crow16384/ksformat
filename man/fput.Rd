@@ -2,7 +2,7 @@
 % Please edit documentation in R/format_apply.R
 \name{fput}
 \alias{fput}
-\title{Apply Format to Data (like SAS PUT function)}
+\title{Apply Format to Data (like 'SAS' PUT function)}
 \usage{
 fput(x, format, ..., keep_na = FALSE)
 }

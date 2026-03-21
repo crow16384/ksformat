@@ -2,7 +2,7 @@
 % Please edit documentation in R/format_apply.R
 \name{fputn}
 \alias{fputn}
-\title{Apply Numeric Format by Name (like SAS PUTN)}
+\title{Apply Numeric Format by Name (like 'SAS' PUTN)}
 \usage{
 fputn(x, format_name, ...)
 }
@@ -11,7 +11,7 @@ fputn(x, format_name, ...)
 
 \item{format_name}{Character. Name of a registered numeric format,
 or a character vector of format names (same length as \code{x}) to apply
-a different format per element (like SAS PUTN with a variable format).}
+a different format per element (like 'SAS' PUTN with a variable format).}
 
 \item{...}{Additional arguments passed to \code{\link{fput}} for expression
 labels (mapped to \code{.x1}, \code{.x2}, etc.).}
