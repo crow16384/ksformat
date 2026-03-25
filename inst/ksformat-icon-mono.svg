@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title>ksformat monochrome icon</title>
+  <desc>A monochrome icon for the ksformat package showing value ranges mapped to formatted labels.</desc>
+
+  <rect x="32" y="32" width="448" height="448" rx="88" fill="#ffffff" stroke="#111111" stroke-width="16"/>
+
+  <rect x="84" y="116" width="344" height="280" rx="32" fill="#111111"/>
+
+  <rect x="104" y="140" width="304" height="52" rx="16" fill="#ffffff"/>
+  <rect x="104" y="230" width="304" height="52" rx="16" fill="#ffffff"/>
+  <rect x="104" y="320" width="304" height="52" rx="16" fill="#ffffff"/>
+
+  <text x="125" y="173" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#111111">0-17</text>
+  <text x="125" y="263" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#111111">18-64</text>
+  <text x="125" y="353" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#111111">65+</text>
+
+  <path d="M218 166h40" stroke="#111111" stroke-width="8" stroke-linecap="round"/>
+  <path d="M218 256h40" stroke="#111111" stroke-width="8" stroke-linecap="round"/>
+  <path d="M218 346h40" stroke="#111111" stroke-width="8" stroke-linecap="round"/>
+
+  <text x="290" y="173" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#111111">Child</text>
+  <text x="290" y="263" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#111111">Adult</text>
+  <text x="290" y="353" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#111111">Senior</text>
+
+  <path d="M88 208c-14 0-24-10-24-24v-28c0-14 10-24 24-24" fill="none" stroke="#111111" stroke-width="10" stroke-linecap="round"/>
+  <path d="M88 304c-14 0-24 10-24 24v28c0 14 10 24 24 24" fill="none" stroke="#111111" stroke-width="10" stroke-linecap="round"/>
+  <path d="M424 132c14 0 24 10 24 24v28c0 14-10 24-24 24" fill="none" stroke="#111111" stroke-width="10" stroke-linecap="round"/>
+  <path d="M424 380c14 0 24-10 24-24v-28c0-14-10-24-24-24" fill="none" stroke="#111111" stroke-width="10" stroke-linecap="round"/>
+
+  <rect x="102" y="410" width="120" height="40" rx="12" fill="#111111"/>
+  <text x="162" y="437" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#ffffff">ks</text>
+
+  <rect x="290" y="410" width="120" height="40" rx="12" fill="#111111"/>
+  <text x="350" y="437" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#ffffff">fmt</text>
+</svg>
