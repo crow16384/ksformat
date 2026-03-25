@@ -11,6 +11,9 @@
 ^\.serena\.project$
 ^cran-comments\.md$
 ^scripts$
+^\.venv$
+^\.cursor$
+^tools$
 
 ^doc$
 ^Meta$
