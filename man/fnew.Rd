@@ -10,7 +10,8 @@ fnew(
   type = "auto",
   default = NULL,
   multilabel = FALSE,
-  ignore_case = FALSE
+  ignore_case = FALSE,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -34,6 +35,9 @@ ranges where a single value can match multiple labels. Used with
 
 \item{ignore_case}{Logical. If \code{TRUE}, key matching for character formats
 is case-insensitive. Default \code{FALSE}.}
+
+\item{verbose}{Logical. If \code{TRUE}, returns the format object visibly;
+otherwise returns it invisibly. Default \code{FALSE}.}
 }
 \value{
 An object of class \code{"ks_format"} containing the format definition.

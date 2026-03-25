@@ -398,18 +398,61 @@ fputc("m", "sex_nc")
 
 fclear()
 
-## ----expr-sprintf-------------------------------------------------------------
-stat_fmt <- fnew(
-  "n"   = "sprintf('%s', .x1)",
-  "pct" = "sprintf('%.1f%%', .x1 * 100)",
+## ----expressions with argument------------------------------------------------
+n.trt <- data.frame(pop = c("fas","pps","saf"), ntot = c(34, 30, 36))
+get_n <- function(pop) {
+  n.trt$ntot[n.trt$pop == pop]
+}
+
+# multyline expressions are valid!
+fnew(
+  "n_fas" = e("get_n('fas')"), # evaluate!
+  "n_pps" = e("get_n('pps')"), # evaluate!
+  "n_saf" = e("get_n('saf')"), # evaluate!
+  "n"   = "sprintf('%d', .x1)",
+  "n_pct_fas" = "sprintf('%d (%5.1f%%)', .x1, .x1 * 100 / get_n('fas'))",
+  "n_pct_pps" = "sprintf('%d (%5.1f%%)', .x1, .x1 * 100 / get_n('pps'))",
+  "n_pct_saf" = "sprintf('%d (%5.1f%%)', .x1, .x1 * 100 / get_n('saf'))",
+  "pct" = "dplyr::case_when(
+               .x1>0 & .x1<0.1 ~ sprintf('%5s', ' <0.1%'),
+               .x1>=0.1 | .x1==0 ~ sprintf(paste0('%5.', 1 ,'f%%'), .x1)
+           )",
+  "pval"   = "dplyr::case_when(
+                .x1>=0 & .x1<0.001 ~ sprintf('%s', '<0.001'),
+                .x1>=0.001 & .x1<=0.999 ~ sprintf(paste0('%.', 3 ,'f'), .x1),
+                .x1>0.999 ~ sprintf('%s', '>0.999'), .default = '--'
+           )",
   name = "stat",
   type = "character"
 )
 
-types  <- c("n",  "pct",  "n",   "pct")
-values <- c(42,   0.053,  100,   0.255)
+# or equivalent
+# multyline expressions are not parsed in such form!
+fmt <- '
+  VALUE stat_01 (character)
+     "n_fas" = "get_n(\'fas\')" (eval)
+     "n_pps" = "get_n(\'pps\')" (eval)
+     "n_saf" = "get_n(\'saf\')" (eval)
+     "n"     = "sprintf(\'%d\', .x1)"
+     "pct"   = "dplyr::case_when(.x1>0 & .x1<0.1 ~ sprintf(\'%5s\', \' <0.1%\'), .x1>=0.1 | .x1==0 ~ sprintf(paste0(\'%5.\', 1 ,\'f%%\'), .x1))"
+     "n_pct_fas" = "sprintf(\'%d (%5.1f%%)\', .x1, .x1 * 100 / get_n(\'fas\'))"
+     "n_pct_pps" = "sprintf(\'%d (%5.1f%%)\', .x1, .x1 * 100 / get_n(\'pps\'))"
+     "n_pct_saf" = "sprintf(\'%d (%5.1f%%)\', .x1, .x1 * 100 / get_n(\'saf\'))"
+     "pval"  = "dplyr::case_when(.x1>=0 & .x1<0.001 ~ sprintf(\'%s\', \'<0.001\'), .x1>=0.001 & .x1<=0.999 ~ sprintf(paste0(\'%.\', 3 ,\'f\'), .x1), .x1>0.999 ~ sprintf(\'%s\', \'>0.999\'), .default = \'--\')"
+;'
+fparse(fmt)
 
-fput(types, stat_fmt, values)
+df <- data.frame(
+  types = c("n_fas", "n_pps", "n_saf", "n","pct","pct","n", "pval","pval",
+            "n_pct_fas", "n_pct_pps", "n_pct_saf"),
+  values = c(NA, NA, NA, 42,0.053,0.0008, 100, 0.255, 0.0003, 22, 22, 22)
+)
+
+df$fmt <- fput(df$types, "stat", df$values)
+print(df)
+
+df$fmt_01 <- fput(df$types, "stat_01", df$values)
+print(df)
 
 ## ----expr-twoargs-------------------------------------------------------------
 ratio_fmt <- fnew(

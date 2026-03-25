@@ -20,6 +20,8 @@
 #'   \code{\link{fput_all}} to retrieve all matching labels. Default \code{FALSE}.
 #' @param ignore_case Logical. If \code{TRUE}, key matching for character formats
 #'   is case-insensitive. Default \code{FALSE}.
+#' @param verbose Logical. If \code{TRUE}, returns the format object visibly;
+#'   otherwise returns it invisibly. Default \code{FALSE}.
 #'
 #' @return An object of class \code{"ks_format"} containing the format definition.
 #'   The object is also stored in the format library if \code{name} is given.
@@ -77,7 +79,7 @@
 #' fput_all(c(3, 14, 25, 70), "age_categories")
 #' fclear()
 fnew <- function(..., name = NULL, type = "auto", default = NULL,
-                 multilabel = FALSE, ignore_case = FALSE) {
+                 multilabel = FALSE, ignore_case = FALSE, verbose = FALSE) {
   type <- match.arg(type, c("auto", "character", "numeric"))
   if (!is.null(name)) {
     if (!is.character(name) || length(name) != 1L || is.na(name) || !nzchar(name)) {
@@ -139,7 +141,7 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
   # Auto-register in library if named
   .format_register(format_obj)
 
-  format_obj
+  if (verbose) format_obj else invisible(format_obj)
 }
 
 

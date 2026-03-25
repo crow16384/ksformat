@@ -1,4 +1,4 @@
-# ksformat
+# ksformat <img src="man/figures/logo.svg" align="right" height="139" alt="ksformat logo" />
 
 [![PROC FORMAT for R](https://img.shields.io/badge/PROC%20FORMAT%20for%20R-ksformat-217346?logo=r)](https://github.com/crow16384/ksformat)
 [![GitHub](https://img.shields.io/badge/GitHub-crow16384%2Fksformat-181717?logo=github)](https://github.com/crow16384/ksformat)

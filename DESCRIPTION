@@ -1,7 +1,7 @@
 Package: ksformat
 Type: Package
 Title: 'SAS'-Style 'PROC FORMAT' for R
-Version: 1.0.0
+Version: 0.4.0
 Author: Vladimir Larchenko [aut, cre]
 Maintainer: Vladimir Larchenko <vladimir.larchenko@keystatsolutions.com>
 Authors@R: c(
