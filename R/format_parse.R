@@ -8,6 +8,9 @@
 #'   If a character vector, lines are concatenated with newlines.
 #' @param file Path to a text file containing format definitions.
 #'   Exactly one of \code{text} or \code{file} must be provided.
+#' @param verbose Logical. If \code{TRUE}, the parsed formats are
+#'   printed to the console.  Default is \code{FALSE} to suppress output
+#'   (the result is returned invisibly).
 #'
 #' @return A named list of \code{ks_format} and/or \code{ks_invalue} objects.
 #'   Names correspond to the format names defined in the text.
@@ -112,7 +115,7 @@
 #' ')
 #' fput_all(c(2, 5, 9), "risk")
 #' fclear()
-fparse <- function(text = NULL, file = NULL) {
+fparse <- function(text = NULL, file = NULL, verbose = FALSE) {
   if (is.null(text) && is.null(file)) {
     cli_abort("Either {.arg text} or {.arg file} must be provided.")
   }
@@ -155,7 +158,7 @@ fparse <- function(text = NULL, file = NULL) {
     result[[block$name]] <- obj
   }
 
-  result
+  if (verbose) result else invisible(result)
 }
 
 
@@ -676,8 +679,8 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
 
     # Check for block start: VALUE or INVALUE
     block_match <- regmatches(line, regexec(
-      "^(VALUE|INVALUE)\\s+(\\w+)\\s*(?:\\(([^)]+)\\))?\\s*$",
-      line, ignore.case = TRUE
+      "^(VALUE|INVALUE)\\s+([\\w.-]+)\\s*(?:\\(([^)]+)\\))?\\s*$",
+      line, ignore.case = TRUE, perl = TRUE
     ))[[1]]
 
     if (length(block_match) >= 3) {
@@ -740,8 +743,18 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
       next
     }
 
-    # Check for block end
-    if (grepl("^;", line)) {
+    # Warn if line looks like a block header but didn't match
+    if (!in_block && grepl("^(VALUE|INVALUE)\\b", line, ignore.case = TRUE)) {
+      cli_warn(c(
+        "Line {i}: Looks like a block header but could not be parsed: {.val {line}}",
+        "i" = "Check the format name or syntax."
+      ))
+      next
+    }
+
+    # Check for block end (standalone ; or trailing ;)
+    ends_with_semi <- grepl(";\\s*$", line)
+    if (grepl("^;\\s*$", line)) {
       if (in_block && !is.null(current_block)) {
         blocks <- c(blocks, list(current_block))
         current_block <- NULL
@@ -750,11 +763,25 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
       next
     }
 
+    # Warn about lines outside any block
+    if (!in_block) {
+      cli_warn("Line {i}: Ignoring line outside of any block: {.val {line}}")
+      next
+    }
+
     # Parse mapping line within a block
-    if (in_block && !is.null(current_block)) {
-      entry <- .parse_mapping_line(line, i)
+    if (!is.null(current_block)) {
+      # Strip trailing comma and/or semicolon from mapping lines
+      mapping_line <- sub("[,;]+\\s*$", "", line)
+      entry <- .parse_mapping_line(mapping_line, i)
       if (!is.null(entry)) {
         current_block$entries <- c(current_block$entries, list(entry))
+      }
+      # Close block if line ended with ;
+      if (ends_with_semi) {
+        blocks <- c(blocks, list(current_block))
+        current_block <- NULL
+        in_block <- FALSE
       }
     }
   }

@@ -459,6 +459,26 @@ test_that("fparse errors with no input", {
   expect_error(fparse(), "Either .text. or .file. must be provided")
 })
 
+test_that("fparse handles hyphenated format names", {
+  fclear()
+  txt <- '
+VALUE 014-001
+  "M" = "Male",
+  "F" = "Female",
+  .missing = "No sex";
+'
+  result <- fparse(text = txt)
+  expect_length(result, 1)
+  expect_s3_class(result[["014-001"]], "ks_format")
+  expect_equal(result[["014-001"]]$mappings[["M"]], "Male")
+
+  # Verify auto-registration
+  out <- fput(c("M", "F", ""), "014-001")
+  expect_equal(out, c("Male", "Female", "No sex"))
+
+  fclear()
+})
+
 test_that("fparse errors with both inputs", {
   expect_error(
     fparse(text = "x", file = "y"),

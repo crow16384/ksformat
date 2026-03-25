@@ -4,7 +4,7 @@
 \alias{fparse}
 \title{Parse Format Definitions from 'SAS'-like Text}
 \usage{
-fparse(text = NULL, file = NULL)
+fparse(text = NULL, file = NULL, verbose = FALSE)
 }
 \arguments{
 \item{text}{Character string or character vector containing format definitions.
@@ -12,6 +12,10 @@ If a character vector, lines are concatenated with newlines.}
 
 \item{file}{Path to a text file containing format definitions.
 Exactly one of \code{text} or \code{file} must be provided.}
+
+\item{verbose}{Logical. If \code{TRUE}, the parsed formats are
+printed to the console.  Default is \code{FALSE} to suppress output
+(the result is returned invisibly).}
 }
 \value{
 A named list of \code{ks_format} and/or \code{ks_invalue} objects.
