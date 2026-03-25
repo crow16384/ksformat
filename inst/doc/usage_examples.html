@@ -340,6 +340,49 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
+<p><svg id="svg_253320c67275e1fcccc9" align="right" height="120" alt="ksformat logo" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title>ksformat hex icon</title>
+  <desc>A hex sticker style icon for the ksformat package with a formatting pipeline from values to labels.</desc>
+  <defs>
+    <linearGradient id="svg_253320c67275e1fcccc9_hexbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f7f3ec"></stop>
+      <stop offset="100%" stop-color="#e7dcc8"></stop>
+    </linearGradient>
+    <linearGradient id="svg_253320c67275e1fcccc9_panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#264760"></stop>
+      <stop offset="100%" stop-color="#163246"></stop>
+    </linearGradient>
+  </defs>
+
+  <path d="M256 26 430 122v268L256 486 82 390V122L256 26Z" fill="url(#hexbg)" stroke="#173147" stroke-width="18" stroke-linejoin="round" />
+  <path d="M256 62 399 141v230L256 450 113 371V141L256 62Z" fill="none" stroke="#d59b3d" stroke-width="8" stroke-linejoin="round" opacity="0.95" />
+
+  <rect x="112" y="142" width="288" height="196" rx="28" fill="url(#panel)" />
+
+  <rect x="134" y="164" width="244" height="42" rx="14" fill="#f8f5ef" />
+  <rect x="134" y="218" width="244" height="42" rx="14" fill="#f8f5ef" />
+  <rect x="134" y="272" width="244" height="42" rx="14" fill="#f8f5ef" />
+
+  <text x="150" y="191" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#173147">A</text>
+  <text x="150" y="245" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#173147">I</text>
+  <text x="150" y="299" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#173147">P</text>
+
+  <path d="M189 185h28" stroke="#d96c2c" stroke-width="8" stroke-linecap="round" />
+  <path d="M189 239h28" stroke="#d96c2c" stroke-width="8" stroke-linecap="round" />
+  <path d="M189 293h28" stroke="#d96c2c" stroke-width="8" stroke-linecap="round" />
+
+  <text x="234" y="191" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#173147">Active</text>
+  <text x="234" y="245" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#173147">Inactive</text>
+  <text x="234" y="299" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#173147">Pending</text>
+
+  <path d="M118 213c-10 0-18-8-18-18v-14c0-10 8-18 18-18" fill="none" stroke="#f1a340" stroke-width="8" stroke-linecap="round" />
+  <path d="M394 163c10 0 18 8 18 18v14c0 10-8 18-18 18" fill="none" stroke="#f1a340" stroke-width="8" stroke-linecap="round" />
+  <path d="M118 265c-10 0-18 8-18 18v14c0 10 8 18 18 18" fill="none" stroke="#f1a340" stroke-width="8" stroke-linecap="round" />
+  <path d="M394 317c10 0 18-8 18-18v-14c0-10-8-18-18-18" fill="none" stroke="#f1a340" stroke-width="8" stroke-linecap="round" />
+
+  <rect x="138" y="356" width="236" height="58" rx="18" fill="#f8f5ef" stroke="#d8c6ad" stroke-width="4" />
+  <text x="256" y="394" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" fill="#173147">ksformat</text>
+</svg></p>
 <p>The <strong>ksformat</strong> package provides SAS PROC FORMAT-like
 functionality for R. This vignette walks through the most common use
 cases.</p>
@@ -354,37 +397,30 @@ cases.</p>
 <span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>  <span class="at">.other =</span> <span class="st">&quot;Other Gender&quot;</span>,</span>
 <span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">&quot;sex&quot;</span></span>
 <span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>)</span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#&gt; KS Format:sex</span></span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co">#&gt; Type: character </span></span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#&gt; Mappings:</span></span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="co">#&gt;   M =&gt; Male</span></span>
-<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co">#&gt;   F =&gt; Female</span></span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co">#&gt;   .missing =&gt; Unknown</span></span>
-<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="co">#&gt;   .other =&gt; Other Gender</span></span>
-<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a>gender_codes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>, <span class="st">&quot;M&quot;</span>, <span class="cn">NA</span>, <span class="st">&quot;X&quot;</span>, <span class="st">&quot;F&quot;</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a>formatted_genders <span class="ot">&lt;-</span> <span class="fu">fput</span>(gender_codes, <span class="st">&quot;sex&quot;</span>)</span>
-<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
-<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a>  <span class="at">code =</span> gender_codes,</span>
-<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a>  <span class="at">label =</span> formatted_genders</span>
-<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a>)</span>
-<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a><span class="co">#&gt;   code        label</span></span>
-<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a><span class="co">#&gt; 1    M         Male</span></span>
-<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a><span class="co">#&gt; 2    F       Female</span></span>
-<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a><span class="co">#&gt; 3    M         Male</span></span>
-<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a><span class="co">#&gt; 4 &lt;NA&gt;      Unknown</span></span>
-<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a><span class="co">#&gt; 5    X Other Gender</span></span>
-<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a><span class="co">#&gt; 6    F       Female</span></span>
-<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a></span>
-<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a><span class="fu">fprint</span>(<span class="st">&quot;sex&quot;</span>)</span>
-<span id="cb1-32"><a href="#cb1-32" tabindex="-1"></a><span class="co">#&gt; KS Format:sex</span></span>
-<span id="cb1-33"><a href="#cb1-33" tabindex="-1"></a><span class="co">#&gt; Type: character </span></span>
-<span id="cb1-34"><a href="#cb1-34" tabindex="-1"></a><span class="co">#&gt; Mappings:</span></span>
-<span id="cb1-35"><a href="#cb1-35" tabindex="-1"></a><span class="co">#&gt;   M =&gt; Male</span></span>
-<span id="cb1-36"><a href="#cb1-36" tabindex="-1"></a><span class="co">#&gt;   F =&gt; Female</span></span>
-<span id="cb1-37"><a href="#cb1-37" tabindex="-1"></a><span class="co">#&gt;   .missing =&gt; Unknown</span></span>
-<span id="cb1-38"><a href="#cb1-38" tabindex="-1"></a><span class="co">#&gt;   .other =&gt; Other Gender</span></span></code></pre></div>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>gender_codes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>, <span class="st">&quot;M&quot;</span>, <span class="cn">NA</span>, <span class="st">&quot;X&quot;</span>, <span class="st">&quot;F&quot;</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>formatted_genders <span class="ot">&lt;-</span> <span class="fu">fput</span>(gender_codes, <span class="st">&quot;sex&quot;</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>  <span class="at">code =</span> gender_codes,</span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>  <span class="at">label =</span> formatted_genders</span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>)</span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="co">#&gt;   code        label</span></span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="co">#&gt; 1    M         Male</span></span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="co">#&gt; 2    F       Female</span></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="co">#&gt; 3    M         Male</span></span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="co">#&gt; 4 &lt;NA&gt;      Unknown</span></span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="co">#&gt; 5    X Other Gender</span></span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="co">#&gt; 6    F       Female</span></span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a><span class="fu">fprint</span>(<span class="st">&quot;sex&quot;</span>)</span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a><span class="co">#&gt; KS Format:sex</span></span>
+<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a><span class="co">#&gt; Type: character </span></span>
+<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a><span class="co">#&gt; Mappings:</span></span>
+<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a><span class="co">#&gt;   M =&gt; Male</span></span>
+<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a><span class="co">#&gt;   F =&gt; Female</span></span>
+<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a><span class="co">#&gt;   .missing =&gt; Unknown</span></span>
+<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a><span class="co">#&gt;   .other =&gt; Other Gender</span></span></code></pre></div>
 </div>
 <div id="example-2-numeric-range-formatting" class="section level2">
 <h2>Example 2: Numeric Range Formatting</h2>
@@ -397,32 +433,24 @@ cases.</p>
 <span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="st">  .missing    = &quot;Age Unknown&quot;</span></span>
 <span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="st">;</span></span>
 <span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="st">&#39;</span>)</span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; $age</span></span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; KS Format:age</span></span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt; Type: numeric </span></span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; Mappings:</span></span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt;   [0, 18) =&gt; Child</span></span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt;   [18, 65) =&gt; Adult</span></span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt;   [65, HIGH] =&gt; Senior</span></span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt;   .missing =&gt; Age Unknown</span></span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a></span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>ages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="fl">15.3</span>, <span class="fl">17.9</span>, <span class="dv">18</span>, <span class="dv">45</span>, <span class="fl">64.99</span>, <span class="dv">65</span>, <span class="dv">85</span>, <span class="cn">NA</span>)</span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>age_groups <span class="ot">&lt;-</span> <span class="fu">fputn</span>(ages, <span class="st">&quot;age&quot;</span>)</span>
-<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a></span>
-<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
-<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a>  <span class="at">age =</span> ages,</span>
-<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a>  <span class="at">group =</span> age_groups</span>
-<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a>)</span>
-<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a><span class="co">#&gt;     age       group</span></span>
-<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a><span class="co">#&gt; 1  5.00       Child</span></span>
-<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a><span class="co">#&gt; 2 15.30       Child</span></span>
-<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a><span class="co">#&gt; 3 17.90       Child</span></span>
-<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a><span class="co">#&gt; 4 18.00       Adult</span></span>
-<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a><span class="co">#&gt; 5 45.00       Adult</span></span>
-<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a><span class="co">#&gt; 6 64.99       Adult</span></span>
-<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a><span class="co">#&gt; 7 65.00      Senior</span></span>
-<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a><span class="co">#&gt; 8 85.00      Senior</span></span>
-<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a><span class="co">#&gt; 9    NA Age Unknown</span></span></code></pre></div>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>ages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="fl">15.3</span>, <span class="fl">17.9</span>, <span class="dv">18</span>, <span class="dv">45</span>, <span class="fl">64.99</span>, <span class="dv">65</span>, <span class="dv">85</span>, <span class="cn">NA</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>age_groups <span class="ot">&lt;-</span> <span class="fu">fputn</span>(ages, <span class="st">&quot;age&quot;</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>  <span class="at">age =</span> ages,</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>  <span class="at">group =</span> age_groups</span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>)</span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt;     age       group</span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; 1  5.00       Child</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt; 2 15.30       Child</span></span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="co">#&gt; 3 17.90       Child</span></span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt; 4 18.00       Adult</span></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&gt; 5 45.00       Adult</span></span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="co">#&gt; 6 64.99       Adult</span></span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="co">#&gt; 7 65.00      Senior</span></span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a><span class="co">#&gt; 8 85.00      Senior</span></span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a><span class="co">#&gt; 9    NA Age Unknown</span></span></code></pre></div>
 </div>
 <div id="example-3-decimal-ranges-bmi-categories" class="section level2">
 <h2>Example 3: Decimal Ranges (BMI Categories)</h2>
@@ -435,31 +463,22 @@ cases.</p>
 <span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="st">  .missing     = &quot;No data&quot;</span></span>
 <span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="st">;</span></span>
 <span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="st">&#39;</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; $bmi</span></span>
-<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; KS Format:bmi</span></span>
-<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; Type: numeric </span></span>
-<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt; Mappings:</span></span>
-<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt;   [0, 18.5) =&gt; Underweight</span></span>
-<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt;   [18.5, 25) =&gt; Normal</span></span>
-<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt;   [25, 30) =&gt; Overweight</span></span>
-<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt;   [30, HIGH] =&gt; Obese</span></span>
-<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt;   .missing =&gt; No data</span></span>
-<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a></span>
-<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a>bmi_values <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">16.2</span>, <span class="fl">18.5</span>, <span class="fl">22.7</span>, <span class="dv">25</span>, <span class="fl">29.9</span>, <span class="fl">35.1</span>, <span class="cn">NA</span>)</span>
-<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a>bmi_labels <span class="ot">&lt;-</span> <span class="fu">fputn</span>(bmi_values, <span class="st">&quot;bmi&quot;</span>)</span>
-<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a></span>
-<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
-<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a>  <span class="at">bmi =</span> bmi_values,</span>
-<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a>  <span class="at">category =</span> bmi_labels</span>
-<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a>)</span>
-<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a><span class="co">#&gt;    bmi    category</span></span>
-<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a><span class="co">#&gt; 1 16.2 Underweight</span></span>
-<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a><span class="co">#&gt; 2 18.5      Normal</span></span>
-<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a><span class="co">#&gt; 3 22.7      Normal</span></span>
-<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a><span class="co">#&gt; 4 25.0  Overweight</span></span>
-<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a><span class="co">#&gt; 5 29.9  Overweight</span></span>
-<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a><span class="co">#&gt; 6 35.1       Obese</span></span>
-<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a><span class="co">#&gt; 7   NA     No data</span></span></code></pre></div>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>bmi_values <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">16.2</span>, <span class="fl">18.5</span>, <span class="fl">22.7</span>, <span class="dv">25</span>, <span class="fl">29.9</span>, <span class="fl">35.1</span>, <span class="cn">NA</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>bmi_labels <span class="ot">&lt;-</span> <span class="fu">fputn</span>(bmi_values, <span class="st">&quot;bmi&quot;</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>  <span class="at">bmi =</span> bmi_values,</span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>  <span class="at">category =</span> bmi_labels</span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a>)</span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt;    bmi    category</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt; 1 16.2 Underweight</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt; 2 18.5      Normal</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt; 3 22.7      Normal</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt; 4 25.0  Overweight</span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt; 5 29.9  Overweight</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt; 6 35.1       Obese</span></span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt; 7   NA     No data</span></span></code></pre></div>
 </div>
 <div id="example-4-exclusiveinclusive-bounds" class="section level2">
 <h2>Example 4: Exclusive/Inclusive Bounds</h2>
@@ -470,28 +489,21 @@ cases.</p>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="st">  .other     = &quot;Out of range&quot;</span></span>
 <span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="st">;</span></span>
 <span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="st">&#39;</span>)</span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; $score</span></span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; KS Format:score</span></span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; Type: numeric </span></span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; Mappings:</span></span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;   (0, 50] =&gt; Low</span></span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt;   (50, 100] =&gt; High</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt;   .other =&gt; Out of range</span></span>
-<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a></span>
-<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>scores <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">50</span>, <span class="dv">51</span>, <span class="dv">100</span>, <span class="dv">101</span>)</span>
-<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>score_labels <span class="ot">&lt;-</span> <span class="fu">fputn</span>(scores, <span class="st">&quot;score&quot;</span>)</span>
-<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a></span>
-<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
-<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>  <span class="at">score =</span> scores,</span>
-<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>  <span class="at">label =</span> score_labels</span>
-<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a>)</span>
-<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="co">#&gt;   score        label</span></span>
-<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a><span class="co">#&gt; 1     0 Out of range</span></span>
-<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a><span class="co">#&gt; 2     1          Low</span></span>
-<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="co">#&gt; 3    50          Low</span></span>
-<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a><span class="co">#&gt; 4    51         High</span></span>
-<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a><span class="co">#&gt; 5   100         High</span></span>
-<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a><span class="co">#&gt; 6   101 Out of range</span></span></code></pre></div>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>scores <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">50</span>, <span class="dv">51</span>, <span class="dv">100</span>, <span class="dv">101</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>score_labels <span class="ot">&lt;-</span> <span class="fu">fputn</span>(scores, <span class="st">&quot;score&quot;</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>  <span class="at">score =</span> scores,</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>  <span class="at">label =</span> score_labels</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>)</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt;   score        label</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; 1     0 Out of range</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt; 2     1          Low</span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt; 3    50          Low</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt; 4    51         High</span></span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="co">#&gt; 5   100         High</span></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="co">#&gt; 6   101 Out of range</span></span></code></pre></div>
 </div>
 <div id="example-5-reverse-formatting-with-invalue" class="section level2">
 <h2>Example 5: Reverse Formatting with Invalue</h2>
@@ -570,34 +582,18 @@ once:</p>
 <span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="st">  &quot;Asian&quot; = 3</span></span>
 <span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="st">;</span></span>
 <span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="st">&#39;</span>)</span>
-<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="co">#&gt; $race</span></span>
-<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="co">#&gt; KS Format:race</span></span>
-<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt; Type: character </span></span>
-<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co">#&gt; Mappings:</span></span>
-<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="co">#&gt;   W =&gt; White</span></span>
-<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co">#&gt;   B =&gt; Black</span></span>
-<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="co">#&gt;   A =&gt; Asian</span></span>
-<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="co">#&gt;   .missing =&gt; Unknown</span></span>
-<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a><span class="co">#&gt; $race_inv</span></span>
-<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a><span class="co">#&gt; KS Invalue: race_inv </span></span>
-<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a><span class="co">#&gt; Target Type: numeric </span></span>
-<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a><span class="co">#&gt; Mappings:</span></span>
-<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a><span class="co">#&gt;   White =&gt; 1</span></span>
-<span id="cb7-31"><a href="#cb7-31" tabindex="-1"></a><span class="co">#&gt;   Black =&gt; 2</span></span>
-<span id="cb7-32"><a href="#cb7-32" tabindex="-1"></a><span class="co">#&gt;   Asian =&gt; 3</span></span>
-<span id="cb7-33"><a href="#cb7-33" tabindex="-1"></a></span>
-<span id="cb7-34"><a href="#cb7-34" tabindex="-1"></a><span class="fu">fprint</span>()</span>
-<span id="cb7-35"><a href="#cb7-35" tabindex="-1"></a><span class="co">#&gt; Registered formats:</span></span>
-<span id="cb7-36"><a href="#cb7-36" tabindex="-1"></a><span class="co">#&gt;   age - VALUE (numeric), 3 mapping(s)</span></span>
-<span id="cb7-37"><a href="#cb7-37" tabindex="-1"></a><span class="co">#&gt;   bmi - VALUE (numeric), 4 mapping(s)</span></span>
-<span id="cb7-38"><a href="#cb7-38" tabindex="-1"></a><span class="co">#&gt;   race - VALUE (character), 3 mapping(s)</span></span>
-<span id="cb7-39"><a href="#cb7-39" tabindex="-1"></a><span class="co">#&gt;   race_inv - INVALUE (numeric), 3 mapping(s)</span></span>
-<span id="cb7-40"><a href="#cb7-40" tabindex="-1"></a><span class="co">#&gt;   score - VALUE (numeric), 2 mapping(s)</span></span>
-<span id="cb7-41"><a href="#cb7-41" tabindex="-1"></a><span class="co">#&gt;   sex - VALUE (character), 2 mapping(s)</span></span>
-<span id="cb7-42"><a href="#cb7-42" tabindex="-1"></a><span class="co">#&gt;   sex_inv - INVALUE (numeric), 2 mapping(s)</span></span>
-<span id="cb7-43"><a href="#cb7-43" tabindex="-1"></a><span class="co">#&gt;   status - VALUE (character), 3 mapping(s)</span></span>
-<span id="cb7-44"><a href="#cb7-44" tabindex="-1"></a><span class="co">#&gt;   status_inv - INVALUE (character), 3 mapping(s)</span></span></code></pre></div>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="fu">fprint</span>()</span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt; Registered formats:</span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co">#&gt;   age - VALUE (numeric), 3 mapping(s)</span></span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="co">#&gt;   bmi - VALUE (numeric), 4 mapping(s)</span></span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co">#&gt;   race - VALUE (character), 3 mapping(s)</span></span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="co">#&gt;   race_inv - INVALUE (numeric), 3 mapping(s)</span></span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="co">#&gt;   score - VALUE (numeric), 2 mapping(s)</span></span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a><span class="co">#&gt;   sex - VALUE (character), 2 mapping(s)</span></span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a><span class="co">#&gt;   sex_inv - INVALUE (numeric), 2 mapping(s)</span></span>
+<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a><span class="co">#&gt;   status - VALUE (character), 3 mapping(s)</span></span>
+<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a><span class="co">#&gt;   status_inv - INVALUE (character), 3 mapping(s)</span></span></code></pre></div>
 </div>
 <div id="example-8-export-formats-back-to-text" class="section level2">
 <h2>Example 8: Export Formats Back to Text</h2>
@@ -693,12 +689,12 @@ once:</p>
 <span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a>  )</span>
 <span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a>)</span>
 <span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a><span class="co">#&gt;      format         result</span></span>
-<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a><span class="co">#&gt; 1    DATE9.      21MAR2026</span></span>
-<span id="cb12-19"><a href="#cb12-19" tabindex="-1"></a><span class="co">#&gt; 2 MMDDYY10.     03/21/2026</span></span>
-<span id="cb12-20"><a href="#cb12-20" tabindex="-1"></a><span class="co">#&gt; 3 DDMMYY10.     21/03/2026</span></span>
-<span id="cb12-21"><a href="#cb12-21" tabindex="-1"></a><span class="co">#&gt; 4 YYMMDD10.     2026-03-21</span></span>
+<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a><span class="co">#&gt; 1    DATE9.      26MAR2026</span></span>
+<span id="cb12-19"><a href="#cb12-19" tabindex="-1"></a><span class="co">#&gt; 2 MMDDYY10.     03/26/2026</span></span>
+<span id="cb12-20"><a href="#cb12-20" tabindex="-1"></a><span class="co">#&gt; 3 DDMMYY10.     26/03/2026</span></span>
+<span id="cb12-21"><a href="#cb12-21" tabindex="-1"></a><span class="co">#&gt; 4 YYMMDD10.     2026-03-26</span></span>
 <span id="cb12-22"><a href="#cb12-22" tabindex="-1"></a><span class="co">#&gt; 5   MONYY7.        MAR2026</span></span>
-<span id="cb12-23"><a href="#cb12-23" tabindex="-1"></a><span class="co">#&gt; 6 WORDDATE. March 21, 2026</span></span>
+<span id="cb12-23"><a href="#cb12-23" tabindex="-1"></a><span class="co">#&gt; 6 WORDDATE. March 26, 2026</span></span>
 <span id="cb12-24"><a href="#cb12-24" tabindex="-1"></a><span class="co">#&gt; 7    YEAR4.           2026</span></span>
 <span id="cb12-25"><a href="#cb12-25" tabindex="-1"></a><span class="co">#&gt; 8      QTR.              1</span></span>
 <span id="cb12-26"><a href="#cb12-26" tabindex="-1"></a></span>
@@ -748,10 +744,10 @@ once:</p>
 <span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a>  )</span>
 <span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a>)</span>
 <span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a><span class="co">#&gt;        format             result</span></span>
-<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a><span class="co">#&gt; 1 DATETIME20. 21MAR2026:13:35:59</span></span>
-<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a><span class="co">#&gt; 2 DATETIME13.      21MAR26:13:35</span></span>
-<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a><span class="co">#&gt; 3     DTDATE.          21MAR2026</span></span>
-<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a><span class="co">#&gt; 4   DTYYMMDD.         2026-03-21</span></span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a><span class="co">#&gt; 1 DATETIME20. 26MAR2026:00:52:37</span></span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a><span class="co">#&gt; 2 DATETIME13.      26MAR26:00:52</span></span>
+<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a><span class="co">#&gt; 3     DTDATE.          26MAR2026</span></span>
+<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a><span class="co">#&gt; 4   DTYYMMDD.         2026-03-26</span></span>
 <span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a></span>
 <span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a><span class="co"># From numeric R-epoch seconds</span></span>
 <span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a>r_secs <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">as.POSIXct</span>(<span class="st">&quot;2025-06-15 14:30:00&quot;</span>, <span class="at">tz =</span> <span class="st">&quot;UTC&quot;</span>))</span>
@@ -824,39 +820,24 @@ once:</p>
 <span id="cb18-12"><a href="#cb18-12" tabindex="-1"></a><span class="st">  pattern = &quot;DATETIME20.&quot;</span></span>
 <span id="cb18-13"><a href="#cb18-13" tabindex="-1"></a><span class="st">;</span></span>
 <span id="cb18-14"><a href="#cb18-14" tabindex="-1"></a><span class="st">&#39;</span>)</span>
-<span id="cb18-15"><a href="#cb18-15" tabindex="-1"></a><span class="co">#&gt; $enrldt</span></span>
-<span id="cb18-16"><a href="#cb18-16" tabindex="-1"></a><span class="co">#&gt; KS Format:enrldt</span></span>
-<span id="cb18-17"><a href="#cb18-17" tabindex="-1"></a><span class="co">#&gt; Type: date </span></span>
-<span id="cb18-18"><a href="#cb18-18" tabindex="-1"></a><span class="co">#&gt; Pattern: %d%b%Y (DATE9.) </span></span>
-<span id="cb18-19"><a href="#cb18-19" tabindex="-1"></a><span class="co">#&gt;   .missing =&gt; Not Enrolled</span></span>
-<span id="cb18-20"><a href="#cb18-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb18-21"><a href="#cb18-21" tabindex="-1"></a><span class="co">#&gt; $visit_time</span></span>
-<span id="cb18-22"><a href="#cb18-22" tabindex="-1"></a><span class="co">#&gt; KS Format:visit_time</span></span>
-<span id="cb18-23"><a href="#cb18-23" tabindex="-1"></a><span class="co">#&gt; Type: time </span></span>
-<span id="cb18-24"><a href="#cb18-24" tabindex="-1"></a><span class="co">#&gt; Pattern: %_H:%M:%S (TIME8.) </span></span>
-<span id="cb18-25"><a href="#cb18-25" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb18-26"><a href="#cb18-26" tabindex="-1"></a><span class="co">#&gt; $stamp</span></span>
-<span id="cb18-27"><a href="#cb18-27" tabindex="-1"></a><span class="co">#&gt; KS Format:stamp</span></span>
-<span id="cb18-28"><a href="#cb18-28" tabindex="-1"></a><span class="co">#&gt; Type: datetime </span></span>
-<span id="cb18-29"><a href="#cb18-29" tabindex="-1"></a><span class="co">#&gt; Pattern: %d%b%Y:%H:%M:%S (DATETIME20.)</span></span>
+<span id="cb18-15"><a href="#cb18-15" tabindex="-1"></a></span>
+<span id="cb18-16"><a href="#cb18-16" tabindex="-1"></a><span class="fu">fput</span>(<span class="fu">as.Date</span>(<span class="st">&quot;2025-03-01&quot;</span>), <span class="st">&quot;enrldt&quot;</span>)</span>
+<span id="cb18-17"><a href="#cb18-17" tabindex="-1"></a><span class="co">#&gt; [1] &quot;01MAR2025&quot;</span></span>
+<span id="cb18-18"><a href="#cb18-18" tabindex="-1"></a><span class="fu">fput</span>(<span class="dv">36000</span>, <span class="st">&quot;visit_time&quot;</span>)</span>
+<span id="cb18-19"><a href="#cb18-19" tabindex="-1"></a><span class="co">#&gt; [1] &quot;10:00:00&quot;</span></span>
+<span id="cb18-20"><a href="#cb18-20" tabindex="-1"></a><span class="fu">fput</span>(<span class="fu">as.POSIXct</span>(<span class="st">&quot;2025-03-01 10:00:00&quot;</span>, <span class="at">tz =</span> <span class="st">&quot;UTC&quot;</span>), <span class="st">&quot;stamp&quot;</span>)</span>
+<span id="cb18-21"><a href="#cb18-21" tabindex="-1"></a><span class="co">#&gt; [1] &quot;01MAR2025:10:00:00&quot;</span></span>
+<span id="cb18-22"><a href="#cb18-22" tabindex="-1"></a></span>
+<span id="cb18-23"><a href="#cb18-23" tabindex="-1"></a><span class="co"># Export back to text</span></span>
+<span id="cb18-24"><a href="#cb18-24" tabindex="-1"></a>enrl_obj <span class="ot">&lt;-</span> <span class="fu">format_get</span>(<span class="st">&quot;enrldt&quot;</span>)</span>
+<span id="cb18-25"><a href="#cb18-25" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">fexport</span>(<span class="at">enrldt =</span> enrl_obj))</span>
+<span id="cb18-26"><a href="#cb18-26" tabindex="-1"></a><span class="co">#&gt; VALUE enrldt (date)</span></span>
+<span id="cb18-27"><a href="#cb18-27" tabindex="-1"></a><span class="co">#&gt;   pattern = &quot;DATE9.&quot;</span></span>
+<span id="cb18-28"><a href="#cb18-28" tabindex="-1"></a><span class="co">#&gt;   .missing = &quot;Not Enrolled&quot;</span></span>
+<span id="cb18-29"><a href="#cb18-29" tabindex="-1"></a><span class="co">#&gt; ;</span></span>
 <span id="cb18-30"><a href="#cb18-30" tabindex="-1"></a></span>
-<span id="cb18-31"><a href="#cb18-31" tabindex="-1"></a><span class="fu">fput</span>(<span class="fu">as.Date</span>(<span class="st">&quot;2025-03-01&quot;</span>), <span class="st">&quot;enrldt&quot;</span>)</span>
-<span id="cb18-32"><a href="#cb18-32" tabindex="-1"></a><span class="co">#&gt; [1] &quot;01MAR2025&quot;</span></span>
-<span id="cb18-33"><a href="#cb18-33" tabindex="-1"></a><span class="fu">fput</span>(<span class="dv">36000</span>, <span class="st">&quot;visit_time&quot;</span>)</span>
-<span id="cb18-34"><a href="#cb18-34" tabindex="-1"></a><span class="co">#&gt; [1] &quot;10:00:00&quot;</span></span>
-<span id="cb18-35"><a href="#cb18-35" tabindex="-1"></a><span class="fu">fput</span>(<span class="fu">as.POSIXct</span>(<span class="st">&quot;2025-03-01 10:00:00&quot;</span>, <span class="at">tz =</span> <span class="st">&quot;UTC&quot;</span>), <span class="st">&quot;stamp&quot;</span>)</span>
-<span id="cb18-36"><a href="#cb18-36" tabindex="-1"></a><span class="co">#&gt; [1] &quot;01MAR2025:10:00:00&quot;</span></span>
-<span id="cb18-37"><a href="#cb18-37" tabindex="-1"></a></span>
-<span id="cb18-38"><a href="#cb18-38" tabindex="-1"></a><span class="co"># Export back to text</span></span>
-<span id="cb18-39"><a href="#cb18-39" tabindex="-1"></a>enrl_obj <span class="ot">&lt;-</span> <span class="fu">format_get</span>(<span class="st">&quot;enrldt&quot;</span>)</span>
-<span id="cb18-40"><a href="#cb18-40" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">fexport</span>(<span class="at">enrldt =</span> enrl_obj))</span>
-<span id="cb18-41"><a href="#cb18-41" tabindex="-1"></a><span class="co">#&gt; VALUE enrldt (date)</span></span>
-<span id="cb18-42"><a href="#cb18-42" tabindex="-1"></a><span class="co">#&gt;   pattern = &quot;DATE9.&quot;</span></span>
-<span id="cb18-43"><a href="#cb18-43" tabindex="-1"></a><span class="co">#&gt;   .missing = &quot;Not Enrolled&quot;</span></span>
-<span id="cb18-44"><a href="#cb18-44" tabindex="-1"></a><span class="co">#&gt; ;</span></span>
-<span id="cb18-45"><a href="#cb18-45" tabindex="-1"></a></span>
-<span id="cb18-46"><a href="#cb18-46" tabindex="-1"></a><span class="fu">fclear</span>()</span>
-<span id="cb18-47"><a href="#cb18-47" tabindex="-1"></a><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
+<span id="cb18-31"><a href="#cb18-31" tabindex="-1"></a><span class="fu">fclear</span>()</span>
+<span id="cb18-32"><a href="#cb18-32" tabindex="-1"></a><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
 </div>
 </div>
 <div id="example-13-multilabel-formats" class="section level2">
@@ -877,32 +858,22 @@ labels:</p>
 <span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;numeric&quot;</span>,</span>
 <span id="cb19-11"><a href="#cb19-11" tabindex="-1"></a>  <span class="at">multilabel =</span> <span class="cn">TRUE</span></span>
 <span id="cb19-12"><a href="#cb19-12" tabindex="-1"></a>)</span>
-<span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a><span class="co">#&gt; KS Format:age_categories (multilabel)</span></span>
-<span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a><span class="co">#&gt; Type: numeric </span></span>
-<span id="cb19-15"><a href="#cb19-15" tabindex="-1"></a><span class="co">#&gt; Mappings:</span></span>
-<span id="cb19-16"><a href="#cb19-16" tabindex="-1"></a><span class="co">#&gt;   [0, 5] =&gt; Infant</span></span>
-<span id="cb19-17"><a href="#cb19-17" tabindex="-1"></a><span class="co">#&gt;   [6, 11] =&gt; Child</span></span>
-<span id="cb19-18"><a href="#cb19-18" tabindex="-1"></a><span class="co">#&gt;   [12, 17] =&gt; Adolescent</span></span>
-<span id="cb19-19"><a href="#cb19-19" tabindex="-1"></a><span class="co">#&gt;   [0, 17] =&gt; Pediatric</span></span>
-<span id="cb19-20"><a href="#cb19-20" tabindex="-1"></a><span class="co">#&gt;   [18, 64] =&gt; Adult</span></span>
-<span id="cb19-21"><a href="#cb19-21" tabindex="-1"></a><span class="co">#&gt;   [65, HIGH] =&gt; Elderly</span></span>
-<span id="cb19-22"><a href="#cb19-22" tabindex="-1"></a><span class="co">#&gt;   [18, HIGH] =&gt; Non-Pediatric</span></span>
-<span id="cb19-23"><a href="#cb19-23" tabindex="-1"></a></span>
-<span id="cb19-24"><a href="#cb19-24" tabindex="-1"></a>ages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">14</span>, <span class="dv">25</span>, <span class="dv">70</span>)</span>
-<span id="cb19-25"><a href="#cb19-25" tabindex="-1"></a></span>
-<span id="cb19-26"><a href="#cb19-26" tabindex="-1"></a><span class="co"># fput returns first match only</span></span>
-<span id="cb19-27"><a href="#cb19-27" tabindex="-1"></a><span class="fu">fput</span>(ages, <span class="st">&quot;age_categories&quot;</span>)</span>
-<span id="cb19-28"><a href="#cb19-28" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Infant&quot;     &quot;Adolescent&quot; &quot;Adult&quot;      &quot;Elderly&quot;</span></span>
-<span id="cb19-29"><a href="#cb19-29" tabindex="-1"></a></span>
-<span id="cb19-30"><a href="#cb19-30" tabindex="-1"></a><span class="co"># fput_all returns ALL matching labels</span></span>
-<span id="cb19-31"><a href="#cb19-31" tabindex="-1"></a>all_labels <span class="ot">&lt;-</span> <span class="fu">fput_all</span>(ages, <span class="st">&quot;age_categories&quot;</span>)</span>
-<span id="cb19-32"><a href="#cb19-32" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(ages)) {</span>
-<span id="cb19-33"><a href="#cb19-33" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Age&quot;</span>, ages[i], <span class="st">&quot;-&gt;&quot;</span>, <span class="fu">paste</span>(all_labels[[i]], <span class="at">collapse =</span> <span class="st">&quot;, &quot;</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb19-34"><a href="#cb19-34" tabindex="-1"></a>}</span>
-<span id="cb19-35"><a href="#cb19-35" tabindex="-1"></a><span class="co">#&gt; Age 3 -&gt; Infant, Pediatric </span></span>
-<span id="cb19-36"><a href="#cb19-36" tabindex="-1"></a><span class="co">#&gt; Age 14 -&gt; Adolescent, Pediatric </span></span>
-<span id="cb19-37"><a href="#cb19-37" tabindex="-1"></a><span class="co">#&gt; Age 25 -&gt; Adult, Non-Pediatric </span></span>
-<span id="cb19-38"><a href="#cb19-38" tabindex="-1"></a><span class="co">#&gt; Age 70 -&gt; Elderly, Non-Pediatric</span></span></code></pre></div>
+<span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a></span>
+<span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a>ages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">14</span>, <span class="dv">25</span>, <span class="dv">70</span>)</span>
+<span id="cb19-15"><a href="#cb19-15" tabindex="-1"></a></span>
+<span id="cb19-16"><a href="#cb19-16" tabindex="-1"></a><span class="co"># fput returns first match only</span></span>
+<span id="cb19-17"><a href="#cb19-17" tabindex="-1"></a><span class="fu">fput</span>(ages, <span class="st">&quot;age_categories&quot;</span>)</span>
+<span id="cb19-18"><a href="#cb19-18" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Infant&quot;     &quot;Adolescent&quot; &quot;Adult&quot;      &quot;Elderly&quot;</span></span>
+<span id="cb19-19"><a href="#cb19-19" tabindex="-1"></a></span>
+<span id="cb19-20"><a href="#cb19-20" tabindex="-1"></a><span class="co"># fput_all returns ALL matching labels</span></span>
+<span id="cb19-21"><a href="#cb19-21" tabindex="-1"></a>all_labels <span class="ot">&lt;-</span> <span class="fu">fput_all</span>(ages, <span class="st">&quot;age_categories&quot;</span>)</span>
+<span id="cb19-22"><a href="#cb19-22" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(ages)) {</span>
+<span id="cb19-23"><a href="#cb19-23" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Age&quot;</span>, ages[i], <span class="st">&quot;-&gt;&quot;</span>, <span class="fu">paste</span>(all_labels[[i]], <span class="at">collapse =</span> <span class="st">&quot;, &quot;</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb19-24"><a href="#cb19-24" tabindex="-1"></a>}</span>
+<span id="cb19-25"><a href="#cb19-25" tabindex="-1"></a><span class="co">#&gt; Age 3 -&gt; Infant, Pediatric </span></span>
+<span id="cb19-26"><a href="#cb19-26" tabindex="-1"></a><span class="co">#&gt; Age 14 -&gt; Adolescent, Pediatric </span></span>
+<span id="cb19-27"><a href="#cb19-27" tabindex="-1"></a><span class="co">#&gt; Age 25 -&gt; Adult, Non-Pediatric </span></span>
+<span id="cb19-28"><a href="#cb19-28" tabindex="-1"></a><span class="co">#&gt; Age 70 -&gt; Elderly, Non-Pediatric</span></span></code></pre></div>
 </div>
 <div id="multilabel-with-missing-values" class="section level3">
 <h3>Multilabel with Missing Values</h3>
@@ -917,27 +888,18 @@ labels:</p>
 <span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;numeric&quot;</span>,</span>
 <span id="cb20-10"><a href="#cb20-10" tabindex="-1"></a>  <span class="at">multilabel =</span> <span class="cn">TRUE</span></span>
 <span id="cb20-11"><a href="#cb20-11" tabindex="-1"></a>)</span>
-<span id="cb20-12"><a href="#cb20-12" tabindex="-1"></a><span class="co">#&gt; KS Format:score_ml (multilabel)</span></span>
-<span id="cb20-13"><a href="#cb20-13" tabindex="-1"></a><span class="co">#&gt; Type: numeric </span></span>
-<span id="cb20-14"><a href="#cb20-14" tabindex="-1"></a><span class="co">#&gt; Mappings:</span></span>
-<span id="cb20-15"><a href="#cb20-15" tabindex="-1"></a><span class="co">#&gt;   [0, 100] =&gt; Valid Score</span></span>
-<span id="cb20-16"><a href="#cb20-16" tabindex="-1"></a><span class="co">#&gt;   [0, 49] =&gt; Below Average</span></span>
-<span id="cb20-17"><a href="#cb20-17" tabindex="-1"></a><span class="co">#&gt;   [50, 100] =&gt; Above Average</span></span>
-<span id="cb20-18"><a href="#cb20-18" tabindex="-1"></a><span class="co">#&gt;   [90, 100] =&gt; Excellent</span></span>
-<span id="cb20-19"><a href="#cb20-19" tabindex="-1"></a><span class="co">#&gt;   .missing =&gt; No Score</span></span>
-<span id="cb20-20"><a href="#cb20-20" tabindex="-1"></a><span class="co">#&gt;   .other =&gt; Out of Range</span></span>
-<span id="cb20-21"><a href="#cb20-21" tabindex="-1"></a></span>
-<span id="cb20-22"><a href="#cb20-22" tabindex="-1"></a>scores <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">95</span>, <span class="dv">45</span>, <span class="cn">NA</span>, <span class="dv">150</span>)</span>
-<span id="cb20-23"><a href="#cb20-23" tabindex="-1"></a>ml_result <span class="ot">&lt;-</span> <span class="fu">fput_all</span>(scores, <span class="st">&quot;score_ml&quot;</span>)</span>
-<span id="cb20-24"><a href="#cb20-24" tabindex="-1"></a></span>
-<span id="cb20-25"><a href="#cb20-25" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(scores)) {</span>
-<span id="cb20-26"><a href="#cb20-26" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Score&quot;</span>, <span class="fu">ifelse</span>(<span class="fu">is.na</span>(scores[i]), <span class="st">&quot;NA&quot;</span>, scores[i]),</span>
-<span id="cb20-27"><a href="#cb20-27" tabindex="-1"></a>      <span class="st">&quot;-&gt;&quot;</span>, <span class="fu">paste</span>(ml_result[[i]], <span class="at">collapse =</span> <span class="st">&quot;, &quot;</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb20-28"><a href="#cb20-28" tabindex="-1"></a>}</span>
-<span id="cb20-29"><a href="#cb20-29" tabindex="-1"></a><span class="co">#&gt; Score 95 -&gt; Valid Score, Above Average, Excellent </span></span>
-<span id="cb20-30"><a href="#cb20-30" tabindex="-1"></a><span class="co">#&gt; Score 45 -&gt; Valid Score, Below Average </span></span>
-<span id="cb20-31"><a href="#cb20-31" tabindex="-1"></a><span class="co">#&gt; Score NA -&gt; No Score </span></span>
-<span id="cb20-32"><a href="#cb20-32" tabindex="-1"></a><span class="co">#&gt; Score 150 -&gt; Out of Range</span></span></code></pre></div>
+<span id="cb20-12"><a href="#cb20-12" tabindex="-1"></a></span>
+<span id="cb20-13"><a href="#cb20-13" tabindex="-1"></a>scores <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">95</span>, <span class="dv">45</span>, <span class="cn">NA</span>, <span class="dv">150</span>)</span>
+<span id="cb20-14"><a href="#cb20-14" tabindex="-1"></a>ml_result <span class="ot">&lt;-</span> <span class="fu">fput_all</span>(scores, <span class="st">&quot;score_ml&quot;</span>)</span>
+<span id="cb20-15"><a href="#cb20-15" tabindex="-1"></a></span>
+<span id="cb20-16"><a href="#cb20-16" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(scores)) {</span>
+<span id="cb20-17"><a href="#cb20-17" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Score&quot;</span>, <span class="fu">ifelse</span>(<span class="fu">is.na</span>(scores[i]), <span class="st">&quot;NA&quot;</span>, scores[i]),</span>
+<span id="cb20-18"><a href="#cb20-18" tabindex="-1"></a>      <span class="st">&quot;-&gt;&quot;</span>, <span class="fu">paste</span>(ml_result[[i]], <span class="at">collapse =</span> <span class="st">&quot;, &quot;</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb20-19"><a href="#cb20-19" tabindex="-1"></a>}</span>
+<span id="cb20-20"><a href="#cb20-20" tabindex="-1"></a><span class="co">#&gt; Score 95 -&gt; Valid Score, Above Average, Excellent </span></span>
+<span id="cb20-21"><a href="#cb20-21" tabindex="-1"></a><span class="co">#&gt; Score 45 -&gt; Valid Score, Below Average </span></span>
+<span id="cb20-22"><a href="#cb20-22" tabindex="-1"></a><span class="co">#&gt; Score NA -&gt; No Score </span></span>
+<span id="cb20-23"><a href="#cb20-23" tabindex="-1"></a><span class="co">#&gt; Score 150 -&gt; Out of Range</span></span></code></pre></div>
 </div>
 <div id="parse-multilabel-from-text" class="section level3">
 <h3>Parse Multilabel from Text</h3>
@@ -949,24 +911,16 @@ labels:</p>
 <span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a><span class="st">  (7, 10]  = &quot;High Risk&quot;</span></span>
 <span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a><span class="st">;</span></span>
 <span id="cb21-8"><a href="#cb21-8" tabindex="-1"></a><span class="st">&#39;</span>)</span>
-<span id="cb21-9"><a href="#cb21-9" tabindex="-1"></a><span class="co">#&gt; $risk</span></span>
-<span id="cb21-10"><a href="#cb21-10" tabindex="-1"></a><span class="co">#&gt; KS Format:risk (multilabel)</span></span>
-<span id="cb21-11"><a href="#cb21-11" tabindex="-1"></a><span class="co">#&gt; Type: numeric </span></span>
-<span id="cb21-12"><a href="#cb21-12" tabindex="-1"></a><span class="co">#&gt; Mappings:</span></span>
-<span id="cb21-13"><a href="#cb21-13" tabindex="-1"></a><span class="co">#&gt;   [0, 3] =&gt; Low Risk</span></span>
-<span id="cb21-14"><a href="#cb21-14" tabindex="-1"></a><span class="co">#&gt;   [0, 7] =&gt; Monitored</span></span>
-<span id="cb21-15"><a href="#cb21-15" tabindex="-1"></a><span class="co">#&gt;   (3, 7] =&gt; Medium Risk</span></span>
-<span id="cb21-16"><a href="#cb21-16" tabindex="-1"></a><span class="co">#&gt;   (7, 10] =&gt; High Risk</span></span>
-<span id="cb21-17"><a href="#cb21-17" tabindex="-1"></a></span>
-<span id="cb21-18"><a href="#cb21-18" tabindex="-1"></a>risk_scores <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">9</span>)</span>
-<span id="cb21-19"><a href="#cb21-19" tabindex="-1"></a>risk_labels <span class="ot">&lt;-</span> <span class="fu">fput_all</span>(risk_scores, <span class="st">&quot;risk&quot;</span>)</span>
-<span id="cb21-20"><a href="#cb21-20" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(risk_scores)) {</span>
-<span id="cb21-21"><a href="#cb21-21" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Score&quot;</span>, risk_scores[i], <span class="st">&quot;-&gt;&quot;</span>,</span>
-<span id="cb21-22"><a href="#cb21-22" tabindex="-1"></a>      <span class="fu">paste</span>(risk_labels[[i]], <span class="at">collapse =</span> <span class="st">&quot; | &quot;</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb21-23"><a href="#cb21-23" tabindex="-1"></a>}</span>
-<span id="cb21-24"><a href="#cb21-24" tabindex="-1"></a><span class="co">#&gt; Score 2 -&gt; Low Risk | Monitored </span></span>
-<span id="cb21-25"><a href="#cb21-25" tabindex="-1"></a><span class="co">#&gt; Score 5 -&gt; Monitored | Medium Risk </span></span>
-<span id="cb21-26"><a href="#cb21-26" tabindex="-1"></a><span class="co">#&gt; Score 9 -&gt; High Risk</span></span></code></pre></div>
+<span id="cb21-9"><a href="#cb21-9" tabindex="-1"></a></span>
+<span id="cb21-10"><a href="#cb21-10" tabindex="-1"></a>risk_scores <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">9</span>)</span>
+<span id="cb21-11"><a href="#cb21-11" tabindex="-1"></a>risk_labels <span class="ot">&lt;-</span> <span class="fu">fput_all</span>(risk_scores, <span class="st">&quot;risk&quot;</span>)</span>
+<span id="cb21-12"><a href="#cb21-12" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(risk_scores)) {</span>
+<span id="cb21-13"><a href="#cb21-13" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Score&quot;</span>, risk_scores[i], <span class="st">&quot;-&gt;&quot;</span>,</span>
+<span id="cb21-14"><a href="#cb21-14" tabindex="-1"></a>      <span class="fu">paste</span>(risk_labels[[i]], <span class="at">collapse =</span> <span class="st">&quot; | &quot;</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb21-15"><a href="#cb21-15" tabindex="-1"></a>}</span>
+<span id="cb21-16"><a href="#cb21-16" tabindex="-1"></a><span class="co">#&gt; Score 2 -&gt; Low Risk | Monitored </span></span>
+<span id="cb21-17"><a href="#cb21-17" tabindex="-1"></a><span class="co">#&gt; Score 5 -&gt; Monitored | Medium Risk </span></span>
+<span id="cb21-18"><a href="#cb21-18" tabindex="-1"></a><span class="co">#&gt; Score 9 -&gt; High Risk</span></span></code></pre></div>
 </div>
 <div id="multilabel-export" class="section level3">
 <h3>Multilabel Export</h3>
@@ -1002,31 +956,21 @@ labels:</p>
 <span id="cb23-10"><a href="#cb23-10" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;numeric&quot;</span>,</span>
 <span id="cb23-11"><a href="#cb23-11" tabindex="-1"></a>  <span class="at">multilabel =</span> <span class="cn">TRUE</span></span>
 <span id="cb23-12"><a href="#cb23-12" tabindex="-1"></a>)</span>
-<span id="cb23-13"><a href="#cb23-13" tabindex="-1"></a><span class="co">#&gt; KS Format:ae_grade (multilabel)</span></span>
-<span id="cb23-14"><a href="#cb23-14" tabindex="-1"></a><span class="co">#&gt; Type: numeric </span></span>
-<span id="cb23-15"><a href="#cb23-15" tabindex="-1"></a><span class="co">#&gt; Mappings:</span></span>
-<span id="cb23-16"><a href="#cb23-16" tabindex="-1"></a><span class="co">#&gt;   [1, 1] =&gt; Mild</span></span>
-<span id="cb23-17"><a href="#cb23-17" tabindex="-1"></a><span class="co">#&gt;   [2, 2] =&gt; Moderate</span></span>
-<span id="cb23-18"><a href="#cb23-18" tabindex="-1"></a><span class="co">#&gt;   [3, 3] =&gt; Severe</span></span>
-<span id="cb23-19"><a href="#cb23-19" tabindex="-1"></a><span class="co">#&gt;   [4, 4] =&gt; Life-threatening</span></span>
-<span id="cb23-20"><a href="#cb23-20" tabindex="-1"></a><span class="co">#&gt;   [5, 5] =&gt; Fatal</span></span>
-<span id="cb23-21"><a href="#cb23-21" tabindex="-1"></a><span class="co">#&gt;   [3, 5] =&gt; Serious</span></span>
-<span id="cb23-22"><a href="#cb23-22" tabindex="-1"></a><span class="co">#&gt;   [1, 2] =&gt; Non-serious</span></span>
-<span id="cb23-23"><a href="#cb23-23" tabindex="-1"></a></span>
-<span id="cb23-24"><a href="#cb23-24" tabindex="-1"></a>grades <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>)</span>
-<span id="cb23-25"><a href="#cb23-25" tabindex="-1"></a>ae_labels <span class="ot">&lt;-</span> <span class="fu">fput_all</span>(grades, <span class="st">&quot;ae_grade&quot;</span>)</span>
-<span id="cb23-26"><a href="#cb23-26" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(grades)) {</span>
-<span id="cb23-27"><a href="#cb23-27" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Grade&quot;</span>, grades[i], <span class="st">&quot;:&quot;</span>,</span>
-<span id="cb23-28"><a href="#cb23-28" tabindex="-1"></a>      <span class="fu">paste</span>(ae_labels[[i]], <span class="at">collapse =</span> <span class="st">&quot; + &quot;</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb23-29"><a href="#cb23-29" tabindex="-1"></a>}</span>
-<span id="cb23-30"><a href="#cb23-30" tabindex="-1"></a><span class="co">#&gt; Grade 1 : Mild + Non-serious </span></span>
-<span id="cb23-31"><a href="#cb23-31" tabindex="-1"></a><span class="co">#&gt; Grade 2 : Moderate + Non-serious </span></span>
-<span id="cb23-32"><a href="#cb23-32" tabindex="-1"></a><span class="co">#&gt; Grade 3 : Severe + Serious </span></span>
-<span id="cb23-33"><a href="#cb23-33" tabindex="-1"></a><span class="co">#&gt; Grade 4 : Life-threatening + Serious </span></span>
-<span id="cb23-34"><a href="#cb23-34" tabindex="-1"></a><span class="co">#&gt; Grade 5 : Fatal + Serious</span></span>
-<span id="cb23-35"><a href="#cb23-35" tabindex="-1"></a></span>
-<span id="cb23-36"><a href="#cb23-36" tabindex="-1"></a><span class="fu">fclear</span>()</span>
-<span id="cb23-37"><a href="#cb23-37" tabindex="-1"></a><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
+<span id="cb23-13"><a href="#cb23-13" tabindex="-1"></a></span>
+<span id="cb23-14"><a href="#cb23-14" tabindex="-1"></a>grades <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>)</span>
+<span id="cb23-15"><a href="#cb23-15" tabindex="-1"></a>ae_labels <span class="ot">&lt;-</span> <span class="fu">fput_all</span>(grades, <span class="st">&quot;ae_grade&quot;</span>)</span>
+<span id="cb23-16"><a href="#cb23-16" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(grades)) {</span>
+<span id="cb23-17"><a href="#cb23-17" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Grade&quot;</span>, grades[i], <span class="st">&quot;:&quot;</span>,</span>
+<span id="cb23-18"><a href="#cb23-18" tabindex="-1"></a>      <span class="fu">paste</span>(ae_labels[[i]], <span class="at">collapse =</span> <span class="st">&quot; + &quot;</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb23-19"><a href="#cb23-19" tabindex="-1"></a>}</span>
+<span id="cb23-20"><a href="#cb23-20" tabindex="-1"></a><span class="co">#&gt; Grade 1 : Mild + Non-serious </span></span>
+<span id="cb23-21"><a href="#cb23-21" tabindex="-1"></a><span class="co">#&gt; Grade 2 : Moderate + Non-serious </span></span>
+<span id="cb23-22"><a href="#cb23-22" tabindex="-1"></a><span class="co">#&gt; Grade 3 : Severe + Serious </span></span>
+<span id="cb23-23"><a href="#cb23-23" tabindex="-1"></a><span class="co">#&gt; Grade 4 : Life-threatening + Serious </span></span>
+<span id="cb23-24"><a href="#cb23-24" tabindex="-1"></a><span class="co">#&gt; Grade 5 : Fatal + Serious</span></span>
+<span id="cb23-25"><a href="#cb23-25" tabindex="-1"></a></span>
+<span id="cb23-26"><a href="#cb23-26" tabindex="-1"></a><span class="fu">fclear</span>()</span>
+<span id="cb23-27"><a href="#cb23-27" tabindex="-1"></a><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
 </div>
 </div>
 <div id="example-14-case-insensitive-matching" class="section level2">
@@ -1143,262 +1087,336 @@ you compute labels dynamically.</p>
 <span id="cb30-5"><a href="#cb30-5" tabindex="-1"></a>)</span>
 <span id="cb30-6"><a href="#cb30-6" tabindex="-1"></a></span>
 <span id="cb30-7"><a href="#cb30-7" tabindex="-1"></a><span class="fu">fput</span>(<span class="fu">c</span>(<span class="st">&quot;val&quot;</span>, <span class="st">&quot;val&quot;</span>), label_fmt, <span class="fu">c</span>(<span class="dv">42</span>, <span class="dv">55</span>), <span class="dv">100</span>)</span>
-<span id="cb30-8"><a href="#cb30-8" tabindex="-1"></a><span class="co">#&gt; [1] &quot;42 (N=100)&quot; &quot;55 (N=100)&quot;</span></span>
-<span id="cb30-9"><a href="#cb30-9" tabindex="-1"></a></span>
-<span id="cb30-10"><a href="#cb30-10" tabindex="-1"></a><span class="fu">fclear</span>()</span>
-<span id="cb30-11"><a href="#cb30-11" tabindex="-1"></a><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
+<span id="cb30-8"><a href="#cb30-8" tabindex="-1"></a><span class="co">#&gt; [1] &quot;42 (N=100)&quot; &quot;55 (N=100)&quot;</span></span></code></pre></div>
+</div>
+<div id="statistical-table-format-with-computed-labels" class="section level3">
+<h3>Statistical Table Format with Computed Labels</h3>
+<p>A realistic clinical-trial example: <code>e()</code> marks labels as
+expressions evaluated at apply-time, <code>.x1</code> references the
+extra argument, and multiline <code>dplyr::case_when</code> shows
+complex conditional formatting.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="co"># Population counts used as denominators</span></span>
+<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a>n.trt <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">pop =</span> <span class="fu">c</span>(<span class="st">&quot;fas&quot;</span>,<span class="st">&quot;pps&quot;</span>,<span class="st">&quot;saf&quot;</span>), <span class="at">ntot =</span> <span class="fu">c</span>(<span class="dv">34</span>, <span class="dv">30</span>, <span class="dv">36</span>))</span>
+<span id="cb31-3"><a href="#cb31-3" tabindex="-1"></a>get_n <span class="ot">&lt;-</span> <span class="cf">function</span>(pop) {</span>
+<span id="cb31-4"><a href="#cb31-4" tabindex="-1"></a>  n.trt<span class="sc">$</span>ntot[n.trt<span class="sc">$</span>pop <span class="sc">==</span> pop]</span>
+<span id="cb31-5"><a href="#cb31-5" tabindex="-1"></a>}</span>
+<span id="cb31-6"><a href="#cb31-6" tabindex="-1"></a></span>
+<span id="cb31-7"><a href="#cb31-7" tabindex="-1"></a><span class="fu">fnew</span>(</span>
+<span id="cb31-8"><a href="#cb31-8" tabindex="-1"></a>  <span class="st">&quot;n_fas&quot;</span> <span class="ot">=</span> <span class="fu">e</span>(<span class="st">&quot;get_n(&#39;fas&#39;)&quot;</span>),</span>
+<span id="cb31-9"><a href="#cb31-9" tabindex="-1"></a>  <span class="st">&quot;n_pps&quot;</span> <span class="ot">=</span> <span class="fu">e</span>(<span class="st">&quot;get_n(&#39;pps&#39;)&quot;</span>),</span>
+<span id="cb31-10"><a href="#cb31-10" tabindex="-1"></a>  <span class="st">&quot;n_saf&quot;</span> <span class="ot">=</span> <span class="fu">e</span>(<span class="st">&quot;get_n(&#39;saf&#39;)&quot;</span>),</span>
+<span id="cb31-11"><a href="#cb31-11" tabindex="-1"></a>  <span class="st">&quot;n&quot;</span>   <span class="ot">=</span> <span class="st">&quot;sprintf(&#39;%d&#39;, .x1)&quot;</span>,</span>
+<span id="cb31-12"><a href="#cb31-12" tabindex="-1"></a>  <span class="st">&quot;n_pct_fas&quot;</span> <span class="ot">=</span> <span class="st">&quot;sprintf(&#39;%d (%5.1f%%)&#39;, .x1, .x1 * 100 / get_n(&#39;fas&#39;))&quot;</span>,</span>
+<span id="cb31-13"><a href="#cb31-13" tabindex="-1"></a>  <span class="st">&quot;n_pct_pps&quot;</span> <span class="ot">=</span> <span class="st">&quot;sprintf(&#39;%d (%5.1f%%)&#39;, .x1, .x1 * 100 / get_n(&#39;pps&#39;))&quot;</span>,</span>
+<span id="cb31-14"><a href="#cb31-14" tabindex="-1"></a>  <span class="st">&quot;n_pct_saf&quot;</span> <span class="ot">=</span> <span class="st">&quot;sprintf(&#39;%d (%5.1f%%)&#39;, .x1, .x1 * 100 / get_n(&#39;saf&#39;))&quot;</span>,</span>
+<span id="cb31-15"><a href="#cb31-15" tabindex="-1"></a>  <span class="st">&quot;pct&quot;</span> <span class="ot">=</span> <span class="st">&quot;dplyr::case_when(</span></span>
+<span id="cb31-16"><a href="#cb31-16" tabindex="-1"></a><span class="st">               .x1&gt;0 &amp; .x1&lt;0.1 ~ sprintf(&#39;%5s&#39;, &#39; &lt;0.1%&#39;),</span></span>
+<span id="cb31-17"><a href="#cb31-17" tabindex="-1"></a><span class="st">               .x1&gt;=0.1 | .x1==0 ~ sprintf(paste0(&#39;%5.&#39;, 1 ,&#39;f%%&#39;), .x1)</span></span>
+<span id="cb31-18"><a href="#cb31-18" tabindex="-1"></a><span class="st">           )&quot;</span>,</span>
+<span id="cb31-19"><a href="#cb31-19" tabindex="-1"></a>  <span class="st">&quot;pval&quot;</span> <span class="ot">=</span> <span class="st">&quot;dplyr::case_when(</span></span>
+<span id="cb31-20"><a href="#cb31-20" tabindex="-1"></a><span class="st">                .x1&gt;=0 &amp; .x1&lt;0.001 ~ sprintf(&#39;%s&#39;, &#39;&lt;0.001&#39;),</span></span>
+<span id="cb31-21"><a href="#cb31-21" tabindex="-1"></a><span class="st">                .x1&gt;=0.001 &amp; .x1&lt;=0.999 ~ sprintf(paste0(&#39;%.&#39;, 3 ,&#39;f&#39;), .x1),</span></span>
+<span id="cb31-22"><a href="#cb31-22" tabindex="-1"></a><span class="st">                .x1&gt;0.999 ~ sprintf(&#39;%s&#39;, &#39;&gt;0.999&#39;), .default = &#39;--&#39;</span></span>
+<span id="cb31-23"><a href="#cb31-23" tabindex="-1"></a><span class="st">           )&quot;</span>,</span>
+<span id="cb31-24"><a href="#cb31-24" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">&quot;stat&quot;</span>,</span>
+<span id="cb31-25"><a href="#cb31-25" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;character&quot;</span></span>
+<span id="cb31-26"><a href="#cb31-26" tabindex="-1"></a>)</span></code></pre></div>
+<p>The same format can be created via <code>fparse()</code>. Note that
+multiline expressions must be collapsed to single lines in the text
+block, and <code>(eval)</code> marks evaluated labels:</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a>fmt <span class="ot">&lt;-</span> <span class="st">&#39;</span></span>
+<span id="cb32-2"><a href="#cb32-2" tabindex="-1"></a><span class="st">  VALUE stat_01 (character)</span></span>
+<span id="cb32-3"><a href="#cb32-3" tabindex="-1"></a><span class="st">     &quot;n_fas&quot; = &quot;get_n(</span><span class="sc">\&#39;</span><span class="st">fas</span><span class="sc">\&#39;</span><span class="st">)&quot; (eval)</span></span>
+<span id="cb32-4"><a href="#cb32-4" tabindex="-1"></a><span class="st">     &quot;n_pps&quot; = &quot;get_n(</span><span class="sc">\&#39;</span><span class="st">pps</span><span class="sc">\&#39;</span><span class="st">)&quot; (eval)</span></span>
+<span id="cb32-5"><a href="#cb32-5" tabindex="-1"></a><span class="st">     &quot;n_saf&quot; = &quot;get_n(</span><span class="sc">\&#39;</span><span class="st">saf</span><span class="sc">\&#39;</span><span class="st">)&quot; (eval)</span></span>
+<span id="cb32-6"><a href="#cb32-6" tabindex="-1"></a><span class="st">     &quot;n&quot;     = &quot;sprintf(</span><span class="sc">\&#39;</span><span class="st">%d</span><span class="sc">\&#39;</span><span class="st">, .x1)&quot;</span></span>
+<span id="cb32-7"><a href="#cb32-7" tabindex="-1"></a><span class="st">     &quot;pct&quot;   = &quot;dplyr::case_when(.x1&gt;0 &amp; .x1&lt;0.1 ~ sprintf(</span><span class="sc">\&#39;</span><span class="st">%5s</span><span class="sc">\&#39;</span><span class="st">, </span><span class="sc">\&#39;</span><span class="st"> &lt;0.1%</span><span class="sc">\&#39;</span><span class="st">), .x1&gt;=0.1 | .x1==0 ~ sprintf(paste0(</span><span class="sc">\&#39;</span><span class="st">%5.</span><span class="sc">\&#39;</span><span class="st">, 1 ,</span><span class="sc">\&#39;</span><span class="st">f%%</span><span class="sc">\&#39;</span><span class="st">), .x1))&quot;</span></span>
+<span id="cb32-8"><a href="#cb32-8" tabindex="-1"></a><span class="st">     &quot;n_pct_fas&quot; = &quot;sprintf(</span><span class="sc">\&#39;</span><span class="st">%d (%5.1f%%)</span><span class="sc">\&#39;</span><span class="st">, .x1, .x1 * 100 / get_n(</span><span class="sc">\&#39;</span><span class="st">fas</span><span class="sc">\&#39;</span><span class="st">))&quot;</span></span>
+<span id="cb32-9"><a href="#cb32-9" tabindex="-1"></a><span class="st">     &quot;n_pct_pps&quot; = &quot;sprintf(</span><span class="sc">\&#39;</span><span class="st">%d (%5.1f%%)</span><span class="sc">\&#39;</span><span class="st">, .x1, .x1 * 100 / get_n(</span><span class="sc">\&#39;</span><span class="st">pps</span><span class="sc">\&#39;</span><span class="st">))&quot;</span></span>
+<span id="cb32-10"><a href="#cb32-10" tabindex="-1"></a><span class="st">     &quot;n_pct_saf&quot; = &quot;sprintf(</span><span class="sc">\&#39;</span><span class="st">%d (%5.1f%%)</span><span class="sc">\&#39;</span><span class="st">, .x1, .x1 * 100 / get_n(</span><span class="sc">\&#39;</span><span class="st">saf</span><span class="sc">\&#39;</span><span class="st">))&quot;</span></span>
+<span id="cb32-11"><a href="#cb32-11" tabindex="-1"></a><span class="st">     &quot;pval&quot;  = &quot;dplyr::case_when(.x1&gt;=0 &amp; .x1&lt;0.001 ~ sprintf(</span><span class="sc">\&#39;</span><span class="st">%s</span><span class="sc">\&#39;</span><span class="st">, </span><span class="sc">\&#39;</span><span class="st">&lt;0.001</span><span class="sc">\&#39;</span><span class="st">), .x1&gt;=0.001 &amp; .x1&lt;=0.999 ~ sprintf(paste0(</span><span class="sc">\&#39;</span><span class="st">%.</span><span class="sc">\&#39;</span><span class="st">, 3 ,</span><span class="sc">\&#39;</span><span class="st">f</span><span class="sc">\&#39;</span><span class="st">), .x1), .x1&gt;0.999 ~ sprintf(</span><span class="sc">\&#39;</span><span class="st">%s</span><span class="sc">\&#39;</span><span class="st">, </span><span class="sc">\&#39;</span><span class="st">&gt;0.999</span><span class="sc">\&#39;</span><span class="st">), .default = </span><span class="sc">\&#39;</span><span class="st">--</span><span class="sc">\&#39;</span><span class="st">)&quot;</span></span>
+<span id="cb32-12"><a href="#cb32-12" tabindex="-1"></a><span class="st">;&#39;</span></span>
+<span id="cb32-13"><a href="#cb32-13" tabindex="-1"></a><span class="fu">fparse</span>(fmt)</span></code></pre></div>
+<p>Both <code>stat</code> (via <code>fnew</code>) and
+<code>stat_01</code> (via <code>fparse</code>) produce identical
+results:</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb33-2"><a href="#cb33-2" tabindex="-1"></a>  <span class="at">types =</span> <span class="fu">c</span>(<span class="st">&quot;n_fas&quot;</span>, <span class="st">&quot;n_pps&quot;</span>, <span class="st">&quot;n_saf&quot;</span>, <span class="st">&quot;n&quot;</span>, <span class="st">&quot;pct&quot;</span>, <span class="st">&quot;pct&quot;</span>, <span class="st">&quot;n&quot;</span>, <span class="st">&quot;pval&quot;</span>, <span class="st">&quot;pval&quot;</span>,</span>
+<span id="cb33-3"><a href="#cb33-3" tabindex="-1"></a>            <span class="st">&quot;n_pct_fas&quot;</span>, <span class="st">&quot;n_pct_pps&quot;</span>, <span class="st">&quot;n_pct_saf&quot;</span>),</span>
+<span id="cb33-4"><a href="#cb33-4" tabindex="-1"></a>  <span class="at">values =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="dv">42</span>, <span class="fl">0.053</span>, <span class="fl">0.0008</span>, <span class="dv">100</span>, <span class="fl">0.255</span>, <span class="fl">0.0003</span>, <span class="dv">22</span>, <span class="dv">22</span>, <span class="dv">22</span>)</span>
+<span id="cb33-5"><a href="#cb33-5" tabindex="-1"></a>)</span>
+<span id="cb33-6"><a href="#cb33-6" tabindex="-1"></a></span>
+<span id="cb33-7"><a href="#cb33-7" tabindex="-1"></a>df<span class="sc">$</span>fmt    <span class="ot">&lt;-</span> <span class="fu">fput</span>(df<span class="sc">$</span>types, <span class="st">&quot;stat&quot;</span>,    df<span class="sc">$</span>values)</span>
+<span id="cb33-8"><a href="#cb33-8" tabindex="-1"></a>df<span class="sc">$</span>fmt_01 <span class="ot">&lt;-</span> <span class="fu">fput</span>(df<span class="sc">$</span>types, <span class="st">&quot;stat_01&quot;</span>, df<span class="sc">$</span>values)</span>
+<span id="cb33-9"><a href="#cb33-9" tabindex="-1"></a><span class="fu">print</span>(df)</span>
+<span id="cb33-10"><a href="#cb33-10" tabindex="-1"></a><span class="co">#&gt;        types   values         fmt      fmt_01</span></span>
+<span id="cb33-11"><a href="#cb33-11" tabindex="-1"></a><span class="co">#&gt; 1      n_fas       NA          34          34</span></span>
+<span id="cb33-12"><a href="#cb33-12" tabindex="-1"></a><span class="co">#&gt; 2      n_pps       NA          30          30</span></span>
+<span id="cb33-13"><a href="#cb33-13" tabindex="-1"></a><span class="co">#&gt; 3      n_saf       NA          36          36</span></span>
+<span id="cb33-14"><a href="#cb33-14" tabindex="-1"></a><span class="co">#&gt; 4          n  42.0000          42          42</span></span>
+<span id="cb33-15"><a href="#cb33-15" tabindex="-1"></a><span class="co">#&gt; 5        pct   0.0530       &lt;0.1%       &lt;0.1%</span></span>
+<span id="cb33-16"><a href="#cb33-16" tabindex="-1"></a><span class="co">#&gt; 6        pct   0.0008       &lt;0.1%       &lt;0.1%</span></span>
+<span id="cb33-17"><a href="#cb33-17" tabindex="-1"></a><span class="co">#&gt; 7          n 100.0000         100         100</span></span>
+<span id="cb33-18"><a href="#cb33-18" tabindex="-1"></a><span class="co">#&gt; 8       pval   0.2550       0.255       0.255</span></span>
+<span id="cb33-19"><a href="#cb33-19" tabindex="-1"></a><span class="co">#&gt; 9       pval   0.0003      &lt;0.001      &lt;0.001</span></span>
+<span id="cb33-20"><a href="#cb33-20" tabindex="-1"></a><span class="co">#&gt; 10 n_pct_fas  22.0000 22 ( 64.7%) 22 ( 64.7%)</span></span>
+<span id="cb33-21"><a href="#cb33-21" tabindex="-1"></a><span class="co">#&gt; 11 n_pct_pps  22.0000 22 ( 73.3%) 22 ( 73.3%)</span></span>
+<span id="cb33-22"><a href="#cb33-22" tabindex="-1"></a><span class="co">#&gt; 12 n_pct_saf  22.0000 22 ( 61.1%) 22 ( 61.1%)</span></span>
+<span id="cb33-23"><a href="#cb33-23" tabindex="-1"></a></span>
+<span id="cb33-24"><a href="#cb33-24" tabindex="-1"></a><span class="fu">fclear</span>()</span>
+<span id="cb33-25"><a href="#cb33-25" tabindex="-1"></a><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
 </div>
 </div>
 <div id="example-16-vectorized-format-names-sas-putc-style" class="section level2">
 <h2>Example 16: Vectorized Format Names (SAS PUTC-style)</h2>
 <p>Each element can use a different format, determined by a vector of
 format names:</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="co"># Dispatch format: maps type code to format name</span></span>
-<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a><span class="fu">fnew</span>(<span class="st">&quot;1&quot;</span> <span class="ot">=</span> <span class="st">&quot;groupx&quot;</span>, <span class="st">&quot;2&quot;</span> <span class="ot">=</span> <span class="st">&quot;groupy&quot;</span>, <span class="st">&quot;3&quot;</span> <span class="ot">=</span> <span class="st">&quot;groupz&quot;</span>,</span>
-<span id="cb31-3"><a href="#cb31-3" tabindex="-1"></a>     <span class="at">name =</span> <span class="st">&quot;typefmt&quot;</span>, <span class="at">type =</span> <span class="st">&quot;numeric&quot;</span>)</span>
-<span id="cb31-4"><a href="#cb31-4" tabindex="-1"></a><span class="co">#&gt; KS Format:typefmt</span></span>
-<span id="cb31-5"><a href="#cb31-5" tabindex="-1"></a><span class="co">#&gt; Type: numeric </span></span>
-<span id="cb31-6"><a href="#cb31-6" tabindex="-1"></a><span class="co">#&gt; Mappings:</span></span>
-<span id="cb31-7"><a href="#cb31-7" tabindex="-1"></a><span class="co">#&gt;   1 =&gt; groupx</span></span>
-<span id="cb31-8"><a href="#cb31-8" tabindex="-1"></a><span class="co">#&gt;   2 =&gt; groupy</span></span>
-<span id="cb31-9"><a href="#cb31-9" tabindex="-1"></a><span class="co">#&gt;   3 =&gt; groupz</span></span>
-<span id="cb31-10"><a href="#cb31-10" tabindex="-1"></a></span>
-<span id="cb31-11"><a href="#cb31-11" tabindex="-1"></a><span class="co"># Per-group character formats</span></span>
-<span id="cb31-12"><a href="#cb31-12" tabindex="-1"></a><span class="fu">fnew</span>(<span class="st">&quot;positive&quot;</span> <span class="ot">=</span> <span class="st">&quot;agree&quot;</span>,  <span class="st">&quot;negative&quot;</span> <span class="ot">=</span> <span class="st">&quot;disagree&quot;</span>, <span class="st">&quot;neutral&quot;</span> <span class="ot">=</span> <span class="st">&quot;notsure&quot;</span>,</span>
-<span id="cb31-13"><a href="#cb31-13" tabindex="-1"></a>     <span class="at">name =</span> <span class="st">&quot;groupx&quot;</span>, <span class="at">type =</span> <span class="st">&quot;character&quot;</span>)</span>
-<span id="cb31-14"><a href="#cb31-14" tabindex="-1"></a><span class="co">#&gt; KS Format:groupx</span></span>
-<span id="cb31-15"><a href="#cb31-15" tabindex="-1"></a><span class="co">#&gt; Type: character </span></span>
-<span id="cb31-16"><a href="#cb31-16" tabindex="-1"></a><span class="co">#&gt; Mappings:</span></span>
-<span id="cb31-17"><a href="#cb31-17" tabindex="-1"></a><span class="co">#&gt;   positive =&gt; agree</span></span>
-<span id="cb31-18"><a href="#cb31-18" tabindex="-1"></a><span class="co">#&gt;   negative =&gt; disagree</span></span>
-<span id="cb31-19"><a href="#cb31-19" tabindex="-1"></a><span class="co">#&gt;   neutral =&gt; notsure</span></span>
-<span id="cb31-20"><a href="#cb31-20" tabindex="-1"></a><span class="fu">fnew</span>(<span class="st">&quot;positive&quot;</span> <span class="ot">=</span> <span class="st">&quot;accept&quot;</span>, <span class="st">&quot;negative&quot;</span> <span class="ot">=</span> <span class="st">&quot;reject&quot;</span>,   <span class="st">&quot;neutral&quot;</span> <span class="ot">=</span> <span class="st">&quot;possible&quot;</span>,</span>
-<span id="cb31-21"><a href="#cb31-21" tabindex="-1"></a>     <span class="at">name =</span> <span class="st">&quot;groupy&quot;</span>, <span class="at">type =</span> <span class="st">&quot;character&quot;</span>)</span>
-<span id="cb31-22"><a href="#cb31-22" tabindex="-1"></a><span class="co">#&gt; KS Format:groupy</span></span>
-<span id="cb31-23"><a href="#cb31-23" tabindex="-1"></a><span class="co">#&gt; Type: character </span></span>
-<span id="cb31-24"><a href="#cb31-24" tabindex="-1"></a><span class="co">#&gt; Mappings:</span></span>
-<span id="cb31-25"><a href="#cb31-25" tabindex="-1"></a><span class="co">#&gt;   positive =&gt; accept</span></span>
-<span id="cb31-26"><a href="#cb31-26" tabindex="-1"></a><span class="co">#&gt;   negative =&gt; reject</span></span>
-<span id="cb31-27"><a href="#cb31-27" tabindex="-1"></a><span class="co">#&gt;   neutral =&gt; possible</span></span>
-<span id="cb31-28"><a href="#cb31-28" tabindex="-1"></a><span class="fu">fnew</span>(<span class="st">&quot;positive&quot;</span> <span class="ot">=</span> <span class="st">&quot;pass&quot;</span>,   <span class="st">&quot;negative&quot;</span> <span class="ot">=</span> <span class="st">&quot;fail&quot;</span>,     <span class="st">&quot;neutral&quot;</span> <span class="ot">=</span> <span class="st">&quot;retest&quot;</span>,</span>
-<span id="cb31-29"><a href="#cb31-29" tabindex="-1"></a>     <span class="at">name =</span> <span class="st">&quot;groupz&quot;</span>, <span class="at">type =</span> <span class="st">&quot;character&quot;</span>)</span>
-<span id="cb31-30"><a href="#cb31-30" tabindex="-1"></a><span class="co">#&gt; KS Format:groupz</span></span>
-<span id="cb31-31"><a href="#cb31-31" tabindex="-1"></a><span class="co">#&gt; Type: character </span></span>
-<span id="cb31-32"><a href="#cb31-32" tabindex="-1"></a><span class="co">#&gt; Mappings:</span></span>
-<span id="cb31-33"><a href="#cb31-33" tabindex="-1"></a><span class="co">#&gt;   positive =&gt; pass</span></span>
-<span id="cb31-34"><a href="#cb31-34" tabindex="-1"></a><span class="co">#&gt;   negative =&gt; fail</span></span>
-<span id="cb31-35"><a href="#cb31-35" tabindex="-1"></a><span class="co">#&gt;   neutral =&gt; retest</span></span>
-<span id="cb31-36"><a href="#cb31-36" tabindex="-1"></a></span>
-<span id="cb31-37"><a href="#cb31-37" tabindex="-1"></a>type     <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">3</span>)</span>
-<span id="cb31-38"><a href="#cb31-38" tabindex="-1"></a>response <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;positive&quot;</span>, <span class="st">&quot;negative&quot;</span>, <span class="st">&quot;neutral&quot;</span>,</span>
-<span id="cb31-39"><a href="#cb31-39" tabindex="-1"></a>              <span class="st">&quot;positive&quot;</span>, <span class="st">&quot;negative&quot;</span>, <span class="st">&quot;neutral&quot;</span>,</span>
-<span id="cb31-40"><a href="#cb31-40" tabindex="-1"></a>              <span class="st">&quot;positive&quot;</span>, <span class="st">&quot;negative&quot;</span>, <span class="st">&quot;neutral&quot;</span>)</span>
-<span id="cb31-41"><a href="#cb31-41" tabindex="-1"></a></span>
-<span id="cb31-42"><a href="#cb31-42" tabindex="-1"></a><span class="co"># Step 1: map type -&gt; format name</span></span>
-<span id="cb31-43"><a href="#cb31-43" tabindex="-1"></a>respfmt <span class="ot">&lt;-</span> <span class="fu">fput</span>(type, <span class="st">&quot;typefmt&quot;</span>)</span>
-<span id="cb31-44"><a href="#cb31-44" tabindex="-1"></a></span>
-<span id="cb31-45"><a href="#cb31-45" tabindex="-1"></a><span class="co"># Step 2: apply per-element format</span></span>
-<span id="cb31-46"><a href="#cb31-46" tabindex="-1"></a>word <span class="ot">&lt;-</span> <span class="fu">fputc</span>(response, respfmt)</span>
-<span id="cb31-47"><a href="#cb31-47" tabindex="-1"></a></span>
-<span id="cb31-48"><a href="#cb31-48" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">type =</span> type, <span class="at">response =</span> response, <span class="at">respfmt =</span> respfmt, <span class="at">word =</span> word)</span>
-<span id="cb31-49"><a href="#cb31-49" tabindex="-1"></a><span class="co">#&gt;   type response respfmt     word</span></span>
-<span id="cb31-50"><a href="#cb31-50" tabindex="-1"></a><span class="co">#&gt; 1    1 positive  groupx    agree</span></span>
-<span id="cb31-51"><a href="#cb31-51" tabindex="-1"></a><span class="co">#&gt; 2    1 negative  groupx disagree</span></span>
-<span id="cb31-52"><a href="#cb31-52" tabindex="-1"></a><span class="co">#&gt; 3    1  neutral  groupx  notsure</span></span>
-<span id="cb31-53"><a href="#cb31-53" tabindex="-1"></a><span class="co">#&gt; 4    2 positive  groupy   accept</span></span>
-<span id="cb31-54"><a href="#cb31-54" tabindex="-1"></a><span class="co">#&gt; 5    2 negative  groupy   reject</span></span>
-<span id="cb31-55"><a href="#cb31-55" tabindex="-1"></a><span class="co">#&gt; 6    2  neutral  groupy possible</span></span>
-<span id="cb31-56"><a href="#cb31-56" tabindex="-1"></a><span class="co">#&gt; 7    3 positive  groupz     pass</span></span>
-<span id="cb31-57"><a href="#cb31-57" tabindex="-1"></a><span class="co">#&gt; 8    3 negative  groupz     fail</span></span>
-<span id="cb31-58"><a href="#cb31-58" tabindex="-1"></a><span class="co">#&gt; 9    3  neutral  groupz   retest</span></span>
-<span id="cb31-59"><a href="#cb31-59" tabindex="-1"></a></span>
-<span id="cb31-60"><a href="#cb31-60" tabindex="-1"></a><span class="fu">fclear</span>()</span>
-<span id="cb31-61"><a href="#cb31-61" tabindex="-1"></a><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a><span class="co"># Dispatch format: maps type code to format name</span></span>
+<span id="cb34-2"><a href="#cb34-2" tabindex="-1"></a><span class="fu">fnew</span>(<span class="st">&quot;1&quot;</span> <span class="ot">=</span> <span class="st">&quot;groupx&quot;</span>, <span class="st">&quot;2&quot;</span> <span class="ot">=</span> <span class="st">&quot;groupy&quot;</span>, <span class="st">&quot;3&quot;</span> <span class="ot">=</span> <span class="st">&quot;groupz&quot;</span>,</span>
+<span id="cb34-3"><a href="#cb34-3" tabindex="-1"></a>     <span class="at">name =</span> <span class="st">&quot;typefmt&quot;</span>, <span class="at">type =</span> <span class="st">&quot;numeric&quot;</span>)</span>
+<span id="cb34-4"><a href="#cb34-4" tabindex="-1"></a></span>
+<span id="cb34-5"><a href="#cb34-5" tabindex="-1"></a><span class="co"># Per-group character formats</span></span>
+<span id="cb34-6"><a href="#cb34-6" tabindex="-1"></a><span class="fu">fnew</span>(<span class="st">&quot;positive&quot;</span> <span class="ot">=</span> <span class="st">&quot;agree&quot;</span>,  <span class="st">&quot;negative&quot;</span> <span class="ot">=</span> <span class="st">&quot;disagree&quot;</span>, <span class="st">&quot;neutral&quot;</span> <span class="ot">=</span> <span class="st">&quot;notsure&quot;</span>,</span>
+<span id="cb34-7"><a href="#cb34-7" tabindex="-1"></a>     <span class="at">name =</span> <span class="st">&quot;groupx&quot;</span>, <span class="at">type =</span> <span class="st">&quot;character&quot;</span>)</span>
+<span id="cb34-8"><a href="#cb34-8" tabindex="-1"></a><span class="fu">fnew</span>(<span class="st">&quot;positive&quot;</span> <span class="ot">=</span> <span class="st">&quot;accept&quot;</span>, <span class="st">&quot;negative&quot;</span> <span class="ot">=</span> <span class="st">&quot;reject&quot;</span>,   <span class="st">&quot;neutral&quot;</span> <span class="ot">=</span> <span class="st">&quot;possible&quot;</span>,</span>
+<span id="cb34-9"><a href="#cb34-9" tabindex="-1"></a>     <span class="at">name =</span> <span class="st">&quot;groupy&quot;</span>, <span class="at">type =</span> <span class="st">&quot;character&quot;</span>)</span>
+<span id="cb34-10"><a href="#cb34-10" tabindex="-1"></a><span class="fu">fnew</span>(<span class="st">&quot;positive&quot;</span> <span class="ot">=</span> <span class="st">&quot;pass&quot;</span>,   <span class="st">&quot;negative&quot;</span> <span class="ot">=</span> <span class="st">&quot;fail&quot;</span>,     <span class="st">&quot;neutral&quot;</span> <span class="ot">=</span> <span class="st">&quot;retest&quot;</span>,</span>
+<span id="cb34-11"><a href="#cb34-11" tabindex="-1"></a>     <span class="at">name =</span> <span class="st">&quot;groupz&quot;</span>, <span class="at">type =</span> <span class="st">&quot;character&quot;</span>)</span>
+<span id="cb34-12"><a href="#cb34-12" tabindex="-1"></a></span>
+<span id="cb34-13"><a href="#cb34-13" tabindex="-1"></a>type     <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">3</span>)</span>
+<span id="cb34-14"><a href="#cb34-14" tabindex="-1"></a>response <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;positive&quot;</span>, <span class="st">&quot;negative&quot;</span>, <span class="st">&quot;neutral&quot;</span>,</span>
+<span id="cb34-15"><a href="#cb34-15" tabindex="-1"></a>              <span class="st">&quot;positive&quot;</span>, <span class="st">&quot;negative&quot;</span>, <span class="st">&quot;neutral&quot;</span>,</span>
+<span id="cb34-16"><a href="#cb34-16" tabindex="-1"></a>              <span class="st">&quot;positive&quot;</span>, <span class="st">&quot;negative&quot;</span>, <span class="st">&quot;neutral&quot;</span>)</span>
+<span id="cb34-17"><a href="#cb34-17" tabindex="-1"></a></span>
+<span id="cb34-18"><a href="#cb34-18" tabindex="-1"></a><span class="co"># Step 1: map type -&gt; format name</span></span>
+<span id="cb34-19"><a href="#cb34-19" tabindex="-1"></a>respfmt <span class="ot">&lt;-</span> <span class="fu">fput</span>(type, <span class="st">&quot;typefmt&quot;</span>)</span>
+<span id="cb34-20"><a href="#cb34-20" tabindex="-1"></a></span>
+<span id="cb34-21"><a href="#cb34-21" tabindex="-1"></a><span class="co"># Step 2: apply per-element format</span></span>
+<span id="cb34-22"><a href="#cb34-22" tabindex="-1"></a>word <span class="ot">&lt;-</span> <span class="fu">fputc</span>(response, respfmt)</span>
+<span id="cb34-23"><a href="#cb34-23" tabindex="-1"></a></span>
+<span id="cb34-24"><a href="#cb34-24" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">type =</span> type, <span class="at">response =</span> response, <span class="at">respfmt =</span> respfmt, <span class="at">word =</span> word)</span>
+<span id="cb34-25"><a href="#cb34-25" tabindex="-1"></a><span class="co">#&gt;   type response respfmt     word</span></span>
+<span id="cb34-26"><a href="#cb34-26" tabindex="-1"></a><span class="co">#&gt; 1    1 positive  groupx    agree</span></span>
+<span id="cb34-27"><a href="#cb34-27" tabindex="-1"></a><span class="co">#&gt; 2    1 negative  groupx disagree</span></span>
+<span id="cb34-28"><a href="#cb34-28" tabindex="-1"></a><span class="co">#&gt; 3    1  neutral  groupx  notsure</span></span>
+<span id="cb34-29"><a href="#cb34-29" tabindex="-1"></a><span class="co">#&gt; 4    2 positive  groupy   accept</span></span>
+<span id="cb34-30"><a href="#cb34-30" tabindex="-1"></a><span class="co">#&gt; 5    2 negative  groupy   reject</span></span>
+<span id="cb34-31"><a href="#cb34-31" tabindex="-1"></a><span class="co">#&gt; 6    2  neutral  groupy possible</span></span>
+<span id="cb34-32"><a href="#cb34-32" tabindex="-1"></a><span class="co">#&gt; 7    3 positive  groupz     pass</span></span>
+<span id="cb34-33"><a href="#cb34-33" tabindex="-1"></a><span class="co">#&gt; 8    3 negative  groupz     fail</span></span>
+<span id="cb34-34"><a href="#cb34-34" tabindex="-1"></a><span class="co">#&gt; 9    3  neutral  groupz   retest</span></span>
+<span id="cb34-35"><a href="#cb34-35" tabindex="-1"></a></span>
+<span id="cb34-36"><a href="#cb34-36" tabindex="-1"></a><span class="fu">fclear</span>()</span>
+<span id="cb34-37"><a href="#cb34-37" tabindex="-1"></a><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
 </div>
 <div id="example-17-working-with-dates-and-formats-putn" class="section level2">
 <h2>Example 17: Working with Dates and Formats — PUTN</h2>
 <p>A SAS-style workflow where format names are looked up dynamically per
 observation:</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a><span class="co"># Format that maps key codes to date format names</span></span>
-<span id="cb32-2"><a href="#cb32-2" tabindex="-1"></a><span class="fu">fnew</span>(<span class="st">&quot;1&quot;</span> <span class="ot">=</span> <span class="st">&quot;date9.&quot;</span>, <span class="st">&quot;2&quot;</span> <span class="ot">=</span> <span class="st">&quot;mmddyy10.&quot;</span>,</span>
-<span id="cb32-3"><a href="#cb32-3" tabindex="-1"></a>     <span class="at">name =</span> <span class="st">&quot;writfmt&quot;</span>, <span class="at">type =</span> <span class="st">&quot;numeric&quot;</span>)</span>
-<span id="cb32-4"><a href="#cb32-4" tabindex="-1"></a><span class="co">#&gt; KS Format:writfmt</span></span>
-<span id="cb32-5"><a href="#cb32-5" tabindex="-1"></a><span class="co">#&gt; Type: numeric </span></span>
-<span id="cb32-6"><a href="#cb32-6" tabindex="-1"></a><span class="co">#&gt; Mappings:</span></span>
-<span id="cb32-7"><a href="#cb32-7" tabindex="-1"></a><span class="co">#&gt;   1 =&gt; date9.</span></span>
-<span id="cb32-8"><a href="#cb32-8" tabindex="-1"></a><span class="co">#&gt;   2 =&gt; mmddyy10.</span></span>
-<span id="cb32-9"><a href="#cb32-9" tabindex="-1"></a></span>
-<span id="cb32-10"><a href="#cb32-10" tabindex="-1"></a><span class="fu">fnew_date</span>(<span class="st">&quot;date9.&quot;</span>)</span>
-<span id="cb32-11"><a href="#cb32-11" tabindex="-1"></a><span class="co">#&gt; KS Format:DATE9.</span></span>
-<span id="cb32-12"><a href="#cb32-12" tabindex="-1"></a><span class="co">#&gt; Type: date </span></span>
-<span id="cb32-13"><a href="#cb32-13" tabindex="-1"></a><span class="co">#&gt; Pattern: %d%b%Y (DATE9.)</span></span>
-<span id="cb32-14"><a href="#cb32-14" tabindex="-1"></a><span class="fu">fnew_date</span>(<span class="st">&quot;mmddyy10.&quot;</span>)</span>
-<span id="cb32-15"><a href="#cb32-15" tabindex="-1"></a><span class="co">#&gt; KS Format:MMDDYY10.</span></span>
-<span id="cb32-16"><a href="#cb32-16" tabindex="-1"></a><span class="co">#&gt; Type: date </span></span>
-<span id="cb32-17"><a href="#cb32-17" tabindex="-1"></a><span class="co">#&gt; Pattern: %m/%d/%Y (MMDDYY10.)</span></span>
-<span id="cb32-18"><a href="#cb32-18" tabindex="-1"></a></span>
-<span id="cb32-19"><a href="#cb32-19" tabindex="-1"></a><span class="co"># Input data (R date numbers = days since 1970-01-01)</span></span>
-<span id="cb32-20"><a href="#cb32-20" tabindex="-1"></a>number <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12103</span>, <span class="dv">10899</span>)</span>
-<span id="cb32-21"><a href="#cb32-21" tabindex="-1"></a>key    <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)</span>
-<span id="cb32-22"><a href="#cb32-22" tabindex="-1"></a></span>
-<span id="cb32-23"><a href="#cb32-23" tabindex="-1"></a><span class="co"># Look up format name per observation</span></span>
-<span id="cb32-24"><a href="#cb32-24" tabindex="-1"></a>datefmt <span class="ot">&lt;-</span> <span class="fu">fputn</span>(key, <span class="st">&quot;writfmt&quot;</span>)</span>
-<span id="cb32-25"><a href="#cb32-25" tabindex="-1"></a></span>
-<span id="cb32-26"><a href="#cb32-26" tabindex="-1"></a><span class="co"># Apply per-element date format</span></span>
-<span id="cb32-27"><a href="#cb32-27" tabindex="-1"></a>date <span class="ot">&lt;-</span> <span class="fu">fputn</span>(number, datefmt)</span>
-<span id="cb32-28"><a href="#cb32-28" tabindex="-1"></a></span>
-<span id="cb32-29"><a href="#cb32-29" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">number =</span> number, <span class="at">key =</span> key, <span class="at">datefmt =</span> datefmt, <span class="at">date =</span> date)</span>
-<span id="cb32-30"><a href="#cb32-30" tabindex="-1"></a><span class="co">#&gt;   number key   datefmt       date</span></span>
-<span id="cb32-31"><a href="#cb32-31" tabindex="-1"></a><span class="co">#&gt; 1  12103   1    date9.  20FEB2003</span></span>
-<span id="cb32-32"><a href="#cb32-32" tabindex="-1"></a><span class="co">#&gt; 2  10899   2 mmddyy10. 11/04/1999</span></span>
-<span id="cb32-33"><a href="#cb32-33" tabindex="-1"></a></span>
-<span id="cb32-34"><a href="#cb32-34" tabindex="-1"></a><span class="fu">fclear</span>()</span>
-<span id="cb32-35"><a href="#cb32-35" tabindex="-1"></a><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a><span class="co"># Format that maps key codes to date format names</span></span>
+<span id="cb35-2"><a href="#cb35-2" tabindex="-1"></a><span class="fu">fnew</span>(<span class="st">&quot;1&quot;</span> <span class="ot">=</span> <span class="st">&quot;date9.&quot;</span>, <span class="st">&quot;2&quot;</span> <span class="ot">=</span> <span class="st">&quot;mmddyy10.&quot;</span>,</span>
+<span id="cb35-3"><a href="#cb35-3" tabindex="-1"></a>     <span class="at">name =</span> <span class="st">&quot;writfmt&quot;</span>, <span class="at">type =</span> <span class="st">&quot;numeric&quot;</span>)</span>
+<span id="cb35-4"><a href="#cb35-4" tabindex="-1"></a></span>
+<span id="cb35-5"><a href="#cb35-5" tabindex="-1"></a><span class="fu">fnew_date</span>(<span class="st">&quot;date9.&quot;</span>)</span>
+<span id="cb35-6"><a href="#cb35-6" tabindex="-1"></a><span class="co">#&gt; KS Format:DATE9.</span></span>
+<span id="cb35-7"><a href="#cb35-7" tabindex="-1"></a><span class="co">#&gt; Type: date </span></span>
+<span id="cb35-8"><a href="#cb35-8" tabindex="-1"></a><span class="co">#&gt; Pattern: %d%b%Y (DATE9.)</span></span>
+<span id="cb35-9"><a href="#cb35-9" tabindex="-1"></a><span class="fu">fnew_date</span>(<span class="st">&quot;mmddyy10.&quot;</span>)</span>
+<span id="cb35-10"><a href="#cb35-10" tabindex="-1"></a><span class="co">#&gt; KS Format:MMDDYY10.</span></span>
+<span id="cb35-11"><a href="#cb35-11" tabindex="-1"></a><span class="co">#&gt; Type: date </span></span>
+<span id="cb35-12"><a href="#cb35-12" tabindex="-1"></a><span class="co">#&gt; Pattern: %m/%d/%Y (MMDDYY10.)</span></span>
+<span id="cb35-13"><a href="#cb35-13" tabindex="-1"></a></span>
+<span id="cb35-14"><a href="#cb35-14" tabindex="-1"></a><span class="co"># Input data (R date numbers = days since 1970-01-01)</span></span>
+<span id="cb35-15"><a href="#cb35-15" tabindex="-1"></a>number <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12103</span>, <span class="dv">10899</span>)</span>
+<span id="cb35-16"><a href="#cb35-16" tabindex="-1"></a>key    <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb35-17"><a href="#cb35-17" tabindex="-1"></a></span>
+<span id="cb35-18"><a href="#cb35-18" tabindex="-1"></a><span class="co"># Look up format name per observation</span></span>
+<span id="cb35-19"><a href="#cb35-19" tabindex="-1"></a>datefmt <span class="ot">&lt;-</span> <span class="fu">fputn</span>(key, <span class="st">&quot;writfmt&quot;</span>)</span>
+<span id="cb35-20"><a href="#cb35-20" tabindex="-1"></a></span>
+<span id="cb35-21"><a href="#cb35-21" tabindex="-1"></a><span class="co"># Apply per-element date format</span></span>
+<span id="cb35-22"><a href="#cb35-22" tabindex="-1"></a>date <span class="ot">&lt;-</span> <span class="fu">fputn</span>(number, datefmt)</span>
+<span id="cb35-23"><a href="#cb35-23" tabindex="-1"></a></span>
+<span id="cb35-24"><a href="#cb35-24" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">number =</span> number, <span class="at">key =</span> key, <span class="at">datefmt =</span> datefmt, <span class="at">date =</span> date)</span>
+<span id="cb35-25"><a href="#cb35-25" tabindex="-1"></a><span class="co">#&gt;   number key   datefmt       date</span></span>
+<span id="cb35-26"><a href="#cb35-26" tabindex="-1"></a><span class="co">#&gt; 1  12103   1    date9.  20FEB2003</span></span>
+<span id="cb35-27"><a href="#cb35-27" tabindex="-1"></a><span class="co">#&gt; 2  10899   2 mmddyy10. 11/04/1999</span></span>
+<span id="cb35-28"><a href="#cb35-28" tabindex="-1"></a></span>
+<span id="cb35-29"><a href="#cb35-29" tabindex="-1"></a><span class="fu">fclear</span>()</span>
+<span id="cb35-30"><a href="#cb35-30" tabindex="-1"></a><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
 </div>
 <div id="example-18-import-sas-formats-from-cntlout-csv" class="section level2">
 <h2>Example 18: Import SAS Formats from CNTLOUT CSV</h2>
 <p>The <code>fimport()</code> function reads a CSV file exported from a
 SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a>csv_path <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;test_cntlout.csv&quot;</span>, <span class="at">package =</span> <span class="st">&quot;ksformat&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a>imported <span class="ot">&lt;-</span> <span class="fu">fimport</span>(csv_path)</span>
-<span id="cb34-2"><a href="#cb34-2" tabindex="-1"></a><span class="co">#&gt; Warning: Skipping PICTURE format: &quot;PICFMT&quot;</span></span>
-<span id="cb34-3"><a href="#cb34-3" tabindex="-1"></a><span class="co">#&gt; ℹ TYPE=&quot;P&quot; is not supported by ksformat.</span></span>
-<span id="cb34-4"><a href="#cb34-4" tabindex="-1"></a><span class="co">#&gt; Warning: Skipped incompatible entry in format &quot;SMISSING&quot;:</span></span>
-<span id="cb34-5"><a href="#cb34-5" tabindex="-1"></a><span class="co">#&gt; ✖ SAS special missing value &#39;.A&#39; (HLO=&#39;S&#39;) has no R equivalent.</span></span>
-<span id="cb34-6"><a href="#cb34-6" tabindex="-1"></a><span class="co">#&gt; Warning: Skipped incompatible entry in format &quot;SMISSING&quot;:</span></span>
-<span id="cb34-7"><a href="#cb34-7" tabindex="-1"></a><span class="co">#&gt; ✖ SAS special missing value &#39;.B&#39; (HLO=&#39;S&#39;) has no R equivalent.</span></span>
-<span id="cb34-8"><a href="#cb34-8" tabindex="-1"></a><span class="co">#&gt; ✔ Imported 4 formats and 1 invalue from</span></span>
-<span id="cb34-9"><a href="#cb34-9" tabindex="-1"></a><span class="co">#&gt;   &#39;/tmp/RtmpGqVuz8/temp_libpathab72a7e807f47/ksformat/extdata/test_cntlout.csv&#39;.</span></span>
-<span id="cb34-10"><a href="#cb34-10" tabindex="-1"></a><span class="fu">names</span>(imported)</span>
-<span id="cb34-11"><a href="#cb34-11" tabindex="-1"></a><span class="co">#&gt; [1] &quot;AGEGRP&quot;   &quot;BMICAT&quot;   &quot;GENDER&quot;   &quot;RACEIN&quot;   &quot;SMISSING&quot;</span></span>
-<span id="cb34-12"><a href="#cb34-12" tabindex="-1"></a></span>
-<span id="cb34-13"><a href="#cb34-13" tabindex="-1"></a><span class="fu">fprint</span>()</span>
-<span id="cb34-14"><a href="#cb34-14" tabindex="-1"></a><span class="co">#&gt; Registered formats:</span></span>
-<span id="cb34-15"><a href="#cb34-15" tabindex="-1"></a><span class="co">#&gt;   AGEGRP - VALUE (numeric), 3 mapping(s)</span></span>
-<span id="cb34-16"><a href="#cb34-16" tabindex="-1"></a><span class="co">#&gt;   BMICAT - VALUE (numeric), 4 mapping(s)</span></span>
-<span id="cb34-17"><a href="#cb34-17" tabindex="-1"></a><span class="co">#&gt;   GENDER - VALUE (character), 2 mapping(s)</span></span>
-<span id="cb34-18"><a href="#cb34-18" tabindex="-1"></a><span class="co">#&gt;   RACEIN - INVALUE (numeric), 3 mapping(s)</span></span>
-<span id="cb34-19"><a href="#cb34-19" tabindex="-1"></a><span class="co">#&gt;   SMISSING - VALUE (numeric), 1 mapping(s)</span></span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" tabindex="-1"></a>csv_path <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;test_cntlout.csv&quot;</span>, <span class="at">package =</span> <span class="st">&quot;ksformat&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a>imported <span class="ot">&lt;-</span> <span class="fu">fimport</span>(csv_path)</span>
+<span id="cb37-2"><a href="#cb37-2" tabindex="-1"></a><span class="co">#&gt; Warning: Skipping PICTURE format: &quot;PICFMT&quot;</span></span>
+<span id="cb37-3"><a href="#cb37-3" tabindex="-1"></a><span class="co">#&gt; ℹ TYPE=&quot;P&quot; is not supported by ksformat.</span></span>
+<span id="cb37-4"><a href="#cb37-4" tabindex="-1"></a><span class="co">#&gt; Warning: Skipped incompatible entry in format &quot;SMISSING&quot;:</span></span>
+<span id="cb37-5"><a href="#cb37-5" tabindex="-1"></a><span class="co">#&gt; ✖ SAS special missing value &#39;.A&#39; (HLO=&#39;S&#39;) has no R equivalent.</span></span>
+<span id="cb37-6"><a href="#cb37-6" tabindex="-1"></a><span class="co">#&gt; Warning: Skipped incompatible entry in format &quot;SMISSING&quot;:</span></span>
+<span id="cb37-7"><a href="#cb37-7" tabindex="-1"></a><span class="co">#&gt; ✖ SAS special missing value &#39;.B&#39; (HLO=&#39;S&#39;) has no R equivalent.</span></span>
+<span id="cb37-8"><a href="#cb37-8" tabindex="-1"></a><span class="co">#&gt; ✔ Imported 4 formats and 1 invalue from</span></span>
+<span id="cb37-9"><a href="#cb37-9" tabindex="-1"></a><span class="co">#&gt;   &#39;/tmp/Rtmpva3Nff/temp_libpath1ae2315f285421/ksformat/extdata/test_cntlout.csv&#39;.</span></span>
+<span id="cb37-10"><a href="#cb37-10" tabindex="-1"></a><span class="fu">names</span>(imported)</span>
+<span id="cb37-11"><a href="#cb37-11" tabindex="-1"></a><span class="co">#&gt; [1] &quot;AGEGRP&quot;   &quot;BMICAT&quot;   &quot;GENDER&quot;   &quot;RACEIN&quot;   &quot;SMISSING&quot;</span></span>
+<span id="cb37-12"><a href="#cb37-12" tabindex="-1"></a></span>
+<span id="cb37-13"><a href="#cb37-13" tabindex="-1"></a><span class="fu">fprint</span>()</span>
+<span id="cb37-14"><a href="#cb37-14" tabindex="-1"></a><span class="co">#&gt; Registered formats:</span></span>
+<span id="cb37-15"><a href="#cb37-15" tabindex="-1"></a><span class="co">#&gt;   AGEGRP - VALUE (numeric), 3 mapping(s)</span></span>
+<span id="cb37-16"><a href="#cb37-16" tabindex="-1"></a><span class="co">#&gt;   BMICAT - VALUE (numeric), 4 mapping(s)</span></span>
+<span id="cb37-17"><a href="#cb37-17" tabindex="-1"></a><span class="co">#&gt;   GENDER - VALUE (character), 2 mapping(s)</span></span>
+<span id="cb37-18"><a href="#cb37-18" tabindex="-1"></a><span class="co">#&gt;   RACEIN - INVALUE (numeric), 3 mapping(s)</span></span>
+<span id="cb37-19"><a href="#cb37-19" tabindex="-1"></a><span class="co">#&gt;   SMISSING - VALUE (numeric), 1 mapping(s)</span></span></code></pre></div>
 <div id="use-imported-formats" class="section level3">
 <h3>Use Imported Formats</h3>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a><span class="co"># Character format (GENDER)</span></span>
-<span id="cb35-2"><a href="#cb35-2" tabindex="-1"></a>gender_codes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>, <span class="cn">NA</span>, <span class="st">&quot;X&quot;</span>)</span>
-<span id="cb35-3"><a href="#cb35-3" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
-<span id="cb35-4"><a href="#cb35-4" tabindex="-1"></a>  <span class="at">code =</span> gender_codes,</span>
-<span id="cb35-5"><a href="#cb35-5" tabindex="-1"></a>  <span class="at">label =</span> <span class="fu">fputc</span>(gender_codes, <span class="st">&quot;GENDER&quot;</span>)</span>
-<span id="cb35-6"><a href="#cb35-6" tabindex="-1"></a>)</span>
-<span id="cb35-7"><a href="#cb35-7" tabindex="-1"></a><span class="co">#&gt;   code   label</span></span>
-<span id="cb35-8"><a href="#cb35-8" tabindex="-1"></a><span class="co">#&gt; 1    M    Male</span></span>
-<span id="cb35-9"><a href="#cb35-9" tabindex="-1"></a><span class="co">#&gt; 2    F  Female</span></span>
-<span id="cb35-10"><a href="#cb35-10" tabindex="-1"></a><span class="co">#&gt; 3 &lt;NA&gt; Unknown</span></span>
-<span id="cb35-11"><a href="#cb35-11" tabindex="-1"></a><span class="co">#&gt; 4    X       X</span></span>
-<span id="cb35-12"><a href="#cb35-12" tabindex="-1"></a></span>
-<span id="cb35-13"><a href="#cb35-13" tabindex="-1"></a><span class="co"># Numeric format (AGEGRP)</span></span>
-<span id="cb35-14"><a href="#cb35-14" tabindex="-1"></a>ages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">17</span>, <span class="dv">18</span>, <span class="dv">45</span>, <span class="dv">65</span>, <span class="dv">100</span>, <span class="cn">NA</span>, <span class="sc">-</span><span class="dv">1</span>)</span>
-<span id="cb35-15"><a href="#cb35-15" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
-<span id="cb35-16"><a href="#cb35-16" tabindex="-1"></a>  <span class="at">age =</span> ages,</span>
-<span id="cb35-17"><a href="#cb35-17" tabindex="-1"></a>  <span class="at">group =</span> <span class="fu">fputn</span>(ages, <span class="st">&quot;AGEGRP&quot;</span>)</span>
-<span id="cb35-18"><a href="#cb35-18" tabindex="-1"></a>)</span>
-<span id="cb35-19"><a href="#cb35-19" tabindex="-1"></a><span class="co">#&gt;   age       group</span></span>
-<span id="cb35-20"><a href="#cb35-20" tabindex="-1"></a><span class="co">#&gt; 1   5       Child</span></span>
-<span id="cb35-21"><a href="#cb35-21" tabindex="-1"></a><span class="co">#&gt; 2  17       Child</span></span>
-<span id="cb35-22"><a href="#cb35-22" tabindex="-1"></a><span class="co">#&gt; 3  18       Adult</span></span>
-<span id="cb35-23"><a href="#cb35-23" tabindex="-1"></a><span class="co">#&gt; 4  45       Adult</span></span>
-<span id="cb35-24"><a href="#cb35-24" tabindex="-1"></a><span class="co">#&gt; 5  65      Senior</span></span>
-<span id="cb35-25"><a href="#cb35-25" tabindex="-1"></a><span class="co">#&gt; 6 100      Senior</span></span>
-<span id="cb35-26"><a href="#cb35-26" tabindex="-1"></a><span class="co">#&gt; 7  NA Missing Age</span></span>
-<span id="cb35-27"><a href="#cb35-27" tabindex="-1"></a><span class="co">#&gt; 8  -1       Other</span></span>
-<span id="cb35-28"><a href="#cb35-28" tabindex="-1"></a></span>
-<span id="cb35-29"><a href="#cb35-29" tabindex="-1"></a><span class="co"># Numeric format (BMICAT)</span></span>
-<span id="cb35-30"><a href="#cb35-30" tabindex="-1"></a>bmi_values <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">15.0</span>, <span class="fl">18.5</span>, <span class="fl">22.3</span>, <span class="fl">25.0</span>, <span class="fl">28.7</span>, <span class="fl">30.0</span>, <span class="fl">35.5</span>)</span>
-<span id="cb35-31"><a href="#cb35-31" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
-<span id="cb35-32"><a href="#cb35-32" tabindex="-1"></a>  <span class="at">bmi =</span> bmi_values,</span>
-<span id="cb35-33"><a href="#cb35-33" tabindex="-1"></a>  <span class="at">category =</span> <span class="fu">fputn</span>(bmi_values, <span class="st">&quot;BMICAT&quot;</span>)</span>
-<span id="cb35-34"><a href="#cb35-34" tabindex="-1"></a>)</span>
-<span id="cb35-35"><a href="#cb35-35" tabindex="-1"></a><span class="co">#&gt;    bmi    category</span></span>
-<span id="cb35-36"><a href="#cb35-36" tabindex="-1"></a><span class="co">#&gt; 1 15.0 Underweight</span></span>
-<span id="cb35-37"><a href="#cb35-37" tabindex="-1"></a><span class="co">#&gt; 2 18.5      Normal</span></span>
-<span id="cb35-38"><a href="#cb35-38" tabindex="-1"></a><span class="co">#&gt; 3 22.3      Normal</span></span>
-<span id="cb35-39"><a href="#cb35-39" tabindex="-1"></a><span class="co">#&gt; 4 25.0  Overweight</span></span>
-<span id="cb35-40"><a href="#cb35-40" tabindex="-1"></a><span class="co">#&gt; 5 28.7  Overweight</span></span>
-<span id="cb35-41"><a href="#cb35-41" tabindex="-1"></a><span class="co">#&gt; 6 30.0       Obese</span></span>
-<span id="cb35-42"><a href="#cb35-42" tabindex="-1"></a><span class="co">#&gt; 7 35.5       Obese</span></span>
-<span id="cb35-43"><a href="#cb35-43" tabindex="-1"></a></span>
-<span id="cb35-44"><a href="#cb35-44" tabindex="-1"></a><span class="co"># Invalue (RACEIN)</span></span>
-<span id="cb35-45"><a href="#cb35-45" tabindex="-1"></a>race_labels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;White&quot;</span>, <span class="st">&quot;Black&quot;</span>, <span class="st">&quot;Asian&quot;</span>, <span class="st">&quot;Other&quot;</span>)</span>
-<span id="cb35-46"><a href="#cb35-46" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
-<span id="cb35-47"><a href="#cb35-47" tabindex="-1"></a>  <span class="at">label =</span> race_labels,</span>
-<span id="cb35-48"><a href="#cb35-48" tabindex="-1"></a>  <span class="at">code =</span> <span class="fu">finputn</span>(race_labels, <span class="st">&quot;RACEIN&quot;</span>)</span>
-<span id="cb35-49"><a href="#cb35-49" tabindex="-1"></a>)</span>
-<span id="cb35-50"><a href="#cb35-50" tabindex="-1"></a><span class="co">#&gt;   label code</span></span>
-<span id="cb35-51"><a href="#cb35-51" tabindex="-1"></a><span class="co">#&gt; 1 White    1</span></span>
-<span id="cb35-52"><a href="#cb35-52" tabindex="-1"></a><span class="co">#&gt; 2 Black    2</span></span>
-<span id="cb35-53"><a href="#cb35-53" tabindex="-1"></a><span class="co">#&gt; 3 Asian    3</span></span>
-<span id="cb35-54"><a href="#cb35-54" tabindex="-1"></a><span class="co">#&gt; 4 Other   NA</span></span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a><span class="co"># Character format (GENDER)</span></span>
+<span id="cb38-2"><a href="#cb38-2" tabindex="-1"></a>gender_codes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>, <span class="cn">NA</span>, <span class="st">&quot;X&quot;</span>)</span>
+<span id="cb38-3"><a href="#cb38-3" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
+<span id="cb38-4"><a href="#cb38-4" tabindex="-1"></a>  <span class="at">code =</span> gender_codes,</span>
+<span id="cb38-5"><a href="#cb38-5" tabindex="-1"></a>  <span class="at">label =</span> <span class="fu">fputc</span>(gender_codes, <span class="st">&quot;GENDER&quot;</span>)</span>
+<span id="cb38-6"><a href="#cb38-6" tabindex="-1"></a>)</span>
+<span id="cb38-7"><a href="#cb38-7" tabindex="-1"></a><span class="co">#&gt;   code   label</span></span>
+<span id="cb38-8"><a href="#cb38-8" tabindex="-1"></a><span class="co">#&gt; 1    M    Male</span></span>
+<span id="cb38-9"><a href="#cb38-9" tabindex="-1"></a><span class="co">#&gt; 2    F  Female</span></span>
+<span id="cb38-10"><a href="#cb38-10" tabindex="-1"></a><span class="co">#&gt; 3 &lt;NA&gt; Unknown</span></span>
+<span id="cb38-11"><a href="#cb38-11" tabindex="-1"></a><span class="co">#&gt; 4    X       X</span></span>
+<span id="cb38-12"><a href="#cb38-12" tabindex="-1"></a></span>
+<span id="cb38-13"><a href="#cb38-13" tabindex="-1"></a><span class="co"># Numeric format (AGEGRP)</span></span>
+<span id="cb38-14"><a href="#cb38-14" tabindex="-1"></a>ages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">17</span>, <span class="dv">18</span>, <span class="dv">45</span>, <span class="dv">65</span>, <span class="dv">100</span>, <span class="cn">NA</span>, <span class="sc">-</span><span class="dv">1</span>)</span>
+<span id="cb38-15"><a href="#cb38-15" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
+<span id="cb38-16"><a href="#cb38-16" tabindex="-1"></a>  <span class="at">age =</span> ages,</span>
+<span id="cb38-17"><a href="#cb38-17" tabindex="-1"></a>  <span class="at">group =</span> <span class="fu">fputn</span>(ages, <span class="st">&quot;AGEGRP&quot;</span>)</span>
+<span id="cb38-18"><a href="#cb38-18" tabindex="-1"></a>)</span>
+<span id="cb38-19"><a href="#cb38-19" tabindex="-1"></a><span class="co">#&gt;   age       group</span></span>
+<span id="cb38-20"><a href="#cb38-20" tabindex="-1"></a><span class="co">#&gt; 1   5       Child</span></span>
+<span id="cb38-21"><a href="#cb38-21" tabindex="-1"></a><span class="co">#&gt; 2  17       Child</span></span>
+<span id="cb38-22"><a href="#cb38-22" tabindex="-1"></a><span class="co">#&gt; 3  18       Adult</span></span>
+<span id="cb38-23"><a href="#cb38-23" tabindex="-1"></a><span class="co">#&gt; 4  45       Adult</span></span>
+<span id="cb38-24"><a href="#cb38-24" tabindex="-1"></a><span class="co">#&gt; 5  65      Senior</span></span>
+<span id="cb38-25"><a href="#cb38-25" tabindex="-1"></a><span class="co">#&gt; 6 100      Senior</span></span>
+<span id="cb38-26"><a href="#cb38-26" tabindex="-1"></a><span class="co">#&gt; 7  NA Missing Age</span></span>
+<span id="cb38-27"><a href="#cb38-27" tabindex="-1"></a><span class="co">#&gt; 8  -1       Other</span></span>
+<span id="cb38-28"><a href="#cb38-28" tabindex="-1"></a></span>
+<span id="cb38-29"><a href="#cb38-29" tabindex="-1"></a><span class="co"># Numeric format (BMICAT)</span></span>
+<span id="cb38-30"><a href="#cb38-30" tabindex="-1"></a>bmi_values <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">15.0</span>, <span class="fl">18.5</span>, <span class="fl">22.3</span>, <span class="fl">25.0</span>, <span class="fl">28.7</span>, <span class="fl">30.0</span>, <span class="fl">35.5</span>)</span>
+<span id="cb38-31"><a href="#cb38-31" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
+<span id="cb38-32"><a href="#cb38-32" tabindex="-1"></a>  <span class="at">bmi =</span> bmi_values,</span>
+<span id="cb38-33"><a href="#cb38-33" tabindex="-1"></a>  <span class="at">category =</span> <span class="fu">fputn</span>(bmi_values, <span class="st">&quot;BMICAT&quot;</span>)</span>
+<span id="cb38-34"><a href="#cb38-34" tabindex="-1"></a>)</span>
+<span id="cb38-35"><a href="#cb38-35" tabindex="-1"></a><span class="co">#&gt;    bmi    category</span></span>
+<span id="cb38-36"><a href="#cb38-36" tabindex="-1"></a><span class="co">#&gt; 1 15.0 Underweight</span></span>
+<span id="cb38-37"><a href="#cb38-37" tabindex="-1"></a><span class="co">#&gt; 2 18.5      Normal</span></span>
+<span id="cb38-38"><a href="#cb38-38" tabindex="-1"></a><span class="co">#&gt; 3 22.3      Normal</span></span>
+<span id="cb38-39"><a href="#cb38-39" tabindex="-1"></a><span class="co">#&gt; 4 25.0  Overweight</span></span>
+<span id="cb38-40"><a href="#cb38-40" tabindex="-1"></a><span class="co">#&gt; 5 28.7  Overweight</span></span>
+<span id="cb38-41"><a href="#cb38-41" tabindex="-1"></a><span class="co">#&gt; 6 30.0       Obese</span></span>
+<span id="cb38-42"><a href="#cb38-42" tabindex="-1"></a><span class="co">#&gt; 7 35.5       Obese</span></span>
+<span id="cb38-43"><a href="#cb38-43" tabindex="-1"></a></span>
+<span id="cb38-44"><a href="#cb38-44" tabindex="-1"></a><span class="co"># Invalue (RACEIN)</span></span>
+<span id="cb38-45"><a href="#cb38-45" tabindex="-1"></a>race_labels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;White&quot;</span>, <span class="st">&quot;Black&quot;</span>, <span class="st">&quot;Asian&quot;</span>, <span class="st">&quot;Other&quot;</span>)</span>
+<span id="cb38-46"><a href="#cb38-46" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
+<span id="cb38-47"><a href="#cb38-47" tabindex="-1"></a>  <span class="at">label =</span> race_labels,</span>
+<span id="cb38-48"><a href="#cb38-48" tabindex="-1"></a>  <span class="at">code =</span> <span class="fu">finputn</span>(race_labels, <span class="st">&quot;RACEIN&quot;</span>)</span>
+<span id="cb38-49"><a href="#cb38-49" tabindex="-1"></a>)</span>
+<span id="cb38-50"><a href="#cb38-50" tabindex="-1"></a><span class="co">#&gt;   label code</span></span>
+<span id="cb38-51"><a href="#cb38-51" tabindex="-1"></a><span class="co">#&gt; 1 White    1</span></span>
+<span id="cb38-52"><a href="#cb38-52" tabindex="-1"></a><span class="co">#&gt; 2 Black    2</span></span>
+<span id="cb38-53"><a href="#cb38-53" tabindex="-1"></a><span class="co">#&gt; 3 Asian    3</span></span>
+<span id="cb38-54"><a href="#cb38-54" tabindex="-1"></a><span class="co">#&gt; 4 Other   NA</span></span></code></pre></div>
 </div>
 <div id="apply-to-data-frame" class="section level3">
 <h3>Apply to Data Frame</h3>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb36-2"><a href="#cb36-2" tabindex="-1"></a>  <span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,</span>
-<span id="cb36-3"><a href="#cb36-3" tabindex="-1"></a>  <span class="at">sex =</span> <span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>, <span class="st">&quot;M&quot;</span>, <span class="cn">NA</span>, <span class="st">&quot;F&quot;</span>),</span>
-<span id="cb36-4"><a href="#cb36-4" tabindex="-1"></a>  <span class="at">age =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">30</span>, <span class="dv">70</span>, <span class="cn">NA</span>, <span class="dv">50</span>),</span>
-<span id="cb36-5"><a href="#cb36-5" tabindex="-1"></a>  <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
-<span id="cb36-6"><a href="#cb36-6" tabindex="-1"></a>)</span>
-<span id="cb36-7"><a href="#cb36-7" tabindex="-1"></a></span>
-<span id="cb36-8"><a href="#cb36-8" tabindex="-1"></a>gender_fmt <span class="ot">&lt;-</span> imported[[<span class="st">&quot;GENDER&quot;</span>]]</span>
-<span id="cb36-9"><a href="#cb36-9" tabindex="-1"></a>age_fmt    <span class="ot">&lt;-</span> imported[[<span class="st">&quot;AGEGRP&quot;</span>]]</span>
-<span id="cb36-10"><a href="#cb36-10" tabindex="-1"></a></span>
-<span id="cb36-11"><a href="#cb36-11" tabindex="-1"></a><span class="fu">fput_df</span>(df, <span class="at">sex =</span> gender_fmt, <span class="at">age =</span> age_fmt, <span class="at">suffix =</span> <span class="st">&quot;_label&quot;</span>)</span>
-<span id="cb36-12"><a href="#cb36-12" tabindex="-1"></a><span class="co">#&gt;   id  sex age sex_label   age_label</span></span>
-<span id="cb36-13"><a href="#cb36-13" tabindex="-1"></a><span class="co">#&gt; 1  1    M  10      Male       Child</span></span>
-<span id="cb36-14"><a href="#cb36-14" tabindex="-1"></a><span class="co">#&gt; 2  2    F  30    Female       Adult</span></span>
-<span id="cb36-15"><a href="#cb36-15" tabindex="-1"></a><span class="co">#&gt; 3  3    M  70      Male      Senior</span></span>
-<span id="cb36-16"><a href="#cb36-16" tabindex="-1"></a><span class="co">#&gt; 4  4 &lt;NA&gt;  NA   Unknown Missing Age</span></span>
-<span id="cb36-17"><a href="#cb36-17" tabindex="-1"></a><span class="co">#&gt; 5  5    F  50    Female       Adult</span></span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb39-2"><a href="#cb39-2" tabindex="-1"></a>  <span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,</span>
+<span id="cb39-3"><a href="#cb39-3" tabindex="-1"></a>  <span class="at">sex =</span> <span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>, <span class="st">&quot;M&quot;</span>, <span class="cn">NA</span>, <span class="st">&quot;F&quot;</span>),</span>
+<span id="cb39-4"><a href="#cb39-4" tabindex="-1"></a>  <span class="at">age =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">30</span>, <span class="dv">70</span>, <span class="cn">NA</span>, <span class="dv">50</span>),</span>
+<span id="cb39-5"><a href="#cb39-5" tabindex="-1"></a>  <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
+<span id="cb39-6"><a href="#cb39-6" tabindex="-1"></a>)</span>
+<span id="cb39-7"><a href="#cb39-7" tabindex="-1"></a></span>
+<span id="cb39-8"><a href="#cb39-8" tabindex="-1"></a>gender_fmt <span class="ot">&lt;-</span> imported[[<span class="st">&quot;GENDER&quot;</span>]]</span>
+<span id="cb39-9"><a href="#cb39-9" tabindex="-1"></a>age_fmt    <span class="ot">&lt;-</span> imported[[<span class="st">&quot;AGEGRP&quot;</span>]]</span>
+<span id="cb39-10"><a href="#cb39-10" tabindex="-1"></a></span>
+<span id="cb39-11"><a href="#cb39-11" tabindex="-1"></a><span class="fu">fput_df</span>(df, <span class="at">sex =</span> gender_fmt, <span class="at">age =</span> age_fmt, <span class="at">suffix =</span> <span class="st">&quot;_label&quot;</span>)</span>
+<span id="cb39-12"><a href="#cb39-12" tabindex="-1"></a><span class="co">#&gt;   id  sex age sex_label   age_label</span></span>
+<span id="cb39-13"><a href="#cb39-13" tabindex="-1"></a><span class="co">#&gt; 1  1    M  10      Male       Child</span></span>
+<span id="cb39-14"><a href="#cb39-14" tabindex="-1"></a><span class="co">#&gt; 2  2    F  30    Female       Adult</span></span>
+<span id="cb39-15"><a href="#cb39-15" tabindex="-1"></a><span class="co">#&gt; 3  3    M  70      Male      Senior</span></span>
+<span id="cb39-16"><a href="#cb39-16" tabindex="-1"></a><span class="co">#&gt; 4  4 &lt;NA&gt;  NA   Unknown Missing Age</span></span>
+<span id="cb39-17"><a href="#cb39-17" tabindex="-1"></a><span class="co">#&gt; 5  5    F  50    Female       Adult</span></span></code></pre></div>
 </div>
 <div id="export-imported-format" class="section level3">
 <h3>Export Imported Format</h3>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">fexport</span>(<span class="at">AGEGRP =</span> age_fmt))</span>
-<span id="cb37-2"><a href="#cb37-2" tabindex="-1"></a><span class="co">#&gt; VALUE AGEGRP (numeric)</span></span>
-<span id="cb37-3"><a href="#cb37-3" tabindex="-1"></a><span class="co">#&gt;   [0, 17] = &quot;Child&quot;</span></span>
-<span id="cb37-4"><a href="#cb37-4" tabindex="-1"></a><span class="co">#&gt;   [18, 64] = &quot;Adult&quot;</span></span>
-<span id="cb37-5"><a href="#cb37-5" tabindex="-1"></a><span class="co">#&gt;   [65, HIGH] = &quot;Senior&quot;</span></span>
-<span id="cb37-6"><a href="#cb37-6" tabindex="-1"></a><span class="co">#&gt;   .missing = &quot;Missing Age&quot;</span></span>
-<span id="cb37-7"><a href="#cb37-7" tabindex="-1"></a><span class="co">#&gt;   .other = &quot;Other&quot;</span></span>
-<span id="cb37-8"><a href="#cb37-8" tabindex="-1"></a><span class="co">#&gt; ;</span></span>
-<span id="cb37-9"><a href="#cb37-9" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">fexport</span>(<span class="at">GENDER =</span> gender_fmt))</span>
-<span id="cb37-10"><a href="#cb37-10" tabindex="-1"></a><span class="co">#&gt; VALUE GENDER (character)</span></span>
-<span id="cb37-11"><a href="#cb37-11" tabindex="-1"></a><span class="co">#&gt;   &quot;M&quot; = &quot;Male&quot;</span></span>
-<span id="cb37-12"><a href="#cb37-12" tabindex="-1"></a><span class="co">#&gt;   &quot;F&quot; = &quot;Female&quot;</span></span>
-<span id="cb37-13"><a href="#cb37-13" tabindex="-1"></a><span class="co">#&gt;   .missing = &quot;Unknown&quot;</span></span>
-<span id="cb37-14"><a href="#cb37-14" tabindex="-1"></a><span class="co">#&gt; ;</span></span></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">fexport</span>(<span class="at">AGEGRP =</span> age_fmt))</span>
+<span id="cb40-2"><a href="#cb40-2" tabindex="-1"></a><span class="co">#&gt; VALUE AGEGRP (numeric)</span></span>
+<span id="cb40-3"><a href="#cb40-3" tabindex="-1"></a><span class="co">#&gt;   [0, 17] = &quot;Child&quot;</span></span>
+<span id="cb40-4"><a href="#cb40-4" tabindex="-1"></a><span class="co">#&gt;   [18, 64] = &quot;Adult&quot;</span></span>
+<span id="cb40-5"><a href="#cb40-5" tabindex="-1"></a><span class="co">#&gt;   [65, HIGH] = &quot;Senior&quot;</span></span>
+<span id="cb40-6"><a href="#cb40-6" tabindex="-1"></a><span class="co">#&gt;   .missing = &quot;Missing Age&quot;</span></span>
+<span id="cb40-7"><a href="#cb40-7" tabindex="-1"></a><span class="co">#&gt;   .other = &quot;Other&quot;</span></span>
+<span id="cb40-8"><a href="#cb40-8" tabindex="-1"></a><span class="co">#&gt; ;</span></span>
+<span id="cb40-9"><a href="#cb40-9" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">fexport</span>(<span class="at">GENDER =</span> gender_fmt))</span>
+<span id="cb40-10"><a href="#cb40-10" tabindex="-1"></a><span class="co">#&gt; VALUE GENDER (character)</span></span>
+<span id="cb40-11"><a href="#cb40-11" tabindex="-1"></a><span class="co">#&gt;   &quot;M&quot; = &quot;Male&quot;</span></span>
+<span id="cb40-12"><a href="#cb40-12" tabindex="-1"></a><span class="co">#&gt;   &quot;F&quot; = &quot;Female&quot;</span></span>
+<span id="cb40-13"><a href="#cb40-13" tabindex="-1"></a><span class="co">#&gt;   .missing = &quot;Unknown&quot;</span></span>
+<span id="cb40-14"><a href="#cb40-14" tabindex="-1"></a><span class="co">#&gt; ;</span></span></code></pre></div>
 </div>
 <div id="selective-import-no-auto-register" class="section level3">
 <h3>Selective Import (No Auto-register)</h3>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a><span class="fu">fclear</span>()</span>
-<span id="cb38-2"><a href="#cb38-2" tabindex="-1"></a><span class="co">#&gt; All formats cleared from library.</span></span>
-<span id="cb38-3"><a href="#cb38-3" tabindex="-1"></a></span>
-<span id="cb38-4"><a href="#cb38-4" tabindex="-1"></a>manual <span class="ot">&lt;-</span> <span class="fu">fimport</span>(csv_path, <span class="at">register =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb38-5"><a href="#cb38-5" tabindex="-1"></a><span class="co">#&gt; Warning: Skipping PICTURE format: &quot;PICFMT&quot;</span></span>
-<span id="cb38-6"><a href="#cb38-6" tabindex="-1"></a><span class="co">#&gt; ℹ TYPE=&quot;P&quot; is not supported by ksformat.</span></span>
-<span id="cb38-7"><a href="#cb38-7" tabindex="-1"></a><span class="co">#&gt; Warning: Skipped incompatible entry in format &quot;SMISSING&quot;:</span></span>
-<span id="cb38-8"><a href="#cb38-8" tabindex="-1"></a><span class="co">#&gt; ✖ SAS special missing value &#39;.A&#39; (HLO=&#39;S&#39;) has no R equivalent.</span></span>
-<span id="cb38-9"><a href="#cb38-9" tabindex="-1"></a><span class="co">#&gt; Warning: Skipped incompatible entry in format &quot;SMISSING&quot;:</span></span>
-<span id="cb38-10"><a href="#cb38-10" tabindex="-1"></a><span class="co">#&gt; ✖ SAS special missing value &#39;.B&#39; (HLO=&#39;S&#39;) has no R equivalent.</span></span>
-<span id="cb38-11"><a href="#cb38-11" tabindex="-1"></a><span class="co">#&gt; ✔ Imported 4 formats and 1 invalue from</span></span>
-<span id="cb38-12"><a href="#cb38-12" tabindex="-1"></a><span class="co">#&gt;   &#39;/tmp/RtmpGqVuz8/temp_libpathab72a7e807f47/ksformat/extdata/test_cntlout.csv&#39;.</span></span>
-<span id="cb38-13"><a href="#cb38-13" tabindex="-1"></a></span>
-<span id="cb38-14"><a href="#cb38-14" tabindex="-1"></a><span class="co"># Library should be empty</span></span>
-<span id="cb38-15"><a href="#cb38-15" tabindex="-1"></a><span class="fu">fprint</span>()</span>
-<span id="cb38-16"><a href="#cb38-16" tabindex="-1"></a><span class="co">#&gt; Format library is empty</span></span>
-<span id="cb38-17"><a href="#cb38-17" tabindex="-1"></a></span>
-<span id="cb38-18"><a href="#cb38-18" tabindex="-1"></a><span class="co"># Use directly from returned list</span></span>
-<span id="cb38-19"><a href="#cb38-19" tabindex="-1"></a><span class="fu">fput</span>(<span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>), manual[[<span class="st">&quot;GENDER&quot;</span>]])</span>
-<span id="cb38-20"><a href="#cb38-20" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Male&quot;   &quot;Female&quot;</span></span>
-<span id="cb38-21"><a href="#cb38-21" tabindex="-1"></a></span>
-<span id="cb38-22"><a href="#cb38-22" tabindex="-1"></a><span class="fu">fclear</span>()</span>
-<span id="cb38-23"><a href="#cb38-23" tabindex="-1"></a><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" tabindex="-1"></a><span class="fu">fclear</span>()</span>
+<span id="cb41-2"><a href="#cb41-2" tabindex="-1"></a><span class="co">#&gt; All formats cleared from library.</span></span>
+<span id="cb41-3"><a href="#cb41-3" tabindex="-1"></a></span>
+<span id="cb41-4"><a href="#cb41-4" tabindex="-1"></a>manual <span class="ot">&lt;-</span> <span class="fu">fimport</span>(csv_path, <span class="at">register =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb41-5"><a href="#cb41-5" tabindex="-1"></a><span class="co">#&gt; Warning: Skipping PICTURE format: &quot;PICFMT&quot;</span></span>
+<span id="cb41-6"><a href="#cb41-6" tabindex="-1"></a><span class="co">#&gt; ℹ TYPE=&quot;P&quot; is not supported by ksformat.</span></span>
+<span id="cb41-7"><a href="#cb41-7" tabindex="-1"></a><span class="co">#&gt; Warning: Skipped incompatible entry in format &quot;SMISSING&quot;:</span></span>
+<span id="cb41-8"><a href="#cb41-8" tabindex="-1"></a><span class="co">#&gt; ✖ SAS special missing value &#39;.A&#39; (HLO=&#39;S&#39;) has no R equivalent.</span></span>
+<span id="cb41-9"><a href="#cb41-9" tabindex="-1"></a><span class="co">#&gt; Warning: Skipped incompatible entry in format &quot;SMISSING&quot;:</span></span>
+<span id="cb41-10"><a href="#cb41-10" tabindex="-1"></a><span class="co">#&gt; ✖ SAS special missing value &#39;.B&#39; (HLO=&#39;S&#39;) has no R equivalent.</span></span>
+<span id="cb41-11"><a href="#cb41-11" tabindex="-1"></a><span class="co">#&gt; ✔ Imported 4 formats and 1 invalue from</span></span>
+<span id="cb41-12"><a href="#cb41-12" tabindex="-1"></a><span class="co">#&gt;   &#39;/tmp/Rtmpva3Nff/temp_libpath1ae2315f285421/ksformat/extdata/test_cntlout.csv&#39;.</span></span>
+<span id="cb41-13"><a href="#cb41-13" tabindex="-1"></a></span>
+<span id="cb41-14"><a href="#cb41-14" tabindex="-1"></a><span class="co"># Library should be empty</span></span>
+<span id="cb41-15"><a href="#cb41-15" tabindex="-1"></a><span class="fu">fprint</span>()</span>
+<span id="cb41-16"><a href="#cb41-16" tabindex="-1"></a><span class="co">#&gt; Format library is empty</span></span>
+<span id="cb41-17"><a href="#cb41-17" tabindex="-1"></a></span>
+<span id="cb41-18"><a href="#cb41-18" tabindex="-1"></a><span class="co"># Use directly from returned list</span></span>
+<span id="cb41-19"><a href="#cb41-19" tabindex="-1"></a><span class="fu">fput</span>(<span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>), manual[[<span class="st">&quot;GENDER&quot;</span>]])</span>
+<span id="cb41-20"><a href="#cb41-20" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Male&quot;   &quot;Female&quot;</span></span>
+<span id="cb41-21"><a href="#cb41-21" tabindex="-1"></a></span>
+<span id="cb41-22"><a href="#cb41-22" tabindex="-1"></a><span class="fu">fclear</span>()</span>
+<span id="cb41-23"><a href="#cb41-23" tabindex="-1"></a><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
 </div>
+</div>
+<div id="example-19-bilingual-format" class="section level2">
+<h2>Example 19: Bilingual Format</h2>
+<p>Expression labels can select between languages at apply-time using an
+extra argument:</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" tabindex="-1"></a><span class="co"># Single format, language selected via .x1 extra argument</span></span>
+<span id="cb42-2"><a href="#cb42-2" tabindex="-1"></a>sex_bi <span class="ot">&lt;-</span> <span class="fu">fnew</span>(</span>
+<span id="cb42-3"><a href="#cb42-3" tabindex="-1"></a>  <span class="st">&quot;M&quot;</span> <span class="ot">=</span> <span class="st">&quot;ifelse(.x1 == &#39;en&#39;, &#39;Male&#39;, &#39;Homme&#39;)&quot;</span>,</span>
+<span id="cb42-4"><a href="#cb42-4" tabindex="-1"></a>  <span class="st">&quot;F&quot;</span> <span class="ot">=</span> <span class="st">&quot;ifelse(.x1 == &#39;en&#39;, &#39;Female&#39;, &#39;Femme&#39;)&quot;</span>,</span>
+<span id="cb42-5"><a href="#cb42-5" tabindex="-1"></a>  <span class="at">.missing =</span> <span class="st">&quot;Unknown&quot;</span>,</span>
+<span id="cb42-6"><a href="#cb42-6" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">&quot;sex_bi&quot;</span></span>
+<span id="cb42-7"><a href="#cb42-7" tabindex="-1"></a>)</span>
+<span id="cb42-8"><a href="#cb42-8" tabindex="-1"></a></span>
+<span id="cb42-9"><a href="#cb42-9" tabindex="-1"></a><span class="co"># .x1 = language code per observation</span></span>
+<span id="cb42-10"><a href="#cb42-10" tabindex="-1"></a><span class="fu">fput</span>(<span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>, <span class="st">&quot;M&quot;</span>), sex_bi, <span class="fu">c</span>(<span class="st">&quot;en&quot;</span>, <span class="st">&quot;fr&quot;</span>, <span class="st">&quot;en&quot;</span>))</span>
+<span id="cb42-11"><a href="#cb42-11" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Male&quot;  &quot;Femme&quot; &quot;Male&quot;</span></span>
+<span id="cb42-12"><a href="#cb42-12" tabindex="-1"></a><span class="co"># -&gt; &quot;Male&quot; &quot;Femme&quot; &quot;Male&quot;</span></span>
+<span id="cb42-13"><a href="#cb42-13" tabindex="-1"></a></span>
+<span id="cb42-14"><a href="#cb42-14" tabindex="-1"></a><span class="co"># Alternative: one format per language, selected at apply-time</span></span>
+<span id="cb42-15"><a href="#cb42-15" tabindex="-1"></a><span class="fu">fnew</span>(<span class="st">&quot;M&quot;</span> <span class="ot">=</span> <span class="st">&quot;Male&quot;</span>,  <span class="st">&quot;F&quot;</span> <span class="ot">=</span> <span class="st">&quot;Female&quot;</span>,  <span class="at">.missing =</span> <span class="st">&quot;Unknown&quot;</span>, <span class="at">name =</span> <span class="st">&quot;sex_en&quot;</span>)</span>
+<span id="cb42-16"><a href="#cb42-16" tabindex="-1"></a><span class="fu">fnew</span>(<span class="st">&quot;M&quot;</span> <span class="ot">=</span> <span class="st">&quot;Homme&quot;</span>, <span class="st">&quot;F&quot;</span> <span class="ot">=</span> <span class="st">&quot;Femme&quot;</span>,   <span class="at">.missing =</span> <span class="st">&quot;Inconnu&quot;</span>, <span class="at">name =</span> <span class="st">&quot;sex_fr&quot;</span>)</span>
+<span id="cb42-17"><a href="#cb42-17" tabindex="-1"></a></span>
+<span id="cb42-18"><a href="#cb42-18" tabindex="-1"></a>lang <span class="ot">&lt;-</span> <span class="st">&quot;fr&quot;</span></span>
+<span id="cb42-19"><a href="#cb42-19" tabindex="-1"></a><span class="fu">fput</span>(<span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>, <span class="cn">NA</span>), <span class="fu">paste0</span>(<span class="st">&quot;sex_&quot;</span>, lang))</span>
+<span id="cb42-20"><a href="#cb42-20" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Homme&quot;   &quot;Femme&quot;   &quot;Inconnu&quot;</span></span>
+<span id="cb42-21"><a href="#cb42-21" tabindex="-1"></a><span class="co"># -&gt; &quot;Homme&quot; &quot;Femme&quot; &quot;Inconnu&quot;</span></span>
+<span id="cb42-22"><a href="#cb42-22" tabindex="-1"></a></span>
+<span id="cb42-23"><a href="#cb42-23" tabindex="-1"></a><span class="fu">fclear</span>()</span>
+<span id="cb42-24"><a href="#cb42-24" tabindex="-1"></a><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
 </div>
 
 

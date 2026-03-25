@@ -591,6 +591,75 @@ label_fmt <- fnew(
 )
 
 fput(c("val", "val"), label_fmt, c(42, 55), 100)
+```
+
+### Statistical Table Format with Computed Labels
+
+A realistic clinical-trial example: `e()` marks labels as expressions evaluated
+at apply-time, `.x1` references the extra argument, and multiline `dplyr::case_when`
+shows complex conditional formatting.
+
+```{r expr-stat-fnew}
+# Population counts used as denominators
+n.trt <- data.frame(pop = c("fas","pps","saf"), ntot = c(34, 30, 36))
+get_n <- function(pop) {
+  n.trt$ntot[n.trt$pop == pop]
+}
+
+fnew(
+  "n_fas" = e("get_n('fas')"),
+  "n_pps" = e("get_n('pps')"),
+  "n_saf" = e("get_n('saf')"),
+  "n"   = "sprintf('%d', .x1)",
+  "n_pct_fas" = "sprintf('%d (%5.1f%%)', .x1, .x1 * 100 / get_n('fas'))",
+  "n_pct_pps" = "sprintf('%d (%5.1f%%)', .x1, .x1 * 100 / get_n('pps'))",
+  "n_pct_saf" = "sprintf('%d (%5.1f%%)', .x1, .x1 * 100 / get_n('saf'))",
+  "pct" = "dplyr::case_when(
+               .x1>0 & .x1<0.1 ~ sprintf('%5s', ' <0.1%'),
+               .x1>=0.1 | .x1==0 ~ sprintf(paste0('%5.', 1 ,'f%%'), .x1)
+           )",
+  "pval" = "dplyr::case_when(
+                .x1>=0 & .x1<0.001 ~ sprintf('%s', '<0.001'),
+                .x1>=0.001 & .x1<=0.999 ~ sprintf(paste0('%.', 3 ,'f'), .x1),
+                .x1>0.999 ~ sprintf('%s', '>0.999'), .default = '--'
+           )",
+  name = "stat",
+  type = "character"
+)
+```
+
+The same format can be created via `fparse()`. Note that multiline expressions
+must be collapsed to single lines in the text block, and `(eval)` marks
+evaluated labels:
+
+```{r expr-stat-fparse}
+fmt <- '
+  VALUE stat_01 (character)
+     "n_fas" = "get_n(\'fas\')" (eval)
+     "n_pps" = "get_n(\'pps\')" (eval)
+     "n_saf" = "get_n(\'saf\')" (eval)
+     "n"     = "sprintf(\'%d\', .x1)"
+     "pct"   = "dplyr::case_when(.x1>0 & .x1<0.1 ~ sprintf(\'%5s\', \' <0.1%\'), .x1>=0.1 | .x1==0 ~ sprintf(paste0(\'%5.\', 1 ,\'f%%\'), .x1))"
+     "n_pct_fas" = "sprintf(\'%d (%5.1f%%)\', .x1, .x1 * 100 / get_n(\'fas\'))"
+     "n_pct_pps" = "sprintf(\'%d (%5.1f%%)\', .x1, .x1 * 100 / get_n(\'pps\'))"
+     "n_pct_saf" = "sprintf(\'%d (%5.1f%%)\', .x1, .x1 * 100 / get_n(\'saf\'))"
+     "pval"  = "dplyr::case_when(.x1>=0 & .x1<0.001 ~ sprintf(\'%s\', \'<0.001\'), .x1>=0.001 & .x1<=0.999 ~ sprintf(paste0(\'%.\', 3 ,\'f\'), .x1), .x1>0.999 ~ sprintf(\'%s\', \'>0.999\'), .default = \'--\')"
+;'
+fparse(fmt)
+```
+
+Both `stat` (via `fnew`) and `stat_01` (via `fparse`) produce identical results:
+
+```{r expr-stat-apply}
+df <- data.frame(
+  types = c("n_fas", "n_pps", "n_saf", "n", "pct", "pct", "n", "pval", "pval",
+            "n_pct_fas", "n_pct_pps", "n_pct_saf"),
+  values = c(NA, NA, NA, 42, 0.053, 0.0008, 100, 0.255, 0.0003, 22, 22, 22)
+)
+
+df$fmt    <- fput(df$types, "stat",    df$values)
+df$fmt_01 <- fput(df$types, "stat_01", df$values)
+print(df)
 
 fclear()
 ```
@@ -738,6 +807,34 @@ fprint()
 
 # Use directly from returned list
 fput(c("M", "F"), manual[["GENDER"]])
+
+fclear()
+```
+
+## Example 19: Bilingual Format
+
+Expression labels can select between languages at apply-time using an extra argument:
+
+```{r bilingual}
+# Single format, language selected via .x1 extra argument
+sex_bi <- fnew(
+  "M" = "ifelse(.x1 == 'en', 'Male', 'Homme')",
+  "F" = "ifelse(.x1 == 'en', 'Female', 'Femme')",
+  .missing = "Unknown",
+  name = "sex_bi"
+)
+
+# .x1 = language code per observation
+fput(c("M", "F", "M"), sex_bi, c("en", "fr", "en"))
+# -> "Male" "Femme" "Male"
+
+# Alternative: one format per language, selected at apply-time
+fnew("M" = "Male",  "F" = "Female",  .missing = "Unknown", name = "sex_en")
+fnew("M" = "Homme", "F" = "Femme",   .missing = "Inconnu", name = "sex_fr")
+
+lang <- "fr"
+fput(c("M", "F", NA), paste0("sex_", lang))
+# -> "Homme" "Femme" "Inconnu"
 
 fclear()
 ```
