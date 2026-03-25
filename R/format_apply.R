@@ -84,6 +84,30 @@ fput <- function(x, format, ..., keep_na = FALSE) {
   }
 
   extra_args <- list(...)
+
+  # Recycle x when extra args are longer (vectorized .xN support)
+  if (length(extra_args) > 0L) {
+    arg_lens <- vapply(extra_args, length, integer(1L))
+    non_scalar <- arg_lens[arg_lens > 1L]
+    if (length(non_scalar) > 0L) {
+      target_len <- non_scalar[1L]
+      # All non-scalar extra args must have the same length
+      if (!all(non_scalar == target_len)) {
+        cli_abort(
+          "Length mismatch in extra arguments: lengths {paste(arg_lens, collapse = ', ')}. All non-scalar arguments must have the same length."
+        )
+      }
+      nx <- length(x)
+      if (nx == 1L) {
+        x <- rep(x, target_len)
+      } else if (nx != target_len) {
+        cli_abort(
+          "Length mismatch: {.arg x} has length {nx} but extra arguments have length {target_len}. They must be equal (or {.arg x} must be scalar)."
+        )
+      }
+    }
+  }
+
   nocase <- isTRUE(format$ignore_case)
   caller_env <- parent.frame()
 
