@@ -2348,6 +2348,39 @@ test_that(".format_get resolves SAS datetime format on the fly", {
 # Code review fixes — regression tests
 # ============================================================
 
+test_that("fput expression: scalar x with scalar extra arg", {
+  fparse(text = '
+  VALUE stat (character)
+    "mean" = "sprintf(\"%.2f\", .x1)"
+  ;
+  ')
+  result <- fput("mean", "stat", 1.23456)
+  expect_equal(result, "1.23")
+  fclear()
+})
+
+test_that("fput expression: scalar x with vector extra arg", {
+  fparse(text = '
+  VALUE stat (character)
+    "mean" = "sprintf(\"%.2f\", .x1)"
+  ;
+  ')
+  result <- fput("mean", "stat", c(1.23456, 2.34567, 3.45678))
+  expect_equal(result, c("1.23", "2.35", "3.46"))
+  fclear()
+})
+
+test_that("fput expression: matching-length x and extra arg", {
+  fparse(text = '
+  VALUE stat (character)
+    "mean" = "sprintf(\"%.2f\", .x1)"
+  ;
+  ')
+  result <- fput(c("mean", "mean", "mean"), "stat", c(1.23456, 2.34567, 3.45678))
+  expect_equal(result, c("1.23", "2.35", "3.46"))
+  fclear()
+})
+
 test_that("fput vector recycling: length mismatch errors", {
   fparse(text = '
   VALUE stat
