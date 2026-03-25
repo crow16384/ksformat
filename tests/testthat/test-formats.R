@@ -1632,6 +1632,169 @@ VALUE stat (character)
 
 
 # ===========================================================================
+# Explicit (eval) / e() Expression Label Tests
+# ===========================================================================
+
+test_that("e() sets eval attribute on a string", {
+  label <- e("get_dttm('ru')")
+  expect_equal(as.character(label), "get_dttm('ru')")
+  expect_true(isTRUE(attr(label, "eval")))
+  fclear()
+})
+
+test_that("e() errors on non-string input", {
+  expect_error(e(42))
+  expect_error(e(c("a", "b")))
+  fclear()
+})
+
+test_that(".has_eval_attr detects eval attribute", {
+  expect_true(ksformat:::.has_eval_attr(e("test")))
+  expect_false(ksformat:::.has_eval_attr("test"))
+  fclear()
+})
+
+test_that("fnew with e() wrapper creates eval-marked labels", {
+  fmt <- fnew(
+    "ts" = e("format(Sys.time(), '%Y')"),
+    "static" = "Hello"
+  )
+  expect_true(isTRUE(attr(fmt$mappings[["ts"]], "eval")))
+  expect_null(attr(fmt$mappings[["static"]], "eval"))
+  fclear()
+})
+
+test_that("fput evaluates e() label calling user-defined function", {
+  my_greet <- function(lang) {
+    if (lang == "ru") "Привет" else "Hello"
+  }
+  fmt <- fnew(
+    "ru" = e("my_greet('ru')"),
+    "en" = e("my_greet('en')")
+  )
+  result <- fput(c("ru", "en"), fmt)
+  expect_equal(result, c("\u041f\u0440\u0438\u0432\u0435\u0442", "Hello"))
+  fclear()
+})
+
+test_that("fput with mixed e() and .xN labels", {
+  fmt <- fnew(
+    "ts" = e("format(Sys.time(), '%Y')"),
+    "n"  = "sprintf('%s', .x1)"
+  )
+  result <- fput(c("ts", "n"), fmt, c(0, 42))
+  expect_equal(result[1], format(Sys.time(), "%Y"))
+  expect_equal(result[2], "42")
+  fclear()
+})
+
+test_that("fput with e() label and .xN args combined", {
+  fmt <- fnew(
+    "val" = e("sprintf('%s items', .x1)")
+  )
+  result <- fput("val", fmt, 5)
+  expect_equal(result, "5 items")
+  fclear()
+})
+
+test_that("fparse with (eval) marker creates eval-marked labels", {
+  result <- fparse(text = '
+VALUE d_footer
+  "left_ru" = "paste(\"A\", \"B\")" (eval)
+  "left_en" = "Hello"
+;
+')
+  expect_true(isTRUE(attr(result$d_footer$mappings[["left_ru"]], "eval")))
+  expect_null(attr(result$d_footer$mappings[["left_en"]], "eval"))
+  fclear()
+})
+
+test_that("fparse (eval) label is evaluated by fput", {
+  my_suffix <- function() "!!!"
+  fparse(text = '
+VALUE eval_test
+  "k" = "my_suffix()" (eval)
+;
+')
+  result <- fput("k", "eval_test")
+  expect_equal(result, "!!!")
+  fclear()
+})
+
+test_that("fparse (eval) with .missing and .other", {
+  result <- fparse(text = '
+VALUE eval_mo
+  "a" = "Static"
+  .missing = "paste(\"M\", \"V\")" (eval)
+  .other = "paste(\"O\", \"V\")" (eval)
+;
+')
+  fmt <- result$eval_mo
+  expect_true(isTRUE(attr(fmt$missing_label, "eval")))
+  expect_true(isTRUE(attr(fmt$other_label, "eval")))
+
+  res <- fput(c("a", NA, "zzz"), fmt)
+  expect_equal(res[1], "Static")
+  expect_equal(res[2], "M V")
+  expect_equal(res[3], "O V")
+  fclear()
+})
+
+test_that("fexport roundtrip preserves (eval) flag", {
+  fmt <- fnew(
+    "ts" = e("format(Sys.time(), '%Y')"),
+    "static" = "Hello",
+    name = "rt_test"
+  )
+  txt <- fexport(rt_test = fmt)
+  expect_match(txt, '(eval)', fixed = TRUE)
+
+  fclear()
+  reparsed <- fparse(text = txt)
+  expect_true(isTRUE(attr(reparsed$rt_test$mappings[["ts"]], "eval")))
+  expect_null(attr(reparsed$rt_test$mappings[["static"]], "eval"))
+  fclear()
+})
+
+test_that("fexport roundtrip preserves (eval) on .missing/.other", {
+  fmt <- fnew(
+    "a" = "Static",
+    .missing = e("paste('miss')"),
+    .other = e("paste('other')"),
+    name = "rt_mo"
+  )
+  txt <- fexport(rt_mo = fmt)
+  expect_match(txt, '.missing = "paste(\'miss\')" (eval)', fixed = TRUE)
+  expect_match(txt, '.other = "paste(\'other\')" (eval)', fixed = TRUE)
+
+  fclear()
+  reparsed <- fparse(text = txt)
+  expect_true(isTRUE(attr(reparsed$rt_mo$missing_label, "eval")))
+  expect_true(isTRUE(attr(reparsed$rt_mo$other_label, "eval")))
+  fclear()
+})
+
+test_that("fput_all with e() eval labels", {
+  my_tag <- function() "TAG"
+  fmt <- fnew(
+    "a" = e("my_tag()"),
+    "b" = "Static"
+  )
+  result <- fput_all(c("a", "b"), fmt)
+  expect_equal(result[[1]], "TAG")
+  expect_equal(result[[2]], "Static")
+  fclear()
+})
+
+test_that("existing .xN expressions still work without (eval)", {
+  fmt <- fnew("n" = "sprintf('%s', .x1)")
+  result <- fput("n", fmt, 42)
+  expect_equal(result, "42")
+  fclear()
+})
+
+
+# ===========================================================================
 # Edge Case Tests
 # ===========================================================================
 

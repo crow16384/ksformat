@@ -816,8 +816,19 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
   lhs <- trimws(substring(line, 1, eq_pos - 1))
   rhs <- trimws(substring(line, eq_pos + 1))
 
+  # Check for (eval) marker before unquoting
+  has_eval <- grepl("\\(eval\\)\\s*$", rhs)
+  if (has_eval) {
+    rhs <- trimws(sub("\\s*\\(eval\\)\\s*$", "", rhs))
+  }
+
   # Unquote rhs
   rhs <- .unquote(rhs)
+
+  # Set eval attribute if (eval) marker was found
+  if (has_eval) {
+    attr(rhs, "eval") <- TRUE
+  }
 
   # Check for .missing / .other directives
   if (lhs == ".missing") {
@@ -1080,6 +1091,7 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
   for (i in seq_along(fmt$mappings)) {
     key <- names(fmt$mappings)[i]
     label <- fmt$mappings[[i]]
+    eval_suffix <- if (.has_eval_attr(label)) " (eval)" else ""
     parsed <- .parse_range_key(key)
     if (!is.null(parsed)) {
       left_bracket <- if (parsed$inc_low) "[" else "("
@@ -1087,18 +1099,20 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
       low <- .format_range_bound(parsed$low, is_low = TRUE)
       high <- .format_range_bound(parsed$high, is_low = FALSE)
       parts[[idx]] <- paste0("  ", left_bracket, low, ", ", high,
-                             right_bracket, " = \"", label, "\"")
+                             right_bracket, " = \"", label, "\"", eval_suffix)
     } else {
-      parts[[idx]] <- paste0("  \"", key, "\" = \"", label, "\"")
+      parts[[idx]] <- paste0("  \"", key, "\" = \"", label, "\"", eval_suffix)
     }
     idx <- idx + 1L
   }
 
   if (!is.null(fmt$missing_label)) {
-    parts[[idx]] <- paste0("  .missing = \"", fmt$missing_label, "\""); idx <- idx + 1L
+    miss_eval <- if (.has_eval_attr(fmt$missing_label)) " (eval)" else ""
+    parts[[idx]] <- paste0("  .missing = \"", fmt$missing_label, "\"", miss_eval); idx <- idx + 1L
   }
   if (!is.null(fmt$other_label)) {
-    parts[[idx]] <- paste0("  .other = \"", fmt$other_label, "\""); idx <- idx + 1L
+    other_eval <- if (.has_eval_attr(fmt$other_label)) " (eval)" else ""
+    parts[[idx]] <- paste0("  .other = \"", fmt$other_label, "\"", other_eval); idx <- idx + 1L
   }
   parts[[idx]] <- ";"
   paste(unlist(parts[seq_len(idx)]), collapse = "\n")
@@ -1144,7 +1158,8 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
   for (i in seq_along(inv$mappings)) {
     key <- names(inv$mappings)[i]
     value <- inv$mappings[[i]]
-    parts[[idx]] <- paste0("  \"", key, "\" = \"", value, "\""); idx <- idx + 1L
+    eval_suffix <- if (.has_eval_attr(value)) " (eval)" else ""
+    parts[[idx]] <- paste0("  \"", key, "\" = \"", value, "\"", eval_suffix); idx <- idx + 1L
   }
 
   if (!is.null(inv$missing_value) && !identical(inv$missing_value, NA)) {

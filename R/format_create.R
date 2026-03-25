@@ -142,6 +142,45 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
   format_obj
 }
 
+
+#' Mark a Label for Expression Evaluation
+#'
+#' Marks a format label string so it will be evaluated as an R expression
+#' at apply-time (\code{\link{fput}}), even when it does not contain
+#' \code{.x1}, \code{.x2}, etc. placeholders.
+#'
+#' @param expr Character string. The R expression to evaluate.
+#' @return The same character string with an \code{"eval"} attribute set to
+#'   \code{TRUE}.
+#'
+#' @details
+#' This is useful when a label should call a function that does not need
+#' positional \code{.xN} arguments.
+#' The expression is evaluated in the caller's environment of
+#' \code{\link{fput}}, so user-defined functions are accessible.
+#'
+#' Labels containing \code{.x1}, \code{.x2}, etc. are still evaluated
+#' automatically without needing \code{e()}.
+#'
+#' @export
+#' @examples
+#' # Mark an expression for evaluation at apply-time
+#' fmt <- fnew(
+#'   "timestamp" = e("format(Sys.time(), '%Y-%m-%d')"),
+#'   "static"    = "Hello",
+#'   name = "demo_eval"
+#' )
+#' fput(c("timestamp", "static"), fmt)
+#' fclear()
+e <- function(expr) {
+  if (!is.character(expr) || length(expr) != 1L) {
+    cli_abort("{.arg expr} must be a single character string.")
+  }
+  attr(expr, "eval") <- TRUE
+  expr
+}
+
+
 #' Detect Format Type
 #'
 #' @param keys Character vector of mapping key names

@@ -25,6 +25,17 @@ NULL
 }
 
 
+#' Check if a label has the eval attribute
+#'
+#' @param label Character string (the label/value side of a mapping)
+#' @return Logical
+#' @keywords internal
+#' @noRd
+.has_eval_attr <- function(label) {
+  isTRUE(attr(label, "eval"))
+}
+
+
 #' Evaluate an expression label with extra arguments
 #'
 #' Parses the expression string and evaluates it in an environment
@@ -36,8 +47,9 @@ NULL
 #' @return Character vector of evaluated results.
 #' @keywords internal
 #' @noRd
-.eval_expr_label <- function(expr_str, extra_args, indices) {
-  env <- new.env(parent = baseenv())
+.eval_expr_label <- function(expr_str, extra_args, indices,
+                             parent_env = baseenv()) {
+  env <- new.env(parent = parent_env)
 
   for (j in seq_along(extra_args)) {
     arg_name <- paste0(".x", j)

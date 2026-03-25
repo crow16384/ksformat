@@ -2,6 +2,7 @@
 
 S3method(print,ks_format)
 S3method(print,ks_invalue)
+export(e)
 export(fclear)
 export(fexport)
 export(fimport)
