@@ -46,6 +46,14 @@ finput <- function(..., name = NULL, target_type = "numeric", missing_value = NA
     cli_abort("At least one label-value mapping must be provided.")
   }
 
+  # Validate mapping values are scalar
+  for (i in seq_along(mappings)) {
+    val <- mappings[[i]]
+    if (length(val) != 1L) {
+      cli_abort("Mapping value for label {.val {names(mappings)[i]}} must be scalar (length 1), got length {length(val)}.")
+    }
+  }
+
   # Create invalue object
   invalue_obj <- structure(
     list(
@@ -131,6 +139,10 @@ finput <- function(..., name = NULL, target_type = "numeric", missing_value = NA
     if (any(not_na_vals)) {
       result[target_idx[not_na_vals]] <- converter(values[not_na_vals])
     }
+    # Explicitly assign NA for mappings that map to NA
+    if (any(!not_na_vals)) {
+      result[target_idx[!not_na_vals]] <- NA
+    }
   }
 
   # Unfound: try direct numeric conversion for numeric/integer types
@@ -185,6 +197,9 @@ finputn <- function(x, invalue_name) {
   inv_obj <- .format_get(invalue_name)
   if (!inherits(inv_obj, "ks_invalue")) {
     cli_abort("{.val {invalue_name}} is not an INVALUE format ({.cls ks_invalue}).")
+  }
+  if (!inv_obj$target_type %in% c("numeric", "integer")) {
+    cli_warn("{.val {invalue_name}} has target_type {.val {inv_obj$target_type}}, not numeric. Coercing result to numeric.")
   }
   result <- .invalue_apply(x, inv_obj)
   as.numeric(result)
@@ -263,6 +278,16 @@ finputc <- function(x, invalue_name) {
 #' fclear()
 fnew_bid <- function(..., name = NULL, type = "auto") {
   mappings <- list(...)
+
+  # Warn if multiple keys map to the same value (ambiguous reverse mapping)
+  values <- unlist(mappings, use.names = FALSE)
+  if (anyDuplicated(values)) {
+    dupes <- unique(values[duplicated(values)])
+    cli_warn(c(
+      "Multiple keys map to the same value{?s}: {.val {dupes}}",
+      "i" = "The reverse (invalue) mapping is ambiguous; only the first key per value will be used."
+    ))
+  }
 
   # Create format (value -> label)
   format_obj <- do.call(fnew, c(mappings, list(name = name, type = type)))

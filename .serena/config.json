@@ -1,0 +1,24 @@
+{
+  "project_name": "ksformat",
+  "project_root": "/home/rdev/ksformat",
+  "project_type": "r-package",
+  "language": "r",
+  "remote": {
+    "type": "ssh",
+    "host": "debian13",
+    "user": "rdev",
+    "path": "/home/rdev/ksformat"
+  },
+  "source_directories": ["R"],
+  "test_directories": ["tests"],
+  "documentation_directories": ["man"],
+  "code_file_extensions": [".R", ".r"],
+  "ignore_patterns": [
+    "*.Rcheck",
+    "*.tar.gz",
+    ".Rproj.user",
+    ".Rhistory",
+    ".RData",
+    "man/*.Rd"
+  ]
+}

@@ -61,7 +61,18 @@ NULL
     }
   }
 
-  parsed <- parse(text = expr_str)
+  parsed <- tryCatch(
+    parse(text = expr_str),
+    error = function(e) {
+      cli_warn(c(
+        "Expression parse failed: {conditionMessage(e)}",
+        "i" = "Expression: {expr_str}"
+      ))
+      NULL
+    }
+  )
+  if (is.null(parsed)) return(rep(NA_character_, length(indices)))
+
   result <- tryCatch(
     as.character(eval(parsed, envir = env)),
     error = function(e) {
@@ -74,8 +85,11 @@ NULL
   )
 
   # Ensure result length matches indices
-  if (length(result) != length(indices)) {
-    if (length(result) == 1) {
+  if (length(result) == 0L) {
+    cli_warn("Expression returned empty result, using NA. Expression: {expr_str}")
+    result <- rep(NA_character_, length(indices))
+  } else if (length(result) != length(indices)) {
+    if (length(result) == 1L) {
       result <- rep(result, length(indices))
     } else {
       cli_warn("Expression returned {length(result)} values, expected {length(indices)}. Recycling/truncating.")
@@ -169,6 +183,7 @@ in_range <- function(x, range_spec) {
   if (!inherits(range_spec, "range_spec")) {
     return(FALSE)
   }
+  if (length(x) == 1L && is.na(x)) return(FALSE)
 
   low_ok <- if (range_spec$inc_low) x >= range_spec$low else x > range_spec$low
   high_ok <- if (range_spec$inc_high) x <= range_spec$high else x < range_spec$high
@@ -264,6 +279,12 @@ in_range <- function(x, range_spec) {
     if (length(ci_match) == 1L) {
       return(get(ci_match, envir = .format_library))
     }
+    if (length(ci_match) > 1L) {
+      cli_abort(c(
+        "Ambiguous format name {.val {name}}: multiple case-insensitive matches found.",
+        "i" = "Matches: {.val {ci_match}}"
+      ))
+    }
 
     # Fallback: check if it's a built-in SAS datetime format
     if (.is_sas_datetime_format(name)) {
@@ -329,8 +350,9 @@ fprint <- function(name = NULL) {
       cat("Format library is empty\n")
     } else {
       cat("Registered formats:\n")
+      objs <- mget(fnames, envir = .format_library)
       for (nm in fnames) {
-        obj <- get(nm, envir = .format_library)
+        obj <- objs[[nm]]
         type_str <- if (inherits(obj, "ks_format")) {
           if (obj$type %in% c("date", "time", "datetime")) {
             sas_info <- if (!is.null(obj$sas_name)) paste0(", ", obj$sas_name, ".") else ""

@@ -3,35 +3,107 @@
 #' @description
 #' Provides 'SAS' 'PROC FORMAT'-like functionality for creating and applying
 #' value formats in R. The package supports mapping values to labels,
-#' range-based formatting, reverse formatting (invalue), and proper handling
-#' of missing values (NA, NULL, NaN).
+#' range-based formatting, reverse formatting (invalue), date/time/datetime
+#' formatting, and proper handling of missing values (NA, NULL, NaN).
 #'
 #' @details
-#' Main features:
+#' \strong{Format creation:}
 #' \itemize{
-#'   \item Create value-to-label mappings (formats) with \code{\link{fnew}}
-#'   \item Apply formats to vectors using \code{\link{fput}}
-#'   \item Apply formats by name: \code{\link{fputn}} (numeric), \code{\link{fputc}} (character)
-#'   \item Reverse formatting with \code{\link{finput}}, \code{\link{finputn}}, \code{\link{finputc}}
-#'   \item Apply invalues by name: \code{\link{finputn}} (numeric), \code{\link{finputc}} (character)
-#'   \item Parse 'SAS'-like format definitions from text with \code{\link{fparse}}
-#'   \item Global format library with auto-registration
-#'   \item Range-based formatting for numeric data
+#'   \item \code{\link{fnew}} — create value-to-label mappings (formats)
+#'   \item \code{\link{finput}} — create reverse mappings (label-to-value invalues)
+#'   \item \code{\link{fnew_bid}} — create both format and invalue simultaneously
+#'   \item \code{\link{fnew_date}} — create date/time/datetime formats ('SAS'-style or
+#'     custom \code{strftime} patterns)
+#'   \item \code{\link{fparse}} — parse 'SAS'-like format definitions from text or file
+#'   \item \code{\link{fimport}} — import formats from a 'SAS' CNTLOUT CSV file
+#'   \item \code{\link{e}} — mark a label for expression evaluation at apply-time
 #' }
 #'
-#' Cheat sheet: run \code{\link{ksformat_cheatsheet}()} to open the HTML version in your browser, or see the files in \code{system.file("doc", package = "ksformat")}.
+#' \strong{Format application:}
+#' \itemize{
+#'   \item \code{\link{fput}} — apply a format to a vector (value to label)
+#'   \item \code{\link{fputn}} — apply a numeric format by name (like 'SAS' PUTN)
+#'   \item \code{\link{fputc}} — apply a character format by name (like 'SAS' PUTC)
+#'   \item \code{\link{fput_all}} — apply a multilabel format returning all matching labels
+#'   \item \code{\link{fput_df}} — apply formats to data frame columns
+#' }
+#'
+#' \strong{Reverse formatting:}
+#' \itemize{
+#'   \item \code{\link{finputn}} — apply a numeric invalue by name (like 'SAS' INPUTN)
+#'   \item \code{\link{finputc}} — apply a character invalue by name (like 'SAS' INPUTC)
+#' }
+#'
+#' \strong{Format library:}
+#' \itemize{
+#'   \item \code{\link{format_get}} — retrieve a format from the global library
+#'   \item \code{\link{fprint}} — list or display registered formats
+#'   \item \code{\link{fclear}} — remove one or all formats from the library
+#'   \item \code{\link{fexport}} — export formats to 'SAS'-like text
+#' }
+#'
+#' \strong{Utilities:}
+#' \itemize{
+#'   \item \code{\link{is_missing}} — check for NA, NaN, and empty strings
+#'   \item \code{\link{range_spec}} — create a range specification object
+#' }
+#'
+#' \strong{Key features:}
+#' \itemize{
+#'   \item \emph{Discrete and range-based} numeric formatting with configurable
+#'     inclusive/exclusive bounds
+#'   \item \emph{Multilabel} formats — a value can match multiple labels
+#'     (\code{multilabel = TRUE} in \code{\link{fnew}}, retrieved with
+#'     \code{\link{fput_all}})
+#'   \item \emph{Case-insensitive matching} (\code{ignore_case = TRUE} in
+#'     \code{\link{fnew}})
+#'   \item \emph{Expression labels} — labels containing \code{.x1}, \code{.x2},
+#'     etc. are evaluated at apply-time; see also \code{\link{e}}
+#'   \item \emph{Date/time/datetime} formatting with built-in 'SAS' format
+#'     names (auto-resolved) or custom \code{strftime} patterns
+#'   \item \emph{Global format library} with auto-registration and
+#'     case-insensitive name lookup
+#'   \item \emph{CNTLOUT import} — read format catalogues exported from 'SAS'
+#' }
+#'
+#' Cheat sheet: run \code{\link{ksformat_cheatsheet}()} to open the HTML
+#' version in your browser, or see the files in
+#' \code{system.file("doc", package = "ksformat")}.
 #'
 #' @examples
+#' # Discrete format
 #' fnew("M" = "Male", "F" = "Female", .missing = "Unknown", name = "sex")
 #' fput(c("M", "F", NA), "sex")
 #'
+#' # Numeric range format (parsed from text)
 #' fparse(text = '
 #' VALUE age (numeric)
-#'   [0, 18) = "Child"
+#'   [0, 18)  = "Child"
 #'   [18, 65) = "Adult"
 #' ;
 #' ')
 #' fputn(c(5, 25), "age")
+#'
+#' # Bidirectional format + invalue
+#' fnew_bid("A" = "Active", "I" = "Inactive", name = "status")
+#' fputc("A", "status")
+#' finputc("Active", "status_inv")
+#'
+#' # Multilabel format
+#' ml <- fnew(
+#'   "0,17,TRUE,TRUE" = "Pediatric",
+#'   "18,Inf,TRUE,TRUE" = "Adult",
+#'   "0,Inf,TRUE,TRUE" = "Any Age",
+#'   name = "agegrp", type = "numeric", multilabel = TRUE
+#' )
+#' fput_all(c(10, 30), ml)
+#'
+#' # Date format (SAS-style, auto-resolved)
+#' fputn(Sys.Date(), "DATE9.")
+#'
+#' # Export and library management
+#' cat(fexport(sex = format_get("sex")))
+#' fprint()
 #' fclear()
 #'
 #' @docType package

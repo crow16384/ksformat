@@ -190,8 +190,13 @@ detect_format_type <- function(keys) {
   if (length(keys) == 0L) return("character")
 
   non_empty <- keys[!is.na(keys) & nzchar(keys)]
-  if (length(non_empty) > 0L &&
-      all(!is.na(suppressWarnings(as.numeric(non_empty))))) {
+
+  if (length(non_empty) == 0L) {
+    cli_warn("All mapping keys are empty or NA; defaulting to {.val numeric} type.")
+    return("numeric")
+  }
+
+  if (all(!is.na(suppressWarnings(as.numeric(non_empty))))) {
     return("numeric")
   }
 

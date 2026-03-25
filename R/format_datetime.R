@@ -414,10 +414,10 @@ fnew_date <- function(pattern, name = NULL, type = "auto",
     has_s   <- grepl("%S", std_pattern, fixed = TRUE) && !has_os
 
     fmt <- rep(std_pattern, length(total_secs))
-    if (has_os) for (j in seq_along(fmt)) fmt[j] <- sub("%OS", s_frac_str[j], fmt[j], fixed = TRUE)
-    if (has_h)  for (j in seq_along(fmt)) fmt[j] <- sub("%H", h_str[j], fmt[j], fixed = TRUE)
-    if (has_m)  for (j in seq_along(fmt)) fmt[j] <- sub("%M", m_str[j], fmt[j], fixed = TRUE)
-    if (has_s)  for (j in seq_along(fmt)) fmt[j] <- sub("%S", s_int_str[j], fmt[j], fixed = TRUE)
+    if (has_os) fmt <- mapply(sub, "%OS", s_frac_str, fmt, MoreArgs = list(fixed = TRUE), USE.NAMES = FALSE)
+    if (has_h)  fmt <- mapply(sub, "%H", h_str, fmt, MoreArgs = list(fixed = TRUE), USE.NAMES = FALSE)
+    if (has_m)  fmt <- mapply(sub, "%M", m_str, fmt, MoreArgs = list(fixed = TRUE), USE.NAMES = FALSE)
+    if (has_s)  fmt <- mapply(sub, "%S", s_int_str, fmt, MoreArgs = list(fixed = TRUE), USE.NAMES = FALSE)
 
     result[not_na] <- fmt
     return(result)
@@ -491,6 +491,16 @@ fnew_date <- function(pattern, name = NULL, type = "auto",
     return(as.POSIXct(x, origin = origin, tz = "UTC"))
   }
   if (is.character(x)) {
+    fmt_attempts <- c("%Y-%m-%d %H:%M:%S", "%Y/%m/%d %H:%M:%S",
+                      "%d%b%Y %H:%M:%S", "%d%b%Y:%H:%M:%S")
+    for (fmt in fmt_attempts) {
+      parsed <- tryCatch(
+        as.POSIXct(x, format = fmt, tz = "UTC"),
+        error = function(e) NULL
+      )
+      if (!is.null(parsed) && !all(is.na(parsed))) return(parsed)
+    }
+    # Fallback: default R parsing
     parsed <- as.POSIXct(x, tz = "UTC")
     return(parsed)
   }

@@ -13,15 +13,14 @@
 #' }
 ksformat_cheatsheet <- function(format = c("html", "pdf")) {
   format <- match.arg(format)
-  basename <- if (format == "html") "ksformat-cheatsheet.html" else "ksformat-Cheat-Sheet.pdf"
+  basename <- if (format == "html") "ksformat-cheatsheet.html" else "ksformat-cheatsheet.pdf"
   path <- system.file("doc", basename, package = "ksformat")
   if (!nzchar(path)) {
-    cli::cli_abort("Cheat sheet not found: {basename}. Reinstall the package.")
+    cli::cli_abort(c(
+      "Cheat sheet not found: {basename}",
+      "i" = "Try reinstalling the package."
+    ))
   }
-  if (format == "html") {
-    utils::browseURL(path)
-  } else {
-    utils::browseURL(path)
-  }
+  utils::browseURL(path)
   invisible(path)
 }

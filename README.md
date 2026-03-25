@@ -31,6 +31,11 @@ devtools::install()
 - **Reverse formatting** — Convert labels back to values (INVALUE)
 - **Missing value handling** — NA, NULL, NaN, and empty values
 - **Range support** — Numeric ranges with inclusive/exclusive bounds
+- **Multilabel** — A single value can match multiple labels (`fput_all`)
+- **Expression labels** — Dynamic labels with `.x1`, `.x2`, … evaluated at apply-time
+- **Case-insensitive matching** — `ignore_case = TRUE` in `fnew`
+- **Date/time/datetime** — Built-in SAS format names and custom `strftime` patterns
+- **Import/export** — Parse SAS-like text (`fparse`), export (`fexport`), import CNTLOUT CSV (`fimport`)
 - **Format library** — Register and retrieve formats globally
 
 ## Quick start
@@ -96,6 +101,82 @@ df <- data.frame(
 fput_df(df, sex = format_get("sex"), age = format_get("age"), suffix = "_label")
 ```
 
+## Multilabel formats
+
+With `multilabel = TRUE`, a single value can match multiple labels. Use `fput_all()` to collect all matches:
+
+```r
+fnew(
+  "0,17,TRUE,TRUE"  = "Pediatric",
+  "18,Inf,TRUE,TRUE" = "Adult",
+  "3,5,TRUE,TRUE"   = "Serious",
+  name = "ae_age", type = "numeric", multilabel = TRUE
+)
+
+fput_all(c(10, 25, 4), "ae_age")
+# [[1]] "Pediatric"
+# [[2]] "Adult"
+# [[3]] "Pediatric" "Serious"
+```
+
+## Date/time/datetime formats
+
+SAS date format names are auto-resolved — no pre-creation needed:
+
+```r
+fputn(Sys.Date(), "DATE9.")
+# [1] "25MAR2026"
+
+fputn(Sys.Date(), "MMDDYY10.")
+# [1] "03/25/2026"
+
+# Custom strftime pattern
+fnew_date("%d.%m.%Y", name = "ru_date", type = "date")
+fput(Sys.Date(), "ru_date")
+# [1] "25.03.2026"
+```
+
+Time (seconds since midnight) and datetime are also supported:
+
+```r
+fputn(3600, "TIME8.")
+# [1] "1:00:00"
+
+fputn(Sys.time(), "DATETIME20.")
+```
+
+## Expression labels
+
+Labels containing `.x1`, `.x2`, etc. are evaluated as R expressions at apply-time. Pass extra arguments through `fput(x, fmt, ...)`:
+
+```r
+stat_fmt <- fnew(
+  "n"   = "sprintf('%s', .x1)",
+  "pct" = "sprintf('%.1f%%', .x1 * 100)",
+  name = "stat", type = "character"
+)
+
+fput(c("n", "pct"), stat_fmt, c(42, 0.053))
+# [1] "42"   "5.3%"
+```
+
+Use `e()` to mark a label for evaluation even without `.xN` placeholders:
+
+```r
+fnew("ts" = e("format(Sys.time(), '%Y-%m-%d')"), name = "demo")
+fput("ts", "demo")
+```
+
+## Case-insensitive matching
+
+```r
+fnew("M" = "Male", "F" = "Female", name = "sex_nc",
+     type = "character", ignore_case = TRUE)
+
+fput(c("m", "F", "M", "f"), "sex_nc")
+# [1] "Male"   "Female" "Male"   "Female"
+```
+
 ## Missing value handling
 
 Priority order:
@@ -116,7 +197,7 @@ Options: `keep_na = TRUE`, `na_if`, `include_empty = TRUE`.
 
 | Area | Functions |
 |------|-----------|
-| **Creation** | `fnew()`, `finput()`, `fnew_bid()`, `fnew_date()`, `fparse()` |
+| **Creation** | `fnew()`, `finput()`, `fnew_bid()`, `fnew_date()`, `fparse()`, `e()` |
 | **Application** | `fput()`, `fputn()`, `fputc()`, `fput_all()`, `fput_df()` |
 | **Reverse** | `finputn()`, `finputc()` |
 | **Library** | `format_get()`, `fprint()`, `fclear()`, `fexport()`, `fimport()` |

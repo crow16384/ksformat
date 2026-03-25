@@ -540,9 +540,8 @@ fput_all <- function(x, format, ..., keep_na = FALSE) {
       if (label_is_eval) {
         expr_map[[label]] <- c(expr_map[[label]], non_miss[matched_pos])
       } else {
-        for (p in matched_pos) {
-          result[[non_miss[p]]] <- c(result[[non_miss[p]]], label)
-        }
+        target <- non_miss[matched_pos]
+        result[target] <- Map(c, result[target], list(label))
       }
     }
   }
@@ -563,9 +562,8 @@ fput_all <- function(x, format, ..., keep_na = FALSE) {
         if (re_is_eval) {
           expr_map[[re$label]] <- c(expr_map[[re$label]], non_miss[which(in_rng)])
         } else {
-          for (p in which(in_rng)) {
-            result[[non_miss[p]]] <- c(result[[non_miss[p]]], re$label)
-          }
+          target <- non_miss[which(in_rng)]
+          result[target] <- Map(c, result[target], list(re$label))
         }
       }
     }
@@ -578,9 +576,7 @@ fput_all <- function(x, format, ..., keep_na = FALSE) {
       evaled <- .eval_expr_label(
         expr_str, extra_args, indices, parent_env = caller_env
       )
-      for (k in seq_along(indices)) {
-        result[[indices[k]]] <- c(result[[indices[k]]], evaled[k])
-      }
+      result[indices] <- Map(c, result[indices], as.list(evaled))
     }
   }
 

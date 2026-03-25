@@ -840,7 +840,7 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
 
   # Check for interval notation: [low, high) or (low, high] etc.
   interval_match <- regmatches(lhs, regexec(
-    "^(\\[|\\()\\s*(-?[0-9.]+|LOW|HIGH|Inf|-Inf)\\s*,\\s*(-?[0-9.]+|LOW|HIGH|Inf|-Inf)\\s*(\\]|\\))$",
+    "^(\\[|\\()\\s*(-?[0-9]+(?:\\.[0-9]+)?|LOW|HIGH|Inf|-Inf)\\s*,\\s*(-?[0-9]+(?:\\.[0-9]+)?|LOW|HIGH|Inf|-Inf)\\s*(\\]|\\))$",
     lhs, ignore.case = TRUE
   ))[[1]]
 
@@ -864,7 +864,7 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
 
   # Check for legacy range: low - high pattern (no brackets)
   range_match <- regmatches(lhs, regexec(
-    "^(-?[0-9.]+|LOW|HIGH|Inf|-Inf)\\s*-\\s*(-?[0-9.]+|LOW|HIGH|Inf|-Inf)$",
+    "^(-?[0-9]+(?:\\.[0-9]+)?|LOW|HIGH|Inf|-Inf)\\s*-\\s*(-?[0-9]+(?:\\.[0-9]+)?|LOW|HIGH|Inf|-Inf)$",
     lhs, ignore.case = TRUE
   ))[[1]]
 

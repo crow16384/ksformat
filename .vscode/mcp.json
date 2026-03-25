@@ -1,0 +1,13 @@
+{
+	"servers": {
+		"oraios/serena": {
+			"type": "stdio",
+			"command": "bash",
+			"args": [
+				"${workspaceFolder}/tools/start_serena.sh",
+				"${workspaceFolder}"
+			]
+		}
+	},
+	"inputs": []
+}

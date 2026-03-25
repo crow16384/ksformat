@@ -6,10 +6,6 @@
 *.tar.gz
 *.Rproj
 .github/
-.serena/
-.vscode/
-.serena.project
-.serenaproject
 .DS_*
 ._.DS_*
 ._*
