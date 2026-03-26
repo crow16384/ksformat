@@ -112,8 +112,16 @@ fprint()
 fclear()
 
 }
+\seealso{
+Source repository and issue tracker: \url{https://github.com/crow16384/ksformat}
+}
 \author{
 \strong{Maintainer}: Vladimir Larchenko \email{vladimir.larchenko@keystatsolutions.com}
+
+Authors:
+\itemize{
+  \item Igor Aleschenkov \email{igor.aleschenkov@keystatsolutions.com}
+}
 
 }
 \keyword{package}

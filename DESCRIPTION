@@ -1,14 +1,19 @@
 Package: ksformat
 Type: Package
 Title: 'SAS'-Style 'PROC FORMAT' for R
-Version: 0.4.0
-Author: Vladimir Larchenko [aut, cre]
+Version: 0.4.1
+Author: Vladimir Larchenko [aut, cre], Igor Aleschenkov [aut]
 Maintainer: Vladimir Larchenko <vladimir.larchenko@keystatsolutions.com>
 Authors@R: c(
     person(
       "Vladimir", "Larchenko",
       email = "vladimir.larchenko@keystatsolutions.com",
       role = c("aut", "cre")
+    ),
+    person(
+      "Igor", "Aleschenkov",
+      email = "igor.aleschenkov@keystatsolutions.com",
+      role = "aut"
     )
   )
 Description: Provides 'SAS' 'PROC FORMAT'-like functionality for creating and applying
@@ -17,6 +22,8 @@ Description: Provides 'SAS' 'PROC FORMAT'-like functionality for creating and ap
     names, multilabel formats, expression labels evaluated at apply-time,
     case-insensitive matching, import/export of format definitions, and proper handling
     of missing values (NA, NULL, NaN).
+URL: https://github.com/crow16384/ksformat
+BugReports: https://github.com/crow16384/ksformat/issues
 License: GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.3.3

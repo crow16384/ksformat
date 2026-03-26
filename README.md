@@ -7,6 +7,8 @@
 
 SAS-style **PROC FORMAT** for R: create and apply value formats, range-based formatting, reverse formatting (invalue), and consistent handling of missing values (NA, NULL, NaN).
 
+**Repository:** [github.com/crow16384/ksformat](https://github.com/crow16384/ksformat) — source code, issue tracker, and development.
+
 ## Installation
 
 **From GitHub** (after cloning or from your repo URL):

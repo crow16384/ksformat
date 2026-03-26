@@ -70,6 +70,9 @@
 #' version in your browser, or see the files in
 #' \code{system.file("doc", package = "ksformat")}.
 #'
+#' @seealso
+#' Source repository and issue tracker: \url{https://github.com/crow16384/ksformat}
+#'
 #' @examples
 #' # Discrete format
 #' fnew("M" = "Male", "F" = "Female", .missing = "Unknown", name = "sex")

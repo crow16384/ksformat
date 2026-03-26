@@ -6,11 +6,6 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SAS-Style PROC FORMAT for R • ksformat</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="48x48" href="favicon-48x48.png">
-<link rel="icon" type="”image/svg+xml”" href="favicon.svg">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" sizes="any" href="favicon.ico">
-<link rel="manifest" href="site.webmanifest">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
@@ -39,7 +34,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.1</span>
       </span>
     </div>
 
@@ -61,7 +56,14 @@
   </ul>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/crow16384/ksformat/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
+
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -78,6 +80,7 @@
 </h1></div>
 <p><a href="https://github.com/crow16384/ksformat" class="external-link"><img src="https://img.shields.io/badge/PROC%20FORMAT%20for%20R-ksformat-217346?logo=r" alt="PROC FORMAT for R"></a> <a href="https://github.com/crow16384/ksformat" class="external-link"><img src="https://img.shields.io/badge/GitHub-crow16384%2Fksformat-181717?logo=github" alt="GitHub"></a> <a href="https://www.gnu.org/licenses/gpl-3.0" class="external-link"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3"></a> <a href="https://www.r-project.org/" class="external-link"><img src="https://img.shields.io/badge/R-package-276DC3?logo=r" alt="R package"></a></p>
 <p>SAS-style <strong>PROC FORMAT</strong> for R: create and apply value formats, range-based formatting, reverse formatting (invalue), and consistent handling of missing values (NA, NULL, NaN).</p>
+<p><strong>Repository:</strong> <a href="https://github.com/crow16384/ksformat" class="external-link">github.com/crow16384/ksformat</a> — source code, issue tracker, and development.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -127,7 +130,7 @@
 <h3 id="discrete-formatting">Discrete formatting<a class="anchor" aria-label="anchor" href="#discrete-formatting"></a>
 </h3>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">ksformat</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/crow16384/ksformat" class="external-link">ksformat</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="reference/fnew.html">fnew</a></span><span class="op">(</span></span>
 <span>  <span class="st">"M"</span> <span class="op">=</span> <span class="st">"Male"</span>,</span>
@@ -353,6 +356,8 @@
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
 <li><a href="https://cloud.r-project.org/package=ksformat" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/crow16384/ksformat/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/crow16384/ksformat/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
@@ -375,6 +380,7 @@
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Vladimir Larchenko <br><small class="roles"> Author, maintainer </small>   </li>
+<li>Igor Aleschenkov <br><small class="roles"> Author </small>   </li>
 </ul>
 </div>
 
@@ -386,7 +392,7 @@
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by Vladimir Larchenko.</p>
+<p>Developed by Vladimir Larchenko, Igor Aleschenkov.</p>
 </div>
 
 <div class="pkgdown">
