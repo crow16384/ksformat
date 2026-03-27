@@ -6,6 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ksformat Usage Examples • ksformat</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="48x48" href="../favicon-48x48.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
@@ -416,12 +421,12 @@ once:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;      format         result</span></span>
-<span><span class="co">#&gt; 1    DATE9.      26MAR2026</span></span>
-<span><span class="co">#&gt; 2 MMDDYY10.     03/26/2026</span></span>
-<span><span class="co">#&gt; 3 DDMMYY10.     26/03/2026</span></span>
-<span><span class="co">#&gt; 4 YYMMDD10.     2026-03-26</span></span>
+<span><span class="co">#&gt; 1    DATE9.      27MAR2026</span></span>
+<span><span class="co">#&gt; 2 MMDDYY10.     03/27/2026</span></span>
+<span><span class="co">#&gt; 3 DDMMYY10.     27/03/2026</span></span>
+<span><span class="co">#&gt; 4 YYMMDD10.     2026-03-27</span></span>
 <span><span class="co">#&gt; 5   MONYY7.        MAR2026</span></span>
-<span><span class="co">#&gt; 6 WORDDATE. March 26, 2026</span></span>
+<span><span class="co">#&gt; 6 WORDDATE. March 27, 2026</span></span>
 <span><span class="co">#&gt; 7    YEAR4.           2026</span></span>
 <span><span class="co">#&gt; 8      QTR.              1</span></span>
 <span></span>
@@ -477,10 +482,10 @@ once:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;        format             result</span></span>
-<span><span class="co">#&gt; 1 DATETIME20. 26MAR2026:08:22:48</span></span>
-<span><span class="co">#&gt; 2 DATETIME13.      26MAR26:08:22</span></span>
-<span><span class="co">#&gt; 3     DTDATE.          26MAR2026</span></span>
-<span><span class="co">#&gt; 4   DTYYMMDD.         2026-03-26</span></span>
+<span><span class="co">#&gt; 1 DATETIME20. 27MAR2026:20:22:09</span></span>
+<span><span class="co">#&gt; 2 DATETIME13.      27MAR26:20:22</span></span>
+<span><span class="co">#&gt; 3     DTDATE.          27MAR2026</span></span>
+<span><span class="co">#&gt; 4   DTYYMMDD.         2026-03-27</span></span>
 <span></span>
 <span><span class="co"># From numeric R-epoch seconds</span></span>
 <span><span class="va">r_secs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2025-06-15 14:30:00"</span>, tz <span class="op">=</span> <span class="st">"UTC"</span><span class="op">)</span><span class="op">)</span></span>
@@ -1034,7 +1039,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/tmp/RtmpvNHqHG/temp_libpath1b650ce22f384/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/tmp/RtmpM5wpZA/temp_libpath1dddc333038a4b/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">imported</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "AGEGRP"   "BMICAT"   "GENDER"   "RACEIN"   "SMISSING"</span></span>
 <span></span>
@@ -1160,7 +1165,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/tmp/RtmpvNHqHG/temp_libpath1b650ce22f384/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/tmp/RtmpM5wpZA/temp_libpath1dddc333038a4b/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span></span>
 <span><span class="co"># Library should be empty</span></span>
 <span><span class="fu"><a href="../reference/fprint.html">fprint</a></span><span class="op">(</span><span class="op">)</span></span>

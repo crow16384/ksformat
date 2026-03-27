@@ -16,5 +16,6 @@
 ^tools$
 
 ^doc$
+^docs$
 ^Meta$
 ^.*\.Rcheck$

@@ -140,6 +140,14 @@ test_that("finputc applies character invalue by name", {
   fclear()
 })
 
+test_that(".find_cheatsheet_path returns a path for known formats", {
+  html_result <- ksformat:::.find_cheatsheet_path("html")
+  expect_type(html_result, "character")
+
+  pdf_result <- ksformat:::.find_cheatsheet_path("pdf")
+  expect_type(pdf_result, "character")
+})
+
 context("Invalue Creation and Application (finput)")
 
 test_that(".invalue_apply reverses formatting", {
