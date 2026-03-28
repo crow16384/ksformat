@@ -71,7 +71,7 @@ formatting, and proper handling of missing values (NA, NULL, NaN).
   \item \emph{CNTLOUT import} — read format catalogues exported from 'SAS'
 }
 
-Cheat sheet: run \code{\link{ksformat_cheatsheet}()} to open the HTML
+Cheat sheet: run \code{\link[ksformat]{ksformat_cheatsheet}()} to open the HTML
 version in your browser, or see the files in
 \code{system.file("doc", package = "ksformat")}.
 }
