@@ -49,28 +49,37 @@ NULL
 #' @noRd
 .eval_expr_label <- function(expr_str, extra_args, indices,
                              parent_env = baseenv()) {
-  env <- new.env(parent = parent_env)
-
-  for (j in seq_along(extra_args)) {
-    arg_name <- paste0(".x", j)
-    arg_val <- extra_args[[j]]
-    if (length(arg_val) == 1L) {
-      assign(arg_name, arg_val, envir = env)
-    } else {
-      assign(arg_name, arg_val[indices], envir = env)
+  # Build .x1, .x2, ... bindings via list2env (single C-level call)
+  n_args <- length(extra_args)
+  if (n_args > 0L) {
+    xn_vals <- vector("list", n_args)
+    xn_names <- paste0(".x", seq_len(n_args))
+    for (j in seq_len(n_args)) {
+      av <- extra_args[[j]]
+      xn_vals[[j]] <- if (length(av) == 1L) av else av[indices]
     }
+    env <- list2env(setNames(xn_vals, xn_names), parent = parent_env)
+  } else {
+    env <- new.env(parent = parent_env)
   }
 
-  parsed <- tryCatch(
-    parse(text = expr_str),
-    error = function(e) {
-      cli_warn(c(
-        "Expression parse failed: {conditionMessage(e)}",
-        "i" = "Expression: {expr_str}"
-      ))
-      NULL
-    }
-  )
+  # Use cached parsed expression to avoid repeat parse() calls
+  parsed <- if (exists(expr_str, envir = .expr_parse_cache, inherits = FALSE)) {
+    .expr_parse_cache[[expr_str]]
+  } else {
+    p <- tryCatch(
+      parse(text = expr_str),
+      error = function(e) {
+        cli_warn(c(
+          "Expression parse failed: {conditionMessage(e)}",
+          "i" = "Expression: {expr_str}"
+        ))
+        NULL
+      }
+    )
+    if (!is.null(p)) assign(expr_str, p, envir = .expr_parse_cache)
+    p
+  }
   if (is.null(parsed)) return(rep(NA_character_, length(indices)))
 
   result <- tryCatch(
@@ -227,6 +236,14 @@ in_range <- function(x, range_spec) {
 
   NULL
 }
+
+#' Parse Cache for Expression Labels
+#'
+#' Caches parsed R expressions (from \code{parse()}) keyed by the expression
+#' string to avoid repeated parsing on successive \code{fput()} calls.
+#'
+#' @keywords internal
+.expr_parse_cache <- new.env(hash = TRUE, parent = emptyenv())
 
 #' Format Library (Global Environment for Storing Formats)
 #'
