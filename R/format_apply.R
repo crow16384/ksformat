@@ -164,12 +164,20 @@ fput <- function(x, format, ..., keep_na = FALSE) {
       matched[found_nm[static]] <- TRUE
     }
 
-    # Defer expression labels — group by label in one vectorized pass (avoids O(N²) growth)
+    # Defer expression labels — group by label
     if (any(is_expr)) {
       expr_idx <- which(is_expr)
-      grouped <- split(found_nm[expr_idx], found_labels[expr_idx])
-      for (lbl in names(grouped)) {
-        expr_map[[lbl]] <- c(expr_map[[lbl]], grouped[[lbl]])
+      expr_labels <- found_labels[expr_idx]
+      unique_expr <- unique(expr_labels)
+      if (length(unique_expr) == 1L) {
+        # Fast path: single expression label (common case)
+        expr_map[[unique_expr]] <- c(expr_map[[unique_expr]], found_nm[expr_idx])
+      } else {
+        # General case: multiple expression labels
+        grouped <- split(found_nm[expr_idx], expr_labels)
+        for (lbl in names(grouped)) {
+          expr_map[[lbl]] <- c(expr_map[[lbl]], grouped[[lbl]])
+        }
       }
       matched[found_nm[is_expr]] <- TRUE
     }

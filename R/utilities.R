@@ -131,7 +131,7 @@ is_missing <- function(x) {
   if (is.null(x)) return(logical(0))
   out <- is.na(x)
   if (is.numeric(x)) return(out | is.nan(x))
-  out | nchar(x) == 0L
+  out | !nzchar(x)
 }
 
 #' Create Range Specification
