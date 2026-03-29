@@ -164,11 +164,12 @@ fput <- function(x, format, ..., keep_na = FALSE) {
       matched[found_nm[static]] <- TRUE
     }
 
-    # Defer expression labels
+    # Defer expression labels — group by label in one vectorized pass (avoids O(N²) growth)
     if (any(is_expr)) {
-      for (j in which(is_expr)) {
-        lbl <- found_labels[j]
-        expr_map[[lbl]] <- c(expr_map[[lbl]], found_nm[j])
+      expr_idx <- which(is_expr)
+      grouped <- split(found_nm[expr_idx], found_labels[expr_idx])
+      for (lbl in names(grouped)) {
+        expr_map[[lbl]] <- c(expr_map[[lbl]], grouped[[lbl]])
       }
       matched[found_nm[is_expr]] <- TRUE
     }
