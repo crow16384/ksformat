@@ -62,6 +62,17 @@ INVALUE name
   \item \code{.missing} and \code{.other} are special directives
   \item Lines starting with \code{/*}, \code{*}, \code{//}, or \code{#} are comments
 }
+
+\strong{Block options:}
+
+Comma-separated options can be placed inside the parentheses after the type:
+\itemize{
+  \item \code{nocase} — enables case-insensitive key matching (equivalent to
+        \code{ignore_case = TRUE} in \code{\link{fnew}}).
+  \item \code{multilabel} — allows overlapping ranges where a single value
+        matches multiple labels (used with \code{\link{fput_all}}).
+}
+Options can be combined: \code{VALUE name (character, nocase, multilabel)}.
 }
 \examples{
 # Parse multiple format definitions from text
@@ -112,6 +123,18 @@ VALUE stamp (datetime)
 fput(as.Date("2025-03-01"), "enrldt")
 fput(36000, "visit_time")
 fput(as.POSIXct("2025-03-01 10:00:00", tz = "UTC"), "stamp")
+fclear()
+
+# Case-insensitive format (nocase option)
+fparse(text = '
+VALUE yesno (character, nocase)
+  "Y" = "Yes"
+  "N" = "No"
+  .other = "Unknown"
+;
+')
+fput(c("y", "N", "YES"), "yesno")
+# [1] "Yes" "No" "Unknown"
 fclear()
 
 # Parse multilabel format
