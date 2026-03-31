@@ -106,6 +106,7 @@
 #'
 #' # Export and library management
 #' cat(fexport(sex = format_get("sex")))
+#' flist()           # character vector of registered names
 #' fprint()
 #' fclear()
 #'

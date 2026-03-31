@@ -58,6 +58,7 @@ because R has no equivalent concept.
 
 csv_file <- system.file("extdata", "test_cntlout.csv", package = "ksformat")
 imported <- fimport(csv_file)
+flist()
 fprint()
 fclear()
 }

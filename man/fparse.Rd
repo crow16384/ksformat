@@ -101,6 +101,7 @@ INVALUE race_inv
 fput(c("M", "F", NA), "sex")
 fputn(c(5, 25, 70, NA), "age")
 finputn(c("White", "Black"), "race_inv")
+flist()
 fprint()
 fclear()
 

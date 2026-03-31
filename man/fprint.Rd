@@ -20,7 +20,12 @@ When called with a name, displays the full definition of that format.
 }
 \examples{
 fnew("M" = "Male", "F" = "Female", name = "sex")
+flist()          # character vector of names
 fprint()         # list all formats
 fprint("sex")    # show specific format
 fclear()
+}
+\seealso{
+\code{\link{flist}} for a programmatic alternative that returns
+  a character vector of registered names.
 }

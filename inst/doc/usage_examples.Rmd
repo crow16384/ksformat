@@ -172,6 +172,7 @@ INVALUE race_inv
 ;
 ')
 
+flist()   # character vector of names
 fprint()
 ```
 
@@ -737,6 +738,7 @@ csv_path <- system.file("extdata", "test_cntlout.csv", package = "ksformat")
 imported <- fimport(csv_path)
 names(imported)
 
+flist()
 fprint()
 ```
 
@@ -803,6 +805,7 @@ fclear()
 manual <- fimport(csv_path, register = FALSE)
 
 # Library should be empty
+flist()
 fprint()
 
 # Use directly from returned list

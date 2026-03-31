@@ -91,6 +91,7 @@
 #' fput(c("M", "F", NA), "sex")
 #' fputn(c(5, 25, 70, NA), "age")
 #' finputn(c("White", "Black"), "race_inv")
+#' flist()
 #' fprint()
 #' fclear()
 #'
@@ -336,6 +337,7 @@ fexport <- function(..., formats = NULL, file = NULL) {
 #'
 #' csv_file <- system.file("extdata", "test_cntlout.csv", package = "ksformat")
 #' imported <- fimport(csv_file)
+#' flist()
 #' fprint()
 #' fclear()
 fimport <- function(file, register = TRUE, overwrite = TRUE) {

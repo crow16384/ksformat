@@ -583,17 +583,20 @@ once:</p>
 <span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="st">;</span></span>
 <span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="st">&#39;</span>)</span>
 <span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a></span>
-<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="fu">fprint</span>()</span>
-<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt; Registered formats:</span></span>
-<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co">#&gt;   age - VALUE (numeric), 3 mapping(s)</span></span>
-<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="co">#&gt;   bmi - VALUE (numeric), 4 mapping(s)</span></span>
-<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co">#&gt;   race - VALUE (character), 3 mapping(s)</span></span>
-<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="co">#&gt;   race_inv - INVALUE (numeric), 3 mapping(s)</span></span>
-<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="co">#&gt;   score - VALUE (numeric), 2 mapping(s)</span></span>
-<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a><span class="co">#&gt;   sex - VALUE (character), 2 mapping(s)</span></span>
-<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a><span class="co">#&gt;   sex_inv - INVALUE (numeric), 2 mapping(s)</span></span>
-<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a><span class="co">#&gt;   status - VALUE (character), 3 mapping(s)</span></span>
-<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a><span class="co">#&gt;   status_inv - INVALUE (character), 3 mapping(s)</span></span></code></pre></div>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="fu">flist</span>()   <span class="co"># character vector of names</span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt; [1] &quot;age&quot;        &quot;bmi&quot;        &quot;race&quot;       &quot;race_inv&quot;   &quot;score&quot;     </span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co">#&gt; [6] &quot;sex&quot;        &quot;sex_inv&quot;    &quot;status&quot;     &quot;status_inv&quot;</span></span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="fu">fprint</span>()</span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co">#&gt; Registered formats:</span></span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="co">#&gt;   age - VALUE (numeric), 3 mapping(s)</span></span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="co">#&gt;   bmi - VALUE (numeric), 4 mapping(s)</span></span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a><span class="co">#&gt;   race - VALUE (character), 3 mapping(s)</span></span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a><span class="co">#&gt;   race_inv - INVALUE (numeric), 3 mapping(s)</span></span>
+<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a><span class="co">#&gt;   score - VALUE (numeric), 2 mapping(s)</span></span>
+<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a><span class="co">#&gt;   sex - VALUE (character), 2 mapping(s)</span></span>
+<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a><span class="co">#&gt;   sex_inv - INVALUE (numeric), 2 mapping(s)</span></span>
+<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a><span class="co">#&gt;   status - VALUE (character), 3 mapping(s)</span></span>
+<span id="cb7-31"><a href="#cb7-31" tabindex="-1"></a><span class="co">#&gt;   status_inv - INVALUE (character), 3 mapping(s)</span></span></code></pre></div>
 </div>
 <div id="example-8-export-formats-back-to-text" class="section level2">
 <h2>Example 8: Export Formats Back to Text</h2>
@@ -689,12 +692,12 @@ once:</p>
 <span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a>  )</span>
 <span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a>)</span>
 <span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a><span class="co">#&gt;      format         result</span></span>
-<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a><span class="co">#&gt; 1    DATE9.      26MAR2026</span></span>
-<span id="cb12-19"><a href="#cb12-19" tabindex="-1"></a><span class="co">#&gt; 2 MMDDYY10.     03/26/2026</span></span>
-<span id="cb12-20"><a href="#cb12-20" tabindex="-1"></a><span class="co">#&gt; 3 DDMMYY10.     26/03/2026</span></span>
-<span id="cb12-21"><a href="#cb12-21" tabindex="-1"></a><span class="co">#&gt; 4 YYMMDD10.     2026-03-26</span></span>
+<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a><span class="co">#&gt; 1    DATE9.      31MAR2026</span></span>
+<span id="cb12-19"><a href="#cb12-19" tabindex="-1"></a><span class="co">#&gt; 2 MMDDYY10.     03/31/2026</span></span>
+<span id="cb12-20"><a href="#cb12-20" tabindex="-1"></a><span class="co">#&gt; 3 DDMMYY10.     31/03/2026</span></span>
+<span id="cb12-21"><a href="#cb12-21" tabindex="-1"></a><span class="co">#&gt; 4 YYMMDD10.     2026-03-31</span></span>
 <span id="cb12-22"><a href="#cb12-22" tabindex="-1"></a><span class="co">#&gt; 5   MONYY7.        MAR2026</span></span>
-<span id="cb12-23"><a href="#cb12-23" tabindex="-1"></a><span class="co">#&gt; 6 WORDDATE. March 26, 2026</span></span>
+<span id="cb12-23"><a href="#cb12-23" tabindex="-1"></a><span class="co">#&gt; 6 WORDDATE. March 31, 2026</span></span>
 <span id="cb12-24"><a href="#cb12-24" tabindex="-1"></a><span class="co">#&gt; 7    YEAR4.           2026</span></span>
 <span id="cb12-25"><a href="#cb12-25" tabindex="-1"></a><span class="co">#&gt; 8      QTR.              1</span></span>
 <span id="cb12-26"><a href="#cb12-26" tabindex="-1"></a></span>
@@ -744,10 +747,10 @@ once:</p>
 <span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a>  )</span>
 <span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a>)</span>
 <span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a><span class="co">#&gt;        format             result</span></span>
-<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a><span class="co">#&gt; 1 DATETIME20. 26MAR2026:01:11:29</span></span>
-<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a><span class="co">#&gt; 2 DATETIME13.      26MAR26:01:11</span></span>
-<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a><span class="co">#&gt; 3     DTDATE.          26MAR2026</span></span>
-<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a><span class="co">#&gt; 4   DTYYMMDD.         2026-03-26</span></span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a><span class="co">#&gt; 1 DATETIME20. 31MAR2026:19:52:57</span></span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a><span class="co">#&gt; 2 DATETIME13.      31MAR26:19:52</span></span>
+<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a><span class="co">#&gt; 3     DTDATE.          31MAR2026</span></span>
+<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a><span class="co">#&gt; 4   DTYYMMDD.         2026-03-31</span></span>
 <span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a></span>
 <span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a><span class="co"># From numeric R-epoch seconds</span></span>
 <span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a>r_secs <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">as.POSIXct</span>(<span class="st">&quot;2025-06-15 14:30:00&quot;</span>, <span class="at">tz =</span> <span class="st">&quot;UTC&quot;</span>))</span>
@@ -1257,17 +1260,19 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span id="cb37-6"><a href="#cb37-6" tabindex="-1"></a><span class="co">#&gt; Warning: Skipped incompatible entry in format &quot;SMISSING&quot;:</span></span>
 <span id="cb37-7"><a href="#cb37-7" tabindex="-1"></a><span class="co">#&gt; ✖ SAS special missing value &#39;.B&#39; (HLO=&#39;S&#39;) has no R equivalent.</span></span>
 <span id="cb37-8"><a href="#cb37-8" tabindex="-1"></a><span class="co">#&gt; ✔ Imported 4 formats and 1 invalue from</span></span>
-<span id="cb37-9"><a href="#cb37-9" tabindex="-1"></a><span class="co">#&gt;   &#39;/tmp/Rtmp0hoxrB/temp_libpath1b04c741a3b726/ksformat/extdata/test_cntlout.csv&#39;.</span></span>
+<span id="cb37-9"><a href="#cb37-9" tabindex="-1"></a><span class="co">#&gt;   &#39;/tmp/RtmpBIWN8F/temp_libpath260e12244b1482/ksformat/extdata/test_cntlout.csv&#39;.</span></span>
 <span id="cb37-10"><a href="#cb37-10" tabindex="-1"></a><span class="fu">names</span>(imported)</span>
 <span id="cb37-11"><a href="#cb37-11" tabindex="-1"></a><span class="co">#&gt; [1] &quot;AGEGRP&quot;   &quot;BMICAT&quot;   &quot;GENDER&quot;   &quot;RACEIN&quot;   &quot;SMISSING&quot;</span></span>
 <span id="cb37-12"><a href="#cb37-12" tabindex="-1"></a></span>
-<span id="cb37-13"><a href="#cb37-13" tabindex="-1"></a><span class="fu">fprint</span>()</span>
-<span id="cb37-14"><a href="#cb37-14" tabindex="-1"></a><span class="co">#&gt; Registered formats:</span></span>
-<span id="cb37-15"><a href="#cb37-15" tabindex="-1"></a><span class="co">#&gt;   AGEGRP - VALUE (numeric), 3 mapping(s)</span></span>
-<span id="cb37-16"><a href="#cb37-16" tabindex="-1"></a><span class="co">#&gt;   BMICAT - VALUE (numeric), 4 mapping(s)</span></span>
-<span id="cb37-17"><a href="#cb37-17" tabindex="-1"></a><span class="co">#&gt;   GENDER - VALUE (character), 2 mapping(s)</span></span>
-<span id="cb37-18"><a href="#cb37-18" tabindex="-1"></a><span class="co">#&gt;   RACEIN - INVALUE (numeric), 3 mapping(s)</span></span>
-<span id="cb37-19"><a href="#cb37-19" tabindex="-1"></a><span class="co">#&gt;   SMISSING - VALUE (numeric), 1 mapping(s)</span></span></code></pre></div>
+<span id="cb37-13"><a href="#cb37-13" tabindex="-1"></a><span class="fu">flist</span>()</span>
+<span id="cb37-14"><a href="#cb37-14" tabindex="-1"></a><span class="co">#&gt; [1] &quot;AGEGRP&quot;   &quot;BMICAT&quot;   &quot;GENDER&quot;   &quot;RACEIN&quot;   &quot;SMISSING&quot;</span></span>
+<span id="cb37-15"><a href="#cb37-15" tabindex="-1"></a><span class="fu">fprint</span>()</span>
+<span id="cb37-16"><a href="#cb37-16" tabindex="-1"></a><span class="co">#&gt; Registered formats:</span></span>
+<span id="cb37-17"><a href="#cb37-17" tabindex="-1"></a><span class="co">#&gt;   AGEGRP - VALUE (numeric), 3 mapping(s)</span></span>
+<span id="cb37-18"><a href="#cb37-18" tabindex="-1"></a><span class="co">#&gt;   BMICAT - VALUE (numeric), 4 mapping(s)</span></span>
+<span id="cb37-19"><a href="#cb37-19" tabindex="-1"></a><span class="co">#&gt;   GENDER - VALUE (character), 2 mapping(s)</span></span>
+<span id="cb37-20"><a href="#cb37-20" tabindex="-1"></a><span class="co">#&gt;   RACEIN - INVALUE (numeric), 3 mapping(s)</span></span>
+<span id="cb37-21"><a href="#cb37-21" tabindex="-1"></a><span class="co">#&gt;   SMISSING - VALUE (numeric), 1 mapping(s)</span></span></code></pre></div>
 <div id="use-imported-formats" class="section level3">
 <h3>Use Imported Formats</h3>
 <div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a><span class="co"># Character format (GENDER)</span></span>
@@ -1375,18 +1380,20 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span id="cb41-9"><a href="#cb41-9" tabindex="-1"></a><span class="co">#&gt; Warning: Skipped incompatible entry in format &quot;SMISSING&quot;:</span></span>
 <span id="cb41-10"><a href="#cb41-10" tabindex="-1"></a><span class="co">#&gt; ✖ SAS special missing value &#39;.B&#39; (HLO=&#39;S&#39;) has no R equivalent.</span></span>
 <span id="cb41-11"><a href="#cb41-11" tabindex="-1"></a><span class="co">#&gt; ✔ Imported 4 formats and 1 invalue from</span></span>
-<span id="cb41-12"><a href="#cb41-12" tabindex="-1"></a><span class="co">#&gt;   &#39;/tmp/Rtmp0hoxrB/temp_libpath1b04c741a3b726/ksformat/extdata/test_cntlout.csv&#39;.</span></span>
+<span id="cb41-12"><a href="#cb41-12" tabindex="-1"></a><span class="co">#&gt;   &#39;/tmp/RtmpBIWN8F/temp_libpath260e12244b1482/ksformat/extdata/test_cntlout.csv&#39;.</span></span>
 <span id="cb41-13"><a href="#cb41-13" tabindex="-1"></a></span>
 <span id="cb41-14"><a href="#cb41-14" tabindex="-1"></a><span class="co"># Library should be empty</span></span>
-<span id="cb41-15"><a href="#cb41-15" tabindex="-1"></a><span class="fu">fprint</span>()</span>
-<span id="cb41-16"><a href="#cb41-16" tabindex="-1"></a><span class="co">#&gt; Format library is empty</span></span>
-<span id="cb41-17"><a href="#cb41-17" tabindex="-1"></a></span>
-<span id="cb41-18"><a href="#cb41-18" tabindex="-1"></a><span class="co"># Use directly from returned list</span></span>
-<span id="cb41-19"><a href="#cb41-19" tabindex="-1"></a><span class="fu">fput</span>(<span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>), manual[[<span class="st">&quot;GENDER&quot;</span>]])</span>
-<span id="cb41-20"><a href="#cb41-20" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Male&quot;   &quot;Female&quot;</span></span>
-<span id="cb41-21"><a href="#cb41-21" tabindex="-1"></a></span>
-<span id="cb41-22"><a href="#cb41-22" tabindex="-1"></a><span class="fu">fclear</span>()</span>
-<span id="cb41-23"><a href="#cb41-23" tabindex="-1"></a><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
+<span id="cb41-15"><a href="#cb41-15" tabindex="-1"></a><span class="fu">flist</span>()</span>
+<span id="cb41-16"><a href="#cb41-16" tabindex="-1"></a><span class="co">#&gt; character(0)</span></span>
+<span id="cb41-17"><a href="#cb41-17" tabindex="-1"></a><span class="fu">fprint</span>()</span>
+<span id="cb41-18"><a href="#cb41-18" tabindex="-1"></a><span class="co">#&gt; Format library is empty</span></span>
+<span id="cb41-19"><a href="#cb41-19" tabindex="-1"></a></span>
+<span id="cb41-20"><a href="#cb41-20" tabindex="-1"></a><span class="co"># Use directly from returned list</span></span>
+<span id="cb41-21"><a href="#cb41-21" tabindex="-1"></a><span class="fu">fput</span>(<span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>), manual[[<span class="st">&quot;GENDER&quot;</span>]])</span>
+<span id="cb41-22"><a href="#cb41-22" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Male&quot;   &quot;Female&quot;</span></span>
+<span id="cb41-23"><a href="#cb41-23" tabindex="-1"></a></span>
+<span id="cb41-24"><a href="#cb41-24" tabindex="-1"></a><span class="fu">fclear</span>()</span>
+<span id="cb41-25"><a href="#cb41-25" tabindex="-1"></a><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
 </div>
 </div>
 <div id="example-19-bilingual-format" class="section level2">

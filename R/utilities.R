@@ -355,8 +355,12 @@ format_get <- function(name) {
 #'
 #' @export
 #'
+#' @seealso \code{\link{flist}} for a programmatic alternative that returns
+#'   a character vector of registered names.
+#'
 #' @examples
 #' fnew("M" = "Male", "F" = "Female", name = "sex")
+#' flist()          # character vector of names
 #' fprint()         # list all formats
 #' fprint("sex")    # show specific format
 #' fclear()
@@ -397,6 +401,24 @@ fprint <- function(name = NULL) {
     print(obj)
   }
   invisible(NULL)
+}
+
+#' List Format Names from Library
+#'
+#' Returns a character vector of all format and invalue names currently
+#' registered in the global format library.
+#'
+#' @return A character vector of registered format names, sorted alphabetically.
+#'   Returns \code{character(0)} if the library is empty.
+#'
+#' @export
+#'
+#' @examples
+#' fnew("M" = "Male", "F" = "Female", name = "sex")
+#' flist()
+#' fclear()
+flist <- function() {
+  sort(ls(envir = .format_library))
 }
 
 #' Remove Format(s) from Library

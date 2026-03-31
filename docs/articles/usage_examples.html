@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.7</span>
       </span>
     </div>
 
@@ -304,6 +304,9 @@ once:</p>
 <span><span class="st">;</span></span>
 <span><span class="st">'</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu"><a href="../reference/flist.html">flist</a></span><span class="op">(</span><span class="op">)</span>   <span class="co"># character vector of names</span></span>
+<span><span class="co">#&gt; [1] "age"        "bmi"        "race"       "race_inv"   "score"     </span></span>
+<span><span class="co">#&gt; [6] "sex"        "sex_inv"    "status"     "status_inv"</span></span>
 <span><span class="fu"><a href="../reference/fprint.html">fprint</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Registered formats:</span></span>
 <span><span class="co">#&gt;   age - VALUE (numeric), 3 mapping(s)</span></span>
@@ -482,8 +485,8 @@ once:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;        format             result</span></span>
-<span><span class="co">#&gt; 1 DATETIME20. 31MAR2026:13:41:40</span></span>
-<span><span class="co">#&gt; 2 DATETIME13.      31MAR26:13:41</span></span>
+<span><span class="co">#&gt; 1 DATETIME20. 31MAR2026:19:53:38</span></span>
+<span><span class="co">#&gt; 2 DATETIME13.      31MAR26:19:53</span></span>
 <span><span class="co">#&gt; 3     DTDATE.          31MAR2026</span></span>
 <span><span class="co">#&gt; 4   DTYYMMDD.         2026-03-31</span></span>
 <span></span>
@@ -1039,10 +1042,12 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/tmp/RtmpoR1wwW/temp_libpath253c1e11845e7d/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/tmp/RtmpmabBeZ/temp_libpath2610d76be563f1/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">imported</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "AGEGRP"   "BMICAT"   "GENDER"   "RACEIN"   "SMISSING"</span></span>
 <span></span>
+<span><span class="fu"><a href="../reference/flist.html">flist</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "AGEGRP"   "BMICAT"   "GENDER"   "RACEIN"   "SMISSING"</span></span>
 <span><span class="fu"><a href="../reference/fprint.html">fprint</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Registered formats:</span></span>
 <span><span class="co">#&gt;   AGEGRP - VALUE (numeric), 3 mapping(s)</span></span>
@@ -1165,9 +1170,11 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/tmp/RtmpoR1wwW/temp_libpath253c1e11845e7d/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/tmp/RtmpmabBeZ/temp_libpath2610d76be563f1/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span></span>
 <span><span class="co"># Library should be empty</span></span>
+<span><span class="fu"><a href="../reference/flist.html">flist</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; character(0)</span></span>
 <span><span class="fu"><a href="../reference/fprint.html">fprint</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Format library is empty</span></span>
 <span></span>
