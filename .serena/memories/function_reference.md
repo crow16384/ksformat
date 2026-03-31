@@ -18,6 +18,7 @@
 | `fparse(text, file)` | format_parse.R | Parse SAS-like text definitions |
 | `fexport(..., formats, file)` | format_parse.R | Export formats to SAS-like text |
 | `fimport(file, register, overwrite)` | format_parse.R | Import SAS CNTLOUT CSV |
+| `flist()` | utilities.R | Return character vector of registered format names |
 | `fprint(name)` | utilities.R | Print/list formats from library |
 | `fclear(name)` | utilities.R | Remove format(s) from library |
 | `is_missing(x)` | utilities.R | Check for missing values |
