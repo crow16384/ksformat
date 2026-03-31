@@ -19,7 +19,7 @@ registered in the global format library."><meta property="og:image" content="/lo
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.6</span>
       </span>
     </div>
 
@@ -149,15 +149,15 @@ Must be specified for custom strftime patterns.</p></dd>
 <span class="r-in"><span><span class="co"># Multiple SAS date formats applied directly</span></span></span>
 <span class="r-in"><span><span class="va">today</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="fputn.html">fputn</a></span><span class="op">(</span><span class="va">today</span>, <span class="st">"DATE9."</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "28MAR2026"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "31MAR2026"</span>
 <span class="r-in"><span><span class="fu"><a href="fputn.html">fputn</a></span><span class="op">(</span><span class="va">today</span>, <span class="st">"MMDDYY10."</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "03/28/2026"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "03/31/2026"</span>
 <span class="r-in"><span><span class="fu"><a href="fputn.html">fputn</a></span><span class="op">(</span><span class="va">today</span>, <span class="st">"YYMMDD10."</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "2026-03-28"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "2026-03-31"</span>
 <span class="r-in"><span><span class="fu"><a href="fputn.html">fputn</a></span><span class="op">(</span><span class="va">today</span>, <span class="st">"MONYY7."</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "MAR2026"</span>
 <span class="r-in"><span><span class="fu"><a href="fputn.html">fputn</a></span><span class="op">(</span><span class="va">today</span>, <span class="st">"WORDDATE."</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "March 28, 2026"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "March 31, 2026"</span>
 <span class="r-in"><span><span class="fu"><a href="fputn.html">fputn</a></span><span class="op">(</span><span class="va">today</span>, <span class="st">"QTR."</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "1"</span>
 <span class="r-in"><span></span></span>
@@ -170,11 +170,11 @@ Must be specified for custom strftime patterns.</p></dd>
 <span class="r-in"><span><span class="co"># Datetime formatting</span></span></span>
 <span class="r-in"><span><span class="va">now</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="fputn.html">fputn</a></span><span class="op">(</span><span class="va">now</span>, <span class="st">"DATETIME20."</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "28MAR2026:13:56:05"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "31MAR2026:13:41:35"</span>
 <span class="r-in"><span><span class="fu"><a href="fputn.html">fputn</a></span><span class="op">(</span><span class="va">now</span>, <span class="st">"DTDATE."</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "28MAR2026"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "31MAR2026"</span>
 <span class="r-in"><span><span class="fu"><a href="fputn.html">fputn</a></span><span class="op">(</span><span class="va">now</span>, <span class="st">"DTYYMMDD."</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "2026-03-28"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "2026-03-31"</span>
 <span class="r-in"><span><span class="fu"><a href="fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> All formats cleared from library.</span>
 </code></pre></div>

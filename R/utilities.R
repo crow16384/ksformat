@@ -501,3 +501,66 @@ fclear <- function(name = NULL) {
 
   invisible(format_obj)
 }
+
+
+# ===========================================================================
+# Named vector expansion helper
+# ===========================================================================
+
+#' Expand Named Vectors in \code{list(...)} Output
+#'
+#' Internal helper that detects unnamed elements in a \code{list(...)} result
+#' that are named atomic vectors or named lists, and expands them into
+#' individual key-value pairs. This allows \code{fnew()}, \code{finput()}, and
+#' \code{fnew_bid()} to accept named vectors alongside individual \code{...}
+#' arguments.
+#'
+#' @param dots_list List. The result of \code{list(...)}.
+#' @param reverse Logical. If \code{TRUE}, swap names and values for expanded
+#'   entries (except \code{.missing} and \code{.other} directives).
+#'   Used by \code{fnew()} where the named-vector convention
+#'   \code{c(Label = "Code")} is reversed relative to the internal
+#'   \code{"Code" = "Label"} representation. Default \code{FALSE}.
+#' @return A flat named list with the same structure as a standard
+#'   \code{list(...)} output.
+#' @keywords internal
+#' @noRd
+.expand_named_vectors <- function(dots_list, reverse = FALSE) {
+  if (length(dots_list) == 0L) return(dots_list)
+
+  outer_names <- names(dots_list)
+  result <- list()
+
+  for (i in seq_along(dots_list)) {
+    nm <- if (!is.null(outer_names)) outer_names[i] else ""
+    elem <- dots_list[[i]]
+
+    # Unnamed element that is a named vector/list -> expand
+    if (is.na(nm) || !nzchar(nm)) {
+      elem_names <- names(elem)
+
+      if (is.null(elem_names) || !all(nzchar(elem_names))) {
+        cli_abort("Unnamed argument at position {i} must be a fully named vector or list.")
+      }
+
+      for (j in seq_along(elem)) {
+        key <- elem_names[j]
+        val <- elem[[j]]
+
+        if (reverse && !key %in% c(".missing", ".other")) {
+          # Swap: name becomes value, value becomes name
+          entry <- stats::setNames(list(key), as.character(val))
+        } else {
+          entry <- stats::setNames(list(val), key)
+        }
+        result <- c(result, entry)
+      }
+    } else {
+      # Regular named scalar argument -> keep as-is
+      entry <- stats::setNames(list(elem), nm)
+      result <- c(result, entry)
+    }
+  }
+
+  result
+}

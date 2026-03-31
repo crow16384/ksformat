@@ -5,11 +5,17 @@
 #' The format is automatically stored in the global format library if \code{name}
 #' is provided.
 #'
-#' @param ... Named arguments defining value-label mappings. Can be:
+#' @param ... Named arguments defining value-label mappings, or one or more
+#'   named vectors/lists using the R convention \code{c(Label = "Code")}.
+#'   Can be:
 #'   \itemize{
 #'     \item Discrete values: \code{"M" = "Male", "F" = "Female"}
+#'     \item Named vector: \code{c(Male = "M", Female = "F")}
+#'     \item Named list: \code{list(Male = "M", Female = "F")}
 #'     \item Special values: \code{.missing = "Missing"}, \code{.other = "Other"}
 #'   }
+#'   Named vectors use the R idiom where names are labels and values are codes,
+#'   which is the reverse of the \code{...} argument convention.
 #' @param name Character. Optional name for the format. If provided, the format
 #'   is automatically registered in the global format library.
 #' @param type Character. Type of format: \code{"character"}, \code{"numeric"},
@@ -78,6 +84,13 @@
 #' fput(c(3, 14, 25, 70), "age_categories")
 #' fput_all(c(3, 14, 25, 70), "age_categories")
 #' fclear()
+#'
+#' # From a named vector (Label = Code convention)
+#' sex_vec <- fnew(c(Male = "M", Female = "F"), .missing = "Unknown",
+#'                name = "sex_vec")
+#' fput(c("M", "F", NA), sex_vec)
+#' # [1] "Male" "Female" "Unknown"
+#' fclear()
 fnew <- function(..., name = NULL, type = "auto", default = NULL,
                  multilabel = FALSE, ignore_case = FALSE, verbose = FALSE) {
   type <- match.arg(type, c("auto", "character", "numeric"))
@@ -97,6 +110,9 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
   }
 
   mappings <- list(...)
+
+  # Expand named vectors (c(Label = "Code") -> individual mappings, reversed)
+  mappings <- .expand_named_vectors(mappings, reverse = TRUE)
 
   if (length(mappings) == 0L) {
     cli_abort("At least one value-label mapping must be provided.")

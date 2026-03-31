@@ -40,4 +40,10 @@ fputc(c("A", "I", "P", "A"), "status")
 finputc(c("Active", "Pending", "Inactive"), "status_inv")
 # [1] "A" "P" "I"
 fclear()
+
+# From a named vector (Label = Code convention, same as fnew)
+fnew_bid(c(Male = "M", Female = "F"), name = "sex_bid")
+fputc(c("M", "F"), "sex_bid")
+finputc(c("Male", "Female"), "sex_bid_inv")
+fclear()
 }

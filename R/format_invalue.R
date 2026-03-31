@@ -5,8 +5,9 @@
 #' The invalue is automatically stored in the global format library if \code{name}
 #' is provided.
 #'
-#' @param ... Named arguments defining label-value mappings (reverse of \code{\link{fnew}}).
-#'   Example: \code{"Male" = 1, "Female" = 2}.
+#' @param ... Named arguments defining label-value mappings (reverse of \code{\link{fnew}}),
+#'   or one or more named vectors/lists using \code{c(Label = value)}.
+#'   Example: \code{"Male" = 1, "Female" = 2} or \code{c(Male = 1, Female = 2)}.
 #' @param name Character. Optional name for the invalue format. If provided,
 #'   the invalue is automatically registered in the global format library.
 #' @param target_type Character. Type to convert to: \code{"numeric"} (default),
@@ -32,6 +33,12 @@
 #' finputn(c("Male", "Female", "Unknown"), "sex_inv")
 #' # [1]  1  2 NA
 #' fclear()
+#'
+#' # From a named vector
+#' finput(c(Male = 1, Female = 2), name = "sex_inv2")
+#' finputn(c("Male", "Female"), "sex_inv2")
+#' # [1] 1 2
+#' fclear()
 finput <- function(..., name = NULL, target_type = "numeric", missing_value = NA) {
   target_type <- match.arg(target_type, c("numeric", "integer", "character", "logical"))
   if (!is.null(name)) {
@@ -41,6 +48,9 @@ finput <- function(..., name = NULL, target_type = "numeric", missing_value = NA
   }
 
   mappings <- list(...)
+
+  # Expand named vectors (c(Label = value) -> individual mappings)
+  mappings <- .expand_named_vectors(mappings, reverse = FALSE)
 
   if (length(mappings) == 0L) {
     cli_abort("At least one label-value mapping must be provided.")
@@ -276,8 +286,17 @@ finputc <- function(x, invalue_name) {
 #' finputc(c("Active", "Pending", "Inactive"), "status_inv")
 #' # [1] "A" "P" "I"
 #' fclear()
+#'
+#' # From a named vector (Label = Code convention, same as fnew)
+#' fnew_bid(c(Male = "M", Female = "F"), name = "sex_bid")
+#' fputc(c("M", "F"), "sex_bid")
+#' finputc(c("Male", "Female"), "sex_bid_inv")
+#' fclear()
 fnew_bid <- function(..., name = NULL, type = "auto") {
   mappings <- list(...)
+
+  # Expand named vectors (c(Label = "Code") -> individual mappings, reversed)
+  mappings <- .expand_named_vectors(mappings, reverse = TRUE)
 
   # Warn if multiple keys map to the same value (ambiguous reverse mapping)
   values <- unlist(mappings, use.names = FALSE)

@@ -7,8 +7,9 @@
 finput(..., name = NULL, target_type = "numeric", missing_value = NA)
 }
 \arguments{
-\item{...}{Named arguments defining label-value mappings (reverse of \code{\link{fnew}}).
-Example: \code{"Male" = 1, "Female" = 2}.}
+\item{...}{Named arguments defining label-value mappings (reverse of \code{\link{fnew}}),
+or one or more named vectors/lists using \code{c(Label = value)}.
+Example: \code{"Male" = 1, "Female" = 2} or \code{c(Male = 1, Female = 2)}.}
 
 \item{name}{Character. Optional name for the invalue format. If provided,
 the invalue is automatically registered in the global format library.}
@@ -41,5 +42,11 @@ finput(
 # Apply using finputn (numeric invalue by name)
 finputn(c("Male", "Female", "Unknown"), "sex_inv")
 # [1]  1  2 NA
+fclear()
+
+# From a named vector
+finput(c(Male = 1, Female = 2), name = "sex_inv2")
+finputn(c("Male", "Female"), "sex_inv2")
+# [1] 1 2
 fclear()
 }

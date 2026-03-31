@@ -148,6 +148,92 @@ test_that(".find_cheatsheet_path returns a path for known formats", {
   expect_type(pdf_result, "character")
 })
 
+
+# ===========================================================================
+# Named vector support
+# ===========================================================================
+
+context("Named Vector Support")
+
+test_that("fnew works with named character vector", {
+  fmt <- fnew(c(Male = "M", Female = "F"), name = "sex_vec")
+
+  expect_s3_class(fmt, "ks_format")
+  expect_equal(fmt$type, "character")
+  expect_equal(length(fmt$mappings), 2)
+
+  result <- fput(c("M", "F"), fmt)
+  expect_equal(result, c("Male", "Female"))
+
+  fclear()
+})
+
+test_that("fnew named vector with .missing and .other directives", {
+  fmt <- fnew(c(Male = "M", Female = "F", .missing = "Unknown", .other = "Other"))
+
+  result <- fput(c("M", "F", NA, "X"), fmt)
+  expect_equal(result, c("Male", "Female", "Unknown", "Other"))
+})
+
+test_that("fnew mixed: named vector + scalar ... args", {
+  fmt <- fnew(c(Male = "M", Female = "F"), .missing = "Unknown")
+
+  result <- fput(c("M", NA), fmt)
+  expect_equal(result, c("Male", "Unknown"))
+})
+
+test_that("fnew with named list", {
+  fmt <- fnew(list(Male = "M", Female = "F"))
+
+  result <- fput(c("M", "F"), fmt)
+  expect_equal(result, c("Male", "Female"))
+})
+
+test_that("fnew with multiple named vectors", {
+  fmt <- fnew(c(Male = "M", Female = "F"), c(Child = "C", Adult = "A"))
+
+  result <- fput(c("M", "F", "C", "A"), fmt)
+  expect_equal(result, c("Male", "Female", "Child", "Adult"))
+})
+
+test_that("fnew errors on unnamed vector without names", {
+  expect_error(fnew(c("M", "F")), "fully named")
+})
+
+test_that("finput works with named numeric vector", {
+  inv <- finput(c(Male = 1, Female = 2), name = "sex_inv_vec")
+
+  result <- finputn(c("Male", "Female"), "sex_inv_vec")
+  expect_equal(result, c(1, 2))
+
+  fclear()
+})
+
+test_that("finput works with named character vector", {
+  inv <- finput(c(Male = "M", Female = "F"),
+                name = "sex_inv_chr", target_type = "character")
+
+  result <- finputc(c("Male", "Female"), "sex_inv_chr")
+  expect_equal(result, c("M", "F"))
+
+  fclear()
+})
+
+test_that("fnew_bid works with named vector", {
+  bi <- fnew_bid(c(Male = "M", Female = "F"), name = "sex_bid_vec")
+
+  expect_s3_class(bi$format, "ks_format")
+  expect_s3_class(bi$invalue, "ks_invalue")
+
+  fwd <- fputc(c("M", "F"), "sex_bid_vec")
+  expect_equal(fwd, c("Male", "Female"))
+
+  rev <- finputc(c("Male", "Female"), "sex_bid_vec_inv")
+  expect_equal(rev, c("M", "F"))
+
+  fclear()
+})
+
 context("Invalue Creation and Application (finput)")
 
 test_that(".invalue_apply reverses formatting", {

@@ -20,7 +20,7 @@ is provided."><meta property="og:image" content="/logo.svg"><!-- mathjax --><scr
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.6</span>
       </span>
     </div>
 
@@ -82,9 +82,14 @@ is provided.</p>
 
 
 <dl><dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Named arguments defining value-label mappings. Can be:</p><ul><li><p>Discrete values: <code>"M" = "Male", "F" = "Female"</code></p></li>
+<dd><p>Named arguments defining value-label mappings, or one or more
+named vectors/lists using the R convention <code>c(Label = "Code")</code>.
+Can be:</p><ul><li><p>Discrete values: <code>"M" = "Male", "F" = "Female"</code></p></li>
+<li><p>Named vector: <code>c(Male = "M", Female = "F")</code></p></li>
+<li><p>Named list: <code>list(Male = "M", Female = "F")</code></p></li>
 <li><p>Special values: <code>.missing = "Missing"</code>, <code>.other = "Other"</code></p></li>
-</ul></dd>
+</ul><p>Named vectors use the R idiom where names are labels and values are codes,
+which is the reverse of the <code>...</code> argument convention.</p></dd>
 
 
 <dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
@@ -184,6 +189,15 @@ are passed positionally via <code>...</code> in <code><a href="fput.html">fput</
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[4]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Elderly"       "Non-Pediatric"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="fu"><a href="fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> All formats cleared from library.</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># From a named vector (Label = Code convention)</span></span></span>
+<span class="r-in"><span><span class="va">sex_vec</span> <span class="op">&lt;-</span> <span class="fu">fnew</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Male <span class="op">=</span> <span class="st">"M"</span>, Female <span class="op">=</span> <span class="st">"F"</span><span class="op">)</span>, .missing <span class="op">=</span> <span class="st">"Unknown"</span>,</span></span>
+<span class="r-in"><span>               name <span class="op">=</span> <span class="st">"sex_vec"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="fput.html">fput</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M"</span>, <span class="st">"F"</span>, <span class="cn">NA</span><span class="op">)</span>, <span class="va">sex_vec</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Male"    "Female"  "Unknown"</span>
+<span class="r-in"><span><span class="co"># [1] "Male" "Female" "Unknown"</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> All formats cleared from library.</span>
 </code></pre></div>

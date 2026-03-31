@@ -15,11 +15,17 @@ fnew(
 )
 }
 \arguments{
-\item{...}{Named arguments defining value-label mappings. Can be:
+\item{...}{Named arguments defining value-label mappings, or one or more
+named vectors/lists using the R convention \code{c(Label = "Code")}.
+Can be:
 \itemize{
   \item Discrete values: \code{"M" = "Male", "F" = "Female"}
+  \item Named vector: \code{c(Male = "M", Female = "F")}
+  \item Named list: \code{list(Male = "M", Female = "F")}
   \item Special values: \code{.missing = "Missing"}, \code{.other = "Other"}
-}}
+}
+Named vectors use the R idiom where names are labels and values are codes,
+which is the reverse of the \code{...} argument convention.}
 
 \item{name}{Character. Optional name for the format. If provided, the format
 is automatically registered in the global format library.}
@@ -98,5 +104,12 @@ fnew(
 # fput returns first match; fput_all returns all matches
 fput(c(3, 14, 25, 70), "age_categories")
 fput_all(c(3, 14, 25, 70), "age_categories")
+fclear()
+
+# From a named vector (Label = Code convention)
+sex_vec <- fnew(c(Male = "M", Female = "F"), .missing = "Unknown",
+               name = "sex_vec")
+fput(c("M", "F", NA), sex_vec)
+# [1] "Male" "Female" "Unknown"
 fclear()
 }

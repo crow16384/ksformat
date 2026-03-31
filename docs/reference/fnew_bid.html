@@ -19,7 +19,7 @@ is provided."><meta property="og:image" content="/logo.svg"><!-- mathjax --><scr
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.6</span>
       </span>
     </div>
 
@@ -109,6 +109,29 @@ named <code>paste0(name, "_inv")</code>.</p></dd>
 <span class="r-in"><span><span class="fu"><a href="finputc.html">finputc</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Active"</span>, <span class="st">"Pending"</span>, <span class="st">"Inactive"</span><span class="op">)</span>, <span class="st">"status_inv"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "A" "P" "I"</span>
 <span class="r-in"><span><span class="co"># [1] "A" "P" "I"</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> All formats cleared from library.</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># From a named vector (Label = Code convention, same as fnew)</span></span></span>
+<span class="r-in"><span><span class="fu">fnew_bid</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Male <span class="op">=</span> <span class="st">"M"</span>, Female <span class="op">=</span> <span class="st">"F"</span><span class="op">)</span>, name <span class="op">=</span> <span class="st">"sex_bid"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $format</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> KS Format:sex_bid</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Type: character </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mappings:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   M =&gt; Male</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   F =&gt; Female</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $invalue</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> KS Invalue: sex_bid_inv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Target Type: character </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mappings:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Male =&gt; M</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Female =&gt; F</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="fu"><a href="fputc.html">fputc</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M"</span>, <span class="st">"F"</span><span class="op">)</span>, <span class="st">"sex_bid"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Male"   "Female"</span>
+<span class="r-in"><span><span class="fu"><a href="finputc.html">finputc</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Male"</span>, <span class="st">"Female"</span><span class="op">)</span>, <span class="st">"sex_bid_inv"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "M" "F"</span>
 <span class="r-in"><span><span class="fu"><a href="fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> All formats cleared from library.</span>
 </code></pre></div>
