@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.8</span>
       </span>
     </div>
 
@@ -424,14 +424,14 @@ once:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;      format         result</span></span>
-<span><span class="co">#&gt; 1    DATE9.      31MAR2026</span></span>
-<span><span class="co">#&gt; 2 MMDDYY10.     03/31/2026</span></span>
-<span><span class="co">#&gt; 3 DDMMYY10.     31/03/2026</span></span>
-<span><span class="co">#&gt; 4 YYMMDD10.     2026-03-31</span></span>
-<span><span class="co">#&gt; 5   MONYY7.        MAR2026</span></span>
-<span><span class="co">#&gt; 6 WORDDATE. March 31, 2026</span></span>
+<span><span class="co">#&gt; 1    DATE9.      14APR2026</span></span>
+<span><span class="co">#&gt; 2 MMDDYY10.     04/14/2026</span></span>
+<span><span class="co">#&gt; 3 DDMMYY10.     14/04/2026</span></span>
+<span><span class="co">#&gt; 4 YYMMDD10.     2026-04-14</span></span>
+<span><span class="co">#&gt; 5   MONYY7.        APR2026</span></span>
+<span><span class="co">#&gt; 6 WORDDATE. April 14, 2026</span></span>
 <span><span class="co">#&gt; 7    YEAR4.           2026</span></span>
-<span><span class="co">#&gt; 8      QTR.              1</span></span>
+<span><span class="co">#&gt; 8      QTR.              2</span></span>
 <span></span>
 <span><span class="co"># Multiple dates</span></span>
 <span><span class="va">dates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2020-01-15"</span>, <span class="st">"2020-06-30"</span>, <span class="st">"2020-12-25"</span><span class="op">)</span><span class="op">)</span></span>
@@ -485,10 +485,10 @@ once:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;        format             result</span></span>
-<span><span class="co">#&gt; 1 DATETIME20. 31MAR2026:19:53:38</span></span>
-<span><span class="co">#&gt; 2 DATETIME13.      31MAR26:19:53</span></span>
-<span><span class="co">#&gt; 3     DTDATE.          31MAR2026</span></span>
-<span><span class="co">#&gt; 4   DTYYMMDD.         2026-03-31</span></span>
+<span><span class="co">#&gt; 1 DATETIME20. 14APR2026:20:32:39</span></span>
+<span><span class="co">#&gt; 2 DATETIME13.      14APR26:20:32</span></span>
+<span><span class="co">#&gt; 3     DTDATE.          14APR2026</span></span>
+<span><span class="co">#&gt; 4   DTYYMMDD.         2026-04-14</span></span>
 <span></span>
 <span><span class="co"># From numeric R-epoch seconds</span></span>
 <span><span class="va">r_secs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2025-06-15 14:30:00"</span>, tz <span class="op">=</span> <span class="st">"UTC"</span><span class="op">)</span><span class="op">)</span></span>
@@ -1042,7 +1042,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/tmp/RtmpmabBeZ/temp_libpath2610d76be563f1/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmp7CcMPx/temp_libpath424c115ac62d/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">imported</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "AGEGRP"   "BMICAT"   "GENDER"   "RACEIN"   "SMISSING"</span></span>
 <span></span>
@@ -1170,7 +1170,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/tmp/RtmpmabBeZ/temp_libpath2610d76be563f1/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmp7CcMPx/temp_libpath424c115ac62d/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span></span>
 <span><span class="co"># Library should be empty</span></span>
 <span><span class="fu"><a href="../reference/flist.html">flist</a></span><span class="op">(</span><span class="op">)</span></span>

@@ -847,8 +847,13 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
     rhs <- trimws(sub("\\s*\\(eval\\)\\s*$", "", rhs))
   }
 
-  # Unquote rhs
-  rhs <- .unquote(rhs)
+  # Handle unquoted NA/NaN literals before unquoting (e.g. .other = NA)
+  is_quoted <- grepl("^([\"']).*\\1$", rhs)
+  if (!is_quoted && rhs %in% c("NA", "NaN")) {
+    rhs <- NA_character_
+  } else {
+    rhs <- .unquote(rhs)
+  }
 
   # Set eval attribute if (eval) marker was found
   if (has_eval) {

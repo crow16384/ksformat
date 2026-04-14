@@ -39,7 +39,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.8</span>
       </span>
     </div>
 
@@ -83,7 +83,7 @@
 <div class="section level1">
 <div class="page-header"><h1 id="ksformat-">ksformat <img src="reference/figures/logo.svg" align="right" height="139" alt="ksformat logo"><a class="anchor" aria-label="anchor" href="#ksformat-"></a>
 </h1></div>
-<p><a href="https://github.com/crow16384/ksformat" class="external-link"><img src="https://img.shields.io/badge/PROC%20FORMAT%20for%20R-ksformat-217346?logo=r" alt="PROC FORMAT for R"></a> <a href="https://github.com/crow16384/ksformat" class="external-link"><img src="https://img.shields.io/badge/GitHub-crow16384%2Fksformat-181717?logo=github" alt="GitHub"></a> <a href="https://www.gnu.org/licenses/gpl-3.0" class="external-link"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3"></a> <a href="https://www.r-project.org/" class="external-link"><img src="https://img.shields.io/badge/R-package-276DC3?logo=r" alt="R package"></a></p>
+<p><a href="https://github.com/crow16384/ksformat" class="external-link"><img src="https://img.shields.io/badge/PROC%20FORMAT%20for%20R-ksformat-217346?logo=r" alt="PROC FORMAT for R"></a> <a href="https://github.com/crow16384/ksformat" class="external-link"><img src="https://img.shields.io/badge/GitHub-crow16384%2Fksformat-181717?logo=github" alt="GitHub"></a> <a href="https://www.gnu.org/licenses/gpl-3.0" class="external-link"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3"></a> <a href="https://www.r-project.org/" class="external-link"><img src="https://img.shields.io/badge/R-package-276DC3?logo=r" alt="R package"></a> <a href="https://cran.r-project.org/package=ksformat" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/ksformat"></a></p>
 <p>SAS-style <strong>PROC FORMAT</strong> for R: create and apply value formats, range-based formatting, reverse formatting (invalue), and consistent handling of missing values (NA, NULL, NaN).</p>
 <p><strong>Repository:</strong> <a href="https://github.com/crow16384/ksformat" class="external-link">github.com/crow16384/ksformat</a> — source code, issue tracker, and development.</p>
 <div class="section level2">
@@ -92,7 +92,7 @@
 <p><strong>From GitHub</strong> (after cloning or from your repo URL):</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"crow16384/ksformat"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"crow16384/ksformat"</span><span class="op">)</span></span></code></pre></div>
 <p><strong>From local source:</strong></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"."</span>, repos <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="st">"source"</span><span class="op">)</span></span>
@@ -295,42 +295,42 @@
 <col width="35%">
 <col width="64%">
 </colgroup>
-<thead><tr class="header">
+<thead><tr>
 <th>Area</th>
 <th>Functions</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><strong>Creation</strong></td>
 <td>
 <code><a href="reference/fnew.html">fnew()</a></code>, <code><a href="reference/finput.html">finput()</a></code>, <code><a href="reference/fnew_bid.html">fnew_bid()</a></code>, <code><a href="reference/fnew_date.html">fnew_date()</a></code>, <code><a href="reference/fparse.html">fparse()</a></code>, <code><a href="reference/e.html">e()</a></code>
 </td>
 </tr>
-<tr class="even">
+<tr>
 <td><strong>Application</strong></td>
 <td>
 <code><a href="reference/fput.html">fput()</a></code>, <code><a href="reference/fputn.html">fputn()</a></code>, <code><a href="reference/fputc.html">fputc()</a></code>, <code><a href="reference/fput_all.html">fput_all()</a></code>, <code><a href="reference/fput_df.html">fput_df()</a></code>
 </td>
 </tr>
-<tr class="odd">
+<tr>
 <td><strong>Reverse</strong></td>
 <td>
 <code><a href="reference/finputn.html">finputn()</a></code>, <code><a href="reference/finputc.html">finputc()</a></code>
 </td>
 </tr>
-<tr class="even">
+<tr>
 <td><strong>Library</strong></td>
 <td>
 <code><a href="reference/format_get.html">format_get()</a></code>, <code><a href="reference/fprint.html">fprint()</a></code>, <code><a href="reference/fclear.html">fclear()</a></code>, <code><a href="reference/fexport.html">fexport()</a></code>, <code><a href="reference/fimport.html">fimport()</a></code>
 </td>
 </tr>
-<tr class="odd">
+<tr>
 <td><strong>Utilities</strong></td>
 <td>
 <code><a href="reference/is_missing.html">is_missing()</a></code>, <code><a href="reference/range_spec.html">range_spec()</a></code>
 </td>
 </tr>
-<tr class="even">
+<tr>
 <td><strong>Documentation</strong></td>
 <td>
 <code><a href="reference/ksformat_cheatsheet.html">ksformat_cheatsheet()</a></code> — open cheat sheet</td>
