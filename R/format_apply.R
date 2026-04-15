@@ -688,3 +688,55 @@ fput_df <- function(data, ..., suffix = "_fmt", replace = FALSE) {
 
   result
 }
+
+#' Apply Format Using a Composite Key
+#'
+#' Convenience wrapper around [fput()] that pastes multiple vectors together
+#' into a composite key before lookup. Useful when a format is keyed on the
+#' combination of several columns (e.g., `USUBJID|VISITNUM`).
+#'
+#' @param ... Vectors to paste together into a composite key.
+#'   All vectors are recycled to a common length by [paste()].
+#' @param format A [ks_format] object or a registered format name (character
+#'   string).
+#' @param sep Separator inserted between the pasted components
+#'   (default `"|"`).
+#' @param keep_na If `TRUE`, `NA` inputs remain `NA` in the output instead
+#'   of being mapped via `.missing`. Passed through to [fput()].
+#'
+#' @return A character vector of formatted labels, the same length as the
+#'   (recycled) input vectors.
+#'
+#' @examples
+#' # Build a lookup keyed on two columns
+#' fnew(
+#'   "A|1" = "2025-01-15",
+#'   "A|2" = "2025-02-20",
+#'   "B|1" = "2025-03-10",
+#'   .other = "NOT FOUND",
+#'   name = "visit_date",
+#'   type = "character"
+#' )
+#'
+#' subj  <- c("A", "A", "B", "B")
+#' visit <- c(1, 2, 1, 3)
+#'
+#' fputk(subj, visit, format = "visit_date")
+#' # -> "2025-01-15" "2025-02-20" "2025-03-10" "NOT FOUND"
+#'
+#' fclear()
+#'
+#' @seealso [fput()], [fputn()], [fputc()]
+#' @export
+fputk <- function(..., format, sep = "|", keep_na = FALSE) {
+  args <- list(...)
+  if (length(args) < 1L) {
+    cli_abort("At least one key component must be provided in {.code ...}.")
+  }
+  keys <- do.call(paste, c(args, list(sep = sep)))
+  # Propagate NA: paste() coerces NA to "NA" — restore real NA so
+  # fput() can apply .missing handling correctly.
+  any_na <- Reduce(`|`, lapply(args, is.na))
+  keys[any_na] <- NA_character_
+  fput(keys, format, keep_na = keep_na)
+}

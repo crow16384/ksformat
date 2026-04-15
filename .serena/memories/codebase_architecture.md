@@ -1,7 +1,7 @@
-# ksformat Codebase Architecture (updated 2026-02-18)
+# ksformat Codebase Architecture (updated 2026-04-15)
 
 ## Package Overview
-R package providing SAS PROC FORMAT-like functionality. Version 0.3.1.
+R package providing SAS PROC FORMAT-like functionality. Version 0.4.9.
 Depends on: cli. Suggests: testthat (>= 3.0.0).
 
 ## File Structure
@@ -11,11 +11,12 @@ Depends on: cli. Suggests: testthat (>= 3.0.0).
 - `detect_format_type(keys)` — Auto-detect "character" or "numeric" from key names.
 - `print.ks_format(x, ...)` — Print method for ks_format. Shows interval notation for ranges, date patterns.
 
-### R/format_apply.R (lines ~210+)
+### R/format_apply.R
 - `fput(x, format, ..., keep_na)` — Apply format to vector. Handles missing → exact match → range match → .other. Expression labels (.x1, .x2) evaluated lazily.
 - `.fput_vectorized(x, format_names, type_check, ...)` — Per-element format application (different format per element).
 - `fputn(x, format_name, ...)` — Apply numeric format by name (like SAS PUTN). Supports vectorized format_name.
 - `fputc(x, format_name, ...)` — Apply character format by name (like SAS PUTC). Supports vectorized format_name.
+- `fputk(..., format, sep, keep_na)` — Apply format keyed on composite paste key (e.g. USUBJID|VISITNUM). NA in any component propagates as NA.
 - `fput_all(x, format, ..., keep_na)` — Multilabel: returns list of all matching labels per element.
 - `fput_df(data, ..., suffix, replace)` — Apply formats to data frame columns.
 

@@ -48,8 +48,9 @@ overflow: visible;
 }
 </style>
 <style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -60,7 +61,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -340,49 +341,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<p><svg id="svg_253320c67275e1fcccc9" align="right" height="120" alt="ksformat logo" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
-  <title>ksformat hex icon</title>
-  <desc>A hex sticker style icon for the ksformat package with a formatting pipeline from values to labels.</desc>
-  <defs>
-    <linearGradient id="svg_253320c67275e1fcccc9_hexbg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#f7f3ec"></stop>
-      <stop offset="100%" stop-color="#e7dcc8"></stop>
-    </linearGradient>
-    <linearGradient id="svg_253320c67275e1fcccc9_panel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#264760"></stop>
-      <stop offset="100%" stop-color="#163246"></stop>
-    </linearGradient>
-  </defs>
-
-  <path d="M256 26 430 122v268L256 486 82 390V122L256 26Z" fill="url(#hexbg)" stroke="#173147" stroke-width="18" stroke-linejoin="round" />
-  <path d="M256 62 399 141v230L256 450 113 371V141L256 62Z" fill="none" stroke="#d59b3d" stroke-width="8" stroke-linejoin="round" opacity="0.95" />
-
-  <rect x="112" y="142" width="288" height="196" rx="28" fill="url(#panel)" />
-
-  <rect x="134" y="164" width="244" height="42" rx="14" fill="#f8f5ef" />
-  <rect x="134" y="218" width="244" height="42" rx="14" fill="#f8f5ef" />
-  <rect x="134" y="272" width="244" height="42" rx="14" fill="#f8f5ef" />
-
-  <text x="150" y="191" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#173147">A</text>
-  <text x="150" y="245" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#173147">I</text>
-  <text x="150" y="299" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#173147">P</text>
-
-  <path d="M189 185h28" stroke="#d96c2c" stroke-width="8" stroke-linecap="round" />
-  <path d="M189 239h28" stroke="#d96c2c" stroke-width="8" stroke-linecap="round" />
-  <path d="M189 293h28" stroke="#d96c2c" stroke-width="8" stroke-linecap="round" />
-
-  <text x="234" y="191" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#173147">Active</text>
-  <text x="234" y="245" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#173147">Inactive</text>
-  <text x="234" y="299" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#173147">Pending</text>
-
-  <path d="M118 213c-10 0-18-8-18-18v-14c0-10 8-18 18-18" fill="none" stroke="#f1a340" stroke-width="8" stroke-linecap="round" />
-  <path d="M394 163c10 0 18 8 18 18v14c0 10-8 18-18 18" fill="none" stroke="#f1a340" stroke-width="8" stroke-linecap="round" />
-  <path d="M118 265c-10 0-18 8-18 18v14c0 10 8 18 18 18" fill="none" stroke="#f1a340" stroke-width="8" stroke-linecap="round" />
-  <path d="M394 317c10 0 18-8 18-18v-14c0-10-8-18-18-18" fill="none" stroke="#f1a340" stroke-width="8" stroke-linecap="round" />
-
-  <rect x="138" y="356" width="236" height="58" rx="18" fill="#f8f5ef" stroke="#d8c6ad" stroke-width="4" />
-  <text x="256" y="394" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" fill="#173147">ksformat</text>
-</svg></p>
+<p><img role="img" aria-label="ksformat logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+CiAgPHRpdGxlPmtzZm9ybWF0IGhleCBpY29uPC90aXRsZT4KICA8ZGVzYz5BIGhleCBzdGlja2VyIHN0eWxlIGljb24gZm9yIHRoZSBrc2Zvcm1hdCBwYWNrYWdlIHdpdGggYSBmb3JtYXR0aW5nIHBpcGVsaW5lIGZyb20gdmFsdWVzIHRvIGxhYmVscy48L2Rlc2M+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImhleGJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmN2YzZWMiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZTdkY2M4Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJwYW5lbCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMjY0NzYwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzE2MzI0NiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CgogIDxwYXRoIGQ9Ik0yNTYgMjYgNDMwIDEyMnYyNjhMMjU2IDQ4NiA4MiAzOTBWMTIyTDI1NiAyNloiIGZpbGw9InVybCgjaGV4YmcpIiBzdHJva2U9IiMxNzMxNDciIHN0cm9rZS13aWR0aD0iMTgiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJNMjU2IDYyIDM5OSAxNDF2MjMwTDI1NiA0NTAgMTEzIDM3MVYxNDFMMjU2IDYyWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZDU5YjNkIiBzdHJva2Utd2lkdGg9IjgiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIG9wYWNpdHk9IjAuOTUiLz4KCiAgPHJlY3QgeD0iMTEyIiB5PSIxNDIiIHdpZHRoPSIyODgiIGhlaWdodD0iMTk2IiByeD0iMjgiIGZpbGw9InVybCgjcGFuZWwpIi8+CgogIDxyZWN0IHg9IjEzNCIgeT0iMTY0IiB3aWR0aD0iMjQ0IiBoZWlnaHQ9IjQyIiByeD0iMTQiIGZpbGw9IiNmOGY1ZWYiLz4KICA8cmVjdCB4PSIxMzQiIHk9IjIxOCIgd2lkdGg9IjI0NCIgaGVpZ2h0PSI0MiIgcng9IjE0IiBmaWxsPSIjZjhmNWVmIi8+CiAgPHJlY3QgeD0iMTM0IiB5PSIyNzIiIHdpZHRoPSIyNDQiIGhlaWdodD0iNDIiIHJ4PSIxNCIgZmlsbD0iI2Y4ZjVlZiIvPgoKICA8dGV4dCB4PSIxNTAiIHk9IjE5MSIgZm9udC1mYW1pbHk9IkFyaWFsLCBIZWx2ZXRpY2EsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiMxNzMxNDciPkE8L3RleHQ+CiAgPHRleHQgeD0iMTUwIiB5PSIyNDUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgSGVsdmV0aWNhLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjIyIiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMTczMTQ3Ij5JPC90ZXh0PgogIDx0ZXh0IHg9IjE1MCIgeT0iMjk5IiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMiIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzE3MzE0NyI+UDwvdGV4dD4KCiAgPHBhdGggZD0iTTE4OSAxODVoMjgiIHN0cm9rZT0iI2Q5NmMyYyIgc3Ryb2tlLXdpZHRoPSI4IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNMTg5IDIzOWgyOCIgc3Ryb2tlPSIjZDk2YzJjIiBzdHJva2Utd2lkdGg9IjgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0xODkgMjkzaDI4IiBzdHJva2U9IiNkOTZjMmMiIHN0cm9rZS13aWR0aD0iOCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CgogIDx0ZXh0IHg9IjIzNCIgeT0iMTkxIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzE3MzE0NyI+QWN0aXZlPC90ZXh0PgogIDx0ZXh0IHg9IjIzNCIgeT0iMjQ1IiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzE3MzE0NyI+SW5hY3RpdmU8L3RleHQ+CiAgPHRleHQgeD0iMjM0IiB5PSIyOTkiIGZvbnQtZmFtaWx5PSJBcmlhbCwgSGVsdmV0aWNhLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjIxIiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMTczMTQ3Ij5QZW5kaW5nPC90ZXh0PgoKICA8cGF0aCBkPSJNMTE4IDIxM2MtMTAgMC0xOC04LTE4LTE4di0xNGMwLTEwIDgtMTggMTgtMTgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2YxYTM0MCIgc3Ryb2tlLXdpZHRoPSI4IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNMzk0IDE2M2MxMCAwIDE4IDggMTggMTh2MTRjMCAxMC04IDE4LTE4IDE4IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMWEzNDAiIHN0cm9rZS13aWR0aD0iOCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0iTTExOCAyNjVjLTEwIDAtMTggOC0xOCAxOHYxNGMwIDEwIDggMTggMTggMTgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2YxYTM0MCIgc3Ryb2tlLXdpZHRoPSI4IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNMzk0IDMxN2MxMCAwIDE4LTggMTgtMTh2LTE0YzAtMTAtOC0xOC0xOC0xOCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjFhMzQwIiBzdHJva2Utd2lkdGg9IjgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgoKICA8cmVjdCB4PSIxMzgiIHk9IjM1NiIgd2lkdGg9IjIzNiIgaGVpZ2h0PSI1OCIgcng9IjE4IiBmaWxsPSIjZjhmNWVmIiBzdHJva2U9IiNkOGM2YWQiIHN0cm9rZS13aWR0aD0iNCIvPgogIDx0ZXh0IHg9IjI1NiIgeT0iMzk0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsIEhlbHZldGljYSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzNCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzE3MzE0NyI+a3Nmb3JtYXQ8L3RleHQ+Cjwvc3ZnPg==" align="right" height="120" alt="ksformat logo" /></p>
 <p>The <strong>ksformat</strong> package provides SAS PROC FORMAT-like
 functionality for R. This vignette walks through the most common use
 cases.</p>
@@ -692,14 +651,14 @@ once:</p>
 <span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a>  )</span>
 <span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a>)</span>
 <span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a><span class="co">#&gt;      format         result</span></span>
-<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a><span class="co">#&gt; 1    DATE9.      31MAR2026</span></span>
-<span id="cb12-19"><a href="#cb12-19" tabindex="-1"></a><span class="co">#&gt; 2 MMDDYY10.     03/31/2026</span></span>
-<span id="cb12-20"><a href="#cb12-20" tabindex="-1"></a><span class="co">#&gt; 3 DDMMYY10.     31/03/2026</span></span>
-<span id="cb12-21"><a href="#cb12-21" tabindex="-1"></a><span class="co">#&gt; 4 YYMMDD10.     2026-03-31</span></span>
-<span id="cb12-22"><a href="#cb12-22" tabindex="-1"></a><span class="co">#&gt; 5   MONYY7.        MAR2026</span></span>
-<span id="cb12-23"><a href="#cb12-23" tabindex="-1"></a><span class="co">#&gt; 6 WORDDATE. March 31, 2026</span></span>
+<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a><span class="co">#&gt; 1    DATE9.      15APR2026</span></span>
+<span id="cb12-19"><a href="#cb12-19" tabindex="-1"></a><span class="co">#&gt; 2 MMDDYY10.     04/15/2026</span></span>
+<span id="cb12-20"><a href="#cb12-20" tabindex="-1"></a><span class="co">#&gt; 3 DDMMYY10.     15/04/2026</span></span>
+<span id="cb12-21"><a href="#cb12-21" tabindex="-1"></a><span class="co">#&gt; 4 YYMMDD10.     2026-04-15</span></span>
+<span id="cb12-22"><a href="#cb12-22" tabindex="-1"></a><span class="co">#&gt; 5   MONYY7.        APR2026</span></span>
+<span id="cb12-23"><a href="#cb12-23" tabindex="-1"></a><span class="co">#&gt; 6 WORDDATE. April 15, 2026</span></span>
 <span id="cb12-24"><a href="#cb12-24" tabindex="-1"></a><span class="co">#&gt; 7    YEAR4.           2026</span></span>
-<span id="cb12-25"><a href="#cb12-25" tabindex="-1"></a><span class="co">#&gt; 8      QTR.              1</span></span>
+<span id="cb12-25"><a href="#cb12-25" tabindex="-1"></a><span class="co">#&gt; 8      QTR.              2</span></span>
 <span id="cb12-26"><a href="#cb12-26" tabindex="-1"></a></span>
 <span id="cb12-27"><a href="#cb12-27" tabindex="-1"></a><span class="co"># Multiple dates</span></span>
 <span id="cb12-28"><a href="#cb12-28" tabindex="-1"></a>dates <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="fu">c</span>(<span class="st">&quot;2020-01-15&quot;</span>, <span class="st">&quot;2020-06-30&quot;</span>, <span class="st">&quot;2020-12-25&quot;</span>))</span>
@@ -747,10 +706,10 @@ once:</p>
 <span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a>  )</span>
 <span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a>)</span>
 <span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a><span class="co">#&gt;        format             result</span></span>
-<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a><span class="co">#&gt; 1 DATETIME20. 31MAR2026:19:52:57</span></span>
-<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a><span class="co">#&gt; 2 DATETIME13.      31MAR26:19:52</span></span>
-<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a><span class="co">#&gt; 3     DTDATE.          31MAR2026</span></span>
-<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a><span class="co">#&gt; 4   DTYYMMDD.         2026-03-31</span></span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a><span class="co">#&gt; 1 DATETIME20. 15APR2026:03:12:16</span></span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a><span class="co">#&gt; 2 DATETIME13.      15APR26:03:12</span></span>
+<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a><span class="co">#&gt; 3     DTDATE.          15APR2026</span></span>
+<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a><span class="co">#&gt; 4   DTYYMMDD.         2026-04-15</span></span>
 <span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a></span>
 <span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a><span class="co"># From numeric R-epoch seconds</span></span>
 <span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a>r_secs <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">as.POSIXct</span>(<span class="st">&quot;2025-06-15 14:30:00&quot;</span>, <span class="at">tz =</span> <span class="st">&quot;UTC&quot;</span>))</span>
@@ -1260,7 +1219,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span id="cb37-6"><a href="#cb37-6" tabindex="-1"></a><span class="co">#&gt; Warning: Skipped incompatible entry in format &quot;SMISSING&quot;:</span></span>
 <span id="cb37-7"><a href="#cb37-7" tabindex="-1"></a><span class="co">#&gt; ✖ SAS special missing value &#39;.B&#39; (HLO=&#39;S&#39;) has no R equivalent.</span></span>
 <span id="cb37-8"><a href="#cb37-8" tabindex="-1"></a><span class="co">#&gt; ✔ Imported 4 formats and 1 invalue from</span></span>
-<span id="cb37-9"><a href="#cb37-9" tabindex="-1"></a><span class="co">#&gt;   &#39;/tmp/RtmpBIWN8F/temp_libpath260e12244b1482/ksformat/extdata/test_cntlout.csv&#39;.</span></span>
+<span id="cb37-9"><a href="#cb37-9" tabindex="-1"></a><span class="co">#&gt;   &#39;/Users/meguty/Library/R/arm64/4.5/library/ksformat/extdata/test_cntlout.csv&#39;.</span></span>
 <span id="cb37-10"><a href="#cb37-10" tabindex="-1"></a><span class="fu">names</span>(imported)</span>
 <span id="cb37-11"><a href="#cb37-11" tabindex="-1"></a><span class="co">#&gt; [1] &quot;AGEGRP&quot;   &quot;BMICAT&quot;   &quot;GENDER&quot;   &quot;RACEIN&quot;   &quot;SMISSING&quot;</span></span>
 <span id="cb37-12"><a href="#cb37-12" tabindex="-1"></a></span>
@@ -1380,7 +1339,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span id="cb41-9"><a href="#cb41-9" tabindex="-1"></a><span class="co">#&gt; Warning: Skipped incompatible entry in format &quot;SMISSING&quot;:</span></span>
 <span id="cb41-10"><a href="#cb41-10" tabindex="-1"></a><span class="co">#&gt; ✖ SAS special missing value &#39;.B&#39; (HLO=&#39;S&#39;) has no R equivalent.</span></span>
 <span id="cb41-11"><a href="#cb41-11" tabindex="-1"></a><span class="co">#&gt; ✔ Imported 4 formats and 1 invalue from</span></span>
-<span id="cb41-12"><a href="#cb41-12" tabindex="-1"></a><span class="co">#&gt;   &#39;/tmp/RtmpBIWN8F/temp_libpath260e12244b1482/ksformat/extdata/test_cntlout.csv&#39;.</span></span>
+<span id="cb41-12"><a href="#cb41-12" tabindex="-1"></a><span class="co">#&gt;   &#39;/Users/meguty/Library/R/arm64/4.5/library/ksformat/extdata/test_cntlout.csv&#39;.</span></span>
 <span id="cb41-13"><a href="#cb41-13" tabindex="-1"></a></span>
 <span id="cb41-14"><a href="#cb41-14" tabindex="-1"></a><span class="co"># Library should be empty</span></span>
 <span id="cb41-15"><a href="#cb41-15" tabindex="-1"></a><span class="fu">flist</span>()</span>
@@ -1424,6 +1383,79 @@ extra argument:</p>
 <span id="cb42-22"><a href="#cb42-22" tabindex="-1"></a></span>
 <span id="cb42-23"><a href="#cb42-23" tabindex="-1"></a><span class="fu">fclear</span>()</span>
 <span id="cb42-24"><a href="#cb42-24" tabindex="-1"></a><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
+</div>
+<div id="example-20-composite-key-lookup-with-fputk" class="section level2">
+<h2>Example 20: Composite Key Lookup with <code>fputk()</code></h2>
+<p><code>fputk()</code> pastes multiple vectors into a composite key
+before format lookup. This is useful when a format is keyed on the
+combination of several columns, a common pattern in clinical data (e.g.,
+looking up a visit date by subject + visit number).</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" tabindex="-1"></a><span class="co"># Simulate a Subject Visits (SV) domain</span></span>
+<span id="cb43-2"><a href="#cb43-2" tabindex="-1"></a>SV <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb43-3"><a href="#cb43-3" tabindex="-1"></a>  <span class="at">USUBJID  =</span> <span class="fu">c</span>(<span class="st">&quot;SUBJ-001&quot;</span>, <span class="st">&quot;SUBJ-001&quot;</span>, <span class="st">&quot;SUBJ-001&quot;</span>, <span class="st">&quot;SUBJ-002&quot;</span>, <span class="st">&quot;SUBJ-002&quot;</span>),</span>
+<span id="cb43-4"><a href="#cb43-4" tabindex="-1"></a>  <span class="at">VISITNUM =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">2</span>),</span>
+<span id="cb43-5"><a href="#cb43-5" tabindex="-1"></a>  <span class="at">SVSTDTC  =</span> <span class="fu">c</span>(<span class="st">&quot;2025-01-15&quot;</span>, <span class="st">&quot;2025-02-20&quot;</span>, <span class="st">&quot;2025-03-10&quot;</span>,</span>
+<span id="cb43-6"><a href="#cb43-6" tabindex="-1"></a>               <span class="st">&quot;2025-01-18&quot;</span>, <span class="st">&quot;2025-02-25&quot;</span>),</span>
+<span id="cb43-7"><a href="#cb43-7" tabindex="-1"></a>  <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
+<span id="cb43-8"><a href="#cb43-8" tabindex="-1"></a>)</span>
+<span id="cb43-9"><a href="#cb43-9" tabindex="-1"></a></span>
+<span id="cb43-10"><a href="#cb43-10" tabindex="-1"></a><span class="co"># Simulate a Questionnaires (QS) domain</span></span>
+<span id="cb43-11"><a href="#cb43-11" tabindex="-1"></a>QS <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb43-12"><a href="#cb43-12" tabindex="-1"></a>  <span class="at">USUBJID  =</span> <span class="fu">c</span>(<span class="st">&quot;SUBJ-001&quot;</span>, <span class="st">&quot;SUBJ-001&quot;</span>, <span class="st">&quot;SUBJ-002&quot;</span>, <span class="st">&quot;SUBJ-002&quot;</span>, <span class="st">&quot;SUBJ-002&quot;</span>),</span>
+<span id="cb43-13"><a href="#cb43-13" tabindex="-1"></a>  <span class="at">VISITNUM =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>),</span>
+<span id="cb43-14"><a href="#cb43-14" tabindex="-1"></a>  <span class="at">QSTESTCD =</span> <span class="fu">c</span>(<span class="st">&quot;SCORE1&quot;</span>, <span class="st">&quot;SCORE1&quot;</span>, <span class="st">&quot;SCORE1&quot;</span>, <span class="st">&quot;SCORE1&quot;</span>, <span class="st">&quot;SCORE1&quot;</span>),</span>
+<span id="cb43-15"><a href="#cb43-15" tabindex="-1"></a>  <span class="at">QSSTRESN =</span> <span class="fu">c</span>(<span class="dv">85</span>, <span class="dv">90</span>, <span class="dv">72</span>, <span class="dv">78</span>, <span class="cn">NA</span>),</span>
+<span id="cb43-16"><a href="#cb43-16" tabindex="-1"></a>  <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
+<span id="cb43-17"><a href="#cb43-17" tabindex="-1"></a>)</span>
+<span id="cb43-18"><a href="#cb43-18" tabindex="-1"></a></span>
+<span id="cb43-19"><a href="#cb43-19" tabindex="-1"></a>SV</span>
+<span id="cb43-20"><a href="#cb43-20" tabindex="-1"></a><span class="co">#&gt;    USUBJID VISITNUM    SVSTDTC</span></span>
+<span id="cb43-21"><a href="#cb43-21" tabindex="-1"></a><span class="co">#&gt; 1 SUBJ-001        1 2025-01-15</span></span>
+<span id="cb43-22"><a href="#cb43-22" tabindex="-1"></a><span class="co">#&gt; 2 SUBJ-001        2 2025-02-20</span></span>
+<span id="cb43-23"><a href="#cb43-23" tabindex="-1"></a><span class="co">#&gt; 3 SUBJ-001        3 2025-03-10</span></span>
+<span id="cb43-24"><a href="#cb43-24" tabindex="-1"></a><span class="co">#&gt; 4 SUBJ-002        1 2025-01-18</span></span>
+<span id="cb43-25"><a href="#cb43-25" tabindex="-1"></a><span class="co">#&gt; 5 SUBJ-002        2 2025-02-25</span></span>
+<span id="cb43-26"><a href="#cb43-26" tabindex="-1"></a>QS</span>
+<span id="cb43-27"><a href="#cb43-27" tabindex="-1"></a><span class="co">#&gt;    USUBJID VISITNUM QSTESTCD QSSTRESN</span></span>
+<span id="cb43-28"><a href="#cb43-28" tabindex="-1"></a><span class="co">#&gt; 1 SUBJ-001        1   SCORE1       85</span></span>
+<span id="cb43-29"><a href="#cb43-29" tabindex="-1"></a><span class="co">#&gt; 2 SUBJ-001        2   SCORE1       90</span></span>
+<span id="cb43-30"><a href="#cb43-30" tabindex="-1"></a><span class="co">#&gt; 3 SUBJ-002        1   SCORE1       72</span></span>
+<span id="cb43-31"><a href="#cb43-31" tabindex="-1"></a><span class="co">#&gt; 4 SUBJ-002        2   SCORE1       78</span></span>
+<span id="cb43-32"><a href="#cb43-32" tabindex="-1"></a><span class="co">#&gt; 5 SUBJ-002        3   SCORE1       NA</span></span></code></pre></div>
+<p>Register a format keyed on <code>USUBJID|VISITNUM</code> with values
+being the visit start date (<code>SVSTDTC</code>):</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" tabindex="-1"></a><span class="co"># Create composite key -&gt; date mapping from SV</span></span>
+<span id="cb44-2"><a href="#cb44-2" tabindex="-1"></a><span class="fu">fnew</span>(</span>
+<span id="cb44-3"><a href="#cb44-3" tabindex="-1"></a>  <span class="fu">setNames</span>(SV<span class="sc">$</span>SVSTDTC, <span class="fu">paste</span>(SV<span class="sc">$</span>USUBJID, SV<span class="sc">$</span>VISITNUM, <span class="at">sep =</span> <span class="st">&quot;|&quot;</span>)),</span>
+<span id="cb44-4"><a href="#cb44-4" tabindex="-1"></a>  <span class="at">.other  =</span> <span class="st">&quot;NOT FOUND&quot;</span>,</span>
+<span id="cb44-5"><a href="#cb44-5" tabindex="-1"></a>  <span class="at">name    =</span> <span class="st">&quot;svdtc&quot;</span>,</span>
+<span id="cb44-6"><a href="#cb44-6" tabindex="-1"></a>  <span class="at">type    =</span> <span class="st">&quot;character&quot;</span>,</span>
+<span id="cb44-7"><a href="#cb44-7" tabindex="-1"></a>  <span class="at">ignore_case =</span> <span class="cn">TRUE</span></span>
+<span id="cb44-8"><a href="#cb44-8" tabindex="-1"></a>)</span>
+<span id="cb44-9"><a href="#cb44-9" tabindex="-1"></a></span>
+<span id="cb44-10"><a href="#cb44-10" tabindex="-1"></a><span class="fu">fprint</span>(<span class="st">&quot;svdtc&quot;</span>)</span>
+<span id="cb44-11"><a href="#cb44-11" tabindex="-1"></a><span class="co">#&gt; KS Format:svdtc (nocase)</span></span>
+<span id="cb44-12"><a href="#cb44-12" tabindex="-1"></a><span class="co">#&gt; Type: character </span></span>
+<span id="cb44-13"><a href="#cb44-13" tabindex="-1"></a><span class="co">#&gt; Mappings:</span></span>
+<span id="cb44-14"><a href="#cb44-14" tabindex="-1"></a><span class="co">#&gt;   2025-01-15 =&gt; SUBJ-001|1</span></span>
+<span id="cb44-15"><a href="#cb44-15" tabindex="-1"></a><span class="co">#&gt;   2025-02-20 =&gt; SUBJ-001|2</span></span>
+<span id="cb44-16"><a href="#cb44-16" tabindex="-1"></a><span class="co">#&gt;   2025-03-10 =&gt; SUBJ-001|3</span></span>
+<span id="cb44-17"><a href="#cb44-17" tabindex="-1"></a><span class="co">#&gt;   2025-01-18 =&gt; SUBJ-002|1</span></span>
+<span id="cb44-18"><a href="#cb44-18" tabindex="-1"></a><span class="co">#&gt;   2025-02-25 =&gt; SUBJ-002|2</span></span>
+<span id="cb44-19"><a href="#cb44-19" tabindex="-1"></a><span class="co">#&gt;   .other =&gt; NOT FOUND</span></span></code></pre></div>
+<p>Now look up visit dates in the QS domain using
+<code>fputk()</code>:</p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" tabindex="-1"></a>QS<span class="sc">$</span>SVSTDTC <span class="ot">&lt;-</span> <span class="fu">fputk</span>(QS<span class="sc">$</span>USUBJID, QS<span class="sc">$</span>VISITNUM, <span class="at">format =</span> <span class="st">&quot;svdtc&quot;</span>)</span>
+<span id="cb45-2"><a href="#cb45-2" tabindex="-1"></a>QS</span>
+<span id="cb45-3"><a href="#cb45-3" tabindex="-1"></a><span class="co">#&gt;    USUBJID VISITNUM QSTESTCD QSSTRESN   SVSTDTC</span></span>
+<span id="cb45-4"><a href="#cb45-4" tabindex="-1"></a><span class="co">#&gt; 1 SUBJ-001        1   SCORE1       85 NOT FOUND</span></span>
+<span id="cb45-5"><a href="#cb45-5" tabindex="-1"></a><span class="co">#&gt; 2 SUBJ-001        2   SCORE1       90 NOT FOUND</span></span>
+<span id="cb45-6"><a href="#cb45-6" tabindex="-1"></a><span class="co">#&gt; 3 SUBJ-002        1   SCORE1       72 NOT FOUND</span></span>
+<span id="cb45-7"><a href="#cb45-7" tabindex="-1"></a><span class="co">#&gt; 4 SUBJ-002        2   SCORE1       78 NOT FOUND</span></span>
+<span id="cb45-8"><a href="#cb45-8" tabindex="-1"></a><span class="co">#&gt; 5 SUBJ-002        3   SCORE1       NA NOT FOUND</span></span>
+<span id="cb45-9"><a href="#cb45-9" tabindex="-1"></a></span>
+<span id="cb45-10"><a href="#cb45-10" tabindex="-1"></a><span class="fu">fclear</span>()</span>
+<span id="cb45-11"><a href="#cb45-11" tabindex="-1"></a><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
 </div>
 
 

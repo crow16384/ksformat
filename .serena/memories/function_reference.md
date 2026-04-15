@@ -1,20 +1,21 @@
-# ksformat Function Reference (updated 2026-02-18)
+# ksformat Function Reference (updated 2026-04-15)
 
 ## Exported Functions
 
 | Function | File | Purpose |
-|----------|------|---------|
+|----------|------|---------| 
 | `fnew(...)` | format_create.R | Create ks_format (value→label mapping) |
 | `fput(x, format, ..., keep_na)` | format_apply.R | Apply format to vector |
 | `fputn(x, format_name, ...)` | format_apply.R | Apply numeric format by name |
 | `fputc(x, format_name, ...)` | format_apply.R | Apply character format by name |
+| `fputk(..., format, sep, keep_na)` | format_apply.R | Apply format with composite paste key (e.g. SUBJ\|VISIT) |
 | `fput_all(x, format, ..., keep_na)` | format_apply.R | Multilabel: all matching labels |
 | `fput_df(data, ..., suffix, replace)` | format_apply.R | Apply formats to data frame cols |
 | `finput(...)` | format_invalue.R | Create ks_invalue (label→value) |
 | `finputn(x, invalue_name)` | format_invalue.R | Apply numeric invalue by name |
 | `finputc(x, invalue_name)` | format_invalue.R | Apply character invalue by name |
 | `fnew_bid(...)` | format_invalue.R | Create bidirectional format+invalue |
-| `fnew_date(pattern, name, type, .missing)` | format_datetime.R | Create date/time format |
+| `fnew_date(pattern, name, type, .missing)` | format_datetime.R | Create date/time/datetime format |
 | `fparse(text, file)` | format_parse.R | Parse SAS-like text definitions |
 | `fexport(..., formats, file)` | format_parse.R | Export formats to SAS-like text |
 | `fimport(file, register, overwrite)` | format_parse.R | Import SAS CNTLOUT CSV |
@@ -28,7 +29,7 @@
 ## Internal Functions
 
 | Function | File | Purpose |
-|----------|------|---------|
+|----------|------|---------| 
 | `.fput_vectorized()` | format_apply.R | Per-element format application |
 | `.invalue_apply()` | format_invalue.R | Apply invalue format |
 | `.is_expr_label()` | utilities.R | Check expression label |

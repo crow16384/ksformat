@@ -2571,3 +2571,52 @@ test_that("fimport reads SAS CNTLOUT CSV", {
   expect_true(length(imported) > 0)
   fclear()
 })
+
+# --- fputk (composite key lookup) ---
+
+test_that("fputk pastes two vectors and applies format", {
+  fnew("A|1" = "X", "A|2" = "Y", "B|1" = "Z",
+       name = "fputk_test", type = "character")
+  result <- fputk(c("A", "A", "B"), c(1, 2, 1), format = "fputk_test")
+  expect_equal(result, c("X", "Y", "Z"))
+  fclear()
+})
+
+test_that("fputk uses .other for unmatched composite keys", {
+  fnew("A|1" = "X", .other = "MISS",
+       name = "fputk_other", type = "character")
+  result <- fputk(c("A", "B"), c(1, 1), format = "fputk_other")
+  expect_equal(result, c("X", "MISS"))
+  fclear()
+})
+
+test_that("fputk supports custom separator", {
+  fnew("A-1" = "X", name = "fputk_sep", type = "character")
+  result <- fputk("A", 1, format = "fputk_sep", sep = "-")
+  expect_equal(result, "X")
+  fclear()
+})
+
+test_that("fputk passes keep_na through", {
+  fnew("A|1" = "X", .missing = "NA_LABEL",
+       name = "fputk_na", type = "character")
+  result_mapped <- fputk(NA, 1, format = "fputk_na")
+  result_kept   <- fputk(NA, 1, format = "fputk_na", keep_na = TRUE)
+  expect_equal(result_mapped, "NA_LABEL")
+  expect_true(is.na(result_kept))
+  fclear()
+})
+
+test_that("fputk works with three key components", {
+  fnew("A|1|X" = "found", .other = "nope",
+       name = "fputk_3", type = "character")
+  result <- fputk("A", 1, "X", format = "fputk_3")
+  expect_equal(result, "found")
+  fclear()
+})
+
+test_that("fputk accepts a ks_format object directly", {
+  fmt <- fnew("A|1" = "hit", .other = "miss", type = "character")
+  result <- fputk(c("A", "B"), c(1, 1), format = fmt)
+  expect_equal(result, c("hit", "miss"))
+})
