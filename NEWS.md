@@ -1,3 +1,11 @@
+# ksformat 0.5.1
+
+## Bug Fixes
+
+* Fixed Example 20 (Composite Key Lookup) in vignette: added missing
+  `reverse = FALSE` to the character format created with `setNames()`, which
+  caused all lookups to return "NOT FOUND".
+
 # ksformat 0.5.0
 
 ## New Features

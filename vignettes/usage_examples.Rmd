@@ -884,7 +884,8 @@ fnew(
   .other  = "NOT FOUND",
   name    = "svdtc",
   type    = "character",
-  ignore_case = TRUE
+  ignore_case = TRUE,
+  reverse = FALSE
 )
 
 fprint("svdtc")

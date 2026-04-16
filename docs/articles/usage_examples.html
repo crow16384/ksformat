@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.1</span>
       </span>
     </div>
 
@@ -488,8 +488,8 @@ once:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;        format             result</span></span>
-<span><span class="co">#&gt; 1 DATETIME20. 16APR2026:15:15:22</span></span>
-<span><span class="co">#&gt; 2 DATETIME13.      16APR26:15:15</span></span>
+<span><span class="co">#&gt; 1 DATETIME20. 16APR2026:15:42:28</span></span>
+<span><span class="co">#&gt; 2 DATETIME13.      16APR26:15:42</span></span>
 <span><span class="co">#&gt; 3     DTDATE.          16APR2026</span></span>
 <span><span class="co">#&gt; 4   DTYYMMDD.         2026-04-16</span></span>
 <span></span>
@@ -1045,7 +1045,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmp1dR9Yb/temp_libpath159c12ddd0373/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpidOgr8/temp_libpath16bbe608e1ead/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">imported</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "AGEGRP"   "BMICAT"   "GENDER"   "RACEIN"   "SMISSING"</span></span>
 <span></span>
@@ -1173,7 +1173,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmp1dR9Yb/temp_libpath159c12ddd0373/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpidOgr8/temp_libpath16bbe608e1ead/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span></span>
 <span><span class="co"># Library should be empty</span></span>
 <span><span class="fu"><a href="../reference/flist.html">flist</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -1273,30 +1273,31 @@ strings:</p>
 <span>  .other  <span class="op">=</span> <span class="st">"NOT FOUND"</span>,</span>
 <span>  name    <span class="op">=</span> <span class="st">"svdtc"</span>,</span>
 <span>  type    <span class="op">=</span> <span class="st">"character"</span>,</span>
-<span>  ignore_case <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  ignore_case <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  reverse <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/fprint.html">fprint</a></span><span class="op">(</span><span class="st">"svdtc"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; KS Format:svdtc (nocase)</span></span>
 <span><span class="co">#&gt; Type: character </span></span>
 <span><span class="co">#&gt; Mappings:</span></span>
-<span><span class="co">#&gt;   2025-01-15 =&gt; SUBJ-001|1</span></span>
-<span><span class="co">#&gt;   2025-02-20 =&gt; SUBJ-001|2</span></span>
-<span><span class="co">#&gt;   2025-03-10 =&gt; SUBJ-001|3</span></span>
-<span><span class="co">#&gt;   2025-01-18 =&gt; SUBJ-002|1</span></span>
-<span><span class="co">#&gt;   2025-02-25 =&gt; SUBJ-002|2</span></span>
+<span><span class="co">#&gt;   SUBJ-001|1 =&gt; 2025-01-15</span></span>
+<span><span class="co">#&gt;   SUBJ-001|2 =&gt; 2025-02-20</span></span>
+<span><span class="co">#&gt;   SUBJ-001|3 =&gt; 2025-03-10</span></span>
+<span><span class="co">#&gt;   SUBJ-002|1 =&gt; 2025-01-18</span></span>
+<span><span class="co">#&gt;   SUBJ-002|2 =&gt; 2025-02-25</span></span>
 <span><span class="co">#&gt;   .other =&gt; NOT FOUND</span></span></code></pre></div>
 <p>Now look up visit dates in the QS domain using
 <code><a href="../reference/fputk.html">fputk()</a></code>:</p>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">QS</span><span class="op">$</span><span class="va">SVSTDTC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fputk.html">fputk</a></span><span class="op">(</span><span class="va">QS</span><span class="op">$</span><span class="va">USUBJID</span>, <span class="va">QS</span><span class="op">$</span><span class="va">VISITNUM</span>, format <span class="op">=</span> <span class="st">"svdtc"</span><span class="op">)</span></span>
 <span><span class="va">QS</span></span>
-<span><span class="co">#&gt;    USUBJID VISITNUM QSTESTCD QSSTRESN   SVSTDTC</span></span>
-<span><span class="co">#&gt; 1 SUBJ-001        1   SCORE1       85 NOT FOUND</span></span>
-<span><span class="co">#&gt; 2 SUBJ-001        2   SCORE1       90 NOT FOUND</span></span>
-<span><span class="co">#&gt; 3 SUBJ-002        1   SCORE1       72 NOT FOUND</span></span>
-<span><span class="co">#&gt; 4 SUBJ-002        2   SCORE1       78 NOT FOUND</span></span>
-<span><span class="co">#&gt; 5 SUBJ-002        3   SCORE1       NA NOT FOUND</span></span>
+<span><span class="co">#&gt;    USUBJID VISITNUM QSTESTCD QSSTRESN    SVSTDTC</span></span>
+<span><span class="co">#&gt; 1 SUBJ-001        1   SCORE1       85 2025-01-15</span></span>
+<span><span class="co">#&gt; 2 SUBJ-001        2   SCORE1       90 2025-02-20</span></span>
+<span><span class="co">#&gt; 3 SUBJ-002        1   SCORE1       72 2025-01-18</span></span>
+<span><span class="co">#&gt; 4 SUBJ-002        2   SCORE1       78 2025-02-25</span></span>
+<span><span class="co">#&gt; 5 SUBJ-002        3   SCORE1       NA  NOT FOUND</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">QS</span><span class="op">$</span><span class="va">SVSTDTC</span><span class="op">)</span>  <span class="co"># character</span></span>
 <span><span class="co">#&gt; [1] "character"</span></span>
 <span></span>
@@ -1334,12 +1335,12 @@ return them directly — no string conversion needed:</p>
 <div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">QS</span><span class="op">$</span><span class="va">SVSTDTC_DT</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fputk.html">fputk</a></span><span class="op">(</span><span class="va">QS</span><span class="op">$</span><span class="va">USUBJID</span>, <span class="va">QS</span><span class="op">$</span><span class="va">VISITNUM</span>, format <span class="op">=</span> <span class="st">"svdtn"</span><span class="op">)</span></span>
 <span><span class="va">QS</span></span>
-<span><span class="co">#&gt;    USUBJID VISITNUM QSTESTCD QSSTRESN   SVSTDTC SVSTDTC_DT</span></span>
-<span><span class="co">#&gt; 1 SUBJ-001        1   SCORE1       85 NOT FOUND 2025-01-15</span></span>
-<span><span class="co">#&gt; 2 SUBJ-001        2   SCORE1       90 NOT FOUND 2025-02-20</span></span>
-<span><span class="co">#&gt; 3 SUBJ-002        1   SCORE1       72 NOT FOUND 2025-01-18</span></span>
-<span><span class="co">#&gt; 4 SUBJ-002        2   SCORE1       78 NOT FOUND 2025-02-25</span></span>
-<span><span class="co">#&gt; 5 SUBJ-002        3   SCORE1       NA NOT FOUND       &lt;NA&gt;</span></span>
+<span><span class="co">#&gt;    USUBJID VISITNUM QSTESTCD QSSTRESN    SVSTDTC SVSTDTC_DT</span></span>
+<span><span class="co">#&gt; 1 SUBJ-001        1   SCORE1       85 2025-01-15 2025-01-15</span></span>
+<span><span class="co">#&gt; 2 SUBJ-001        2   SCORE1       90 2025-02-20 2025-02-20</span></span>
+<span><span class="co">#&gt; 3 SUBJ-002        1   SCORE1       72 2025-01-18 2025-01-18</span></span>
+<span><span class="co">#&gt; 4 SUBJ-002        2   SCORE1       78 2025-02-25 2025-02-25</span></span>
+<span><span class="co">#&gt; 5 SUBJ-002        3   SCORE1       NA  NOT FOUND       &lt;NA&gt;</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">QS</span><span class="op">$</span><span class="va">SVSTDTC_DT</span><span class="op">)</span>  <span class="co"># Date</span></span>
 <span><span class="co">#&gt; [1] "Date"</span></span>
 <span></span>

@@ -14,7 +14,7 @@ Maps values to labels (formats), labels back to values (invalues), with range, d
 - **uv**: installed at ~/.local/bin/uv (for Serena MCP)
 
 ## Version
-- Current: 0.3.1
+- Current: 0.5.1
 - License: MIT
 
 ## Core Concepts
