@@ -4,7 +4,7 @@
 
 | Function | File | Purpose |
 |----------|------|---------| 
-| `fnew(...)` | format_create.R | Create ks_format (value→label mapping) |
+| `fnew(..., reverse)` | format_create.R | Create ks_format (value→label mapping). `reverse` param controls named-vector direction (NULL=auto, FALSE=never, TRUE=always) |
 | `fput(x, format, ..., keep_na)` | format_apply.R | Apply format to vector |
 | `fputn(x, format_name, ...)` | format_apply.R | Apply numeric format by name |
 | `fputc(x, format_name, ...)` | format_apply.R | Apply character format by name |

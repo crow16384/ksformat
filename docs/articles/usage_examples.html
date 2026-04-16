@@ -58,6 +58,9 @@
     </li>
   </ul>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
@@ -485,8 +488,8 @@ once:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;        format             result</span></span>
-<span><span class="co">#&gt; 1 DATETIME20. 16APR2026:12:17:57</span></span>
-<span><span class="co">#&gt; 2 DATETIME13.      16APR26:12:17</span></span>
+<span><span class="co">#&gt; 1 DATETIME20. 16APR2026:15:15:22</span></span>
+<span><span class="co">#&gt; 2 DATETIME13.      16APR26:15:15</span></span>
 <span><span class="co">#&gt; 3     DTDATE.          16APR2026</span></span>
 <span><span class="co">#&gt; 4   DTYYMMDD.         2026-04-16</span></span>
 <span></span>
@@ -1042,7 +1045,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpEZU1Ef/temp_libpath12ce03e73b8b8/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmp1dR9Yb/temp_libpath159c12ddd0373/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">imported</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "AGEGRP"   "BMICAT"   "GENDER"   "RACEIN"   "SMISSING"</span></span>
 <span></span>
@@ -1170,7 +1173,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpEZU1Ef/temp_libpath12ce03e73b8b8/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmp1dR9Yb/temp_libpath159c12ddd0373/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span></span>
 <span><span class="co"># Library should be empty</span></span>
 <span><span class="fu"><a href="../reference/flist.html">flist</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -1350,6 +1353,164 @@ return them directly — no string conversion needed:</p>
 <span></span>
 <span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="example-21-consistent-data-driven-formats-with-reverse">Example 21: Consistent Data-Driven Formats with
+<code>reverse</code><a class="anchor" aria-label="anchor" href="#example-21-consistent-data-driven-formats-with-reverse"></a>
+</h2>
+<p>When building formats from data (e.g., a data frame with 1000+ rows),
+you use <code><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames()</a></code> to create a named vector. By default,
+<code><a href="../reference/fnew.html">fnew()</a></code> treats named vectors differently depending on the
+output type:</p>
+<ul>
+<li>
+<strong>Value types</strong> (<code>Date</code>,
+<code>POSIXct</code>, <code>logical</code>): <code>c(key = value)</code>
+— natural direction, no reversal.</li>
+<li>
+<strong>Character / numeric</strong>: <code>c(Label = "Code")</code>
+— R convention, names and values are <strong>swapped</strong>
+internally.</li>
+</ul>
+<p>This inconsistency is confusing for data-driven formats. The
+<code>reverse</code> parameter solves it: set
+<code>reverse = FALSE</code> to use the natural
+<code>c(key = value)</code> direction for <strong>all</strong>
+types.</p>
+<div class="section level3">
+<h3 id="clinical-data-example">Clinical-data example<a class="anchor" aria-label="anchor" href="#clinical-data-example"></a>
+</h3>
+<p>Suppose we have a demographics dataset and need two lookup formats
+from the same data — one returning Date objects, one returning character
+strings:</p>
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/crow16384/ksformat" class="external-link">ksformat</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">dm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  USUBJID <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SUBJ-001"</span>, <span class="st">"SUBJ-002"</span>, <span class="st">"SUBJ-003"</span><span class="op">)</span>,</span>
+<span>  SUBJID  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"001"</span>, <span class="st">"002"</span>, <span class="st">"003"</span><span class="op">)</span>,</span>
+<span>  RFICDTC <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2023-03-09T08:45"</span>, <span class="st">"2024-08-13T09:53"</span>, <span class="st">"2025-06-17T09:03"</span><span class="op">)</span>,</span>
+<span>  stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Composite key for both formats</span></span>
+<span><span class="va">keys</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">dm</span><span class="op">$</span><span class="va">USUBJID</span>, <span class="va">dm</span><span class="op">$</span><span class="va">SUBJID</span>, sep <span class="op">=</span> <span class="st">"|"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="same-setnamesvalues-keys-pattern-for-both-types">Same <code>setNames(values, keys)</code> pattern for both types<a class="anchor" aria-label="anchor" href="#same-setnamesvalues-keys-pattern-for-both-types"></a>
+</h3>
+<p>With <code>reverse = FALSE</code>, both formats use the
+<strong>identical</strong> calling style — names are input keys, values
+are output objects:</p>
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Date lookup</span></span>
+<span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">dm</span><span class="op">$</span><span class="va">RFICDTC</span>, format <span class="op">=</span> <span class="st">"%Y-%m-%d"</span><span class="op">)</span>, <span class="va">keys</span><span class="op">)</span>,</span>
+<span>  .other      <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  type        <span class="op">=</span> <span class="st">"Date"</span>,</span>
+<span>  ignore_case <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  name        <span class="op">=</span> <span class="st">"icdtn"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Character lookup — same setNames(values, keys) pattern!</span></span>
+<span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">dm</span><span class="op">$</span><span class="va">RFICDTC</span>, <span class="va">keys</span><span class="op">)</span>,</span>
+<span>  .other      <span class="op">=</span> <span class="st">"NOT FOUND"</span>,</span>
+<span>  type        <span class="op">=</span> <span class="st">"character"</span>,</span>
+<span>  ignore_case <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  reverse     <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  name        <span class="op">=</span> <span class="st">"icdtc"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/fprint.html">fprint</a></span><span class="op">(</span><span class="st">"icdtn"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; KS Format:icdtn (nocase)</span></span>
+<span><span class="co">#&gt; Type: Date </span></span>
+<span><span class="co">#&gt; Mappings:</span></span>
+<span><span class="co">#&gt;   SUBJ-001|001 =&gt; 2023-03-09</span></span>
+<span><span class="co">#&gt;   SUBJ-002|002 =&gt; 2024-08-13</span></span>
+<span><span class="co">#&gt;   SUBJ-003|003 =&gt; 2025-06-17</span></span>
+<span><span class="fu"><a href="../reference/fprint.html">fprint</a></span><span class="op">(</span><span class="st">"icdtc"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; KS Format:icdtc (nocase)</span></span>
+<span><span class="co">#&gt; Type: character </span></span>
+<span><span class="co">#&gt; Mappings:</span></span>
+<span><span class="co">#&gt;   SUBJ-001|001 =&gt; 2023-03-09T08:45</span></span>
+<span><span class="co">#&gt;   SUBJ-002|002 =&gt; 2024-08-13T09:53</span></span>
+<span><span class="co">#&gt;   SUBJ-003|003 =&gt; 2025-06-17T09:03</span></span>
+<span><span class="co">#&gt;   .other =&gt; NOT FOUND</span></span></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Both return the expected results</span></span>
+<span><span class="fu"><a href="../reference/fputk.html">fputk</a></span><span class="op">(</span><span class="st">"SUBJ-001"</span>, <span class="st">"001"</span>, format <span class="op">=</span> <span class="st">"icdtn"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "2023-03-09"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="fu"><a href="../reference/fputk.html">fputk</a></span><span class="op">(</span><span class="st">"SUBJ-001"</span>, <span class="st">"001"</span>, format <span class="op">=</span> <span class="st">"icdtn"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Date"</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/fputk.html">fputk</a></span><span class="op">(</span><span class="st">"SUBJ-001"</span>, <span class="st">"001"</span>, format <span class="op">=</span> <span class="st">"icdtc"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "2023-03-09T08:45"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="fu"><a href="../reference/fputk.html">fputk</a></span><span class="op">(</span><span class="st">"SUBJ-001"</span>, <span class="st">"001"</span>, format <span class="op">=</span> <span class="st">"icdtc"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "character"</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
+<p>The only difference is the <code>reverse = FALSE</code> for the
+character format. For Date formats, <code>reverse</code> defaults to
+<code>FALSE</code> automatically, so you don’t need to specify it.</p>
+</div>
+<div class="section level3">
+<h3 id="when-to-use-the-default-reversal-on">When to use the default (reversal on)<a class="anchor" aria-label="anchor" href="#when-to-use-the-default-reversal-on"></a>
+</h3>
+<p>The default reversal (<code>reverse = NULL</code>) preserves the
+standard R convention where <code>c(Label = "Code")</code> maps
+<code>Code -&gt; Label</code>. This is natural for hand-written
+formats:</p>
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># These are equivalent — both map "M" -&gt; "Male"</span></span>
+<span><span class="va">fmt_a</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Male <span class="op">=</span> <span class="st">"M"</span>, Female <span class="op">=</span> <span class="st">"F"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">fmt_b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="st">"M"</span> <span class="op">=</span> <span class="st">"Male"</span>, <span class="st">"F"</span> <span class="op">=</span> <span class="st">"Female"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M"</span>, <span class="st">"F"</span><span class="op">)</span>, <span class="va">fmt_a</span><span class="op">)</span>, <span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M"</span>, <span class="st">"F"</span><span class="op">)</span>, <span class="va">fmt_b</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="35%">
+<col width="50%">
+<col width="14%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Use case</th>
+<th align="left">Style</th>
+<th align="left"><code>reverse</code></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">Data-driven (any type)</td>
+<td align="left"><code>setNames(values, keys)</code></td>
+<td align="left"><code>FALSE</code></td>
+</tr>
+<tr class="even">
+<td align="left">Hand-written (char/num)</td>
+<td align="left">
+<code>c(Label = "Code")</code> or
+<code>"Code" = "Label"</code>
+</td>
+<td align="left">
+<code>NULL</code> (default)</td>
+</tr>
+<tr class="odd">
+<td align="left">Value types (<code>Date</code>, etc.)</td>
+<td align="left"><code>setNames(values, keys)</code></td>
+<td align="left">
+<code>NULL</code> (default = <code>FALSE</code>)</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
   </div>

@@ -38,6 +38,9 @@ is provided."><meta property="og:image" content="/logo.svg"><!-- mathjax --><scr
       <a href="../articles/usage_examples.html">ksformat Usage Examples</a>
     </li>
   </ul></li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/crow16384/ksformat/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
@@ -73,6 +76,7 @@ is provided.</p>
 <span>  default <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  multilabel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ignore_case <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  reverse <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -83,13 +87,21 @@ is provided.</p>
 
 <dl><dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Named arguments defining value-label mappings, or one or more
-named vectors/lists using the R convention <code>c(Label = "Code")</code>.
-Can be:</p><ul><li><p>Discrete values: <code>"M" = "Male", "F" = "Female"</code></p></li>
+  named vectors/lists using the R convention <code>c(Label = "Code")</code>.
+  Can be:</p><ul><li><p>Discrete values: <code>"M" = "Male", "F" = "Female"</code></p></li>
 <li><p>Named vector: <code>c(Male = "M", Female = "F")</code></p></li>
 <li><p>Named list: <code>list(Male = "M", Female = "F")</code></p></li>
 <li><p>Special values: <code>.missing = "Missing"</code>, <code>.other = "Other"</code></p></li>
 </ul><p>Named vectors use the R idiom where names are labels and values are codes,
-which is the reverse of the <code>...</code> argument convention.</p></dd>
+  which is the reverse of the <code>...</code> argument convention.</p>
+<p><strong>Named-vector reversal:</strong> For character and numeric formats, named
+  vectors are automatically reversed so that <code>c(Male = "M")</code> becomes
+  the mapping <code>"M" -&gt; "Male"</code> (following the <code><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor()</a></code> convention).
+  For value types (<code>"Date"</code>, <code>"POSIXct"</code>, <code>"logical"</code>), no
+  reversal occurs — the named vector is used as-is with names as input keys
+  and values as output objects, because non-character objects cannot serve
+  as vector names. See <code><a href="../articles/usage_examples.html">vignette("usage_examples")</a></code> Example 21 for
+  a detailed walkthrough.</p></dd>
 
 
 <dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
@@ -121,6 +133,17 @@ ranges where a single value can match multiple labels. Used with
 is case-insensitive. Default <code>FALSE</code>.</p></dd>
 
 
+<dt id="arg-reverse">reverse<a class="anchor" aria-label="anchor" href="#arg-reverse"></a></dt>
+<dd><p>Logical or <code>NULL</code>. Controls whether named vectors passed
+as unnamed arguments have their names and values swapped:</p><ul><li><p><code>NULL</code> (default): auto — reverse for character/numeric types
+    (R convention <code>c(Label = "Code")</code>), no reverse for value types.</p></li>
+<li><p><code>FALSE</code>: never reverse — names are always input keys, values
+    are always output labels/objects. Recommended for data-driven formats
+    built with <code>setNames(values, keys)</code>.</p></li>
+<li><p><code>TRUE</code>: always reverse — names are labels, values are codes.</p></li>
+</ul></dd>
+
+
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>Logical. If <code>TRUE</code>, returns the format object visibly;
 otherwise returns it invisibly. Default <code>FALSE</code>.</p></dd>
@@ -135,7 +158,36 @@ otherwise returns it invisibly. Default <code>FALSE</code>.</p></dd>
     <h2>Details</h2>
     <p>Special directives:</p><ul><li><p><code>.missing</code>: Label for NA, NULL, NaN values</p></li>
 <li><p><code>.other</code>: Label for values not matching any rule</p></li>
-</ul><p><strong>Expression labels:</strong> If a label contains <code>.x1</code>, <code>.x2</code>, etc.,
+</ul><p><strong>Named-vector direction (reverse convention):</strong></p>
+<p>When a named vector or list is passed as an unnamed argument (e.g.,
+<code>fnew(c(Male = "M"))</code>), the direction of the name-to-value mapping
+depends on the output <code>type</code>:</p>
+<ul><li><p>For <strong>character / numeric</strong> types, names are <em>labels</em> and
+    values are <em>codes</em>. The pairs are reversed internally so that the
+    format maps <code>code -&gt; label</code>. This follows the standard R idiom used
+    by <code><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor()</a></code>, where <code>c(Label = "Code")</code>.</p></li>
+<li><p>For <strong>value types</strong> (<code>Date</code>, <code>POSIXct</code>,
+    <code>logical</code>), names are <em>input keys</em> and values are the native R
+    objects returned by the format. No reversal is applied, because
+    non-character objects cannot be used as vector names.</p></li>
+</ul><p>This means the <em>same data</em> may need to be arranged differently
+depending on the target type. For example, to create a lookup from subject
+IDs to dates:</p><div class="sourceCode"><pre><code><span></span>
+<span><span class="co"># Date type: natural direction (key = name, date = value)</span></span>
+<span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">dates</span>, <span class="va">ids</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"Date"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Character type: reversed direction (date-string = name, key = value)</span></span>
+<span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">ids</span>, <span class="va">date_strings</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"character"</span><span class="op">)</span></span></code></pre></div>
+
+<p>To avoid this inconsistency, use <code>reverse = FALSE</code> for data-driven
+formats. This makes <code>setNames(values, keys)</code> work identically for
+all types:</p><div class="sourceCode"><pre><code><span></span>
+<span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">dates</span>, <span class="va">ids</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"Date"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">date_strings</span>, <span class="va">ids</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"character"</span>, reverse <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+
+<p>When in doubt, use explicit <code>key = "label"</code> arguments — these are
+never reversed regardless of type.</p>
+<p><strong>Expression labels:</strong> If a label contains <code>.x1</code>, <code>.x2</code>, etc.,
 it is treated as an R expression that is evaluated at apply-time. Extra arguments
 are passed positionally via <code>...</code> in <code><a href="fput.html">fput</a></code>:</p><div class="sourceCode"><pre><code><span></span>
 <span><span class="va">stat_fmt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="st">"n"</span> <span class="op">=</span> <span class="st">"sprintf('%s', .x1)"</span>,</span>

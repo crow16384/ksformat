@@ -27,8 +27,8 @@ dm <- tribble(
 "MIRACLE-01024", "01024", "2022-01-24T07:50"
 )
 
-# Date lookup (value type — no reversal needed)
-# For Date formats, names = input keys, values = output Date objects
+# Date lookup (value type — reverse defaults to FALSE)
+# setNames(values, keys): names = input keys, values = output Date objects
 fmt_date_lookup <- with(
   dm,
   setNames(as.Date(RFICDTC, format="%Y-%m-%d", optional=TRUE), paste(USUBJID, SUBJID, sep = "|"))) 
@@ -37,16 +37,14 @@ fmt_date_lookup
 fmt_date_lookup %>%
   fnew(ignore_case = TRUE, .other=NA, type="Date", name = "icdtn")
 
-# Character lookup (standard type — reversal applies)
-# For character formats, names = labels (output), values = codes (input)
-# So we swap: date-strings as names, keys as values
+# Character lookup — same setNames(values, keys) pattern with reverse=FALSE
 fmt_char_lookup <- with(
   dm,
-  setNames(paste(USUBJID, SUBJID, sep = "|"), RFICDTC)) 
+  setNames(RFICDTC, paste(USUBJID, SUBJID, sep = "|")))
 fmt_char_lookup
 
 fmt_char_lookup %>%
-  fnew(ignore_case = TRUE, .other='ERROR', type="character", name = "icdtc")
+  fnew(ignore_case = TRUE, .other='ERROR', type="character", reverse = FALSE, name = "icdtc")
 
 fprint('icdtn')
 fprint('icdtc')

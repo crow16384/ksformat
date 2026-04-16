@@ -200,6 +200,54 @@ test_that("fnew errors on unnamed vector without names", {
   expect_error(fnew(c("M", "F")), "fully named")
 })
 
+test_that("fnew reverse=FALSE skips reversal for character type", {
+  # Without reverse=FALSE: c(Male = "M") means "M" -> "Male"
+  fmt_default <- fnew(c(Male = "M", Female = "F"))
+  expect_equal(fput("M", fmt_default), "Male")
+
+  # With reverse=FALSE: c(Male = "M") means "Male" -> "M"
+  fmt_no_rev <- fnew(c(Male = "M", Female = "F"), reverse = FALSE)
+  expect_equal(fput("Male", fmt_no_rev), "M")
+  expect_equal(fput("Female", fmt_no_rev), "F")
+})
+
+test_that("fnew reverse=FALSE enables consistent setNames for all types", {
+  keys <- c("A", "B")
+  vals_chr <- c("Label-A", "Label-B")
+  vals_date <- as.Date(c("2021-01-01", "2021-06-15"))
+
+  fmt_chr <- fnew(setNames(vals_chr, keys), type = "character", reverse = FALSE)
+  fmt_date <- fnew(setNames(vals_date, keys), type = "Date")
+
+  # Both use same setNames(values, keys) pattern
+
+  expect_equal(fput("A", fmt_chr), "Label-A")
+  expect_equal(fput("B", fmt_chr), "Label-B")
+  expect_equal(fput("A", fmt_date), vals_date[1])
+  expect_equal(fput("B", fmt_date), vals_date[2])
+})
+
+test_that("fnew reverse=TRUE forces reversal even for value types", {
+  # reverse=TRUE: c("val1" = "key1") reversed => "key1" -> "val1"
+  fmt <- fnew(c("val1" = "key1", "val2" = "key2"), reverse = TRUE)
+  expect_equal(fput("key1", fmt), "val1")
+  expect_equal(fput("key2", fmt), "val2")
+})
+
+test_that("fnew reverse=NULL preserves default behavior", {
+  # NULL = auto: character reverses, Date does not
+  fmt_chr <- fnew(c(Male = "M"), reverse = NULL)
+  expect_equal(fput("M", fmt_chr), "Male")
+
+  fmt_date <- fnew(c("M" = as.Date("2021-01-01")), reverse = NULL)
+  expect_equal(fput("M", fmt_date), as.Date("2021-01-01"))
+})
+
+test_that("fnew reverse validates input", {
+  expect_error(fnew("M" = "Male", reverse = "yes"), "TRUE, FALSE, or NULL")
+  expect_error(fnew("M" = "Male", reverse = c(TRUE, FALSE)), "TRUE, FALSE, or NULL")
+})
+
 test_that("finput works with named numeric vector", {
   inv <- finput(c(Male = 1, Female = 2), name = "sex_inv_vec")
 

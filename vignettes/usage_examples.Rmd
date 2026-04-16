@@ -935,33 +935,25 @@ QS$SVSTDTC_DT + 7  # add 7 days
 fclear()
 ```
 
-## Example 21: Named Vector Direction and the `reverse` Convention
+## Example 21: Consistent Data-Driven Formats with `reverse`
 
-When you pass a named vector to `fnew()`, the direction of the name-value
-mapping depends on the output **type**. Understanding this is key to avoiding
-surprises.
+When building formats from data (e.g., a data frame with 1000+ rows), you
+use `setNames()` to create a named vector. By default, `fnew()` treats
+named vectors differently depending on the output type:
 
-### The rule
+- **Value types** (`Date`, `POSIXct`, `logical`): `c(key = value)` — natural
+  direction, no reversal.
+- **Character / numeric**: `c(Label = "Code")` — R convention, names and
+  values are **swapped** internally.
 
-| Output type | Named vector convention | `reverse` | Reason |
-|:---------------------|:-------------------------------------|:----------|:-----------------------------------------------|
-| `"character"` / `"numeric"` | `c(Label = "Code")` — R idiom | Yes | Follows `factor()` / `setNames()` convention |
-| Value types (`"Date"`, `"POSIXct"`, `"logical"`) | `c(Code = value)` — natural | No | Non-character objects cannot serve as names |
-
-For **character / numeric** formats, `fnew()` internally reverses the
-named vector so that `c(Male = "M")` becomes the mapping `"M" → "Male"`.
-This matches R's standard `factor(x, levels, labels)` pattern where the
-*label* sits in the name position.
-
-For **value-type** formats (`Date`, `POSIXct`, `logical`), no reversal
-happens because the *values* are rich R objects that cannot be used as
-character names. Here you write the mapping in its natural direction:
-`c("M" = as.Date("2021-01-01"))`.
+This inconsistency is confusing for data-driven formats. The `reverse`
+parameter solves it: set `reverse = FALSE` to use the natural
+`c(key = value)` direction for **all** types.
 
 ### Clinical-data example
 
 Suppose we have a demographics dataset and need two lookup formats from the
-same data — one returning Date objects and one returning character strings:
+same data — one returning Date objects, one returning character strings:
 
 ```{r reverse-setup}
 library(ksformat)
@@ -969,100 +961,78 @@ library(ksformat)
 dm <- data.frame(
   USUBJID = c("SUBJ-001", "SUBJ-002", "SUBJ-003"),
   SUBJID  = c("001", "002", "003"),
-  RFICDTC = c("2021-02-09T08:05", "2021-08-13T07:50", "2022-01-17T08:02"),
+  RFICDTC = c("2023-03-09T08:45", "2024-08-13T09:53", "2025-06-17T09:03"),
   stringsAsFactors = FALSE
 )
 
 # Composite key for both formats
 keys <- paste(dm$USUBJID, dm$SUBJID, sep = "|")
-keys
 ```
 
-### Practical: Use explicit arguments (no reversal confusion)
+### Same `setNames(values, keys)` pattern for both types
 
-The **easiest and clearest way** to create formats from data is to use explicit
-`key = value` arguments. This style is never reversed, regardless of type:
+With `reverse = FALSE`, both formats use the **identical** calling style —
+names are input keys, values are output objects:
 
-```{r reverse-setup-explicit}
-# Create lookup mappings from dm
-mapping_keys <- paste(dm$USUBJID, dm$SUBJID, sep = "|")
-mapping_dates <- as.Date(dm$RFICDTC, format = "%Y-%m-%d")
-mapping_strings <- dm$RFICDTC
-
-# Date lookup — use explicit key = Date pairs
-# (Same calling style as character below)
+```{r reverse-date}
+# Date lookup
 fnew(
-  "SUBJ-001|001" = mapping_dates[1],
-  "SUBJ-002|002" = mapping_dates[2],
-  "SUBJ-003|003" = mapping_dates[3],
+  setNames(as.Date(dm$RFICDTC, format = "%Y-%m-%d"), keys),
   .other      = NA,
   type        = "Date",
   ignore_case = TRUE,
   name        = "icdtn"
 )
 
-fprint("icdtn")
-
-# Returns native Date objects
-result_date <- fputk("SUBJ-001", "001", format = "icdtn")
-result_date
-class(result_date)
-
-fclear()
-
-# Character lookup — use explicit key = string pairs
-# (IDENTICAL calling style)
+# Character lookup — same setNames(values, keys) pattern!
 fnew(
-  "SUBJ-001|001" = mapping_strings[1],
-  "SUBJ-002|002" = mapping_strings[2],
-  "SUBJ-003|003" = mapping_strings[3],
+  setNames(dm$RFICDTC, keys),
   .other      = "NOT FOUND",
   type        = "character",
   ignore_case = TRUE,
+  reverse     = FALSE,
   name        = "icdtc"
 )
 
+fprint("icdtn")
 fprint("icdtc")
+```
 
-# Returns character strings
-result_char <- fputk("SUBJ-001", "001", format = "icdtc")
-result_char
-class(result_char)
+```{r reverse-apply}
+# Both return the expected results
+fputk("SUBJ-001", "001", format = "icdtn")
+class(fputk("SUBJ-001", "001", format = "icdtn"))
+
+fputk("SUBJ-001", "001", format = "icdtc")
+class(fputk("SUBJ-001", "001", format = "icdtc"))
 
 fclear()
 ```
 
-**Key insight:** Both Date and character formats use the **identical calling style**
-(`key = value` arguments). Names are always input keys, values are always output 
-objects/labels. No reversal, no confusion.
+The only difference is the `reverse = FALSE` for the character format.
+For Date formats, `reverse` defaults to `FALSE` automatically, so you
+don't need to specify it.
 
-### When named-vector reversal matters (advanced)
+### When to use the default (reversal on)
 
-If you do pass a named vector, reversal applies differently by type:
+The default reversal (`reverse = NULL`) preserves the standard R convention
+where `c(Label = "Code")` maps `Code -> Label`. This is natural for
+hand-written formats:
 
-```{r reverse-named-vec}
-# Named vector: c(Label = "Code") — R idiom
-sex_codes <- c(Male = "M", Female = "F")
+```{r reverse-default}
+# These are equivalent — both map "M" -> "Male"
+fmt_a <- fnew(c(Male = "M", Female = "F"))
+fmt_b <- fnew("M" = "Male", "F" = "Female")
 
-# For character type: reversal applies
-# c(Male = "M") becomes "M" -> "Male"
-fnew(sex_codes, name = "sex")
-fput(c("M", "F"), "sex")
-
-fclear()
-
-# For value type: no reversal
-# c("M" = as.Date(...)) stays as "M" -> Date
-date_lookup <- c("M" = as.Date("2021-01-01"), "F" = as.Date("2021-02-01"))
-fnew(date_lookup, type = "Date", name = "mf_dates")
-fput(c("M", "F"), "mf_dates")
+identical(fput(c("M", "F"), fmt_a), fput(c("M", "F"), fmt_b))
 
 fclear()
 ```
 
 ### Summary
 
-* **In practice**, use explicit `key = value` arguments — same style for all types,
-  no reversal surprises.
-* Named-vector reversal is an advanced detail that only matters if you pass
-  `c(...)` or `setNames()` to `fnew()`. Avoid it unless you have a specific reason.
+| Use case | Style | `reverse` |
+|:--------------------------|:--------------------------------------|:----------|
+| Data-driven (any type)    | `setNames(values, keys)`              | `FALSE`   |
+| Hand-written (char/num)   | `c(Label = "Code")` or `"Code" = "Label"` | `NULL` (default) |
+| Value types (`Date`, etc.)| `setNames(values, keys)`              | `NULL` (default = `FALSE`) |

@@ -75,6 +75,7 @@ Rscript -e "devtools::test()"
 | `fput(x, fmt)` | Apply format to vector |
 | `fputn(x, fmt)` | Apply format, numeric input |
 | `fputc(x, fmt)` | Apply format, character input |
+| `fputk(...)` | Apply format with composite key |
 | `fput_all(x, fmt)` | Return all matching labels |
 | `fput_df(data, ...)` | Apply formats to data frame columns |
 | `finput(x, inv)` | Apply invalue (label → value) |
@@ -89,6 +90,17 @@ Rscript -e "devtools::test()"
 | `fclear()` | Clear format library |
 | `is_missing(x)` | Check for NA/NULL/NaN |
 | `range_spec(low, high, label)` | Create range specification |
+
+## Named-Vector Reversal (`reverse` parameter)
+
+When passing named vectors to `fnew()`, the direction depends on `type`:
+- **Character/numeric** (default): `c(Label = "Code")` is reversed → `Code → Label`
+- **Value types** (Date, POSIXct, logical): `c(Key = value)` used as-is
+
+The `reverse` parameter in `fnew()` gives explicit control:
+- `NULL` (default): auto — reverse for char/numeric, not for value types
+- `FALSE`: never reverse — use `setNames(values, keys)` consistently for all types
+- `TRUE`: always reverse
 
 ## Missing Value Priority
 

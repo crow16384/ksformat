@@ -39,6 +39,16 @@
 #'   \code{\link{fput_all}} to retrieve all matching labels. Default \code{FALSE}.
 #' @param ignore_case Logical. If \code{TRUE}, key matching for character formats
 #'   is case-insensitive. Default \code{FALSE}.
+#' @param reverse Logical or \code{NULL}. Controls whether named vectors passed
+#'   as unnamed arguments have their names and values swapped:
+#'   \itemize{
+#'     \item \code{NULL} (default): auto — reverse for character/numeric types
+#'       (R convention \code{c(Label = "Code")}), no reverse for value types.
+#'     \item \code{FALSE}: never reverse — names are always input keys, values
+#'       are always output labels/objects. Recommended for data-driven formats
+#'       built with \code{setNames(values, keys)}.
+#'     \item \code{TRUE}: always reverse — names are labels, values are codes.
+#'   }
 #' @param verbose Logical. If \code{TRUE}, returns the format object visibly;
 #'   otherwise returns it invisibly. Default \code{FALSE}.
 #'
@@ -79,6 +89,15 @@
 #' # Character type: reversed direction (date-string = name, key = value)
 #' fnew(setNames(ids, date_strings), type = "character")
 #' }
+#'
+#' To avoid this inconsistency, use \code{reverse = FALSE} for data-driven
+#' formats. This makes \code{setNames(values, keys)} work identically for
+#' all types:
+#' \preformatted{
+#' fnew(setNames(dates, ids), type = "Date")
+#' fnew(setNames(date_strings, ids), type = "character", reverse = FALSE)
+#' }
+#'
 #' When in doubt, use explicit \code{key = "label"} arguments — these are
 #' never reversed regardless of type.
 #'
@@ -135,7 +154,8 @@
 #' # [1] "Male" "Female" "Unknown"
 #' fclear()
 fnew <- function(..., name = NULL, type = "auto", default = NULL,
-                 multilabel = FALSE, ignore_case = FALSE, verbose = FALSE) {
+                 multilabel = FALSE, ignore_case = FALSE, reverse = NULL,
+                 verbose = FALSE) {
   type <- match.arg(type, c("auto", "character", "numeric", .value_types))
   is_vtype <- .is_value_type(type)
 
@@ -152,6 +172,9 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
   }
   if (!is.logical(ignore_case) || length(ignore_case) != 1L) {
     cli_abort("{.arg ignore_case} must be TRUE or FALSE.")
+  }
+  if (!is.null(reverse) && (!is.logical(reverse) || length(reverse) != 1L)) {
+    cli_abort("{.arg reverse} must be TRUE, FALSE, or NULL.")
   }
 
   mappings <- list(...)
@@ -174,9 +197,9 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
     }
   }
 
-  # For value types: names = keys, values = native objects (no reverse)
-  # For character types: R convention c(Label = "Code") → reversed
-  mappings <- .expand_named_vectors(mappings, reverse = !is_vtype)
+  # Determine reversal: NULL = auto (reverse for char/numeric, not for value types)
+  do_reverse <- if (is.null(reverse)) !is_vtype else reverse
+  mappings <- .expand_named_vectors(mappings, reverse = do_reverse)
 
   if (length(mappings) == 0L) {
     cli_abort("At least one value-label mapping must be provided.")

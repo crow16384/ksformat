@@ -11,6 +11,7 @@ fnew(
   default = NULL,
   multilabel = FALSE,
   ignore_case = FALSE,
+  reverse = NULL,
   verbose = FALSE
 )
 }
@@ -54,6 +55,17 @@ ranges where a single value can match multiple labels. Used with
 
 \item{ignore_case}{Logical. If \code{TRUE}, key matching for character formats
 is case-insensitive. Default \code{FALSE}.}
+
+\item{reverse}{Logical or \code{NULL}. Controls whether named vectors passed
+as unnamed arguments have their names and values swapped:
+\itemize{
+  \item \code{NULL} (default): auto — reverse for character/numeric types
+    (R convention \code{c(Label = "Code")}), no reverse for value types.
+  \item \code{FALSE}: never reverse — names are always input keys, values
+    are always output labels/objects. Recommended for data-driven formats
+    built with \code{setNames(values, keys)}.
+  \item \code{TRUE}: always reverse — names are labels, values are codes.
+}}
 
 \item{verbose}{Logical. If \code{TRUE}, returns the format object visibly;
 otherwise returns it invisibly. Default \code{FALSE}.}
@@ -102,6 +114,15 @@ fnew(setNames(dates, ids), type = "Date")
 # Character type: reversed direction (date-string = name, key = value)
 fnew(setNames(ids, date_strings), type = "character")
 }
+
+To avoid this inconsistency, use \code{reverse = FALSE} for data-driven
+formats. This makes \code{setNames(values, keys)} work identically for
+all types:
+\preformatted{
+fnew(setNames(dates, ids), type = "Date")
+fnew(setNames(date_strings, ids), type = "character", reverse = FALSE)
+}
+
 When in doubt, use explicit \code{key = "label"} arguments — these are
 never reversed regardless of type.
 
