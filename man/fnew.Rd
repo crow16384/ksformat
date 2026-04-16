@@ -16,16 +16,25 @@ fnew(
 }
 \arguments{
 \item{...}{Named arguments defining value-label mappings, or one or more
-named vectors/lists using the R convention \code{c(Label = "Code")}.
-Can be:
-\itemize{
-  \item Discrete values: \code{"M" = "Male", "F" = "Female"}
-  \item Named vector: \code{c(Male = "M", Female = "F")}
-  \item Named list: \code{list(Male = "M", Female = "F")}
-  \item Special values: \code{.missing = "Missing"}, \code{.other = "Other"}
-}
-Named vectors use the R idiom where names are labels and values are codes,
-which is the reverse of the \code{...} argument convention.}
+  named vectors/lists using the R convention \code{c(Label = "Code")}.
+  Can be:
+  \itemize{
+    \item Discrete values: \code{"M" = "Male", "F" = "Female"}
+    \item Named vector: \code{c(Male = "M", Female = "F")}
+    \item Named list: \code{list(Male = "M", Female = "F")}
+    \item Special values: \code{.missing = "Missing"}, \code{.other = "Other"}
+  }
+  Named vectors use the R idiom where names are labels and values are codes,
+  which is the reverse of the \code{...} argument convention.
+
+  \strong{Named-vector reversal:} For character and numeric formats, named
+  vectors are automatically reversed so that \code{c(Male = "M")} becomes
+  the mapping \code{"M" -> "Male"} (following the \code{factor()} convention).
+  For value types (\code{"Date"}, \code{"POSIXct"}, \code{"logical"}), no
+  reversal occurs — the named vector is used as-is with names as input keys
+  and values as output objects, because non-character objects cannot serve
+  as vector names. See \code{vignette("usage_examples")} Example 21 for
+  a detailed walkthrough.}
 
 \item{name}{Character. Optional name for the format. If provided, the format
 is automatically registered in the global format library.}
@@ -65,6 +74,36 @@ Special directives:
   \item \code{.missing}: Label for NA, NULL, NaN values
   \item \code{.other}: Label for values not matching any rule
 }
+
+\strong{Named-vector direction (reverse convention):}
+
+When a named vector or list is passed as an unnamed argument (e.g.,
+\code{fnew(c(Male = "M"))}), the direction of the name-to-value mapping
+depends on the output \code{type}:
+
+\itemize{
+  \item For \strong{character / numeric} types, names are \emph{labels} and
+    values are \emph{codes}. The pairs are reversed internally so that the
+    format maps \code{code -> label}. This follows the standard R idiom used
+    by \code{factor()}, where \code{c(Label = "Code")}.
+  \item For \strong{value types} (\code{Date}, \code{POSIXct},
+    \code{logical}), names are \emph{input keys} and values are the native R
+    objects returned by the format. No reversal is applied, because
+    non-character objects cannot be used as vector names.
+}
+
+This means the \emph{same data} may need to be arranged differently
+depending on the target type. For example, to create a lookup from subject
+IDs to dates:
+\preformatted{
+# Date type: natural direction (key = name, date = value)
+fnew(setNames(dates, ids), type = "Date")
+
+# Character type: reversed direction (date-string = name, key = value)
+fnew(setNames(ids, date_strings), type = "character")
+}
+When in doubt, use explicit \code{key = "label"} arguments — these are
+never reversed regardless of type.
 
 \strong{Expression labels:} If a label contains \code{.x1}, \code{.x2}, etc.,
 it is treated as an R expression that is evaluated at apply-time. Extra arguments

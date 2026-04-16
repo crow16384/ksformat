@@ -653,9 +653,13 @@ fclear <- function(name = NULL) {
 #' @param dots_list List. The result of \code{list(...)}.
 #' @param reverse Logical. If \code{TRUE}, swap names and values for expanded
 #'   entries (except \code{.missing} and \code{.other} directives).
-#'   Used by \code{fnew()} where the named-vector convention
-#'   \code{c(Label = "Code")} is reversed relative to the internal
-#'   \code{"Code" = "Label"} representation. Default \code{FALSE}.
+#'   Used by \code{fnew()} for character/numeric types where the named-vector
+#'   convention \code{c(Label = "Code")} is reversed relative to the internal
+#'   \code{"Code" = "Label"} representation. Set to \code{FALSE} for value
+#'   types (\code{Date}, \code{POSIXct}, \code{logical}) where names are
+#'   already the input keys and values are native R objects. See
+#'   \code{fnew()} details and \code{vignette("usage_examples")} Example 21.
+#'   Default \code{FALSE}.
 #' @return A flat named list with the same structure as a standard
 #'   \code{list(...)} output.
 #' @keywords internal
