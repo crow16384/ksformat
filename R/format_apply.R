@@ -75,12 +75,18 @@ fput <- function(x, format, ..., keep_na = FALSE) {
 
   # Handle NULL input
   if (is.null(x)) {
+    if (.is_value_type(format$type)) return(.typed_na(format$type)[0L])
     return(character(0))
   }
 
   # Delegate to datetime formatter for date/time/datetime types
   if (format$type %in% c("date", "time", "datetime")) {
     return(.apply_datetime_format(x, format, keep_na = keep_na))
+  }
+
+  # Delegate to value type handler for Date/POSIXct/logical types
+  if (.is_value_type(format$type)) {
+    return(.fput_value_type(x, format, keep_na = keep_na))
   }
 
   extra_args <- list(...)
@@ -256,6 +262,109 @@ fput <- function(x, format, ..., keep_na = FALSE) {
       )
     }
   }
+
+  result
+}
+
+# ---------------------------------------------------------------------------
+# Internal helper: apply format with native value types (Date/POSIXct/logical)
+# ---------------------------------------------------------------------------
+
+#' @keywords internal
+.fput_value_type <- function(x, format, keep_na = FALSE) {
+  vtype <- format$type
+  na_val <- .typed_na(vtype)
+
+  n <- length(x)
+  result <- rep(na_val, n)
+
+  # Missing values → stay as typed NA
+  is_miss <- is_missing(x)
+  # (For value types, .missing is always NULL → NA of correct type)
+
+  non_miss <- which(!is_miss)
+  if (length(non_miss) == 0L) return(result)
+
+  nocase <- isTRUE(format$ignore_case)
+  map_keys <- names(format$mappings)
+
+  # Build typed values vector (preserves Date/POSIXct class)
+  map_values <- .typed_map_values(format$mappings)
+
+  # Phase 1: Exact matching on string keys
+  val_str <- as.character(x[non_miss])
+  pos <- if (nocase) {
+    match(tolower(val_str), tolower(map_keys))
+  } else {
+    match(val_str, map_keys)
+  }
+
+  found <- !is.na(pos)
+  matched <- logical(n)
+
+  if (any(found)) {
+    found_nm <- non_miss[found]
+    result[found_nm] <- map_values[pos[found]]
+    matched[found_nm] <- TRUE
+  }
+
+  # Phase 2: Range matching for Date/POSIXct
+  if (vtype %in% c("Date", "POSIXct")) {
+    range_entries <- list()
+    for (i in seq_along(map_keys)) {
+      parsed <- .parse_date_range_key(map_keys[i], format$date_format)
+      if (!is.null(parsed)) {
+        range_entries[[length(range_entries) + 1L]] <- list(
+          low = parsed$low, high = parsed$high,
+          inc_low = parsed$inc_low, inc_high = parsed$inc_high,
+          value = map_values[i]
+        )
+      }
+    }
+
+    if (length(range_entries) > 0L) {
+      unmatched_nm <- non_miss[!matched[non_miss]]
+      if (length(unmatched_nm) > 0L) {
+        # Convert input to the target type for range comparison
+        vals <- if (vtype == "Date") {
+          if (!is.null(format$date_format)) {
+            suppressWarnings(as.Date(as.character(x[unmatched_nm]),
+                                     format = format$date_format))
+          } else {
+            suppressWarnings(as.Date(as.character(x[unmatched_nm])))
+          }
+        } else {
+          if (!is.null(format$date_format)) {
+            suppressWarnings(as.POSIXct(as.character(x[unmatched_nm]),
+                                        format = format$date_format))
+          } else {
+            suppressWarnings(as.POSIXct(as.character(x[unmatched_nm])))
+          }
+        }
+        valid <- !is.na(vals)
+
+        for (re in range_entries) {
+          still_free <- !matched[unmatched_nm] & valid
+          if (!any(still_free)) break
+
+          idx <- which(still_free)
+          v <- vals[idx]
+          low_ok  <- if (re$inc_low)  v >= re$low  else v > re$low
+          high_ok <- if (re$inc_high) v <= re$high else v < re$high
+          in_rng <- low_ok & high_ok
+
+          if (any(in_rng)) {
+            target <- unmatched_nm[idx[in_rng]]
+            result[target] <- re$value
+            matched[target] <- TRUE
+          }
+        }
+      }
+    }
+  }
+
+  # Phase 3: Unmatched → typed NA (no .other for value types)
+  # result already initialized with typed NA, so nothing to do
 
   result
 }
@@ -478,6 +587,12 @@ fput_all <- function(x, format, ..., keep_na = FALSE) {
   # Date/time formats delegate to normal fput (no multilabel concept)
   if (format$type %in% c("date", "time", "datetime")) {
     result <- .apply_datetime_format(x, format, keep_na = keep_na)
+    return(as.list(result))
+  }
+
+  # Value types: no multilabel support, delegate to fput and wrap
+  if (.is_value_type(format$type)) {
+    result <- .fput_value_type(x, format, keep_na = keep_na)
     return(as.list(result))
   }
 

@@ -2620,3 +2620,319 @@ test_that("fputk accepts a ks_format object directly", {
   result <- fputk(c("A", "B"), c(1, 1), format = fmt)
   expect_equal(result, c("hit", "miss"))
 })
+
+
+# ===========================================================================
+# Value Type System (Date, POSIXct, logical)
+# ===========================================================================
+
+context("Value Type Formats")
+
+# --- fnew with value types ---
+
+test_that("fnew creates Date format from named Date vector", {
+  dates <- setNames(
+    as.Date(c("2025-01-15", "2025-02-20", "2025-03-10")),
+    c("A|1", "A|2", "B|1")
+  )
+  fmt <- fnew(dates, type = "Date")
+  expect_equal(fmt$type, "Date")
+  expect_equal(length(fmt$mappings), 3L)
+  expect_s3_class(fmt$mappings[["A|1"]], "Date")
+  expect_equal(fmt$mappings[["A|1"]], as.Date("2025-01-15"))
+  expect_null(fmt$missing_label)
+  expect_null(fmt$other_label)
+})
+
+test_that("fnew creates Date format from direct named args", {
+  fmt <- fnew(
+    "A" = as.Date("2025-01-15"),
+    "B" = as.Date("2025-02-20"),
+    type = "Date"
+  )
+  expect_equal(fmt$type, "Date")
+  expect_s3_class(fmt$mappings[["A"]], "Date")
+  expect_equal(fmt$mappings[["B"]], as.Date("2025-02-20"))
+})
+
+test_that("fnew auto-detects Date type from values", {
+  dates <- setNames(
+    as.Date(c("2025-01-01", "2025-06-01")),
+    c("key1", "key2")
+  )
+  fmt <- fnew(dates)
+  expect_equal(fmt$type, "Date")
+})
+
+test_that("fnew auto-detects logical type from values", {
+  fmt <- fnew("yes" = TRUE, "no" = FALSE)
+  expect_equal(fmt$type, "logical")
+  expect_true(fmt$mappings[["yes"]])
+  expect_false(fmt$mappings[["no"]])
+})
+
+test_that("fnew warns when .missing is non-NA for value types", {
+  expect_warning(
+    fnew("A" = as.Date("2025-01-01"), .missing = "Missing", type = "Date"),
+    "ignored"
+  )
+})
+
+test_that("fnew warns when .other is non-NA for value types", {
+  expect_warning(
+    fnew("A" = as.Date("2025-01-01"), .other = "Other", type = "Date"),
+    "ignored"
+  )
+})
+
+test_that("fnew allows .missing = NA and .other = NA without warning for value types", {
+  expect_silent(
+    fnew("A" = as.Date("2025-01-01"), .missing = NA, .other = NA, type = "Date")
+  )
+})
+
+test_that("fnew creates POSIXct format", {
+  fmt <- fnew(
+    "event1" = as.POSIXct("2025-01-15 10:30:00"),
+    "event2" = as.POSIXct("2025-02-20 14:00:00"),
+    type = "POSIXct"
+  )
+  expect_equal(fmt$type, "POSIXct")
+  expect_s3_class(fmt$mappings[["event1"]], "POSIXct")
+})
+
+test_that("fnew creates logical format", {
+  fmt <- fnew("Y" = TRUE, "N" = FALSE, type = "logical")
+  expect_equal(fmt$type, "logical")
+  expect_true(fmt$mappings[["Y"]])
+  expect_false(fmt$mappings[["N"]])
+})
+
+test_that("fnew stores and retrieves Date format by name", {
+  fnew(
+    "A" = as.Date("2025-01-15"),
+    "B" = as.Date("2025-02-20"),
+    name = "test_date_fmt", type = "Date"
+  )
+  fmt <- format_get("test_date_fmt")
+  expect_equal(fmt$type, "Date")
+  expect_s3_class(fmt$mappings[["A"]], "Date")
+  fclear()
+})
+
+# --- fput with value types ---
+
+test_that("fput returns Date vector for Date format", {
+  fmt <- fnew(
+    "A" = as.Date("2025-01-15"),
+    "B" = as.Date("2025-02-20"),
+    type = "Date"
+  )
+  result <- fput(c("A", "B"), fmt)
+  expect_s3_class(result, "Date")
+  expect_equal(result, as.Date(c("2025-01-15", "2025-02-20")))
+})
+
+test_that("fput returns typed NA for unmatched values in Date format", {
+  fmt <- fnew("A" = as.Date("2025-01-15"), type = "Date")
+  result <- fput(c("A", "X"), fmt)
+  expect_s3_class(result, "Date")
+  expect_equal(result[1], as.Date("2025-01-15"))
+  expect_true(is.na(result[2]))
+})
+
+test_that("fput returns typed NA for missing values in Date format", {
+  fmt <- fnew("A" = as.Date("2025-01-15"), type = "Date")
+  result <- fput(c("A", NA), fmt)
+  expect_s3_class(result, "Date")
+  expect_equal(result[1], as.Date("2025-01-15"))
+  expect_true(is.na(result[2]))
+})
+
+test_that("fput returns logical vector for logical format", {
+  fmt <- fnew("Y" = TRUE, "N" = FALSE, type = "logical")
+  result <- fput(c("Y", "N", "Y"), fmt)
+  expect_type(result, "logical")
+  expect_equal(result, c(TRUE, FALSE, TRUE))
+})
+
+test_that("fput returns NA for unmatched in logical format", {
+  fmt <- fnew("Y" = TRUE, "N" = FALSE, type = "logical")
+  result <- fput(c("Y", "X", NA), fmt)
+  expect_type(result, "logical")
+  expect_true(result[1])
+  expect_true(is.na(result[2]))
+  expect_true(is.na(result[3]))
+})
+
+test_that("fput returns POSIXct vector for POSIXct format", {
+  t1 <- as.POSIXct("2025-01-15 10:30:00")
+  t2 <- as.POSIXct("2025-02-20 14:00:00")
+  fmt <- fnew("e1" = t1, "e2" = t2, type = "POSIXct")
+  result <- fput(c("e1", "e2"), fmt)
+  expect_s3_class(result, "POSIXct")
+  expect_equal(result, c(t1, t2))
+})
+
+test_that("fput handles empty input for value types", {
+  fmt <- fnew("A" = as.Date("2025-01-15"), type = "Date")
+  result <- fput(NULL, fmt)
+  expect_s3_class(result, "Date")
+  expect_equal(length(result), 0L)
+})
+
+test_that("fput handles all-NA input for value types", {
+  fmt <- fnew("A" = as.Date("2025-01-15"), type = "Date")
+  result <- fput(c(NA, NA), fmt)
+  expect_s3_class(result, "Date")
+  expect_true(all(is.na(result)))
+})
+
+test_that("fput with keep_na for value types", {
+  fmt <- fnew("A" = as.Date("2025-01-15"), type = "Date")
+  result <- fput(c("A", NA), fmt, keep_na = TRUE)
+  expect_s3_class(result, "Date")
+  expect_equal(result[1], as.Date("2025-01-15"))
+  expect_true(is.na(result[2]))
+})
+
+# --- fputk with value types ---
+
+test_that("fputk returns Date vector for Date format", {
+  fnew(
+    "A|1" = as.Date("2025-01-15"),
+    "A|2" = as.Date("2025-02-20"),
+    "B|1" = as.Date("2025-03-10"),
+    name = "visit_dt", type = "Date"
+  )
+  result <- fputk(c("A", "A", "B"), c(1, 2, 1), format = "visit_dt")
+  expect_s3_class(result, "Date")
+  expect_equal(result, as.Date(c("2025-01-15", "2025-02-20", "2025-03-10")))
+  fclear()
+})
+
+test_that("fputk returns typed NA for unmatched composite keys", {
+  fmt <- fnew(
+    "A|1" = as.Date("2025-01-15"),
+    type = "Date"
+  )
+  result <- fputk(c("A", "B"), c(1, 1), format = fmt)
+  expect_s3_class(result, "Date")
+  expect_equal(result[1], as.Date("2025-01-15"))
+  expect_true(is.na(result[2]))
+})
+
+# --- fput_df with value types ---
+
+test_that("fput_df creates typed column for Date format", {
+  fmt <- fnew("A" = as.Date("2025-01-15"), "B" = as.Date("2025-02-20"),
+              type = "Date")
+  df <- data.frame(code = c("A", "B", "A"), stringsAsFactors = FALSE)
+  result <- fput_df(df, code = fmt)
+  expect_s3_class(result$code_fmt, "Date")
+  expect_equal(result$code_fmt, as.Date(c("2025-01-15", "2025-02-20", "2025-01-15")))
+})
+
+# --- fput_all with value types ---
+
+test_that("fput_all returns list of typed values for Date format", {
+  fmt <- fnew("A" = as.Date("2025-01-15"), "B" = as.Date("2025-02-20"),
+              type = "Date")
+  result <- fput_all(c("A", "B"), fmt)
+  expect_type(result, "list")
+  expect_s3_class(result[[1]], "Date")
+  expect_equal(result[[1]], as.Date("2025-01-15"))
+})
+
+# --- Date range matching ---
+
+test_that("fput matches Date ranges", {
+  fmt <- fnew(
+    "2020-01-01,2025-12-31,TRUE,FALSE" = as.Date("2022-06-15"),
+    "specific" = as.Date("2030-01-01"),
+    type = "Date"
+  )
+  # Input date "2022-07-01" falls in the range [2020-01-01, 2025-12-31)
+  result <- fput(c("specific", "2022-07-01"), fmt)
+  expect_s3_class(result, "Date")
+  expect_equal(result[1], as.Date("2030-01-01"))
+  expect_equal(result[2], as.Date("2022-06-15"))
+})
+
+# --- ignore_case with value types ---
+
+test_that("fput with ignore_case for Date format", {
+  fmt <- fnew("a" = as.Date("2025-01-15"), type = "Date", ignore_case = TRUE)
+  result <- fput(c("A", "a"), fmt)
+  expect_s3_class(result, "Date")
+  expect_equal(result, as.Date(c("2025-01-15", "2025-01-15")))
+})
+
+# --- print for value types ---
+
+test_that("print.ks_format works for Date format", {
+  fmt <- fnew("A" = as.Date("2025-01-15"), "B" = as.Date("2025-02-20"),
+              type = "Date")
+  output <- capture.output(print(fmt))
+  expect_true(any(grepl("Date", output)))
+  expect_true(any(grepl("2025-01-15", output)))
+})
+
+test_that("print.ks_format works for logical format", {
+  fmt <- fnew("Y" = TRUE, "N" = FALSE, type = "logical")
+  output <- capture.output(print(fmt))
+  expect_true(any(grepl("logical", output)))
+  expect_true(any(grepl("TRUE", output)))
+})
+
+# --- fparse with value types ---
+
+test_that("fparse creates Date format from text", {
+  fparse(text = '
+  VALUE dtest (Date, format: %Y-%m-%d)
+    "A" = "2025-01-15"
+    "B" = "2025-02-20"
+  ;
+  ')
+  fmt <- format_get("dtest")
+  expect_equal(fmt$type, "Date")
+  expect_s3_class(fmt$mappings[["A"]], "Date")
+  expect_equal(fmt$mappings[["A"]], as.Date("2025-01-15"))
+  expect_equal(fmt$date_format, "%Y-%m-%d")
+
+  # Apply
+  result <- fput(c("A", "B"), "dtest")
+  expect_s3_class(result, "Date")
+  expect_equal(result, as.Date(c("2025-01-15", "2025-02-20")))
+  fclear()
+})
+
+test_that("fparse creates logical format from text", {
+  fparse(text = '
+  VALUE bool_test (logical)
+    "Y" = "TRUE"
+    "N" = "FALSE"
+  ;
+  ')
+  fmt <- format_get("bool_test")
+  expect_equal(fmt$type, "logical")
+  expect_true(fmt$mappings[["Y"]])
+  expect_false(fmt$mappings[["N"]])
+  fclear()
+})
+
+# --- fexport roundtrip with value types ---
+
+test_that("fexport/fparse roundtrip for Date format", {
+  fmt_orig <- fnew("A" = as.Date("2025-01-15"), "B" = as.Date("2025-02-20"),
+                   name = "dt_rt", type = "Date")
+  txt <- fexport(dt_rt = fmt_orig)
+  fclear()
+
+  fparse(text = txt)
+  fmt <- format_get("dt_rt")
+  expect_equal(fmt$type, "Date")
+  expect_equal(fmt$mappings[["A"]], as.Date("2025-01-15"))
+  expect_equal(fmt$mappings[["B"]], as.Date("2025-02-20"))
+  fclear()
+})

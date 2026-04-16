@@ -755,12 +755,30 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
         }
       }
 
+      # Parse format: spec from subtype (e.g. "format: %Y-%m-%d")
+      block_date_format <- NULL
+      fmt_match <- regmatches(block_subtype, regexec(
+        "format:\\s*([^,)]+)", block_subtype, ignore.case = TRUE
+      ))[[1]]
+      if (length(fmt_match) >= 2 && fmt_match[1] != "") {
+        block_date_format <- trimws(fmt_match[2])
+        block_subtype <- gsub(",?\\s*format:\\s*[^,)]+", "", block_subtype,
+                              ignore.case = TRUE)
+        block_subtype <- gsub("format:\\s*[^,)]+\\s*,?", "", block_subtype,
+                              ignore.case = TRUE)
+        block_subtype <- trimws(block_subtype)
+        if (block_subtype == "") {
+          block_subtype <- if (block_type == "INVALUE") "numeric" else "auto"
+        }
+      }
+
       current_block <- list(
         type = block_type,
         name = block_name,
         subtype = block_subtype,
         multilabel = block_multilabel,
         nocase = block_nocase,
+        date_format = block_date_format,
         entries = list(),
         line_start = i
       )
@@ -958,7 +976,12 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
 #' Convert VALUE block to ks_format
 #' @keywords internal
 .block_to_ks_format <- function(block) {
-  # Handle date/time/datetime blocks
+  # Value types (case-sensitive: "Date", "POSIXct", "logical")
+  if (block$subtype %in% .value_types) {
+    return(.block_to_value_type_format(block))
+  }
+
+  # Handle date/time/datetime blocks (case-insensitive)
   if (tolower(block$subtype) %in% c("date", "time", "datetime")) {
     return(.block_to_ks_datetime_format(block))
   }
@@ -995,6 +1018,7 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
       other_label = other_label,
       multilabel = isTRUE(block$multilabel),
       ignore_case = isTRUE(block$nocase),
+      date_format = block$date_format,
       created = Sys.time()
     ),
     class = "ks_format"
@@ -1011,6 +1035,48 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
   }
 
   return(format_obj)
+}
+
+
+#' Convert VALUE block with a value type (Date/POSIXct/logical) to ks_format
+#' @keywords internal
+#' @noRd
+.block_to_value_type_format <- function(block) {
+  vtype <- block$subtype
+  date_format <- block$date_format
+
+  mappings <- list()
+
+  for (entry in block$entries) {
+    if (entry$type == "missing" || entry$type == "other") {
+      # Silently ignore — value type formats always use typed NA
+    } else if (entry$type == "discrete") {
+      mappings[[entry$key]] <- .parse_typed_value(entry$label, vtype, date_format)
+    } else if (entry$type == "range") {
+      inc_low <- if (!is.null(entry$inc_low)) entry$inc_low else TRUE
+      inc_high <- if (!is.null(entry$inc_high)) entry$inc_high else FALSE
+      range_key <- paste0(entry$low, ",", entry$high, ",",
+                          toupper(inc_low), ",", toupper(inc_high))
+      mappings[[range_key]] <- .parse_typed_value(entry$label, vtype, date_format)
+    }
+  }
+
+  format_obj <- structure(
+    list(
+      name = block$name,
+      type = vtype,
+      mappings = mappings,
+      missing_label = NULL,
+      other_label = NULL,
+      multilabel = FALSE,
+      ignore_case = isTRUE(block$nocase),
+      date_format = date_format,
+      created = Sys.time()
+    ),
+    class = "ks_format"
+  )
+
+  format_obj
 }
 
 
@@ -1110,7 +1176,8 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
   type_str <- if (!is.null(fmt$type) && fmt$type != "auto") fmt$type else NULL
   ml_str <- if (isTRUE(fmt$multilabel)) "multilabel" else NULL
   nc_str <- if (isTRUE(fmt$ignore_case)) "nocase" else NULL
-  annot_parts <- c(type_str, ml_str, nc_str)
+  df_str <- if (!is.null(fmt$date_format)) paste0("format: ", fmt$date_format) else NULL
+  annot_parts <- c(type_str, ml_str, nc_str, df_str)
   type_part <- if (length(annot_parts) > 0L) {
     paste0(" (", paste(annot_parts, collapse = ", "), ")")
   } else {
@@ -1118,20 +1185,36 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
   }
   parts[[idx]] <- paste0("VALUE ", name, type_part); idx <- idx + 1L
 
+  is_vtype <- .is_value_type(fmt$type)
+
   for (i in seq_along(fmt$mappings)) {
     key <- names(fmt$mappings)[i]
     label <- fmt$mappings[[i]]
-    eval_suffix <- if (.has_eval_attr(label)) " (eval)" else ""
-    parsed <- .parse_range_key(key)
+
+    # Convert native values to strings for text output
+    label_str <- if (is_vtype) {
+      .typed_value_to_string(label, fmt$type, fmt$date_format)
+    } else {
+      as.character(label)
+    }
+
+    eval_suffix <- if (!is_vtype && .has_eval_attr(label)) " (eval)" else ""
+
+    # Try to display range keys in interval notation
+    parsed <- if (is_vtype && fmt$type %in% c("Date", "POSIXct")) {
+      .parse_date_range_key(key, fmt$date_format)
+    } else {
+      .parse_range_key(key)
+    }
     if (!is.null(parsed)) {
       left_bracket <- if (parsed$inc_low) "[" else "("
       right_bracket <- if (parsed$inc_high) "]" else ")"
-      low <- .format_range_bound(parsed$low, is_low = TRUE)
-      high <- .format_range_bound(parsed$high, is_low = FALSE)
+      low <- if (is_vtype) as.character(parsed$low) else .format_range_bound(parsed$low, is_low = TRUE)
+      high <- if (is_vtype) as.character(parsed$high) else .format_range_bound(parsed$high, is_low = FALSE)
       parts[[idx]] <- paste0("  ", left_bracket, low, ", ", high,
-                             right_bracket, " = \"", label, "\"", eval_suffix)
+                             right_bracket, " = \"", label_str, "\"", eval_suffix)
     } else {
-      parts[[idx]] <- paste0("  \"", key, "\" = \"", label, "\"", eval_suffix)
+      parts[[idx]] <- paste0("  \"", key, "\" = \"", label_str, "\"", eval_suffix)
     }
     idx <- idx + 1L
   }

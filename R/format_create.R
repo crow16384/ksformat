@@ -19,7 +19,11 @@
 #' @param name Character. Optional name for the format. If provided, the format
 #'   is automatically registered in the global format library.
 #' @param type Character. Type of format: \code{"character"}, \code{"numeric"},
+#'   \code{"Date"}, \code{"POSIXct"}, \code{"logical"},
 #'   or \code{"auto"} (default) for auto-detection.
+#'   Value types (\code{"Date"}, \code{"POSIXct"}, \code{"logical"}) store
+#'   native R objects instead of character labels. For value types,
+#'   \code{.missing} and \code{.other} are always typed NA.
 #' @param default Character. Default label for unmatched values (overrides .other)
 #' @param multilabel Logical. If \code{TRUE}, the format supports overlapping
 #'   ranges where a single value can match multiple labels. Used with
@@ -93,7 +97,9 @@
 #' fclear()
 fnew <- function(..., name = NULL, type = "auto", default = NULL,
                  multilabel = FALSE, ignore_case = FALSE, verbose = FALSE) {
-  type <- match.arg(type, c("auto", "character", "numeric"))
+  type <- match.arg(type, c("auto", "character", "numeric", .value_types))
+  is_vtype <- .is_value_type(type)
+
   if (!is.null(name)) {
     if (!is.character(name) || length(name) != 1L || is.na(name) || !nzchar(name)) {
       cli_abort("{.arg name} must be a single non-empty character string.")
@@ -111,8 +117,27 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
 
   mappings <- list(...)
 
-  # Expand named vectors (c(Label = "Code") -> individual mappings, reversed)
-  mappings <- .expand_named_vectors(mappings, reverse = TRUE)
+  # Pre-expansion value type auto-detection (must happen before reverse)
+  if (type == "auto") {
+    arg_names <- names(mappings)
+    arg_classes <- character(0)
+    for (i in seq_along(mappings)) {
+      nm <- if (!is.null(arg_names)) arg_names[i] else ""
+      if (nm %in% c(".missing", ".other")) next
+      arg_classes <- c(arg_classes, class(mappings[[i]])[1L])
+    }
+    if (length(arg_classes) > 0L) {
+      unique_cls <- unique(arg_classes)
+      if (length(unique_cls) == 1L && unique_cls %in% .value_types) {
+        type <- unique_cls
+        is_vtype <- TRUE
+      }
+    }
+  }
+
+  # For value types: names = keys, values = native objects (no reverse)
+  # For character types: R convention c(Label = "Code") → reversed
+  mappings <- .expand_named_vectors(mappings, reverse = !is_vtype)
 
   if (length(mappings) == 0L) {
     cli_abort("At least one value-label mapping must be provided.")
@@ -126,12 +151,24 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
   mappings[[".missing"]] <- NULL
   mappings[[".other"]] <- NULL
 
+  # For value types, .missing and .other must be NA (can't mix types)
+  if (is_vtype) {
+    if (!is.null(missing_label) && !is.na(missing_label)) {
+      cli_warn("{.arg .missing} is ignored for {.val {type}} formats (always NA).")
+    }
+    missing_label <- NULL
+    if (!is.null(other_label) && !is.na(other_label)) {
+      cli_warn("{.arg .other} is ignored for {.val {type}} formats (always NA).")
+    }
+    other_label <- NULL
+  }
+
   # Override .other with default if provided
-  if (!is.null(default)) {
+  if (!is.null(default) && !is_vtype) {
     other_label <- default
   }
 
-  # Determine format type
+  # Determine format type (auto-detect for character/numeric when not value type)
   if (identical(type, "auto")) {
     type <- detect_format_type(names(mappings))
   }
@@ -253,23 +290,35 @@ print.ks_format <- function(x, ...) {
     }
     cat("Pattern:", pattern_str, "\n")
   } else {
+    is_vtype <- .is_value_type(x$type)
     cat("Mappings:\n")
 
     for (i in seq_along(x$mappings)) {
       key <- names(x$mappings)[i]
       value <- x$mappings[[i]]
 
+      # Format the value for display
+      value_str <- if (is_vtype) {
+        .typed_value_to_string(value, x$type, x$date_format)
+      } else {
+        as.character(value)
+      }
+
       # Try to display range keys in interval notation
-      parsed <- .parse_range_key(key)
+      parsed <- if (is_vtype && x$type %in% c("Date", "POSIXct")) {
+        .parse_date_range_key(key, x$date_format)
+      } else {
+        .parse_range_key(key)
+      }
       if (!is.null(parsed)) {
         left_bracket <- if (parsed$inc_low) "[" else "("
         right_bracket <- if (parsed$inc_high) "]" else ")"
-        low_str <- if (is.infinite(parsed$low) && parsed$low < 0) "LOW" else as.character(parsed$low)
-        high_str <- if (is.infinite(parsed$high) && parsed$high > 0) "HIGH" else as.character(parsed$high)
+        low_str <- if (is.infinite(as.numeric(parsed$low)) && as.numeric(parsed$low) < 0) "LOW" else as.character(parsed$low)
+        high_str <- if (is.infinite(as.numeric(parsed$high)) && as.numeric(parsed$high) > 0) "HIGH" else as.character(parsed$high)
         cat("  ", left_bracket, low_str, ", ", high_str, right_bracket,
-            " => ", value, "\n", sep = "")
+            " => ", value_str, "\n", sep = "")
       } else {
-        cat("  ", key, " => ", value, "\n", sep = "")
+        cat("  ", key, " => ", value_str, "\n", sep = "")
       }
     }
   }

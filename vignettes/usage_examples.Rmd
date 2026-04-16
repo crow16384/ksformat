@@ -872,11 +872,13 @@ SV
 QS
 ```
 
+### Character lookup (returns character strings)
+
 Register a format keyed on `USUBJID|VISITNUM` with values being the visit
-start date (`SVSTDTC`):
+start date (`SVSTDTC`) as character strings:
 
 ```{r fputk-register}
-# Create composite key -> date mapping from SV
+# Create composite key -> date string mapping from SV
 fnew(
   setNames(SV$SVSTDTC, paste(SV$USUBJID, SV$VISITNUM, sep = "|")),
   .other  = "NOT FOUND",
@@ -893,6 +895,42 @@ Now look up visit dates in the QS domain using `fputk()`:
 ```{r fputk-apply}
 QS$SVSTDTC <- fputk(QS$USUBJID, QS$VISITNUM, format = "svdtc")
 QS
+class(QS$SVSTDTC)  # character
+
+fclear()
+```
+
+### Native Date lookup (returns Date objects)
+
+Using `type = "Date"`, values are stored as native R `Date` objects and
+`fput()`/`fputk()` return them directly — no string conversion needed:
+
+```{r fputk-date}
+# Create composite key -> Date mapping from SV
+fnew(
+  setNames(
+    as.Date(SV$SVSTDTC, format = "%Y-%m-%d"),
+    paste(SV$USUBJID, SV$VISITNUM, sep = "|")
+  ),
+  .other  = NA,
+  name    = "svdtn",
+  type    = "Date",
+  ignore_case = TRUE
+)
+
+fprint("svdtn")
+```
+
+```{r fputk-date-apply}
+QS$SVSTDTC_DT <- fputk(QS$USUBJID, QS$VISITNUM, format = "svdtn")
+QS
+class(QS$SVSTDTC_DT)  # Date
+
+# Typed NA for unmatched keys (SUBJ-002 Visit 3 not in SV)
+is.na(QS$SVSTDTC_DT[5])
+
+# Date arithmetic works directly
+QS$SVSTDTC_DT + 7  # add 7 days
 
 fclear()
 ```

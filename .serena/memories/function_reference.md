@@ -65,8 +65,17 @@
 | `.format_range_bound()` | format_parse.R | Format range bound for text |
 | `.cntlout_to_ks_format()` | format_parse.R | CNTLOUT → ks_format |
 | `.cntlout_to_ks_invalue()` | format_parse.R | CNTLOUT → ks_invalue |
+| `.fput_value_type()` | format_apply.R | Apply format for value types (Date/POSIXct/logical) |
+| `.value_types` | utilities.R | Constant: c("Date", "POSIXct", "logical") |
+| `.is_value_type()` | utilities.R | Check if type string is a value type |
+| `.typed_na()` | utilities.R | Return typed NA for given value type |
+| `.typed_map_values()` | utilities.R | Extract typed vector from mapping list |
+| `.parse_date_range_key()` | utilities.R | Parse Date range key string |
+| `.typed_value_to_string()` | utilities.R | Convert typed value to display string |
+| `.parse_typed_value()` | utilities.R | Parse string to typed value |
+| `.block_to_value_type_format()` | format_parse.R | Block → value type format |
 
 ## Class Hierarchy
-- `ks_format` — VALUE format (value→label). Fields: name, type, mappings, missing_label, other_label, multilabel, ignore_case, created. For datetime: dt_pattern, dt_toupper, sas_name.
+- `ks_format` — VALUE format (value→label). Fields: name, type, mappings, missing_label, other_label, multilabel, ignore_case, created. For datetime: dt_pattern, dt_toupper, sas_name. For value types: date_format. Type can be "character", "numeric", "Date", "POSIXct", "logical", or datetime types.
 - `ks_invalue` — INVALUE format (label→value). Fields: name, target_type, mappings, missing_value, created.
 - `range_spec` — Range specification. Fields: low, high, label, inc_low, inc_high.

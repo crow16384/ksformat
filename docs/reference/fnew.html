@@ -20,7 +20,7 @@ is provided."><meta property="og:image" content="/logo.svg"><!-- mathjax --><scr
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.0</span>
       </span>
     </div>
 
@@ -99,7 +99,11 @@ is automatically registered in the global format library.</p></dd>
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
 <dd><p>Character. Type of format: <code>"character"</code>, <code>"numeric"</code>,
-or <code>"auto"</code> (default) for auto-detection.</p></dd>
+<code>"Date"</code>, <code>"POSIXct"</code>, <code>"logical"</code>,
+or <code>"auto"</code> (default) for auto-detection.
+Value types (<code>"Date"</code>, <code>"POSIXct"</code>, <code>"logical"</code>) store
+native R objects instead of character labels. For value types,
+<code>.missing</code> and <code>.other</code> are always typed NA.</p></dd>
 
 
 <dt id="arg-default">default<a class="anchor" aria-label="anchor" href="#arg-default"></a></dt>

@@ -31,7 +31,11 @@ which is the reverse of the \code{...} argument convention.}
 is automatically registered in the global format library.}
 
 \item{type}{Character. Type of format: \code{"character"}, \code{"numeric"},
-or \code{"auto"} (default) for auto-detection.}
+\code{"Date"}, \code{"POSIXct"}, \code{"logical"},
+or \code{"auto"} (default) for auto-detection.
+Value types (\code{"Date"}, \code{"POSIXct"}, \code{"logical"}) store
+native R objects instead of character labels. For value types,
+\code{.missing} and \code{.other} are always typed NA.}
 
 \item{default}{Character. Default label for unmatched values (overrides .other)}
 

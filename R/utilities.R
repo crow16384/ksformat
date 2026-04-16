@@ -8,6 +8,119 @@ NULL
 
 
 # ===========================================================================
+# Value type constants and helpers
+# ===========================================================================
+
+#' Recognised value types for ks_format objects.
+#' These types store native R objects instead of character labels.
+#' @keywords internal
+#' @noRd
+.value_types <- c("Date", "POSIXct", "logical")
+
+#' Check whether a type string is a value type
+#' @keywords internal
+#' @noRd
+.is_value_type <- function(type) {
+  type %in% .value_types
+}
+
+#' Return a typed NA for the given value type
+#' @keywords internal
+#' @noRd
+.typed_na <- function(type) {
+  switch(type,
+    Date    = as.Date(NA_real_, origin = "1970-01-01"),
+    POSIXct = as.POSIXct(NA_real_, origin = "1970-01-01"),
+    logical = NA,
+    NA
+  )
+}
+
+#' Extract values from a ks_format mapping list as a typed vector
+#'
+#' Uses \code{do.call(c, ...)} which preserves Date/POSIXct class.
+#' Returns NULL for empty mappings.
+#' @keywords internal
+#' @noRd
+.typed_map_values <- function(mappings) {
+  if (length(mappings) == 0L) return(NULL)
+  do.call(c, unname(mappings))
+}
+
+#' Parse a Date range key like "2020-01-01,2025-12-31,TRUE,FALSE"
+#'
+#' @param key Character string to parse.
+#' @param date_format Optional strptime format for parsing date bounds.
+#' @return A list with components low, high (Date), inc_low, inc_high (logical),
+#'   or NULL if the key does not look like a date range.
+#' @keywords internal
+#' @noRd
+.parse_date_range_key <- function(key, date_format = NULL) {
+  parts <- strsplit(key, ",", fixed = TRUE)[[1]]
+  if (length(parts) < 2L || length(parts) > 4L) return(NULL)
+
+  low_str  <- trimws(parts[1])
+  high_str <- trimws(parts[2])
+
+  # Parse bounds
+  parse_bound <- function(s, is_low) {
+    su <- toupper(s)
+    if (su == "LOW")  return(as.Date(-Inf, origin = "1970-01-01"))
+    if (su == "HIGH") return(as.Date(Inf,  origin = "1970-01-01"))
+    if (!is.null(date_format)) {
+      d <- as.Date(s, format = date_format)
+    } else {
+      d <- suppressWarnings(as.Date(s))
+    }
+    if (is.na(d)) return(NULL)
+    d
+  }
+
+  low  <- parse_bound(low_str,  TRUE)
+  high <- parse_bound(high_str, FALSE)
+  if (is.null(low) || is.null(high)) return(NULL)
+
+  inc_low  <- TRUE
+  inc_high <- FALSE
+  if (length(parts) >= 3L) inc_low  <- toupper(trimws(parts[3])) == "TRUE"
+  if (length(parts) >= 4L) inc_high <- toupper(trimws(parts[4])) == "TRUE"
+
+  list(low = low, high = high, inc_low = inc_low, inc_high = inc_high)
+}
+
+#' Convert a typed value to a display string
+#' @keywords internal
+#' @noRd
+.typed_value_to_string <- function(value, type, date_format = NULL) {
+  if (is.na(value)) return("NA")
+  switch(type,
+    Date    = if (!is.null(date_format)) format(value, date_format) else as.character(value),
+    POSIXct = if (!is.null(date_format)) format(value, date_format) else as.character(value),
+    logical = as.character(value),
+    as.character(value)
+  )
+}
+
+#' Parse a string value into a native typed object
+#' @keywords internal
+#' @noRd
+.parse_typed_value <- function(value_str, type, date_format = NULL) {
+  switch(type,
+    Date = {
+      if (!is.null(date_format)) as.Date(value_str, format = date_format)
+      else as.Date(value_str)
+    },
+    POSIXct = {
+      if (!is.null(date_format)) as.POSIXct(value_str, format = date_format)
+      else as.POSIXct(value_str)
+    },
+    logical = as.logical(value_str),
+    value_str
+  )
+}
+
+
+# ===========================================================================
 # Expression label helpers
 # ===========================================================================
 
@@ -473,8 +586,8 @@ fclear <- function(name = NULL) {
       ""
     }
 
-    # Check that all labels are character strings
-    if (length(format_obj$mappings) > 0) {
+    # Check that all labels are character strings (not for value types)
+    if (length(format_obj$mappings) > 0 && !.is_value_type(format_obj$type)) {
       labels <- unlist(format_obj$mappings)
       non_char <- !vapply(labels, is.character, logical(1L))
       if (any(non_char)) {
