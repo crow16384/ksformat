@@ -12,6 +12,8 @@
 #'     \item Discrete values: \code{"M" = "Male", "F" = "Female"}
 #'     \item Named vector: \code{c(Male = "M", Female = "F")}
 #'     \item Named list: \code{list(Male = "M", Female = "F")}
+#'     \item \code{\link{fmap}} vector: \code{fmap(keys, values)} for
+#'       data-driven formats (no reversal)
 #'     \item Special values: \code{.missing = "Missing"}, \code{.other = "Other"}
 #'   }
 #'   Named vectors use the R idiom where names are labels and values are codes,
@@ -23,8 +25,12 @@
 #'   For value types (\code{"Date"}, \code{"POSIXct"}, \code{"logical"}), no
 #'   reversal occurs — the named vector is used as-is with names as input keys
 #'   and values as output objects, because non-character objects cannot serve
-#'   as vector names. See \code{vignette("usage_examples")} Example 21 for
-#'   a detailed walkthrough.
+#'   as vector names.
+#'
+#'   \strong{Data-driven formats:} For formats built programmatically from
+#'   data, wrap your data in \code{\link{fmap}(keys, values)} to suppress
+#'   automatic reversal for all types. See
+#'   \code{vignette("usage_examples")} Example 21 for a detailed walkthrough.
 #' @param name Character. Optional name for the format. If provided, the format
 #'   is automatically registered in the global format library.
 #' @param type Character. Type of format: \code{"character"}, \code{"numeric"},
@@ -39,16 +45,6 @@
 #'   \code{\link{fput_all}} to retrieve all matching labels. Default \code{FALSE}.
 #' @param ignore_case Logical. If \code{TRUE}, key matching for character formats
 #'   is case-insensitive. Default \code{FALSE}.
-#' @param reverse Logical or \code{NULL}. Controls whether named vectors passed
-#'   as unnamed arguments have their names and values swapped:
-#'   \itemize{
-#'     \item \code{NULL} (default): auto — reverse for character/numeric types
-#'       (R convention \code{c(Label = "Code")}), no reverse for value types.
-#'     \item \code{FALSE}: never reverse — names are always input keys, values
-#'       are always output labels/objects. Recommended for data-driven formats
-#'       built with \code{setNames(values, keys)}.
-#'     \item \code{TRUE}: always reverse — names are labels, values are codes.
-#'   }
 #' @param verbose Logical. If \code{TRUE}, returns the format object visibly;
 #'   otherwise returns it invisibly. Default \code{FALSE}.
 #'
@@ -80,22 +76,12 @@
 #' }
 #'
 #' This means the \emph{same data} may need to be arranged differently
-#' depending on the target type. For example, to create a lookup from subject
-#' IDs to dates:
+#' depending on the target type. To avoid this inconsistency for data-driven
+#' formats, use \code{\link{fmap}(keys, values)} which works identically
+#' for all types:
 #' \preformatted{
-#' # Date type: natural direction (key = name, date = value)
-#' fnew(setNames(dates, ids), type = "Date")
-#'
-#' # Character type: reversed direction (date-string = name, key = value)
-#' fnew(setNames(ids, date_strings), type = "character")
-#' }
-#'
-#' To avoid this inconsistency, use \code{reverse = FALSE} for data-driven
-#' formats. This makes \code{setNames(values, keys)} work identically for
-#' all types:
-#' \preformatted{
-#' fnew(setNames(dates, ids), type = "Date")
-#' fnew(setNames(date_strings, ids), type = "character", reverse = FALSE)
+#' fnew(fmap(ids, dates), type = "Date")
+#' fnew(fmap(ids, date_strings), type = "character")
 #' }
 #'
 #' When in doubt, use explicit \code{key = "label"} arguments — these are
@@ -154,7 +140,7 @@
 #' # [1] "Male" "Female" "Unknown"
 #' fclear()
 fnew <- function(..., name = NULL, type = "auto", default = NULL,
-                 multilabel = FALSE, ignore_case = FALSE, reverse = NULL,
+                 multilabel = FALSE, ignore_case = FALSE,
                  verbose = FALSE) {
   type <- match.arg(type, c("auto", "character", "numeric", .value_types))
   is_vtype <- .is_value_type(type)
@@ -173,11 +159,21 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
   if (!is.logical(ignore_case) || length(ignore_case) != 1L) {
     cli_abort("{.arg ignore_case} must be TRUE or FALSE.")
   }
-  if (!is.null(reverse) && (!is.logical(reverse) || length(reverse) != 1L)) {
-    cli_abort("{.arg reverse} must be TRUE, FALSE, or NULL.")
-  }
 
   mappings <- list(...)
+
+  # Detect if any unnamed argument uses ks_fmap (suppresses reversal)
+  has_fmap <- FALSE
+  arg_names <- names(mappings)
+  for (i in seq_along(mappings)) {
+    nm <- if (!is.null(arg_names)) arg_names[i] else ""
+    if ((is.na(nm) || !nzchar(nm)) && inherits(mappings[[i]], "ks_fmap")) {
+      has_fmap <- TRUE
+      # Strip ks_fmap class before expansion
+      cls <- class(mappings[[i]])
+      class(mappings[[i]]) <- cls[cls != "ks_fmap"]
+    }
+  }
 
   # Pre-expansion value type auto-detection (must happen before reverse)
   if (type == "auto") {
@@ -197,8 +193,9 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
     }
   }
 
-  # Determine reversal: NULL = auto (reverse for char/numeric, not for value types)
-  do_reverse <- if (is.null(reverse)) !is_vtype else reverse
+  # Determine reversal: auto (reverse for char/numeric, not for value types)
+  # fmap() vectors suppress reversal for all types
+  do_reverse <- if (has_fmap) FALSE else !is_vtype
   mappings <- .expand_named_vectors(mappings, reverse = do_reverse)
 
   if (length(mappings) == 0L) {

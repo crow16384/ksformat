@@ -223,6 +223,56 @@ NULL
 }
 
 
+#' Create a Key-Value Mapping for Format Creation
+#'
+#' Convenience helper for building data-driven formats with \code{\link{fnew}}.
+#' Returns a named vector (or list) with class \code{"ks_fmap"} that signals
+#' \code{fnew()} to use the natural direction: names are \strong{input keys},
+#' values are \strong{output labels/objects} — regardless of the format type.
+#'
+#' Without \code{fmap()}, \code{fnew()} reverses named vectors for character
+#' and numeric types (the \code{factor()} convention \code{c(Label = "Code")}).
+#' Wrapping your data in \code{fmap()} suppresses this reversal, so
+#' \code{fmap(keys, values)} works identically for character, numeric, Date,
+#' POSIXct, and logical formats.
+#'
+#' @param keys Character vector of input keys (lookup values).
+#' @param values Vector of output labels or objects (character, numeric, Date,
+#'   POSIXct, logical, etc.).
+#'
+#' @return A named vector (or list, for non-atomic values) with class
+#'   \code{c("ks_fmap", <original class>)}. Names are \code{keys}, values are
+#'   \code{values}.
+#'
+#' @export
+#'
+#' @seealso \code{\link{fnew}} for format creation.
+#'
+#' @examples
+#' # Character lookup: keys -> labels
+#' fmap(c("M", "F"), c("Male", "Female")) |> fnew(name = "sex")
+#' fput(c("M", "F"), "sex")
+#' fclear()
+#'
+#' # Date lookup from a data frame
+#' ids   <- c("SUBJ-001", "SUBJ-002")
+#' dates <- as.Date(c("2023-03-09", "2024-08-13"))
+#' fmap(ids, dates) |> fnew(type = "Date", name = "icdtn")
+#' fput("SUBJ-001", "icdtn")
+#' fclear()
+fmap <- function(keys, values) {
+  if (length(keys) != length(values)) {
+    cli_abort(
+      "{.arg keys} (length {length(keys)}) and {.arg values} (length {length(values)}) must have the same length."
+    )
+  }
+  keys <- as.character(keys)
+  out <- stats::setNames(values, keys)
+  class(out) <- c("ks_fmap", class(out))
+  out
+}
+
+
 #' Check if Value is Missing
 #'
 #' Element-wise check for missing values including NA and NaN.

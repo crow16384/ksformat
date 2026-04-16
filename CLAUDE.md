@@ -72,6 +72,7 @@ Rscript -e "devtools::test()"
 | Function | Purpose |
 |---|---|
 | `fnew(...)` | Create format (value → label) |
+| `fmap(keys, values)` | Create key-value mapping for `fnew()` |
 | `fput(x, fmt)` | Apply format to vector |
 | `fputn(x, fmt)` | Apply format, numeric input |
 | `fputc(x, fmt)` | Apply format, character input |
@@ -91,16 +92,26 @@ Rscript -e "devtools::test()"
 | `is_missing(x)` | Check for NA/NULL/NaN |
 | `range_spec(low, high, label)` | Create range specification |
 
-## Named-Vector Reversal (`reverse` parameter)
+## Data-Driven Formats with `fmap()`
 
 When passing named vectors to `fnew()`, the direction depends on `type`:
 - **Character/numeric** (default): `c(Label = "Code")` is reversed → `Code → Label`
 - **Value types** (Date, POSIXct, logical): `c(Key = value)` used as-is
 
-The `reverse` parameter in `fnew()` gives explicit control:
-- `NULL` (default): auto — reverse for char/numeric, not for value types
-- `FALSE`: never reverse — use `setNames(values, keys)` consistently for all types
-- `TRUE`: always reverse
+For data-driven formats, use `fmap(keys, values)` to suppress auto-reversal
+for all types. This ensures `keys → values` direction regardless of type:
+
+```r
+# Same pattern for character and Date formats
+fnew(fmap(ids, date_strings), type = "character")
+fnew(fmap(ids, dates), type = "Date")
+```
+
+Hand-written formats continue to use the R convention:
+```r
+fnew(c(Male = "M", Female = "F"))  # auto-reversed: "M" → "Male"
+fnew("M" = "Male", "F" = "Female") # explicit: same result
+```
 
 ## Missing Value Priority
 

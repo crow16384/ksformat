@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.0</span>
       </span>
     </div>
 
@@ -57,6 +57,23 @@
       <small>Source: <a href="https://github.com/crow16384/ksformat/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.6.0" id="ksformat-060">ksformat 0.6.0<a class="anchor" aria-label="anchor" href="#ksformat-060"></a></h2>
+<div class="section level3">
+<h3 id="breaking-changes-0-6-0">Breaking Changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-6-0"></a></h3>
+<ul><li>
+<code><a href="../reference/fnew.html">fnew()</a></code> no longer accepts the <code>reverse</code> parameter. Use <code>fmap(keys, values)</code> instead of <code>setNames(values, keys)</code> with <code>reverse = FALSE</code> to create data-driven formats consistently for all types.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-0-6-0">New Features<a class="anchor" aria-label="anchor" href="#new-features-0-6-0"></a></h3>
+<ul><li>New <code>fmap(keys, values)</code> helper creates a key-value mapping that tells <code><a href="../reference/fnew.html">fnew()</a></code> to use the natural direction (keys → values) without reversal. Works identically for character, numeric, Date, POSIXct, and logical formats.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-0-6-0">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-6-0"></a></h3>
+<ul><li>Vignette Example 21 rewritten: “Consistent Data-Driven Formats with <code><a href="../reference/fmap.html">fmap()</a></code>” — demonstrates how <code>fmap(keys, values)</code> replaces the old <code><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames()</a></code> + <code>reverse = FALSE</code> pattern.</li>
+<li>Updated Example 20 (Composite Key Lookup) to use <code><a href="../reference/fmap.html">fmap()</a></code>.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.1" id="ksformat-051">ksformat 0.5.1<a class="anchor" aria-label="anchor" href="#ksformat-051"></a></h2>
 <div class="section level3">

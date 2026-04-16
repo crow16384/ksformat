@@ -20,7 +20,7 @@ is provided."><meta property="og:image" content="/logo.svg"><!-- mathjax --><scr
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.0</span>
       </span>
     </div>
 
@@ -76,7 +76,6 @@ is provided.</p>
 <span>  default <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  multilabel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ignore_case <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  reverse <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -91,6 +90,8 @@ is provided.</p>
   Can be:</p><ul><li><p>Discrete values: <code>"M" = "Male", "F" = "Female"</code></p></li>
 <li><p>Named vector: <code>c(Male = "M", Female = "F")</code></p></li>
 <li><p>Named list: <code>list(Male = "M", Female = "F")</code></p></li>
+<li><p><code><a href="fmap.html">fmap</a></code> vector: <code>fmap(keys, values)</code> for
+      data-driven formats (no reversal)</p></li>
 <li><p>Special values: <code>.missing = "Missing"</code>, <code>.other = "Other"</code></p></li>
 </ul><p>Named vectors use the R idiom where names are labels and values are codes,
   which is the reverse of the <code>...</code> argument convention.</p>
@@ -100,8 +101,11 @@ is provided.</p>
   For value types (<code>"Date"</code>, <code>"POSIXct"</code>, <code>"logical"</code>), no
   reversal occurs — the named vector is used as-is with names as input keys
   and values as output objects, because non-character objects cannot serve
-  as vector names. See <code><a href="../articles/usage_examples.html">vignette("usage_examples")</a></code> Example 21 for
-  a detailed walkthrough.</p></dd>
+  as vector names.</p>
+<p><strong>Data-driven formats:</strong> For formats built programmatically from
+  data, wrap your data in <code><a href="fmap.html">fmap</a>(keys, values)</code> to suppress
+  automatic reversal for all types. See
+  <code><a href="../articles/usage_examples.html">vignette("usage_examples")</a></code> Example 21 for a detailed walkthrough.</p></dd>
 
 
 <dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
@@ -133,17 +137,6 @@ ranges where a single value can match multiple labels. Used with
 is case-insensitive. Default <code>FALSE</code>.</p></dd>
 
 
-<dt id="arg-reverse">reverse<a class="anchor" aria-label="anchor" href="#arg-reverse"></a></dt>
-<dd><p>Logical or <code>NULL</code>. Controls whether named vectors passed
-as unnamed arguments have their names and values swapped:</p><ul><li><p><code>NULL</code> (default): auto — reverse for character/numeric types
-    (R convention <code>c(Label = "Code")</code>), no reverse for value types.</p></li>
-<li><p><code>FALSE</code>: never reverse — names are always input keys, values
-    are always output labels/objects. Recommended for data-driven formats
-    built with <code>setNames(values, keys)</code>.</p></li>
-<li><p><code>TRUE</code>: always reverse — names are labels, values are codes.</p></li>
-</ul></dd>
-
-
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>Logical. If <code>TRUE</code>, returns the format object visibly;
 otherwise returns it invisibly. Default <code>FALSE</code>.</p></dd>
@@ -171,19 +164,11 @@ depends on the output <code>type</code>:</p>
     objects returned by the format. No reversal is applied, because
     non-character objects cannot be used as vector names.</p></li>
 </ul><p>This means the <em>same data</em> may need to be arranged differently
-depending on the target type. For example, to create a lookup from subject
-IDs to dates:</p><div class="sourceCode"><pre><code><span></span>
-<span><span class="co"># Date type: natural direction (key = name, date = value)</span></span>
-<span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">dates</span>, <span class="va">ids</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"Date"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Character type: reversed direction (date-string = name, key = value)</span></span>
-<span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">ids</span>, <span class="va">date_strings</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"character"</span><span class="op">)</span></span></code></pre></div>
-
-<p>To avoid this inconsistency, use <code>reverse = FALSE</code> for data-driven
-formats. This makes <code>setNames(values, keys)</code> work identically for
-all types:</p><div class="sourceCode"><pre><code><span></span>
-<span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">dates</span>, <span class="va">ids</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"Date"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">date_strings</span>, <span class="va">ids</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"character"</span>, reverse <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+depending on the target type. To avoid this inconsistency for data-driven
+formats, use <code><a href="fmap.html">fmap</a>(keys, values)</code> which works identically
+for all types:</p><div class="sourceCode"><pre><code><span></span>
+<span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="fu"><a href="../reference/fmap.html">fmap</a></span><span class="op">(</span><span class="va">ids</span>, <span class="va">dates</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"Date"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="fu"><a href="../reference/fmap.html">fmap</a></span><span class="op">(</span><span class="va">ids</span>, <span class="va">date_strings</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"character"</span><span class="op">)</span></span></code></pre></div>
 
 <p>When in doubt, use explicit <code>key = "label"</code> arguments — these are
 never reversed regardless of type.</p>

@@ -11,7 +11,6 @@ fnew(
   default = NULL,
   multilabel = FALSE,
   ignore_case = FALSE,
-  reverse = NULL,
   verbose = FALSE
 )
 }
@@ -23,6 +22,8 @@ fnew(
     \item Discrete values: \code{"M" = "Male", "F" = "Female"}
     \item Named vector: \code{c(Male = "M", Female = "F")}
     \item Named list: \code{list(Male = "M", Female = "F")}
+    \item \code{\link{fmap}} vector: \code{fmap(keys, values)} for
+      data-driven formats (no reversal)
     \item Special values: \code{.missing = "Missing"}, \code{.other = "Other"}
   }
   Named vectors use the R idiom where names are labels and values are codes,
@@ -34,8 +35,12 @@ fnew(
   For value types (\code{"Date"}, \code{"POSIXct"}, \code{"logical"}), no
   reversal occurs — the named vector is used as-is with names as input keys
   and values as output objects, because non-character objects cannot serve
-  as vector names. See \code{vignette("usage_examples")} Example 21 for
-  a detailed walkthrough.}
+  as vector names.
+
+  \strong{Data-driven formats:} For formats built programmatically from
+  data, wrap your data in \code{\link{fmap}(keys, values)} to suppress
+  automatic reversal for all types. See
+  \code{vignette("usage_examples")} Example 21 for a detailed walkthrough.}
 
 \item{name}{Character. Optional name for the format. If provided, the format
 is automatically registered in the global format library.}
@@ -55,17 +60,6 @@ ranges where a single value can match multiple labels. Used with
 
 \item{ignore_case}{Logical. If \code{TRUE}, key matching for character formats
 is case-insensitive. Default \code{FALSE}.}
-
-\item{reverse}{Logical or \code{NULL}. Controls whether named vectors passed
-as unnamed arguments have their names and values swapped:
-\itemize{
-  \item \code{NULL} (default): auto — reverse for character/numeric types
-    (R convention \code{c(Label = "Code")}), no reverse for value types.
-  \item \code{FALSE}: never reverse — names are always input keys, values
-    are always output labels/objects. Recommended for data-driven formats
-    built with \code{setNames(values, keys)}.
-  \item \code{TRUE}: always reverse — names are labels, values are codes.
-}}
 
 \item{verbose}{Logical. If \code{TRUE}, returns the format object visibly;
 otherwise returns it invisibly. Default \code{FALSE}.}
@@ -105,22 +99,12 @@ depends on the output \code{type}:
 }
 
 This means the \emph{same data} may need to be arranged differently
-depending on the target type. For example, to create a lookup from subject
-IDs to dates:
+depending on the target type. To avoid this inconsistency for data-driven
+formats, use \code{\link{fmap}(keys, values)} which works identically
+for all types:
 \preformatted{
-# Date type: natural direction (key = name, date = value)
-fnew(setNames(dates, ids), type = "Date")
-
-# Character type: reversed direction (date-string = name, key = value)
-fnew(setNames(ids, date_strings), type = "character")
-}
-
-To avoid this inconsistency, use \code{reverse = FALSE} for data-driven
-formats. This makes \code{setNames(values, keys)} work identically for
-all types:
-\preformatted{
-fnew(setNames(dates, ids), type = "Date")
-fnew(setNames(date_strings, ids), type = "character", reverse = FALSE)
+fnew(fmap(ids, dates), type = "Date")
+fnew(fmap(ids, date_strings), type = "character")
 }
 
 When in doubt, use explicit \code{key = "label"} arguments — these are

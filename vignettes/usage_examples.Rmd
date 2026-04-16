@@ -880,12 +880,11 @@ start date (`SVSTDTC`) as character strings:
 ```{r fputk-register}
 # Create composite key -> date string mapping from SV
 fnew(
-  setNames(SV$SVSTDTC, paste(SV$USUBJID, SV$VISITNUM, sep = "|")),
+  fmap(paste(SV$USUBJID, SV$VISITNUM, sep = "|"), SV$SVSTDTC),
   .other  = "NOT FOUND",
   name    = "svdtc",
   type    = "character",
-  ignore_case = TRUE,
-  reverse = FALSE
+  ignore_case = TRUE
 )
 
 fprint("svdtc")
@@ -909,9 +908,9 @@ Using `type = "Date"`, values are stored as native R `Date` objects and
 ```{r fputk-date}
 # Create composite key -> Date mapping from SV
 fnew(
-  setNames(
-    as.Date(SV$SVSTDTC, format = "%Y-%m-%d"),
-    paste(SV$USUBJID, SV$VISITNUM, sep = "|")
+  fmap(
+    paste(SV$USUBJID, SV$VISITNUM, sep = "|"),
+    as.Date(SV$SVSTDTC, format = "%Y-%m-%d")
   ),
   .other  = NA,
   name    = "svdtn",
@@ -936,10 +935,10 @@ QS$SVSTDTC_DT + 7  # add 7 days
 fclear()
 ```
 
-## Example 21: Consistent Data-Driven Formats with `reverse`
+## Example 21: Consistent Data-Driven Formats with `fmap()`
 
 When building formats from data (e.g., a data frame with 1000+ rows), you
-use `setNames()` to create a named vector. By default, `fnew()` treats
+need a named vector mapping keys to values. By default, `fnew()` treats
 named vectors differently depending on the output type:
 
 - **Value types** (`Date`, `POSIXct`, `logical`): `c(key = value)` — natural
@@ -947,16 +946,15 @@ named vectors differently depending on the output type:
 - **Character / numeric**: `c(Label = "Code")` — R convention, names and
   values are **swapped** internally.
 
-This inconsistency is confusing for data-driven formats. The `reverse`
-parameter solves it: set `reverse = FALSE` to use the natural
-`c(key = value)` direction for **all** types.
+This inconsistency is confusing for data-driven formats. The `fmap()` helper
+solves it: `fmap(keys, values)` works identically for **all** types.
 
 ### Clinical-data example
 
 Suppose we have a demographics dataset and need two lookup formats from the
 same data — one returning Date objects, one returning character strings:
 
-```{r reverse-setup}
+```{r fmap-setup}
 library(ksformat)
 
 dm <- data.frame(
@@ -970,28 +968,27 @@ dm <- data.frame(
 keys <- paste(dm$USUBJID, dm$SUBJID, sep = "|")
 ```
 
-### Same `setNames(values, keys)` pattern for both types
+### Same `fmap(keys, values)` pattern for both types
 
-With `reverse = FALSE`, both formats use the **identical** calling style —
-names are input keys, values are output objects:
+Both formats use the **identical** calling style — `fmap(keys, values)` where
+keys are input lookup values and values are output objects:
 
-```{r reverse-date}
+```{r fmap-date}
 # Date lookup
 fnew(
-  setNames(as.Date(dm$RFICDTC, format = "%Y-%m-%d"), keys),
+  fmap(keys, as.Date(dm$RFICDTC, format = "%Y-%m-%d")),
   .other      = NA,
   type        = "Date",
   ignore_case = TRUE,
   name        = "icdtn"
 )
 
-# Character lookup — same setNames(values, keys) pattern!
+# Character lookup — same fmap(keys, values) pattern!
 fnew(
-  setNames(dm$RFICDTC, keys),
+  fmap(keys, dm$RFICDTC),
   .other      = "NOT FOUND",
   type        = "character",
   ignore_case = TRUE,
-  reverse     = FALSE,
   name        = "icdtc"
 )
 
@@ -999,7 +996,7 @@ fprint("icdtn")
 fprint("icdtc")
 ```
 
-```{r reverse-apply}
+```{r fmap-apply}
 # Both return the expected results
 fputk("SUBJ-001", "001", format = "icdtn")
 class(fputk("SUBJ-001", "001", format = "icdtn"))
@@ -1010,17 +1007,16 @@ class(fputk("SUBJ-001", "001", format = "icdtc"))
 fclear()
 ```
 
-The only difference is the `reverse = FALSE` for the character format.
-For Date formats, `reverse` defaults to `FALSE` automatically, so you
-don't need to specify it.
+No extra parameters needed — `fmap()` tells `fnew()` to use the natural
+direction for all types.
 
 ### When to use the default (reversal on)
 
-The default reversal (`reverse = NULL`) preserves the standard R convention
+The default auto-reversal preserves the standard R convention
 where `c(Label = "Code")` maps `Code -> Label`. This is natural for
 hand-written formats:
 
-```{r reverse-default}
+```{r fmap-default}
 # These are equivalent — both map "M" -> "Male"
 fmt_a <- fnew(c(Male = "M", Female = "F"))
 fmt_b <- fnew("M" = "Male", "F" = "Female")
@@ -1032,8 +1028,8 @@ fclear()
 
 ### Summary
 
-| Use case | Style | `reverse` |
+| Use case | Style | Reversal |
 |:--------------------------|:--------------------------------------|:----------|
-| Data-driven (any type)    | `setNames(values, keys)`              | `FALSE`   |
-| Hand-written (char/num)   | `c(Label = "Code")` or `"Code" = "Label"` | `NULL` (default) |
-| Value types (`Date`, etc.)| `setNames(values, keys)`              | `NULL` (default = `FALSE`) |
+| Data-driven (any type)    | `fmap(keys, values)`                  | Suppressed |
+| Hand-written (char/num)   | `c(Label = "Code")` or `"Code" = "Label"` | Auto (default) |
+| Value types (`Date`, etc.)| `fmap(keys, values)` or `setNames(values, keys)` | No reversal (default) |

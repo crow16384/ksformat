@@ -1,3 +1,24 @@
+# ksformat 0.6.0
+
+## Breaking Changes
+
+* `fnew()` no longer accepts the `reverse` parameter. Use `fmap(keys, values)`
+  instead of `setNames(values, keys)` with `reverse = FALSE` to create
+  data-driven formats consistently for all types.
+
+## New Features
+
+* New `fmap(keys, values)` helper creates a key-value mapping that tells
+  `fnew()` to use the natural direction (keys → values) without reversal.
+  Works identically for character, numeric, Date, POSIXct, and logical formats.
+
+## Documentation
+
+* Vignette Example 21 rewritten: "Consistent Data-Driven Formats with
+  `fmap()`" — demonstrates how `fmap(keys, values)` replaces the old
+  `setNames()` + `reverse = FALSE` pattern.
+* Updated Example 20 (Composite Key Lookup) to use `fmap()`.
+
 # ksformat 0.5.1
 
 ## Bug Fixes

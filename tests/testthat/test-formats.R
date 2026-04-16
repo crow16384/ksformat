@@ -200,26 +200,36 @@ test_that("fnew errors on unnamed vector without names", {
   expect_error(fnew(c("M", "F")), "fully named")
 })
 
-test_that("fnew reverse=FALSE skips reversal for character type", {
-  # Without reverse=FALSE: c(Male = "M") means "M" -> "Male"
+test_that("fmap creates ks_fmap class with correct names/values", {
+  result <- fmap(c("A", "B"), c("Label-A", "Label-B"))
+  expect_s3_class(result, "ks_fmap")
+  expect_equal(names(result), c("A", "B"))
+  expect_equal(unclass(result), c(A = "Label-A", B = "Label-B"))
+})
+
+test_that("fmap errors on length mismatch", {
+  expect_error(fmap(c("A", "B"), c("X")), "same length")
+})
+
+test_that("fmap suppresses reversal for character type in fnew", {
+  # Without fmap: c(Male = "M") means "M" -> "Male" (auto-reversed)
   fmt_default <- fnew(c(Male = "M", Female = "F"))
   expect_equal(fput("M", fmt_default), "Male")
 
-  # With reverse=FALSE: c(Male = "M") means "Male" -> "M"
-  fmt_no_rev <- fnew(c(Male = "M", Female = "F"), reverse = FALSE)
-  expect_equal(fput("Male", fmt_no_rev), "M")
-  expect_equal(fput("Female", fmt_no_rev), "F")
+  # With fmap: keys are input keys, values are output labels (no reversal)
+  fmt_fmap <- fnew(fmap(c("M", "F"), c("Male", "Female")))
+  expect_equal(fput("M", fmt_fmap), "Male")
+  expect_equal(fput("F", fmt_fmap), "Female")
 })
 
-test_that("fnew reverse=FALSE enables consistent setNames for all types", {
+test_that("fmap enables consistent pattern for all types in fnew", {
   keys <- c("A", "B")
   vals_chr <- c("Label-A", "Label-B")
   vals_date <- as.Date(c("2021-01-01", "2021-06-15"))
 
-  fmt_chr <- fnew(setNames(vals_chr, keys), type = "character", reverse = FALSE)
-  fmt_date <- fnew(setNames(vals_date, keys), type = "Date")
-
-  # Both use same setNames(values, keys) pattern
+  # Same fmap(keys, values) pattern for both types
+  fmt_chr <- fnew(fmap(keys, vals_chr), type = "character")
+  fmt_date <- fnew(fmap(keys, vals_date), type = "Date")
 
   expect_equal(fput("A", fmt_chr), "Label-A")
   expect_equal(fput("B", fmt_chr), "Label-B")
@@ -227,25 +237,14 @@ test_that("fnew reverse=FALSE enables consistent setNames for all types", {
   expect_equal(fput("B", fmt_date), vals_date[2])
 })
 
-test_that("fnew reverse=TRUE forces reversal even for value types", {
-  # reverse=TRUE: c("val1" = "key1") reversed => "key1" -> "val1"
-  fmt <- fnew(c("val1" = "key1", "val2" = "key2"), reverse = TRUE)
-  expect_equal(fput("key1", fmt), "val1")
-  expect_equal(fput("key2", fmt), "val2")
-})
-
-test_that("fnew reverse=NULL preserves default behavior", {
-  # NULL = auto: character reverses, Date does not
-  fmt_chr <- fnew(c(Male = "M"), reverse = NULL)
+test_that("fnew default auto-reversal still works without fmap", {
+  # character reverses
+  fmt_chr <- fnew(c(Male = "M"))
   expect_equal(fput("M", fmt_chr), "Male")
 
-  fmt_date <- fnew(c("M" = as.Date("2021-01-01")), reverse = NULL)
+  # Date does not reverse
+  fmt_date <- fnew(c("M" = as.Date("2021-01-01")))
   expect_equal(fput("M", fmt_date), as.Date("2021-01-01"))
-})
-
-test_that("fnew reverse validates input", {
-  expect_error(fnew("M" = "Male", reverse = "yes"), "TRUE, FALSE, or NULL")
-  expect_error(fnew("M" = "Male", reverse = c(TRUE, FALSE)), "TRUE, FALSE, or NULL")
 })
 
 test_that("finput works with named numeric vector", {

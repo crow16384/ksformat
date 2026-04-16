@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.0</span>
       </span>
     </div>
 
@@ -123,6 +123,9 @@
 <th>Purpose</th>
 </tr></thead><tbody><tr><td><code>fnew(...)</code></td>
 <td>Create format (value → label)</td>
+</tr><tr><td><code>fmap(keys, values)</code></td>
+<td>Create key-value mapping for <code><a href="reference/fnew.html">fnew()</a></code>
+</td>
 </tr><tr><td><code>fput(x, fmt)</code></td>
 <td>Apply format to vector</td>
 </tr><tr><td><code>fputn(x, fmt)</code></td>
@@ -161,9 +164,18 @@
 <td>Create range specification</td>
 </tr></tbody></table></div>
 <div class="section level2">
-<h2 id="named-vector-reversal-reverse-parameter">Named-Vector Reversal (<code>reverse</code> parameter)<a class="anchor" aria-label="anchor" href="#named-vector-reversal-reverse-parameter"></a></h2>
+<h2 id="data-driven-formats-with-fmap">Data-Driven Formats with <code>fmap()</code>
+<a class="anchor" aria-label="anchor" href="#data-driven-formats-with-fmap"></a></h2>
 <p>When passing named vectors to <code><a href="reference/fnew.html">fnew()</a></code>, the direction depends on <code>type</code>: - <strong>Character/numeric</strong> (default): <code>c(Label = "Code")</code> is reversed → <code>Code → Label</code> - <strong>Value types</strong> (Date, POSIXct, logical): <code>c(Key = value)</code> used as-is</p>
-<p>The <code>reverse</code> parameter in <code><a href="reference/fnew.html">fnew()</a></code> gives explicit control: - <code>NULL</code> (default): auto — reverse for char/numeric, not for value types - <code>FALSE</code>: never reverse — use <code>setNames(values, keys)</code> consistently for all types - <code>TRUE</code>: always reverse</p>
+<p>For data-driven formats, use <code>fmap(keys, values)</code> to suppress auto-reversal for all types. This ensures <code>keys → values</code> direction regardless of type:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Same pattern for character and Date formats</span></span>
+<span><span class="fu"><a href="reference/fnew.html">fnew</a></span><span class="op">(</span><span class="fu"><a href="reference/fmap.html">fmap</a></span><span class="op">(</span><span class="va">ids</span>, <span class="va">date_strings</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"character"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/fnew.html">fnew</a></span><span class="op">(</span><span class="fu"><a href="reference/fmap.html">fmap</a></span><span class="op">(</span><span class="va">ids</span>, <span class="va">dates</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"Date"</span><span class="op">)</span></span></code></pre></div>
+<p>Hand-written formats continue to use the R convention:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/fnew.html">fnew</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Male <span class="op">=</span> <span class="st">"M"</span>, Female <span class="op">=</span> <span class="st">"F"</span><span class="op">)</span><span class="op">)</span>  <span class="co"># auto-reversed: "M" → "Male"</span></span>
+<span><span class="fu"><a href="reference/fnew.html">fnew</a></span><span class="op">(</span><span class="st">"M"</span> <span class="op">=</span> <span class="st">"Male"</span>, <span class="st">"F"</span> <span class="op">=</span> <span class="st">"Female"</span><span class="op">)</span> <span class="co"># explicit: same result</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="missing-value-priority">Missing Value Priority<a class="anchor" aria-label="anchor" href="#missing-value-priority"></a></h2>
