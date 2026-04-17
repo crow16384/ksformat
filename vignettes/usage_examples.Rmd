@@ -1033,3 +1033,102 @@ fclear()
 | Data-driven (any type)    | `fmap(keys, values)`                  | Suppressed |
 | Hand-written (char/num)   | `c(Label = "Code")` or `"Code" = "Label"` | Auto (default) |
 | Value types (`Date`, etc.)| `fmap(keys, values)` or `setNames(values, keys)` | No reversal (default) |
+
+## Example 22: Date Lookup via `fparse()` and `fputk()`
+
+Examples 20–21 built composite-key formats programmatically with `fnew()` and
+`fmap()`. When the mapping is **small and known in advance** (e.g., a
+study-specific visit schedule), you can define the same lookup entirely in
+text with `fparse()`.
+
+### Character date lookup
+
+The simplest approach: store dates as character strings using a regular
+`character` format.
+
+```{r fparse-date-char}
+fparse(text = '
+VALUE svdtc (character, nocase)
+  "SUBJ-001|1" = "2025-01-15"
+  "SUBJ-001|2" = "2025-02-20"
+  "SUBJ-001|3" = "2025-03-10"
+  "SUBJ-002|1" = "2025-01-18"
+  "SUBJ-002|2" = "2025-02-25"
+  .other       = "NOT FOUND"
+;
+')
+
+fprint("svdtc")
+```
+
+Apply with `fputk()` to look up visit dates from a questionnaire domain:
+
+```{r fparse-date-char-apply}
+QS <- data.frame(
+  USUBJID  = c("SUBJ-001", "SUBJ-001", "SUBJ-002", "SUBJ-002", "SUBJ-002"),
+  VISITNUM = c(1, 2, 1, 2, 3),
+  QSSTRESN = c(85, 90, 72, 78, NA),
+  stringsAsFactors = FALSE
+)
+
+QS$SVSTDTC <- fputk(QS$USUBJID, QS$VISITNUM, format = "svdtc")
+QS
+
+fclear()
+```
+
+### Native Date lookup
+
+Use the `Date` value type with `format:` to store dates as native R `Date`
+objects. The `format:` parameter tells `fparse()` how to parse the date
+strings in the text block:
+
+```{r fparse-date-native}
+fparse(text = '
+VALUE svdtn (Date, format: %Y-%m-%d, nocase)
+  "SUBJ-001|1" = "2025-01-15"
+  "SUBJ-001|2" = "2025-02-20"
+  "SUBJ-001|3" = "2025-03-10"
+  "SUBJ-002|1" = "2025-01-18"
+  "SUBJ-002|2" = "2025-02-25"
+;
+')
+
+fprint("svdtn")
+```
+
+Now `fputk()` returns real `Date` objects — arithmetic and comparison work
+directly:
+
+```{r fparse-date-native-apply}
+QS$SVSTDTC_DT <- fputk(QS$USUBJID, QS$VISITNUM, format = "svdtn")
+QS
+
+class(QS$SVSTDTC_DT)         # Date
+is.na(QS$SVSTDTC_DT[5])      # TRUE — no match for SUBJ-002 Visit 3
+
+# Date arithmetic works directly
+QS$SVSTDTC_DT + 7
+```
+
+### Round-trip: export and re-import
+
+Formats created with `fparse()` can be exported back to text with `fexport()`
+and re-parsed — useful for version-controlled format definitions:
+
+```{r fparse-date-roundtrip}
+fmt_obj <- format_get("svdtn")
+txt <- fexport(svdtn = fmt_obj)
+cat(txt)
+```
+
+```{r fparse-date-reimport}
+# Re-parse the exported text
+fclear()
+fparse(text = txt)
+
+# Verify it still works
+fputk("SUBJ-001", 2, format = "svdtn")
+
+fclear()
+```

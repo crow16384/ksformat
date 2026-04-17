@@ -1,3 +1,15 @@
+# ksformat 0.6.1
+
+## Documentation
+
+* Cheat sheet updated: added `fputk()` examples (basic composite key,
+  `fmap()` data-driven Date lookup, `fparse()` text-defined Date lookup),
+  added `fmap()` to the Function Reference table, and rearranged layout to
+  fit landscape page.
+* Vignette Example 22 added: "Date Lookup via `fparse()` and `fputk()`" —
+  character lookup, native Date lookup with `fmap()`, and round-trip via
+  `fexport()`/`fparse()`.
+
 # ksformat 0.6.0
 
 ## Breaking Changes
