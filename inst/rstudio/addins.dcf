@@ -1,0 +1,4 @@
+Name: Format Library Browser
+Description: Browse and manage ksformat format library objects.
+Binding: format_library_app
+Interactive: true

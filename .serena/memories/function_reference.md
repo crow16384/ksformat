@@ -1,4 +1,4 @@
-# ksformat Function Reference (updated 2026-04-15)
+# ksformat Function Reference (updated 2026-04-21)
 
 ## Exported Functions
 
@@ -16,6 +16,7 @@
 | `finputc(x, invalue_name)` | format_invalue.R | Apply character invalue by name |
 | `fnew_bid(...)` | format_invalue.R | Create bidirectional format+invalue |
 | `fnew_date(pattern, name, type, .missing)` | format_datetime.R | Create date/time/datetime format |
+| `format_library_app(port, launch.browser)` | format_library_app.R | Launch Shiny browser for format library |
 | `fparse(text, file)` | format_parse.R | Parse SAS-like text definitions |
 | `fexport(..., formats, file)` | format_parse.R | Export formats to SAS-like text |
 | `fimport(file, register, overwrite)` | format_parse.R | Import SAS CNTLOUT CSV |

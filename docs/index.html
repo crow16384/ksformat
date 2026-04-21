@@ -39,7 +39,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.2</span>
       </span>
     </div>
 
@@ -185,9 +185,19 @@
 <span><span class="fu"><a href="reference/fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span>              <span class="co"># clear all</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="data-frames">Data frames<a class="anchor" aria-label="anchor" href="#data-frames"></a>
+<h3 id="interactive-library-browser-shiny">Interactive library browser (Shiny)<a class="anchor" aria-label="anchor" href="#interactive-library-browser-shiny"></a>
 </h3>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"shiny"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="reference/format_library_app.html">format_library_app</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>The app shows both VALUE (<code>ks_format</code>) and INVALUE (<code>ks_invalue</code>) objects, supports name/type filtering, shows a formatted mapping table, and includes library management actions (remove selected, clear all, or quit).</p>
+<p>In RStudio, you can also open it from <strong>Addins</strong> as <strong>Format Library Browser</strong>.</p>
+</div>
+<div class="section level3">
+<h3 id="data-frames">Data frames<a class="anchor" aria-label="anchor" href="#data-frames"></a>
+</h3>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  sex <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M"</span>, <span class="st">"F"</span>, <span class="st">"M"</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
 <span>  age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">15</span>, <span class="fl">25</span>, <span class="fl">70</span>, <span class="fl">35</span><span class="op">)</span></span>
@@ -200,7 +210,7 @@
 <h2 id="multilabel-formats">Multilabel formats<a class="anchor" aria-label="anchor" href="#multilabel-formats"></a>
 </h2>
 <p>With <code>multilabel = TRUE</code>, a single value can match multiple labels. Use <code><a href="reference/fput_all.html">fput_all()</a></code> to collect all matches:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/fnew.html">fnew</a></span><span class="op">(</span></span>
 <span>  <span class="st">"0,17,TRUE,TRUE"</span>  <span class="op">=</span> <span class="st">"Pediatric"</span>,</span>
 <span>  <span class="st">"18,Inf,TRUE,TRUE"</span> <span class="op">=</span> <span class="st">"Adult"</span>,</span>
@@ -217,7 +227,7 @@
 <h2 id="datetimedatetime-formats">Date/time/datetime formats<a class="anchor" aria-label="anchor" href="#datetimedatetime-formats"></a>
 </h2>
 <p>SAS date format names are auto-resolved — no pre-creation needed:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/fputn.html">fputn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"DATE9."</span><span class="op">)</span></span>
 <span><span class="co"># [1] "25MAR2026"</span></span>
 <span></span>
@@ -229,7 +239,7 @@
 <span><span class="fu"><a href="reference/fput.html">fput</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"ru_date"</span><span class="op">)</span></span>
 <span><span class="co"># [1] "25.03.2026"</span></span></code></pre></div>
 <p>Time (seconds since midnight) and datetime are also supported:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/fputn.html">fputn</a></span><span class="op">(</span><span class="fl">3600</span>, <span class="st">"TIME8."</span><span class="op">)</span></span>
 <span><span class="co"># [1] "1:00:00"</span></span>
 <span></span>
@@ -239,7 +249,7 @@
 <h2 id="expression-labels">Expression labels<a class="anchor" aria-label="anchor" href="#expression-labels"></a>
 </h2>
 <p>Labels containing <code>.x1</code>, <code>.x2</code>, etc. are evaluated as R expressions at apply-time. Pass extra arguments through <code>fput(x, fmt, ...)</code>:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">stat_fmt</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fnew.html">fnew</a></span><span class="op">(</span></span>
 <span>  <span class="st">"n"</span>   <span class="op">=</span> <span class="st">"sprintf('%s', .x1)"</span>,</span>
 <span>  <span class="st">"pct"</span> <span class="op">=</span> <span class="st">"sprintf('%.1f%%', .x1 * 100)"</span>,</span>
@@ -249,14 +259,14 @@
 <span><span class="fu"><a href="reference/fput.html">fput</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n"</span>, <span class="st">"pct"</span><span class="op">)</span>, <span class="va">stat_fmt</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">42</span>, <span class="fl">0.053</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># [1] "42"   "5.3%"</span></span></code></pre></div>
 <p>Use <code><a href="reference/e.html">e()</a></code> to mark a label for evaluation even without <code>.xN</code> placeholders:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/fnew.html">fnew</a></span><span class="op">(</span><span class="st">"ts"</span> <span class="op">=</span> <span class="fu"><a href="reference/e.html">e</a></span><span class="op">(</span><span class="st">"format(Sys.time(), '%Y-%m-%d')"</span><span class="op">)</span>, name <span class="op">=</span> <span class="st">"demo"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/fput.html">fput</a></span><span class="op">(</span><span class="st">"ts"</span>, <span class="st">"demo"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="case-insensitive-matching">Case-insensitive matching<a class="anchor" aria-label="anchor" href="#case-insensitive-matching"></a>
 </h2>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/fnew.html">fnew</a></span><span class="op">(</span><span class="st">"M"</span> <span class="op">=</span> <span class="st">"Male"</span>, <span class="st">"F"</span> <span class="op">=</span> <span class="st">"Female"</span>, name <span class="op">=</span> <span class="st">"sex_nc"</span>,</span>
 <span>     type <span class="op">=</span> <span class="st">"character"</span>, ignore_case <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -324,7 +334,7 @@
 <tr>
 <td><strong>Library</strong></td>
 <td>
-<code><a href="reference/format_get.html">format_get()</a></code>, <code><a href="reference/fprint.html">fprint()</a></code>, <code><a href="reference/fclear.html">fclear()</a></code>, <code><a href="reference/fexport.html">fexport()</a></code>, <code><a href="reference/fimport.html">fimport()</a></code>
+<code><a href="reference/format_get.html">format_get()</a></code>, <code><a href="reference/fprint.html">fprint()</a></code>, <code><a href="reference/fclear.html">fclear()</a></code>, <code><a href="reference/fexport.html">fexport()</a></code>, <code><a href="reference/fimport.html">fimport()</a></code>, <code><a href="reference/format_library_app.html">format_library_app()</a></code>
 </td>
 </tr>
 <tr>
@@ -344,7 +354,7 @@
 <div class="section level2">
 <h2 id="development">Development<a class="anchor" aria-label="anchor" href="#development"></a>
 </h2>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"roxygen2"</span>, <span class="st">"testthat"</span>, <span class="st">"devtools"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/document.html" class="external-link">document</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/test.html" class="external-link">test</a></span><span class="op">(</span><span class="op">)</span></span>

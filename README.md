@@ -93,6 +93,21 @@ fclear("sex")         # remove one format
 fclear()              # clear all
 ```
 
+### Interactive library browser (Shiny)
+
+```r
+if (interactive() && requireNamespace("shiny", quietly = TRUE)) {
+  format_library_app()
+}
+```
+
+The app shows both VALUE (`ks_format`) and INVALUE (`ks_invalue`) objects,
+supports name/type filtering, shows a formatted mapping table, and includes
+library management actions (remove selected, clear all, or quit).
+
+In RStudio, you can also open it from **Addins** as
+**Format Library Browser**.
+
 ### Data frames
 
 ```r
@@ -203,7 +218,7 @@ Options: `keep_na = TRUE`, `na_if`, `include_empty = TRUE`.
 | **Creation** | `fnew()`, `finput()`, `fnew_bid()`, `fnew_date()`, `fparse()`, `e()` |
 | **Application** | `fput()`, `fputn()`, `fputc()`, `fput_all()`, `fput_df()` |
 | **Reverse** | `finputn()`, `finputc()` |
-| **Library** | `format_get()`, `fprint()`, `fclear()`, `fexport()`, `fimport()` |
+| **Library** | `format_get()`, `fprint()`, `fclear()`, `fexport()`, `fimport()`, `format_library_app()` |
 | **Utilities** | `is_missing()`, `range_spec()` |
 | **Documentation** | `ksformat_cheatsheet()` — open cheat sheet |
 

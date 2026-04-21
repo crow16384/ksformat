@@ -1,3 +1,26 @@
+# ksformat 0.6.2
+
+## New Features
+
+* Added `format_library_app()` Shiny browser for the global format library,
+  including filters by name/object type, per-object details, and mapping table
+  rendering for both `ks_format` and `ks_invalue` entries.
+* Added an RStudio addin entry (**Format Library Browser**) to launch
+  `format_library_app()` from the Addins menu.
+
+## Enhancements
+
+* Replaced plain-text print preview in the app with a formatted mapping table
+  that shows mappings, range rules, and special directives (`.missing`,
+  `.other`) in structured form.
+* Added app management UX improvements: explicit quit action with confirmation
+  modal, plus confirmations for destructive clear/remove operations.
+
+## Documentation
+
+* Added `format_library_app()` docs and package index references.
+* Updated README with interactive browser usage and behavior summary.
+
 # ksformat 0.6.1
 
 ## Documentation

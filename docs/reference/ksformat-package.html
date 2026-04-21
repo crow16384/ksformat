@@ -20,7 +20,7 @@ formatting, and proper handling of missing values (NA, NULL, NaN)."><meta proper
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.2</span>
       </span>
     </div>
 
@@ -89,6 +89,7 @@ formatting, and proper handling of missing values (NA, NULL, NaN).</p>
 </ul><p><strong>Format library:</strong></p><ul><li><p><code><a href="format_get.html">format_get</a></code> — retrieve a format from the global library</p></li>
 <li><p><code><a href="fprint.html">fprint</a></code> — list or display registered formats</p></li>
 <li><p><code><a href="fclear.html">fclear</a></code> — remove one or all formats from the library</p></li>
+<li><p><code><a href="format_library_app.html">format_library_app</a></code> — open interactive library browser (Shiny)</p></li>
 <li><p><code><a href="fexport.html">fexport</a></code> — export formats to 'SAS'-like text</p></li>
 </ul><p><strong>Utilities:</strong></p><ul><li><p><code><a href="is_missing.html">is_missing</a></code> — check for NA, NaN, and empty strings</p></li>
 <li><p><code><a href="range_spec.html">range_spec</a></code> — create a range specification object</p></li>
@@ -175,7 +176,7 @@ version in your browser, or see the files in
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Date format (SAS-style, auto-resolved)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="fputn.html">fputn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"DATE9."</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "16APR2026"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "21APR2026"</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Export and library management</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="fexport.html">fexport</a></span><span class="op">(</span>sex <span class="op">=</span> <span class="fu"><a href="format_get.html">format_get</a></span><span class="op">(</span><span class="st">"sex"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>

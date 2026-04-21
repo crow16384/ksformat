@@ -44,6 +44,7 @@ formatting, and proper handling of missing values (NA, NULL, NaN).
   \item \code{\link{format_get}} — retrieve a format from the global library
   \item \code{\link{fprint}} — list or display registered formats
   \item \code{\link{fclear}} — remove one or all formats from the library
+  \item \code{\link{format_library_app}} — open interactive library browser (Shiny)
   \item \code{\link{fexport}} — export formats to 'SAS'-like text
 }
 
