@@ -16,7 +16,6 @@
       type = character(0),
       mappings = integer(0),
       flags = character(0),
-      created = character(0),
       stringsAsFactors = FALSE
     ))
   }
@@ -37,7 +36,6 @@
         type = obj$type,
         mappings = length(obj$mappings),
         flags = if (length(flags) > 0L) paste(flags, collapse = ", ") else "",
-        created = as.character(obj$created),
         stringsAsFactors = FALSE
       )
     } else if (inherits(obj, "ks_invalue")) {
@@ -52,7 +50,6 @@
         type = obj$target_type,
         mappings = length(obj$mappings),
         flags = if (length(flags) > 0L) paste(flags, collapse = ", ") else "",
-        created = as.character(obj$created),
         stringsAsFactors = FALSE
       )
     } else {
@@ -62,7 +59,6 @@
         type = NA_character_,
         mappings = NA_integer_,
         flags = "",
-        created = "",
         stringsAsFactors = FALSE
       )
     }
@@ -94,8 +90,7 @@
       Mappings = length(obj$mappings),
       Flags = if (length(flags) > 0L) paste(flags, collapse = ", ") else "none",
       Missing = if (!is.null(obj$missing_label)) as.character(obj$missing_label) else "<none>",
-      Other = if (!is.null(obj$other_label)) as.character(obj$other_label) else "<none>",
-      Created = as.character(obj$created)
+      Other = if (!is.null(obj$other_label)) as.character(obj$other_label) else "<none>"
     ))
   }
 
@@ -105,8 +100,7 @@
       Kind = "INVALUE",
       Target_Type = obj$target_type,
       Mappings = length(obj$mappings),
-      Missing_Value = if (!is.null(obj$missing_value)) as.character(obj$missing_value) else "<none>",
-      Created = as.character(obj$created)
+      Missing_Value = if (!is.null(obj$missing_value)) as.character(obj$missing_value) else "<none>"
     ))
   }
 

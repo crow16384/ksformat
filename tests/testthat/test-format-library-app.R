@@ -6,7 +6,7 @@ test_that(".format_library_snapshot returns empty schema when library is empty",
   expect_equal(nrow(snap), 0L)
   expect_equal(
     names(snap),
-    c("name", "object_kind", "type", "mappings", "flags", "created")
+    c("name", "object_kind", "type", "mappings", "flags")
   )
 })
 
