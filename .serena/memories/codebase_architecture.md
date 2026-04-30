@@ -1,7 +1,7 @@
 # ksformat Codebase Architecture (updated 2026-04-15)
 
 ## Package Overview
-R package providing SAS PROC FORMAT-like functionality. Version 0.4.9.
+R package providing SAS PROC FORMAT-like functionality. Version 0.6.3.
 Depends on: cli. Suggests: testthat (>= 3.0.0).
 
 ## File Structure
@@ -19,6 +19,7 @@ Depends on: cli. Suggests: testthat (>= 3.0.0).
 - `fputk(..., format, sep, keep_na)` — Apply format keyed on composite paste key (e.g. USUBJID|VISITNUM). NA in any component propagates as NA.
 - `fput_all(x, format, ..., keep_na)` — Multilabel: returns list of all matching labels per element.
 - `fput_df(data, ..., suffix, replace)` — Apply formats to data frame columns.
+- `.fput_value_type(x, format, keep_na)` — Internal handler for value-type formats (Date/POSIXct/logical). Result vector tzone is propagated from map_values for POSIXct (bug fix 0.6.3: previously tzone was dropped, causing display in local tz).
 
 ### R/format_invalue.R
 - `finput(...)` — Create invalue (ks_invalue) for reverse formatting (label → value).

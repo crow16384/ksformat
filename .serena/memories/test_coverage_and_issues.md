@@ -44,5 +44,8 @@ Single test file, ~130+ test cases, ~2162 lines.
 - Expression labels, ignore_case, multilabel
 - print.ks_format, print.ks_invalue
 
+### Value Type Formats context (added 0.6.3)
+- "fput preserves POSIXct tzone from source values (UTC)": builds UTC POSIXct format via `fmap()` + `fputk()`, asserts `attr(result, "tzone") == "UTC"` and formatted display in UTC matches source strings.
+
 ### Known Issues
-- None currently tracked. Previous issues (range matching not implemented, stub functions) have been resolved.
+- None currently tracked. Previous issues (range matching not implemented, stub functions, POSIXct tzone loss) have been resolved.
