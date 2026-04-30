@@ -2821,6 +2821,22 @@ test_that("fput returns POSIXct vector for POSIXct format", {
   expect_equal(result, c(t1, t2))
 })
 
+test_that("fput preserves POSIXct tzone from source values (UTC)", {
+  t1 <- as.POSIXct("2021-02-09 11:35", format = "%Y-%m-%d %H:%M", tz = "UTC")
+  t2 <- as.POSIXct("2021-02-09 12:35", format = "%Y-%m-%d %H:%M", tz = "UTC")
+  fmt <- fnew(fmap(c("001|909", "002|910"), c(t1, t2)),
+              type = "POSIXct", name = "trtstart_dttn")
+  on.exit(fclear(), add = TRUE)
+
+  result <- fputk(c("001", "002"), c("909", "910"), format = "trtstart_dttn")
+  expect_s3_class(result, "POSIXct")
+  expect_equal(attr(result, "tzone"), "UTC")
+  # Display in UTC must match the source instants regardless of system TZ
+  expect_equal(format(result, tz = "UTC", format = "%Y-%m-%d %H:%M"),
+               c("2021-02-09 11:35", "2021-02-09 12:35"))
+  expect_equal(as.numeric(result), as.numeric(c(t1, t2)))
+})
+
 test_that("fput handles empty input for value types", {
   fmt <- fnew("A" = as.Date("2025-01-15"), type = "Date")
   result <- fput(NULL, fmt)

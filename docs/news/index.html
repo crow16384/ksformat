@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.3</span>
       </span>
     </div>
 
@@ -57,6 +57,13 @@
       <small>Source: <a href="https://github.com/crow16384/ksformat/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.6.3" id="ksformat-063">ksformat 0.6.3<a class="anchor" aria-label="anchor" href="#ksformat-063"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-6-3">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-6-3"></a></h3>
+<ul><li>Fixed <code><a href="../reference/fput.html">fput()</a></code> (and <code><a href="../reference/fputk.html">fputk()</a></code>) losing the <code>tzone</code> attribute when returning <code>POSIXct</code> values from a value-type format. The result vector was seeded from a tzone-less NA, so values were silently displayed in the local timezone instead of the source timezone (e.g. UTC), causing an apparent time-shift. The <code>tzone</code> attribute of the mapped values is now propagated to the result.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.6.2" id="ksformat-062">ksformat 0.6.2<a class="anchor" aria-label="anchor" href="#ksformat-062"></a></h2>
 <div class="section level3">

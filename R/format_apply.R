@@ -291,6 +291,15 @@ fput <- function(x, format, ..., keep_na = FALSE) {
   # Build typed values vector (preserves Date/POSIXct class)
   map_values <- .typed_map_values(format$mappings)
 
+  # Preserve POSIXct tzone from source values onto the result vector.
+  # `result` was initialised from .typed_na() which has no tzone attribute,
+  # so without this assignments retain the LHS's missing tzone and the
+  # values display in the local timezone instead of the source's.
+  if (vtype == "POSIXct") {
+    tz <- attr(map_values, "tzone")
+    if (!is.null(tz)) attr(result, "tzone") <- tz
+  }
+
   # Phase 1: Exact matching on string keys
   val_str <- as.character(x[non_miss])
   pos <- if (nocase) {

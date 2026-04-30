@@ -1,3 +1,13 @@
+# ksformat 0.6.3
+
+## Bug Fixes
+
+* Fixed `fput()` (and `fputk()`) losing the `tzone` attribute when returning
+  `POSIXct` values from a value-type format. The result vector was seeded from
+  a tzone-less NA, so values were silently displayed in the local timezone
+  instead of the source timezone (e.g. UTC), causing an apparent time-shift.
+  The `tzone` attribute of the mapped values is now propagated to the result.
+
 # ksformat 0.6.2
 
 ## New Features
