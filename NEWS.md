@@ -1,3 +1,14 @@
+# ksformat 0.6.4
+
+## New Features
+
+* Added `franges()`: extracts all range entries from a `ks_format` object as a
+  tidy `data.frame` with columns `low`, `high`, `inc_low`, `inc_high`, and
+  `label`. Accepts either a `ks_format` object or a registered format name.
+* Added `fmap_to_ranges()`: reverse-looks up range bounds by label — given a
+  vector of coded values that match range labels in a format, returns the
+  corresponding `low` / `high` bounds (and inclusivity flags) per element.
+
 # ksformat 0.6.3
 
 ## Bug Fixes

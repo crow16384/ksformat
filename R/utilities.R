@@ -400,6 +400,131 @@ in_range <- function(x, range_spec) {
   NULL
 }
 
+#' Extract Range Entries from a Format
+#'
+#' Returns the range-based mappings of a \code{ks_format} object as a tidy
+#' data frame. Discrete entries (plain values, \code{.missing}, \code{.other})
+#' are excluded.
+#'
+#' @param fmt A \code{ks_format} object, or a character name of a format
+#'   registered in the global library.
+#'
+#' @return A \code{data.frame} with columns \code{low}, \code{high},
+#'   \code{inc_low}, \code{inc_high}, and \code{label}. Rows are returned in
+#'   the order ranges appear in the format. If the format has no range
+#'   entries, an empty data frame with the same columns is returned.
+#'
+#' @details
+#' Range keys are stored internally as strings such as
+#' \code{"0,18,TRUE,FALSE"}. \code{franges()} parses these keys back into
+#' their numeric bounds and inclusivity flags, making it easy to inspect,
+#' filter, or programmatically reuse range definitions.
+#'
+#' Bounds parsed as \code{HIGH} or \code{LOW} appear as \code{Inf} and
+#' \code{-Inf} respectively.
+#'
+#' @export
+#'
+#' @examples
+#' fparse(text = '
+#' VALUE age (numeric)
+#'   [0, 18)    = "Child"
+#'   [18, 65)   = "Adult"
+#'   [65, HIGH] = "Senior"
+#'   .missing   = "Unknown"
+#' ;
+#' ')
+#' franges("age")
+#' fclear()
+franges <- function(fmt) {
+  if (is.character(fmt) && length(fmt) == 1L) {
+    fmt <- format_get(fmt)
+  }
+  if (!inherits(fmt, "ks_format")) {
+    cli_abort("{.arg fmt} must be a {.cls ks_format} object or the name of a registered format.")
+  }
+
+  empty <- data.frame(
+    low = numeric(0),
+    high = numeric(0),
+    inc_low = logical(0),
+    inc_high = logical(0),
+    label = character(0),
+    stringsAsFactors = FALSE
+  )
+
+  if (length(fmt$mappings) == 0L) return(empty)
+
+  keys <- names(fmt$mappings)
+  rows <- vector("list", length(keys))
+  n <- 0L
+  for (i in seq_along(keys)) {
+    parsed <- .parse_range_key(keys[i])
+    if (is.null(parsed)) next
+    n <- n + 1L
+    rows[[n]] <- data.frame(
+      low = parsed$low,
+      high = parsed$high,
+      inc_low = parsed$inc_low,
+      inc_high = parsed$inc_high,
+      label = as.character(fmt$mappings[[i]]),
+      stringsAsFactors = FALSE
+    )
+  }
+
+  if (n == 0L) return(empty)
+  do.call(rbind, rows[seq_len(n)])
+}
+
+#' Reverse-Lookup Range Bounds from Labels
+#'
+#' Given a vector of values that match the \emph{labels} of a range-based
+#' format, returns the corresponding \code{low} / \code{high} bounds (and
+#' inclusivity flags) for each input. Useful for reconstructing the
+#' underlying range from a coded value.
+#'
+#' @param x A vector of values to look up against the format's labels.
+#'   Coerced to character before matching.
+#' @param fmt A \code{ks_format} object, or a character name of a format
+#'   registered in the global library.
+#'
+#' @return A \code{data.frame} with one row per element of \code{x} and
+#'   columns \code{low}, \code{high}, \code{inc_low}, \code{inc_high}.
+#'   Rows where the input does not match any range label contain \code{NA}.
+#'
+#' @details
+#' For \code{multilabel} formats where the same label maps to several
+#' ranges, only the \emph{first} matching range is returned. For full
+#' multi-match behaviour, call \code{\link{franges}()} directly and join
+#' on \code{label}.
+#'
+#' @seealso \code{\link{franges}}
+#'
+#' @export
+#'
+#' @examples
+#' fparse(text = '
+#' VALUE visit_ther (numeric)
+#'   [LOW,  1] =  0
+#'   [ 8, 22] =  2
+#'   [22, 36] =  4
+#'   [37, 50] =  6
+#' ;
+#' ')
+#' fmap_to_ranges(c(0, 2, 4, 6), "visit_ther")
+#' fclear()
+fmap_to_ranges <- function(x, fmt) {
+  df <- franges(fmt)
+  idx <- match(as.character(x), df$label)
+  data.frame(
+    low = df$low[idx],
+    high = df$high[idx],
+    inc_low = df$inc_low[idx],
+    inc_high = df$inc_high[idx],
+    stringsAsFactors = FALSE
+  )
+}
+
 #' Parse Cache for Expression Labels
 #'
 #' Caches parsed R expressions (from \code{parse()}) keyed by the expression

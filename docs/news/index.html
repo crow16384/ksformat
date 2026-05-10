@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.4</span>
       </span>
     </div>
 
@@ -57,6 +57,14 @@
       <small>Source: <a href="https://github.com/crow16384/ksformat/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.6.4" id="ksformat-064">ksformat 0.6.4<a class="anchor" aria-label="anchor" href="#ksformat-064"></a></h2>
+<div class="section level3">
+<h3 id="new-features-0-6-4">New Features<a class="anchor" aria-label="anchor" href="#new-features-0-6-4"></a></h3>
+<ul><li>Added <code><a href="../reference/franges.html">franges()</a></code>: extracts all range entries from a <code>ks_format</code> object as a tidy <code>data.frame</code> with columns <code>low</code>, <code>high</code>, <code>inc_low</code>, <code>inc_high</code>, and <code>label</code>. Accepts either a <code>ks_format</code> object or a registered format name.</li>
+<li>Added <code><a href="../reference/fmap_to_ranges.html">fmap_to_ranges()</a></code>: reverse-looks up range bounds by label — given a vector of coded values that match range labels in a format, returns the corresponding <code>low</code> / <code>high</code> bounds (and inclusivity flags) per element.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.6.3" id="ksformat-063">ksformat 0.6.3<a class="anchor" aria-label="anchor" href="#ksformat-063"></a></h2>
 <div class="section level3">

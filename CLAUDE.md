@@ -91,6 +91,8 @@ Rscript -e "devtools::test()"
 | `fclear()` | Clear format library |
 | `is_missing(x)` | Check for NA/NULL/NaN |
 | `range_spec(low, high, label)` | Create range specification |
+| `franges(fmt)` | Extract range entries from a format as a data frame |
+| `fmap_to_ranges(x, fmt)` | Reverse-lookup range bounds by label |
 
 ## Data-Driven Formats with `fmap()`
 

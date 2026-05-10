@@ -25,6 +25,8 @@
 | `fclear(name)` | utilities.R | Remove format(s) from library |
 | `is_missing(x)` | utilities.R | Check for missing values |
 | `range_spec(low, high, label)` | utilities.R | Create range specification |
+| `franges(fmt)` | utilities.R | Extract range entries from ks_format as data.frame (cols: low, high, inc_low, inc_high, label) |
+| `fmap_to_ranges(x, fmt)` | utilities.R | Reverse-lookup range bounds by label; returns data.frame with low/high/inc_low/inc_high per element of x |
 | `detect_format_type(keys)` | format_create.R | Auto-detect format type |
 
 ## Internal Functions

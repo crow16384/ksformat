@@ -44,6 +44,7 @@
 <url><loc>/reference/finputn.html</loc></url>
 <url><loc>/reference/flist.html</loc></url>
 <url><loc>/reference/fmap.html</loc></url>
+<url><loc>/reference/fmap_to_ranges.html</loc></url>
 <url><loc>/reference/fnew.html</loc></url>
 <url><loc>/reference/fnew_bid.html</loc></url>
 <url><loc>/reference/fnew_date.html</loc></url>
@@ -58,6 +59,7 @@
 <url><loc>/reference/fputc.html</loc></url>
 <url><loc>/reference/fputk.html</loc></url>
 <url><loc>/reference/fputn.html</loc></url>
+<url><loc>/reference/franges.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
 <url><loc>/reference/is_missing.html</loc></url>
 <url><loc>/reference/ksformat-package.html</loc></url>

@@ -1132,3 +1132,78 @@ fputk("SUBJ-001", 2, format = "svdtn")
 
 fclear()
 ```
+
+## Example 23: Inspecting Range Rules with `franges()`
+
+`franges()` extracts all range-based mappings from a format and returns them
+as a tidy `data.frame` — useful for auditing, documentation, or downstream
+processing.
+
+```{r franges-basic}
+fparse(text = '
+VALUE age (numeric)
+  [0, 18)    = "Child"
+  [18, 65)   = "Adult"
+  [65, HIGH] = "Senior"
+  .missing   = "Unknown"
+;
+')
+
+franges("age")
+```
+
+You can use the result like any data frame — filter, display, or feed into
+further calculations:
+
+```{r franges-filter}
+df <- franges("age")
+
+# Which ranges have a finite upper bound?
+df[is.finite(df$high), ]
+```
+
+`franges()` silently excludes discrete entries (`.missing`, `.other`, plain
+string keys) — only range rows appear. It returns an empty `data.frame` with
+the same columns when the format contains no ranges.
+
+```{r franges-discrete}
+fnew("M" = "Male", "F" = "Female", .missing = "Unknown", name = "sex")
+franges("sex")   # 0 rows
+```
+
+```{r franges-cleanup, include=FALSE}
+fclear()
+```
+
+## Example 24: Reverse Range Lookup with `fmap_to_ranges()`
+
+When a range format stores **numeric codes** as its labels (e.g. visit
+windows coded as weeks), `fmap_to_ranges()` turns a vector of those codes
+back into the original `[low, high]` bounds — one row per input value.
+
+```{r fmap-to-ranges}
+fparse(text = '
+VALUE visit_ther (numeric)
+  [LOW,  1] =  0
+  [ 8, 22] =  2
+  [22, 36] =  4
+  [37, 50] =  6
+  [51, 63] =  8
+  [64, 78] = 10
+  [79, 91] = 12
+;
+')
+
+coded_weeks <- c(0, 2, 4, 6, 8, 10, 12)
+fmap_to_ranges(coded_weeks, "visit_ther")
+```
+
+Unmatched values produce `NA` rows, making it safe to pass arbitrary vectors:
+
+```{r fmap-to-ranges-na}
+fmap_to_ranges(c(2, 99, 4), "visit_ther")
+```
+
+```{r fmap-to-ranges-cleanup, include=FALSE}
+fclear()
+```

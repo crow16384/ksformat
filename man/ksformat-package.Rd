@@ -122,6 +122,7 @@ Source repository and issue tracker: \url{https://github.com/crow16384/ksformat}
 
 Authors:
 \itemize{
+  \item Vladimir Larchenko \email{vladimir.larchenko@keystatsolutions.com}
   \item Igor Aleschenkov \email{igor.aleschenkov@keystatsolutions.com}
 }
 

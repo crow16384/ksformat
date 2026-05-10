@@ -944,6 +944,111 @@ test_that("in_range respects bound inclusivity", {
 })
 
 # ===================================================================
+# franges()
+# ===================================================================
+
+context("franges")
+
+test_that("franges extracts range entries from a numeric format", {
+  fmt <- fparse(text = '
+VALUE age (numeric)
+  [0, 18)    = "Child"
+  [18, 65)   = "Adult"
+  [65, HIGH] = "Senior"
+  .missing   = "Unknown"
+;
+')$age
+
+  df <- franges(fmt)
+
+  expect_s3_class(df, "data.frame")
+  expect_equal(nrow(df), 3L)
+  expect_equal(names(df), c("low", "high", "inc_low", "inc_high", "label"))
+  expect_equal(df$low, c(0, 18, 65))
+  expect_equal(df$high, c(18, 65, Inf))
+  expect_equal(df$inc_low, c(TRUE, TRUE, TRUE))
+  expect_equal(df$inc_high, c(FALSE, FALSE, TRUE))
+  expect_equal(df$label, c("Child", "Adult", "Senior"))
+
+  fclear()
+})
+
+test_that("franges accepts a registered format name", {
+  fparse(text = '
+VALUE bmi (numeric)
+  [0, 25)    = "Normal"
+  [25, HIGH] = "Overweight"
+;
+')
+
+  df <- franges("bmi")
+  expect_equal(nrow(df), 2L)
+  expect_equal(df$label, c("Normal", "Overweight"))
+
+  fclear()
+})
+
+test_that("franges returns empty data frame for discrete-only format", {
+  fmt <- fnew("M" = "Male", "F" = "Female", name = "sex")
+  df <- franges(fmt)
+
+  expect_s3_class(df, "data.frame")
+  expect_equal(nrow(df), 0L)
+  expect_equal(names(df), c("low", "high", "inc_low", "inc_high", "label"))
+
+  fclear()
+})
+
+test_that("franges errors on ks_invalue object", {
+  inv <- fparse(text = '
+INVALUE yn
+  "Yes" = 1
+  "No"  = 0
+;
+')$yn
+
+  expect_error(franges(inv), "ks_format")
+
+  fclear()
+})
+
+test_that("fmap_to_ranges returns bounds for matching labels", {
+  fparse(text = '
+VALUE visit_ther (numeric)
+  [LOW,  1] =  0
+  [ 8, 22] =  2
+  [22, 36] =  4
+  [37, 50] =  6
+;
+')
+
+  res <- fmap_to_ranges(c(0, 2, 4, 6), "visit_ther")
+
+  expect_s3_class(res, "data.frame")
+  expect_equal(nrow(res), 4L)
+  expect_equal(res$low, c(-Inf, 8, 22, 37))
+  expect_equal(res$high, c(1, 22, 36, 50))
+  expect_true(all(res$inc_low) && all(res$inc_high))
+
+  fclear()
+})
+
+test_that("fmap_to_ranges returns NA for unmatched labels", {
+  fparse(text = '
+VALUE v (numeric)
+  [0, 10) = 1
+  [10, 20) = 2
+;
+')
+
+  res <- fmap_to_ranges(c(1, 99), "v")
+  expect_equal(res$low, c(0, NA))
+  expect_equal(res$high, c(10, NA))
+
+  fclear()
+})
+
+# ===================================================================
 # INVALUE numeric default
 # ===================================================================
 

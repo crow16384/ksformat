@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.4</span>
       </span>
     </div>
 
@@ -426,15 +426,15 @@ once:</p>
 <span>    <span class="fu"><a href="../reference/fputn.html">fputn</a></span><span class="op">(</span><span class="va">today</span>, <span class="st">"QTR."</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt;      format         result</span></span>
-<span><span class="co">#&gt; 1    DATE9.      30APR2026</span></span>
-<span><span class="co">#&gt; 2 MMDDYY10.     04/30/2026</span></span>
-<span><span class="co">#&gt; 3 DDMMYY10.     30/04/2026</span></span>
-<span><span class="co">#&gt; 4 YYMMDD10.     2026-04-30</span></span>
-<span><span class="co">#&gt; 5   MONYY7.        APR2026</span></span>
-<span><span class="co">#&gt; 6 WORDDATE. April 30, 2026</span></span>
-<span><span class="co">#&gt; 7    YEAR4.           2026</span></span>
-<span><span class="co">#&gt; 8      QTR.              2</span></span>
+<span><span class="co">#&gt;      format       result</span></span>
+<span><span class="co">#&gt; 1    DATE9.    10MAY2026</span></span>
+<span><span class="co">#&gt; 2 MMDDYY10.   05/10/2026</span></span>
+<span><span class="co">#&gt; 3 DDMMYY10.   10/05/2026</span></span>
+<span><span class="co">#&gt; 4 YYMMDD10.   2026-05-10</span></span>
+<span><span class="co">#&gt; 5   MONYY7.      MAY2026</span></span>
+<span><span class="co">#&gt; 6 WORDDATE. May 10, 2026</span></span>
+<span><span class="co">#&gt; 7    YEAR4.         2026</span></span>
+<span><span class="co">#&gt; 8      QTR.            2</span></span>
 <span></span>
 <span><span class="co"># Multiple dates</span></span>
 <span><span class="va">dates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2020-01-15"</span>, <span class="st">"2020-06-30"</span>, <span class="st">"2020-12-25"</span><span class="op">)</span><span class="op">)</span></span>
@@ -488,10 +488,10 @@ once:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;        format             result</span></span>
-<span><span class="co">#&gt; 1 DATETIME20. 30APR2026:21:31:50</span></span>
-<span><span class="co">#&gt; 2 DATETIME13.      30APR26:21:31</span></span>
-<span><span class="co">#&gt; 3     DTDATE.          30APR2026</span></span>
-<span><span class="co">#&gt; 4   DTYYMMDD.         2026-04-30</span></span>
+<span><span class="co">#&gt; 1 DATETIME20. 10MAY2026:21:04:59</span></span>
+<span><span class="co">#&gt; 2 DATETIME13.      10MAY26:21:04</span></span>
+<span><span class="co">#&gt; 3     DTDATE.          10MAY2026</span></span>
+<span><span class="co">#&gt; 4   DTYYMMDD.         2026-05-10</span></span>
 <span></span>
 <span><span class="co"># From numeric R-epoch seconds</span></span>
 <span><span class="va">r_secs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2025-06-15 14:30:00"</span>, tz <span class="op">=</span> <span class="st">"UTC"</span><span class="op">)</span><span class="op">)</span></span>
@@ -1045,7 +1045,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpAetXXn/temp_libpath37b0463a1fbd/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpSxotIK/temp_libpath176e776d72f76/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">imported</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "AGEGRP"   "BMICAT"   "GENDER"   "RACEIN"   "SMISSING"</span></span>
 <span></span>
@@ -1173,7 +1173,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpAetXXn/temp_libpath37b0463a1fbd/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpSxotIK/temp_libpath176e776d72f76/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span></span>
 <span><span class="co"># Library should be empty</span></span>
 <span><span class="fu"><a href="../reference/flist.html">flist</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -1645,6 +1645,88 @@ version-controlled format definitions:</p>
 <span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
 </div>
+</div>
+<div class="section level2">
+<h2 id="example-23-inspecting-range-rules-with-franges">Example 23: Inspecting Range Rules with <code>franges()</code><a class="anchor" aria-label="anchor" href="#example-23-inspecting-range-rules-with-franges"></a>
+</h2>
+<p><code><a href="../reference/franges.html">franges()</a></code> extracts all range-based mappings from a
+format and returns them as a tidy <code>data.frame</code> — useful for
+auditing, documentation, or downstream processing.</p>
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
+<span><span class="st">VALUE age (numeric)</span></span>
+<span><span class="st">  [0, 18)    = "Child"</span></span>
+<span><span class="st">  [18, 65)   = "Adult"</span></span>
+<span><span class="st">  [65, HIGH] = "Senior"</span></span>
+<span><span class="st">  .missing   = "Unknown"</span></span>
+<span><span class="st">;</span></span>
+<span><span class="st">'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/franges.html">franges</a></span><span class="op">(</span><span class="st">"age"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   low high inc_low inc_high  label</span></span>
+<span><span class="co">#&gt; 1   0   18    TRUE    FALSE  Child</span></span>
+<span><span class="co">#&gt; 2  18   65    TRUE    FALSE  Adult</span></span>
+<span><span class="co">#&gt; 3  65  Inf    TRUE     TRUE Senior</span></span></code></pre></div>
+<p>You can use the result like any data frame — filter, display, or feed
+into further calculations:</p>
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/franges.html">franges</a></span><span class="op">(</span><span class="st">"age"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Which ranges have a finite upper bound?</span></span>
+<span><span class="va">df</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/is.finite.html" class="external-link">is.finite</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">high</span><span class="op">)</span>, <span class="op">]</span></span>
+<span><span class="co">#&gt;   low high inc_low inc_high label</span></span>
+<span><span class="co">#&gt; 1   0   18    TRUE    FALSE Child</span></span>
+<span><span class="co">#&gt; 2  18   65    TRUE    FALSE Adult</span></span></code></pre></div>
+<p><code><a href="../reference/franges.html">franges()</a></code> silently excludes discrete entries
+(<code>.missing</code>, <code>.other</code>, plain string keys) — only
+range rows appear. It returns an empty <code>data.frame</code> with the
+same columns when the format contains no ranges.</p>
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="st">"M"</span> <span class="op">=</span> <span class="st">"Male"</span>, <span class="st">"F"</span> <span class="op">=</span> <span class="st">"Female"</span>, .missing <span class="op">=</span> <span class="st">"Unknown"</span>, name <span class="op">=</span> <span class="st">"sex"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/franges.html">franges</a></span><span class="op">(</span><span class="st">"sex"</span><span class="op">)</span>   <span class="co"># 0 rows</span></span>
+<span><span class="co">#&gt; [1] low      high     inc_low  inc_high label   </span></span>
+<span><span class="co">#&gt; &lt;0 rows&gt; (or 0-length row.names)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="example-24-reverse-range-lookup-with-fmap_to_ranges">Example 24: Reverse Range Lookup with
+<code>fmap_to_ranges()</code><a class="anchor" aria-label="anchor" href="#example-24-reverse-range-lookup-with-fmap_to_ranges"></a>
+</h2>
+<p>When a range format stores <strong>numeric codes</strong> as its
+labels (e.g. visit windows coded as weeks),
+<code><a href="../reference/fmap_to_ranges.html">fmap_to_ranges()</a></code> turns a vector of those codes back into
+the original <code>[low, high]</code> bounds — one row per input
+value.</p>
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
+<span><span class="st">VALUE visit_ther (numeric)</span></span>
+<span><span class="st">  [LOW,  1] =  0</span></span>
+<span><span class="st">  [ 8, 22] =  2</span></span>
+<span><span class="st">  [22, 36] =  4</span></span>
+<span><span class="st">  [37, 50] =  6</span></span>
+<span><span class="st">  [51, 63] =  8</span></span>
+<span><span class="st">  [64, 78] = 10</span></span>
+<span><span class="st">  [79, 91] = 12</span></span>
+<span><span class="st">;</span></span>
+<span><span class="st">'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">coded_weeks</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">6</span>, <span class="fl">8</span>, <span class="fl">10</span>, <span class="fl">12</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fmap_to_ranges.html">fmap_to_ranges</a></span><span class="op">(</span><span class="va">coded_weeks</span>, <span class="st">"visit_ther"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    low high inc_low inc_high</span></span>
+<span><span class="co">#&gt; 1 -Inf    1    TRUE     TRUE</span></span>
+<span><span class="co">#&gt; 2    8   22    TRUE     TRUE</span></span>
+<span><span class="co">#&gt; 3   22   36    TRUE     TRUE</span></span>
+<span><span class="co">#&gt; 4   37   50    TRUE     TRUE</span></span>
+<span><span class="co">#&gt; 5   51   63    TRUE     TRUE</span></span>
+<span><span class="co">#&gt; 6   64   78    TRUE     TRUE</span></span>
+<span><span class="co">#&gt; 7   79   91    TRUE     TRUE</span></span></code></pre></div>
+<p>Unmatched values produce <code>NA</code> rows, making it safe to pass
+arbitrary vectors:</p>
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fmap_to_ranges.html">fmap_to_ranges</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">99</span>, <span class="fl">4</span><span class="op">)</span>, <span class="st">"visit_ther"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   low high inc_low inc_high</span></span>
+<span><span class="co">#&gt; 1   8   22    TRUE     TRUE</span></span>
+<span><span class="co">#&gt; 2  NA   NA      NA       NA</span></span>
+<span><span class="co">#&gt; 3  22   36    TRUE     TRUE</span></span></code></pre></div>
 </div>
   </div>
 

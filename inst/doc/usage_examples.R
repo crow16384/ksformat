@@ -665,3 +665,238 @@ fput(c("M", "F", NA), paste0("sex_", lang))
 
 fclear()
 
+## ----fputk-setup--------------------------------------------------------------
+# Simulate a Subject Visits (SV) domain
+SV <- data.frame(
+  USUBJID  = c("SUBJ-001", "SUBJ-001", "SUBJ-001", "SUBJ-002", "SUBJ-002"),
+  VISITNUM = c(1, 2, 3, 1, 2),
+  SVSTDTC  = c("2025-01-15", "2025-02-20", "2025-03-10",
+               "2025-01-18", "2025-02-25"),
+  stringsAsFactors = FALSE
+)
+
+# Simulate a Questionnaires (QS) domain
+QS <- data.frame(
+  USUBJID  = c("SUBJ-001", "SUBJ-001", "SUBJ-002", "SUBJ-002", "SUBJ-002"),
+  VISITNUM = c(1, 2, 1, 2, 3),
+  QSTESTCD = c("SCORE1", "SCORE1", "SCORE1", "SCORE1", "SCORE1"),
+  QSSTRESN = c(85, 90, 72, 78, NA),
+  stringsAsFactors = FALSE
+)
+
+SV
+QS
+
+## ----fputk-register-----------------------------------------------------------
+# Create composite key -> date string mapping from SV
+fnew(
+  fmap(paste(SV$USUBJID, SV$VISITNUM, sep = "|"), SV$SVSTDTC),
+  .other  = "NOT FOUND",
+  name    = "svdtc",
+  type    = "character",
+  ignore_case = TRUE
+)
+
+fprint("svdtc")
+
+## ----fputk-apply--------------------------------------------------------------
+QS$SVSTDTC <- fputk(QS$USUBJID, QS$VISITNUM, format = "svdtc")
+QS
+class(QS$SVSTDTC)  # character
+
+fclear()
+
+## ----fputk-date---------------------------------------------------------------
+# Create composite key -> Date mapping from SV
+fnew(
+  fmap(
+    paste(SV$USUBJID, SV$VISITNUM, sep = "|"),
+    as.Date(SV$SVSTDTC, format = "%Y-%m-%d")
+  ),
+  .other  = NA,
+  name    = "svdtn",
+  type    = "Date",
+  ignore_case = TRUE
+)
+
+fprint("svdtn")
+
+## ----fputk-date-apply---------------------------------------------------------
+QS$SVSTDTC_DT <- fputk(QS$USUBJID, QS$VISITNUM, format = "svdtn")
+QS
+class(QS$SVSTDTC_DT)  # Date
+
+# Typed NA for unmatched keys (SUBJ-002 Visit 3 not in SV)
+is.na(QS$SVSTDTC_DT[5])
+
+# Date arithmetic works directly
+QS$SVSTDTC_DT + 7  # add 7 days
+
+fclear()
+
+## ----fmap-setup---------------------------------------------------------------
+library(ksformat)
+
+dm <- data.frame(
+  USUBJID = c("SUBJ-001", "SUBJ-002", "SUBJ-003"),
+  SUBJID  = c("001", "002", "003"),
+  RFICDTC = c("2023-03-09T08:45", "2024-08-13T09:53", "2025-06-17T09:03"),
+  stringsAsFactors = FALSE
+)
+
+# Composite key for both formats
+keys <- paste(dm$USUBJID, dm$SUBJID, sep = "|")
+
+## ----fmap-date----------------------------------------------------------------
+# Date lookup
+fnew(
+  fmap(keys, as.Date(dm$RFICDTC, format = "%Y-%m-%d")),
+  .other      = NA,
+  type        = "Date",
+  ignore_case = TRUE,
+  name        = "icdtn"
+)
+
+# Character lookup — same fmap(keys, values) pattern!
+fnew(
+  fmap(keys, dm$RFICDTC),
+  .other      = "NOT FOUND",
+  type        = "character",
+  ignore_case = TRUE,
+  name        = "icdtc"
+)
+
+fprint("icdtn")
+fprint("icdtc")
+
+## ----fmap-apply---------------------------------------------------------------
+# Both return the expected results
+fputk("SUBJ-001", "001", format = "icdtn")
+class(fputk("SUBJ-001", "001", format = "icdtn"))
+
+fputk("SUBJ-001", "001", format = "icdtc")
+class(fputk("SUBJ-001", "001", format = "icdtc"))
+
+fclear()
+
+## ----fmap-default-------------------------------------------------------------
+# These are equivalent — both map "M" -> "Male"
+fmt_a <- fnew(c(Male = "M", Female = "F"))
+fmt_b <- fnew("M" = "Male", "F" = "Female")
+
+identical(fput(c("M", "F"), fmt_a), fput(c("M", "F"), fmt_b))
+
+fclear()
+
+## ----fparse-date-char---------------------------------------------------------
+fparse(text = '
+VALUE svdtc (character, nocase)
+  "SUBJ-001|1" = "2025-01-15"
+  "SUBJ-001|2" = "2025-02-20"
+  "SUBJ-001|3" = "2025-03-10"
+  "SUBJ-002|1" = "2025-01-18"
+  "SUBJ-002|2" = "2025-02-25"
+  .other       = "NOT FOUND"
+;
+')
+
+fprint("svdtc")
+
+## ----fparse-date-char-apply---------------------------------------------------
+QS <- data.frame(
+  USUBJID  = c("SUBJ-001", "SUBJ-001", "SUBJ-002", "SUBJ-002", "SUBJ-002"),
+  VISITNUM = c(1, 2, 1, 2, 3),
+  QSSTRESN = c(85, 90, 72, 78, NA),
+  stringsAsFactors = FALSE
+)
+
+QS$SVSTDTC <- fputk(QS$USUBJID, QS$VISITNUM, format = "svdtc")
+QS
+
+fclear()
+
+## ----fparse-date-native-------------------------------------------------------
+fparse(text = '
+VALUE svdtn (Date, format: %Y-%m-%d, nocase)
+  "SUBJ-001|1" = "2025-01-15"
+  "SUBJ-001|2" = "2025-02-20"
+  "SUBJ-001|3" = "2025-03-10"
+  "SUBJ-002|1" = "2025-01-18"
+  "SUBJ-002|2" = "2025-02-25"
+;
+')
+
+fprint("svdtn")
+
+## ----fparse-date-native-apply-------------------------------------------------
+QS$SVSTDTC_DT <- fputk(QS$USUBJID, QS$VISITNUM, format = "svdtn")
+QS
+
+class(QS$SVSTDTC_DT)         # Date
+is.na(QS$SVSTDTC_DT[5])      # TRUE — no match for SUBJ-002 Visit 3
+
+# Date arithmetic works directly
+QS$SVSTDTC_DT + 7
+
+## ----fparse-date-roundtrip----------------------------------------------------
+fmt_obj <- format_get("svdtn")
+txt <- fexport(svdtn = fmt_obj)
+cat(txt)
+
+## ----fparse-date-reimport-----------------------------------------------------
+# Re-parse the exported text
+fclear()
+fparse(text = txt)
+
+# Verify it still works
+fputk("SUBJ-001", 2, format = "svdtn")
+
+fclear()
+
+## ----franges-basic------------------------------------------------------------
+fparse(text = '
+VALUE age (numeric)
+  [0, 18)    = "Child"
+  [18, 65)   = "Adult"
+  [65, HIGH] = "Senior"
+  .missing   = "Unknown"
+;
+')
+
+franges("age")
+
+## ----franges-filter-----------------------------------------------------------
+df <- franges("age")
+
+# Which ranges have a finite upper bound?
+df[is.finite(df$high), ]
+
+## ----franges-discrete---------------------------------------------------------
+fnew("M" = "Male", "F" = "Female", .missing = "Unknown", name = "sex")
+franges("sex")   # 0 rows
+
+## ----franges-cleanup, include=FALSE-------------------------------------------
+fclear()
+
+## ----fmap-to-ranges-----------------------------------------------------------
+fparse(text = '
+VALUE visit_ther (numeric)
+  [LOW,  1] =  0
+  [ 8, 22] =  2
+  [22, 36] =  4
+  [37, 50] =  6
+  [51, 63] =  8
+  [64, 78] = 10
+  [79, 91] = 12
+;
+')
+
+coded_weeks <- c(0, 2, 4, 6, 8, 10, 12)
+fmap_to_ranges(coded_weeks, "visit_ther")
+
+## ----fmap-to-ranges-na--------------------------------------------------------
+fmap_to_ranges(c(2, 99, 4), "visit_ther")
+
+## ----fmap-to-ranges-cleanup, include=FALSE------------------------------------
+fclear()
+
