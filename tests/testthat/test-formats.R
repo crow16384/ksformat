@@ -3231,3 +3231,22 @@ test_that("fput numeric ranges work without cached range_table (fallback)", {
   expect_equal(out[1:2], c("Low", "High"))
   fclear()
 })
+
+test_that("range_table sorts entries so fast path triggers on out-of-order ranges", {
+  # Define ranges in reverse order: still disjoint, should be canonicalised
+  fparse(text = '
+  VALUE rev_rt (numeric)
+    [65, HIGH] = "Senior"
+    [18, 65)   = "Adult"
+    [0, 18)    = "Child"
+  ;
+  ')
+  fmt <- format_get("rev_rt")
+  rt <- fmt$range_table
+  expect_true(rt$sorted_disjoint)
+  expect_equal(rt$low, c(0, 18, 65))
+  expect_equal(rt$label, c("Child", "Adult", "Senior"))
+  out <- fput(c(5, 30, 70), "rev_rt")
+  expect_equal(out, c("Child", "Adult", "Senior"))
+  fclear()
+})

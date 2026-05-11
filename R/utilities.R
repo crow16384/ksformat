@@ -292,9 +292,11 @@ fmap <- function(keys, values) {
 #' is_missing(c(1, NA, NaN)) # FALSE TRUE TRUE
 is_missing <- function(x) {
   if (is.null(x)) return(logical(0))
-  out <- is.na(x)
-  if (is.numeric(x)) return(out | is.nan(x))
-  out | !nzchar(x)
+  # is.na() already returns TRUE for NaN on numeric inputs, so no need for
+  # a separate is.nan() pass. For non-numeric types, also treat empty
+  # strings as missing.
+  if (is.numeric(x)) return(is.na(x))
+  is.na(x) | !nzchar(x)
 }
 
 #' Create Range Specification
@@ -446,13 +448,13 @@ in_range <- function(x, range_spec) {
 .build_range_table <- function(mappings, type) {
   n <- length(mappings)
   map_labels <- if (n == 0L) character(0) else unlist(mappings, use.names = FALSE)
+  # Vectorized eval-flag detection: .is_expr_label is already vectorized
+  # via grepl; only .has_eval_attr needs a per-element check.
   mapping_is_eval <- if (n == 0L) {
     logical(0)
   } else {
-    vapply(seq_len(n), function(i) {
-      lbl <- mappings[[i]]
-      .is_expr_label(lbl) || .has_eval_attr(lbl)
-    }, logical(1L))
+    .is_expr_label(map_labels) |
+      vapply(mappings, .has_eval_attr, logical(1L))
   }
 
   base <- list(
@@ -470,58 +472,59 @@ in_range <- function(x, range_spec) {
   if (n == 0L || !identical(type, "numeric")) return(base)
 
   map_keys <- names(mappings)
-  lows <- numeric(0); highs <- numeric(0)
-  incl <- logical(0); inch <- logical(0)
-  ridx <- integer(0)
-
+  # Two-pass build: identify range indices first, then preallocate
+  parsed_list <- vector("list", n)
+  is_range <- logical(n)
   for (i in seq_len(n)) {
-    parsed <- .parse_range_key(map_keys[i])
-    if (!is.null(parsed)) {
-      lows  <- c(lows,  parsed$low)
-      highs <- c(highs, parsed$high)
-      incl  <- c(incl,  parsed$inc_low)
-      inch  <- c(inch,  parsed$inc_high)
-      ridx  <- c(ridx,  i)
+    p <- .parse_range_key(map_keys[i])
+    if (!is.null(p)) {
+      parsed_list[[i]] <- p
+      is_range[i] <- TRUE
     }
   }
+  ridx <- which(is_range)
+  nr <- length(ridx)
+  if (nr == 0L) return(base)
 
-  if (length(ridx) == 0L) return(base)
+  lows  <- vapply(parsed_list[ridx], `[[`, numeric(1L), "low")
+  highs <- vapply(parsed_list[ridx], `[[`, numeric(1L), "high")
+  incl  <- vapply(parsed_list[ridx], `[[`, logical(1L), "inc_low")
+  inch  <- vapply(parsed_list[ridx], `[[`, logical(1L), "inc_high")
 
-  is_eval_r <- mapping_is_eval[ridx]
-  labels_r  <- map_labels[ridx]
-  # Preserve eval attributes from original mappings
-  for (k in seq_along(ridx)) {
-    if (.has_eval_attr(mappings[[ridx[k]]])) {
-      attr(labels_r[k], "eval") <- TRUE
-    }
-  }
-
+  # Canonicalise: sort range entries by (low, high) so fast path triggers
+  # regardless of the definition order used in fnew()/fparse(). Original
+  # mapping order is preserved on the ks_format object itself; only the
+  # range_table is reordered here.
   sort_perm <- order(lows, highs)
-  is_sorted <- !is.unsorted(lows)
+  lows <- lows[sort_perm]
+  highs <- highs[sort_perm]
+  incl <- incl[sort_perm]
+  inch <- inch[sort_perm]
+  ridx_sorted <- ridx[sort_perm]
+
+  labels_r  <- map_labels[ridx_sorted]
+  is_eval_r <- mapping_is_eval[ridx_sorted]
+
+  # Check disjoint: adjacent ranges may touch only when not both inclusive.
   disjoint <- TRUE
-  if (length(lows) > 1L) {
-    # Order by low for overlap check
-    sl <- lows[sort_perm]; sh <- highs[sort_perm]
-    sil <- incl[sort_perm]; sih <- inch[sort_perm]
-    for (j in seq_len(length(sl) - 1L)) {
-      # Adjacent allowed if previous high == next low and not both inclusive
-      if (sh[j] > sl[j + 1L]) { disjoint <- FALSE; break }
-      if (sh[j] == sl[j + 1L] && sih[j] && sil[j + 1L]) {
+  if (nr > 1L) {
+    for (j in seq_len(nr - 1L)) {
+      if (highs[j] > lows[j + 1L]) { disjoint <- FALSE; break }
+      if (highs[j] == lows[j + 1L] && inch[j] && incl[j + 1L]) {
         disjoint <- FALSE; break
       }
     }
   }
-  sorted_disjoint <- is_sorted && disjoint
 
   list(
     low = lows, high = highs,
     inc_low = incl, inc_high = inch,
     label = labels_r, is_eval = is_eval_r,
-    range_idx = ridx,
+    range_idx = ridx_sorted,
     discrete_idx = setdiff(seq_len(n), ridx),
     mapping_is_eval = mapping_is_eval,
     mapping_labels = map_labels,
-    sorted_disjoint = sorted_disjoint,
+    sorted_disjoint = disjoint,
     sort_perm = sort_perm
   )
 }
