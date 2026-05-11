@@ -1,3 +1,29 @@
+# ksformat 0.6.5
+
+## Performance
+
+* Precomputed range table: `ks_format` objects now carry a pre-built
+  `range_table` field. Range keys are parsed once at format-creation time
+  (in `fnew()`, `fparse()`, `fimport()`) rather than on every `fput()` call.
+* `findInterval()` fast path in `fput()`: sorted, non-overlapping numeric
+  ranges with standard `[low, high)` semantics now use R's built-in
+  `findInterval()` (O(n log k) in C), giving a ~10–14× speedup over the
+  previous per-range R loop on large inputs (benchmarked at 1M rows).
+* `skip_discrete` optimisation in `fput()`: pure numeric-range formats
+  (no discrete keys) with numeric input now skip the `as.character()` +
+  `match()` step entirely.
+* `is_missing()`: removed a redundant `is.nan()` pass on numeric vectors —
+  `is.na()` already returns `TRUE` for `NaN`.
+
+## Bug Fixes
+
+* `.build_range_table()`: ranges defined out-of-order are now sorted by
+  `(low, high)` before storage, so the `findInterval` fast path triggers
+  regardless of definition order.
+* `.build_range_table()`: removed a dead `attr<-` loop that silently had
+  no effect (subsetting a character vector creates a copy, stripping any
+  attribute set on the subset).
+
 # ksformat 0.6.4
 
 ## New Features

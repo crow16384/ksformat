@@ -47,5 +47,9 @@ Single test file, ~130+ test cases, ~2162 lines.
 ### Value Type Formats context (added 0.6.3)
 - "fput preserves POSIXct tzone from source values (UTC)": builds UTC POSIXct format via `fmap()` + `fputk()`, asserts `attr(result, "tzone") == "UTC"` and formatted display in UTC matches source strings.
 
+### Performance Tests (added 0.6.5)
+- 8 tests covering `range_table` attachment, fast-path output, gap handling, multilabel (skips fast path), exclusive lower bound, point range `[5,5]`, fallback path with stripped `range_table`, and out-of-order range definitions being auto-sorted.
+- Test count: **628** (as of 0.6.5).
+
 ### Known Issues
 - None currently tracked. Previous issues (range matching not implemented, stub functions, POSIXct tzone loss) have been resolved.

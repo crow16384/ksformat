@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.5</span>
       </span>
     </div>
 
@@ -57,6 +57,26 @@
       <small>Source: <a href="https://github.com/crow16384/ksformat/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.6.5" id="ksformat-065">ksformat 0.6.5<a class="anchor" aria-label="anchor" href="#ksformat-065"></a></h2>
+<div class="section level3">
+<h3 id="performance-0-6-5">Performance<a class="anchor" aria-label="anchor" href="#performance-0-6-5"></a></h3>
+<ul><li>Precomputed range table: <code>ks_format</code> objects now carry a pre-built <code>range_table</code> field. Range keys are parsed once at format-creation time (in <code><a href="../reference/fnew.html">fnew()</a></code>, <code><a href="../reference/fparse.html">fparse()</a></code>, <code><a href="../reference/fimport.html">fimport()</a></code>) rather than on every <code><a href="../reference/fput.html">fput()</a></code> call.</li>
+<li>
+<code><a href="https://rdrr.io/r/base/findInterval.html" class="external-link">findInterval()</a></code> fast path in <code><a href="../reference/fput.html">fput()</a></code>: sorted, non-overlapping numeric ranges with standard <code>[low, high)</code> semantics now use R’s built-in <code><a href="https://rdrr.io/r/base/findInterval.html" class="external-link">findInterval()</a></code> (O(n log k) in C), giving a ~10–14× speedup over the previous per-range R loop on large inputs (benchmarked at 1M rows).</li>
+<li>
+<code>skip_discrete</code> optimisation in <code><a href="../reference/fput.html">fput()</a></code>: pure numeric-range formats (no discrete keys) with numeric input now skip the <code><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character()</a></code> + <code><a href="https://rdrr.io/r/base/match.html" class="external-link">match()</a></code> step entirely.</li>
+<li>
+<code><a href="../reference/is_missing.html">is_missing()</a></code>: removed a redundant <code><a href="https://rdrr.io/r/base/is.finite.html" class="external-link">is.nan()</a></code> pass on numeric vectors — <code><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na()</a></code> already returns <code>TRUE</code> for <code>NaN</code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-6-5">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-6-5"></a></h3>
+<ul><li>
+<code>.build_range_table()</code>: ranges defined out-of-order are now sorted by <code>(low, high)</code> before storage, so the <code>findInterval</code> fast path triggers regardless of definition order.</li>
+<li>
+<code>.build_range_table()</code>: removed a dead <code>attr&lt;-</code> loop that silently had no effect (subsetting a character vector creates a copy, stripping any attribute set on the subset).</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.6.4" id="ksformat-064">ksformat 0.6.4<a class="anchor" aria-label="anchor" href="#ksformat-064"></a></h2>
 <div class="section level3">

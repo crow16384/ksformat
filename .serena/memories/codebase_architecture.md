@@ -1,7 +1,7 @@
 # ksformat Codebase Architecture (updated 2026-04-15)
 
 ## Package Overview
-R package providing SAS PROC FORMAT-like functionality. Version 0.6.3.
+R package providing SAS PROC FORMAT-like functionality. Version 0.6.5.
 Depends on: cli. Suggests: testthat (>= 3.0.0).
 
 ## File Structure
@@ -89,8 +89,19 @@ Depends on: cli. Suggests: testthat (>= 3.0.0).
 6. **Multilabel**: `fput_all` allows overlapping range matches, returns list of character vectors.
 7. **CNTLOUT import**: `fimport` reads SAS format catalogue CSV exports.
 
-## Performance Notes
+## Performance Notes (updated 0.6.5)
 - `fput` Phase 1: vectorized `match()` for discrete keys (O(n) amortized).
-- `fput` Phase 2: iterative range matching — each range entry scanned against unmatched values.
-- `fput_all` iterates all keys/ranges against all values (no early exit).
+  - `skip_discrete` optimisation: skipped entirely for pure numeric-range formats with numeric input.
+- `fput` Phase 2: range matching via **cached `range_table`** on the `ks_format` object (built once at creation).
+  - **`findInterval()` fast path**: sorted, non-overlapping ranges with half-open `[low, high)` semantics use `findInterval()` (O(n log k) C code) — ~10–14× faster on 1M rows.
+  - General path: iterates pre-parsed `rt$low`/`rt$high`/etc. vectors directly (no per-call key parsing).
+- `fput_all` iterates all keys/ranges against all values (no early exit); uses cached `range_table`.
 - `.fput_vectorized` groups by format name for efficiency.
+- Range table entries are sorted by `(low, high)` at build time so the fast path triggers regardless of definition order.
+- `is_missing()` numeric path is a single `is.na()` pass (NaN ⊆ NA for numerics).
+
+## `ks_format` Object Fields (as of 0.6.5)
+- `mappings`: named list of label→value(s)
+- `type`: "character", "numeric", "Date", "POSIXct", "logical", "date", "time", "datetime"
+- `missing_label`, `other_label`, `ignore_case`, `name`, `dt_pattern`, `date_format`
+- `range_table`: pre-built list with fields `low`, `high`, `inc_low`, `inc_high`, `label`, `is_eval`, `range_idx`, `discrete_idx`, `mapping_is_eval`, `mapping_labels`, `sorted_disjoint`, `sort_perm`
