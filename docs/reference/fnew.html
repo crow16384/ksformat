@@ -20,7 +20,7 @@ is provided."><meta property="og:image" content="/logo.svg"><!-- mathjax --><scr
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.7</span>
       </span>
     </div>
 
@@ -76,6 +76,7 @@ is provided.</p>
 <span>  default <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  multilabel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ignore_case <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  date_format <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -116,10 +117,14 @@ is automatically registered in the global format library.</p></dd>
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
 <dd><p>Character. Type of format: <code>"character"</code>, <code>"numeric"</code>,
 <code>"Date"</code>, <code>"POSIXct"</code>, <code>"logical"</code>,
+<code>"date_range"</code>, <code>"datetime_range"</code>,
 or <code>"auto"</code> (default) for auto-detection.
 Value types (<code>"Date"</code>, <code>"POSIXct"</code>, <code>"logical"</code>) store
 native R objects instead of character labels. For value types,
-<code>.missing</code> and <code>.other</code> are always typed NA.</p></dd>
+<code>.missing</code> and <code>.other</code> are always typed NA.
+Range-bucketing types (<code>"date_range"</code>, <code>"datetime_range"</code>)
+bucket <code>Date</code>/<code>POSIXct</code> input into character labels using
+ISO date/datetime strings as range bounds.</p></dd>
 
 
 <dt id="arg-default">default<a class="anchor" aria-label="anchor" href="#arg-default"></a></dt>
@@ -135,6 +140,14 @@ ranges where a single value can match multiple labels. Used with
 <dt id="arg-ignore-case">ignore_case<a class="anchor" aria-label="anchor" href="#arg-ignore-case"></a></dt>
 <dd><p>Logical. If <code>TRUE</code>, key matching for character formats
 is case-insensitive. Default <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-date-format">date_format<a class="anchor" aria-label="anchor" href="#arg-date-format"></a></dt>
+<dd><p>Character. Optional strptime-style format string used
+when parsing date/datetime range keys (e.g. <code>"%d/%m/%Y"</code>). When
+<code>NULL</code>, ISO 8601 parsing is used. Applies to <code>"date_range"</code>,
+<code>"datetime_range"</code>, and the value types <code>"Date"</code> /
+<code>"POSIXct"</code> when keys are ranges.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>

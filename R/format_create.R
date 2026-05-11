@@ -35,16 +35,25 @@
 #'   is automatically registered in the global format library.
 #' @param type Character. Type of format: \code{"character"}, \code{"numeric"},
 #'   \code{"Date"}, \code{"POSIXct"}, \code{"logical"},
+#'   \code{"date_range"}, \code{"datetime_range"},
 #'   or \code{"auto"} (default) for auto-detection.
 #'   Value types (\code{"Date"}, \code{"POSIXct"}, \code{"logical"}) store
 #'   native R objects instead of character labels. For value types,
 #'   \code{.missing} and \code{.other} are always typed NA.
+#'   Range-bucketing types (\code{"date_range"}, \code{"datetime_range"})
+#'   bucket \code{Date}/\code{POSIXct} input into character labels using
+#'   ISO date/datetime strings as range bounds.
 #' @param default Character. Default label for unmatched values (overrides .other)
 #' @param multilabel Logical. If \code{TRUE}, the format supports overlapping
 #'   ranges where a single value can match multiple labels. Used with
 #'   \code{\link{fput_all}} to retrieve all matching labels. Default \code{FALSE}.
 #' @param ignore_case Logical. If \code{TRUE}, key matching for character formats
 #'   is case-insensitive. Default \code{FALSE}.
+#' @param date_format Character. Optional strptime-style format string used
+#'   when parsing date/datetime range keys (e.g. \code{"\%d/\%m/\%Y"}). When
+#'   \code{NULL}, ISO 8601 parsing is used. Applies to \code{"date_range"},
+#'   \code{"datetime_range"}, and the value types \code{"Date"} /
+#'   \code{"POSIXct"} when keys are ranges.
 #' @param verbose Logical. If \code{TRUE}, returns the format object visibly;
 #'   otherwise returns it invisibly. Default \code{FALSE}.
 #'
@@ -141,8 +150,10 @@
 #' fclear()
 fnew <- function(..., name = NULL, type = "auto", default = NULL,
                  multilabel = FALSE, ignore_case = FALSE,
+                 date_format = NULL,
                  verbose = FALSE) {
-  type <- match.arg(type, c("auto", "character", "numeric", .value_types))
+  type <- match.arg(type, c("auto", "character", "numeric", .value_types,
+                            "date_range", "datetime_range"))
   is_vtype <- .is_value_type(type)
 
   if (!is.null(name)) {
@@ -242,7 +253,8 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
       other_label = other_label,
       multilabel = multilabel,
       ignore_case = ignore_case,
-      range_table = .build_range_table(mappings, type),
+      date_format = date_format,
+      range_table = .build_range_table(mappings, type, date_format),
       created = Sys.time()
     ),
     class = "ks_format"
@@ -367,14 +379,20 @@ print.ks_format <- function(x, ...) {
       # Try to display range keys in interval notation
       parsed <- if (is_vtype && x$type %in% c("Date", "POSIXct")) {
         .parse_date_range_key(key, x$date_format)
+      } else if (x$type == "date_range") {
+        .parse_date_range_key(key, x$date_format)
+      } else if (x$type == "datetime_range") {
+        .parse_datetime_range_key(key, x$date_format)
       } else {
         .parse_range_key(key)
       }
       if (!is.null(parsed)) {
         left_bracket <- if (parsed$inc_low) "[" else "("
         right_bracket <- if (parsed$inc_high) "]" else ")"
-        low_str <- if (is.infinite(as.numeric(parsed$low)) && as.numeric(parsed$low) < 0) "LOW" else as.character(parsed$low)
-        high_str <- if (is.infinite(as.numeric(parsed$high)) && as.numeric(parsed$high) > 0) "HIGH" else as.character(parsed$high)
+        low_num  <- as.numeric(parsed$low)
+        high_num <- as.numeric(parsed$high)
+        low_str <- if (is.infinite(low_num) && low_num < 0) "LOW" else as.character(parsed$low)
+        high_str <- if (is.infinite(high_num) && high_num > 0) "HIGH" else as.character(parsed$high)
         cat("  ", left_bracket, low_str, ", ", high_str, right_bracket,
             " => ", value_str, "\n", sep = "")
       } else {

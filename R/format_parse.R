@@ -911,6 +911,30 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
     }
   }
 
+  # Check for date / datetime interval notation: [YYYY-MM-DD, YYYY-MM-DD)
+  # or [YYYY-MM-DD HH:MM[:SS], ...]. Bounds are kept as strings so the
+  # range_table builder can dispatch to .parse_date_range_key() /
+  # .parse_datetime_range_key() using the format's date_format.
+  date_bound <- "(\\d{4}-\\d{2}-\\d{2}(?:[ T]\\d{2}:\\d{2}(?::\\d{2})?)?|LOW|HIGH)"
+  date_iv_re <- paste0("^(\\[|\\()\\s*", date_bound, "\\s*,\\s*",
+                       date_bound, "\\s*(\\]|\\))$")
+  date_iv_match <- regmatches(lhs, regexec(date_iv_re, lhs,
+                                           ignore.case = TRUE))[[1]]
+
+  if (length(date_iv_match) == 5) {
+    left_bracket  <- date_iv_match[2]
+    low_str       <- trimws(date_iv_match[3])
+    high_str      <- trimws(date_iv_match[4])
+    right_bracket <- date_iv_match[5]
+
+    inc_low  <- (left_bracket == "[")
+    inc_high <- (right_bracket == "]")
+
+    return(list(type = "range", low = low_str, high = high_str,
+                inc_low = inc_low, inc_high = inc_high, label = rhs,
+                bound_kind = "date"))
+  }
+
   # Check for legacy range: low - high pattern (no brackets)
   range_match <- regmatches(lhs, regexec(
     "^(-?[0-9]+(?:\\.[0-9]+)?|LOW|HIGH|Inf|-Inf)\\s*-\\s*(-?[0-9]+(?:\\.[0-9]+)?|LOW|HIGH|Inf|-Inf)$",
@@ -1028,14 +1052,27 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
   # Auto-detect type if needed
   if (type == "auto") {
     has_ranges <- any(vapply(block$entries, function(e) identical(e$type, "range"), logical(1L)))
-    if (has_ranges) {
+    has_date_bounds <- any(vapply(block$entries, function(e) {
+      identical(e$type, "range") && identical(e$bound_kind, "date")
+    }, logical(1L)))
+    if (has_date_bounds) {
+      # Choose date_range vs datetime_range based on whether any bound
+      # carries a time component.
+      has_time <- any(vapply(block$entries, function(e) {
+        identical(e$type, "range") && identical(e$bound_kind, "date") &&
+          (grepl("[ T]\\d{2}:\\d{2}", as.character(e$low)) ||
+           grepl("[ T]\\d{2}:\\d{2}", as.character(e$high)))
+      }, logical(1L)))
+      format_obj$type <- if (has_time) "datetime_range" else "date_range"
+    } else if (has_ranges) {
       format_obj$type <- "numeric"
     } else {
       format_obj$type <- detect_format_type(names(mappings))
     }
   }
 
-  format_obj$range_table <- .build_range_table(mappings, format_obj$type)
+  format_obj$range_table <- .build_range_table(mappings, format_obj$type,
+                                               format_obj$date_format)
 
   return(format_obj)
 }
@@ -1189,6 +1226,7 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
   parts[[idx]] <- paste0("VALUE ", name, type_part); idx <- idx + 1L
 
   is_vtype <- .is_value_type(fmt$type)
+  is_date_rng <- .is_date_range_type(fmt$type)
 
   for (i in seq_along(fmt$mappings)) {
     key <- names(fmt$mappings)[i]
@@ -1206,14 +1244,26 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
     # Try to display range keys in interval notation
     parsed <- if (is_vtype && fmt$type %in% c("Date", "POSIXct")) {
       .parse_date_range_key(key, fmt$date_format)
+    } else if (fmt$type == "date_range") {
+      .parse_date_range_key(key, fmt$date_format)
+    } else if (fmt$type == "datetime_range") {
+      .parse_datetime_range_key(key, fmt$date_format)
     } else {
       .parse_range_key(key)
     }
     if (!is.null(parsed)) {
       left_bracket <- if (parsed$inc_low) "[" else "("
       right_bracket <- if (parsed$inc_high) "]" else ")"
-      low <- if (is_vtype) as.character(parsed$low) else .format_range_bound(parsed$low, is_low = TRUE)
-      high <- if (is_vtype) as.character(parsed$high) else .format_range_bound(parsed$high, is_low = FALSE)
+      low <- if (is_vtype || is_date_rng) {
+        .format_date_bound(parsed$low, fmt$date_format, fmt$type, is_low = TRUE)
+      } else {
+        .format_range_bound(parsed$low, is_low = TRUE)
+      }
+      high <- if (is_vtype || is_date_rng) {
+        .format_date_bound(parsed$high, fmt$date_format, fmt$type, is_low = FALSE)
+      } else {
+        .format_range_bound(parsed$high, is_low = FALSE)
+      }
       parts[[idx]] <- paste0("  ", left_bracket, low, ", ", high,
                              right_bracket, " = \"", label_str, "\"", eval_suffix)
     } else {
@@ -1294,4 +1344,20 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
     return("HIGH")
   }
   return(as.character(val))
+}
+
+#' Format a Date / POSIXct range bound for text output
+#'
+#' Renders infinite bounds as \code{LOW}/\code{HIGH}; otherwise formats the
+#' Date/POSIXct value using \code{date_format} when supplied, else ISO 8601.
+#' Used for value-type (Date/POSIXct) formats and the date_range /
+#' datetime_range types.
+#' @keywords internal
+.format_date_bound <- function(val, date_format = NULL, type = NULL,
+                               is_low = TRUE) {
+  num <- as.numeric(val)
+  if (is.na(num)) return("")
+  if (is.infinite(num)) return(if (num < 0) "LOW" else "HIGH")
+  if (!is.null(date_format)) return(format(val, date_format))
+  as.character(val)
 }

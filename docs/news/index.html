@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.7</span>
       </span>
     </div>
 
@@ -57,6 +57,29 @@
       <small>Source: <a href="https://github.com/crow16384/ksformat/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.6.7" id="ksformat-067">ksformat 0.6.7<a class="anchor" aria-label="anchor" href="#ksformat-067"></a></h2>
+<div class="section level3">
+<h3 id="documentation-0-6-7">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-6-7"></a></h3>
+<ul><li>Added vignette <strong>Example 25: Date Range Bucketing</strong> covering <code>date_range</code> and <code>datetime_range</code> types: fiscal-year bucketing, <code><a href="../reference/fparse.html">fparse()</a></code> with ISO bounds, <code>LOW</code>/<code>HIGH</code> open-ended arms, <code><a href="../reference/fput_all.html">fput_all()</a></code> multilabel overlapping windows, auto-detection, <code><a href="../reference/fexport.html">fexport()</a></code>/<code><a href="../reference/fparse.html">fparse()</a></code> roundtrip, and <code>datetime_range</code> shift bucketing.</li>
+<li>Added <code>examples/DateRanges.R</code> — a self-contained runnable script with the same scenarios for quick interactive exploration.</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.6.6" id="ksformat-066">ksformat 0.6.6<a class="anchor" aria-label="anchor" href="#ksformat-066"></a></h2>
+<div class="section level3">
+<h3 id="new-features-0-6-6">New features<a class="anchor" aria-label="anchor" href="#new-features-0-6-6"></a></h3>
+<ul><li>
+<code>date_range</code> and <code>datetime_range</code> format types: bucket Date or POSIXct values into character labels using interval bounds written as ISO date/datetime strings. Both types reuse the numeric range-table fast path (sorted-disjoint ranges hit <code><a href="https://rdrr.io/r/base/findInterval.html" class="external-link">findInterval()</a></code> in C).</li>
+<li>
+<code><a href="../reference/fnew.html">fnew()</a></code> accepts <code>type = "date_range"</code> / <code>"datetime_range"</code> and a new optional <code>date_format</code> argument for parsing custom bound strings.</li>
+<li>
+<code><a href="../reference/fparse.html">fparse()</a></code> accepts interval notation with date/datetime bounds, e.g. <code>[2024-01-01, 2025-01-01) = "FY24"</code> and <code>[2024-01-01 08:00, 2024-01-01 16:00) = "Day"</code>. The type is auto-detected when no explicit subtype is given.</li>
+<li>
+<code><a href="../reference/fexport.html">fexport()</a></code> renders date/datetime range bounds as ISO strings, enabling full roundtrip through <code><a href="../reference/fparse.html">fparse()</a></code>.</li>
+<li>Bounds support <code>LOW</code> / <code>HIGH</code> keywords (rendered as <code>-Inf</code> / <code>+Inf</code> and emitted back as <code>LOW</code> / <code>HIGH</code> on export) and exclusive <code>(</code> / <code>)</code> brackets.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.6.5" id="ksformat-065">ksformat 0.6.5<a class="anchor" aria-label="anchor" href="#ksformat-065"></a></h2>
 <div class="section level3">

@@ -3250,3 +3250,154 @@ test_that("range_table sorts entries so fast path triggers on out-of-order range
   expect_equal(out, c("Child", "Adult", "Senior"))
   fclear()
 })
+
+
+# ============================================================================
+# Date range / datetime range bucketing (date_range, datetime_range)
+# ============================================================================
+
+context("Date Range Bucketing")
+
+test_that("fnew creates a date_range format and buckets Date input", {
+  fmt <- fnew(
+    "2024-01-01,2025-01-01,TRUE,FALSE" = "FY24",
+    "2025-01-01,2026-01-01,TRUE,FALSE" = "FY25",
+    type = "date_range"
+  )
+  expect_equal(fmt$type, "date_range")
+  expect_true(fmt$range_table$sorted_disjoint)
+  out <- fput(as.Date(c("2024-06-15", "2025-03-01", "2023-12-31")), fmt)
+  expect_equal(out, c("FY24", "FY25", "2023-12-31"))
+})
+
+test_that("date_range accepts POSIXct input by truncating to date", {
+  fmt <- fnew(
+    "2024-01-01,2025-01-01,TRUE,FALSE" = "Y24",
+    type = "date_range"
+  )
+  x <- as.POSIXct(c("2024-06-15 10:30:00", "2025-02-01 00:00:00"), tz = "UTC")
+  out <- fput(x, fmt)
+  expect_equal(out, c("Y24", "2025-02-01"))
+})
+
+test_that("date_range supports LOW / HIGH bounds via fparse", {
+  fparse(text = '
+VALUE era (date_range)
+  [LOW, 2000-01-01)        = "Past"
+  [2000-01-01, 2025-01-01) = "Present"
+  [2025-01-01, HIGH]       = "Future"
+;
+')
+  out <- fput(as.Date(c("1990-01-01", "2010-06-15", "2030-01-01")), "era")
+  expect_equal(out, c("Past", "Present", "Future"))
+  fclear()
+})
+
+test_that("date_range exclusive lower bound (parens) works", {
+  fparse(text = '
+VALUE strict (date_range)
+  (2024-01-01, 2025-01-01) = "Y24"
+;
+')
+  out <- fput(as.Date(c("2024-01-01", "2024-06-01", "2025-01-01")), "strict")
+  expect_equal(out, c("2024-01-01", "Y24", "2025-01-01"))
+  fclear()
+})
+
+test_that("date_range honors .missing and .other", {
+  fparse(text = '
+VALUE bucket (date_range)
+  [2024-01-01, 2025-01-01) = "Y24"
+  .missing = "MISS"
+  .other   = "OTHER"
+;
+')
+  out <- fput(as.Date(c("2024-06-15", NA, "2030-01-01")), "bucket")
+  expect_equal(out, c("Y24", "MISS", "OTHER"))
+  fclear()
+})
+
+test_that("fput_all returns all matching labels for overlapping date_range", {
+  fparse(text = '
+VALUE risk (date_range, multilabel)
+  [2024-01-01, 2024-07-01) = "H1"
+  [2024-04-01, 2024-10-01) = "Mid"
+  [2024-07-01, 2025-01-01) = "H2"
+;
+')
+  out <- fput_all(as.Date(c("2024-02-01", "2024-05-15", "2024-08-15")), "risk")
+  expect_setequal(out[[1]], "H1")
+  expect_setequal(out[[2]], c("H1", "Mid"))
+  expect_setequal(out[[3]], c("Mid", "H2"))
+  fclear()
+})
+
+test_that("auto-detect picks date_range when bounds are ISO dates", {
+  fparse(text = '
+VALUE auto_dr
+  [2024-01-01, 2025-01-01) = "Y24"
+;
+')
+  expect_equal(format_get("auto_dr")$type, "date_range")
+  fclear()
+})
+
+test_that("fexport/fparse roundtrip for date_range", {
+  fparse(text = '
+VALUE fyq (date_range)
+  [2024-01-01, 2024-04-01) = "Q1-24"
+  [2024-04-01, 2024-07-01) = "Q2-24"
+;
+')
+  fmt <- format_get("fyq")
+  txt <- fexport(fmt)
+  expect_true(grepl("date_range", txt))
+  expect_true(grepl("\\[2024-01-01, 2024-04-01\\)", txt))
+  fclear()
+  fparse(text = txt)
+  out <- fput(as.Date(c("2024-02-15", "2024-05-15")), "fyq")
+  expect_equal(out, c("Q1-24", "Q2-24"))
+  fclear()
+})
+
+context("Datetime Range Bucketing")
+
+test_that("datetime_range buckets POSIXct (UTC) input", {
+  fparse(text = '
+VALUE shift (datetime_range)
+  [2024-01-01 00:00:00, 2024-01-01 08:00:00) = "Night"
+  [2024-01-01 08:00:00, 2024-01-01 16:00:00) = "Day"
+  [2024-01-01 16:00:00, 2024-01-02 00:00:00) = "Evening"
+;
+')
+  y <- as.POSIXct(c("2024-01-01 03:00:00",
+                    "2024-01-01 12:00:00",
+                    "2024-01-01 20:00:00"), tz = "UTC")
+  expect_equal(fput(y, "shift"), c("Night", "Day", "Evening"))
+  fclear()
+})
+
+test_that("auto-detect picks datetime_range when bounds include time", {
+  fparse(text = '
+VALUE auto_dtr
+  [2024-01-01 00:00:00, 2024-01-01 12:00:00) = "AM"
+;
+')
+  expect_equal(format_get("auto_dtr")$type, "datetime_range")
+  fclear()
+})
+
+test_that("date_range fast path engages for sorted disjoint bounds", {
+  fparse(text = '
+VALUE fast (date_range)
+  [2024-01-01, 2024-04-01) = "Q1"
+  [2024-04-01, 2024-07-01) = "Q2"
+  [2024-07-01, 2024-10-01) = "Q3"
+  [2024-10-01, 2025-01-01) = "Q4"
+;
+')
+  rt <- format_get("fast")$range_table
+  expect_true(rt$sorted_disjoint)
+  expect_equal(length(rt$low), 4L)
+  fclear()
+})

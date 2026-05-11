@@ -11,6 +11,7 @@ fnew(
   default = NULL,
   multilabel = FALSE,
   ignore_case = FALSE,
+  date_format = NULL,
   verbose = FALSE
 )
 }
@@ -47,10 +48,14 @@ is automatically registered in the global format library.}
 
 \item{type}{Character. Type of format: \code{"character"}, \code{"numeric"},
 \code{"Date"}, \code{"POSIXct"}, \code{"logical"},
+\code{"date_range"}, \code{"datetime_range"},
 or \code{"auto"} (default) for auto-detection.
 Value types (\code{"Date"}, \code{"POSIXct"}, \code{"logical"}) store
 native R objects instead of character labels. For value types,
-\code{.missing} and \code{.other} are always typed NA.}
+\code{.missing} and \code{.other} are always typed NA.
+Range-bucketing types (\code{"date_range"}, \code{"datetime_range"})
+bucket \code{Date}/\code{POSIXct} input into character labels using
+ISO date/datetime strings as range bounds.}
 
 \item{default}{Character. Default label for unmatched values (overrides .other)}
 
@@ -60,6 +65,12 @@ ranges where a single value can match multiple labels. Used with
 
 \item{ignore_case}{Logical. If \code{TRUE}, key matching for character formats
 is case-insensitive. Default \code{FALSE}.}
+
+\item{date_format}{Character. Optional strptime-style format string used
+when parsing date/datetime range keys (e.g. \code{"\%d/\%m/\%Y"}). When
+\code{NULL}, ISO 8601 parsing is used. Applies to \code{"date_range"},
+\code{"datetime_range"}, and the value types \code{"Date"} /
+\code{"POSIXct"} when keys are ranges.}
 
 \item{verbose}{Logical. If \code{TRUE}, returns the format object visibly;
 otherwise returns it invisibly. Default \code{FALSE}.}

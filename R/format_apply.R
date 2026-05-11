@@ -155,15 +155,16 @@ fput <- function(x, format, ..., keep_na = FALSE) {
 
   # Cache type predicate (used in multiple branches below).
   is_numeric_fmt <- format$type == "numeric"
+  is_range_fmt <- .is_range_type(format$type)
 
   # Phase 1: discrete key matching.
   # Skip the (expensive) as.character + match() step when there are no
   # discrete keys to look up (pure numeric-range formats with x already
   # numeric). The discrete keys are the range-encoded strings like
   # "0,18,TRUE,FALSE" which will never match a numeric stringification.
-  skip_discrete <- is_numeric_fmt &&
+  skip_discrete <- is_range_fmt &&
     length(rt$discrete_idx) == 0L &&
-    is.numeric(x)
+    (is.numeric(x) || inherits(x, "Date") || inherits(x, "POSIXt"))
 
   if (!skip_discrete) {
     val_str <- as.character(x[non_miss])
@@ -207,11 +208,15 @@ fput <- function(x, format, ..., keep_na = FALSE) {
     }
   }
 
-  # Phase 2: Vectorized range match for numeric formats (uses cached table)
-  if (is_numeric_fmt && length(rt$low) > 0L) {
+  # Phase 2: Vectorized range match for numeric / date_range / datetime_range
+  # formats. All three share the same scanning machinery — for the date
+  # types the cached low/high are simply the unclassed numeric form of the
+  # Date/POSIXct bounds, and input is coerced to numeric the same way.
+  if (is_range_fmt && length(rt$low) > 0L) {
     unmatched_nm <- non_miss[!matched[non_miss]]
     if (length(unmatched_nm) > 0L) {
-      vals <- if (is.numeric(x)) x[unmatched_nm] else suppressWarnings(as.numeric(x[unmatched_nm]))
+      vals <- .to_range_numeric(x[unmatched_nm], format$type,
+                                format$date_format)
       valid_num <- !is.na(vals)
 
       # Fast path: sorted, non-overlapping ranges with standard half-open
@@ -710,9 +715,10 @@ fput_all <- function(x, format, ..., keep_na = FALSE) {
     }
   }
 
-  # Vectorized range matching (uses cached range_table)
+  # Vectorized range matching (uses cached range_table). Works for numeric,
+  # date_range, and datetime_range formats \u2014 see .to_range_numeric().
   if (length(rt$low) > 0L) {
-    vals <- suppressWarnings(as.numeric(x[non_miss]))
+    vals <- .to_range_numeric(x[non_miss], format$type, format$date_format)
     valid_num <- !is.na(vals)
 
     for (i in seq_along(rt$low)) {

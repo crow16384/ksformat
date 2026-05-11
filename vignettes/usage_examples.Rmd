@@ -1207,3 +1207,164 @@ fmap_to_ranges(c(2, 99, 4), "visit_ther")
 ```{r fmap-to-ranges-cleanup, include=FALSE}
 fclear()
 ```
+
+## Example 25: Date Range Bucketing
+
+`date_range` and `datetime_range` formats bucket `Date` or `POSIXct` input
+into character labels using ISO date/datetime interval bounds.
+They reuse the same range-table engine as numeric ranges, so the
+`findInterval()` fast path is active for sorted, disjoint buckets.
+
+### Fiscal-year bucketing
+
+```{r date-range-basic}
+fnew(
+  "2023-01-01,2024-01-01,TRUE,FALSE" = "FY23",
+  "2024-01-01,2025-01-01,TRUE,FALSE" = "FY24",
+  "2025-01-01,2026-01-01,TRUE,FALSE" = "FY25",
+  type = "date_range",
+  name = "fiscal_year"
+)
+
+dates <- as.Date(c("2023-06-15", "2024-03-01", "2024-12-31",
+                   "2025-07-04", "2022-01-01", NA))
+
+data.frame(
+  date  = dates,
+  fy    = fput(dates, "fiscal_year")
+)
+```
+
+### Define from text with `fparse()`
+
+```{r date-range-fparse}
+fparse(text = '
+VALUE quarter (date_range)
+  [2024-01-01, 2024-04-01) = "Q1-2024"
+  [2024-04-01, 2024-07-01) = "Q2-2024"
+  [2024-07-01, 2024-10-01) = "Q3-2024"
+  [2024-10-01, 2025-01-01) = "Q4-2024"
+  .other                   = "Outside 2024"
+;
+')
+
+sample_dates <- as.Date(c("2024-02-14", "2024-05-20", "2024-08-08",
+                          "2024-11-30", "2025-03-01"))
+
+data.frame(
+  date    = sample_dates,
+  quarter = fput(sample_dates, "quarter")
+)
+```
+
+### `LOW` / `HIGH` open-ended bounds
+
+`LOW` and `HIGH` represent $-\infty$ and $+\infty$ — any date before or
+after a cutpoint falls in the open arm.
+
+```{r date-range-low-high}
+fparse(text = '
+VALUE era (date_range)
+  [LOW,        2000-01-01) = "Pre-2000"
+  [2000-01-01, 2010-01-01) = "2000s"
+  [2010-01-01, 2020-01-01) = "2010s"
+  [2020-01-01, HIGH]       = "2020+"
+;
+')
+
+event_dates <- as.Date(c("1985-07-04", "2005-12-25",
+                         "2015-06-01", "2023-11-11"))
+
+data.frame(
+  date = event_dates,
+  era  = fput(event_dates, "era")
+)
+```
+
+### Export and roundtrip
+
+Formats export with ISO date bounds and re-parse without loss:
+
+```{r date-range-export}
+q_obj <- format_get("quarter")
+cat(fexport(quarter = q_obj))
+```
+
+```{r date-range-roundtrip}
+# Re-parse the exported text
+txt <- fexport(quarter = q_obj)
+fclear()
+fparse(text = txt)
+
+fput(as.Date(c("2024-02-14", "2024-08-08")), "quarter")
+```
+
+### Overlapping buckets with `multilabel` and `fput_all()`
+
+```{r date-range-multilabel}
+fparse(text = '
+VALUE study_window (date_range, multilabel)
+  [2024-01-01, 2024-07-01) = "First Half"
+  [2024-04-01, 2024-10-01) = "Mid-Year"
+  [2024-07-01, 2025-01-01) = "Second Half"
+;
+')
+
+checkup_dates <- as.Date(c("2024-02-15", "2024-05-20", "2024-09-01"))
+all_windows   <- fput_all(checkup_dates, "study_window")
+
+for (i in seq_along(checkup_dates)) {
+  cat(format(checkup_dates[i]), "->",
+      paste(all_windows[[i]], collapse = " | "), "\n")
+}
+```
+
+### Auto-detection of type
+
+When no explicit type is given, `fparse()` infers `date_range` from ISO date
+bounds and `datetime_range` when bounds include a time component:
+
+```{r date-range-autodetect}
+fparse(text = '
+VALUE auto_fy
+  [2024-01-01, 2025-01-01) = "2024"
+;
+
+VALUE auto_shift
+  [2024-01-15 08:00, 2024-01-15 16:00) = "Day shift"
+;
+')
+
+cat("auto_fy type   :", format_get("auto_fy")$type, "\n")
+cat("auto_shift type:", format_get("auto_shift")$type, "\n")
+```
+
+### Datetime range bucketing
+
+`datetime_range` works identically to `date_range` but matches against
+POSIXct values. Bounds are expressed as `YYYY-MM-DD HH:MM[:SS]` strings.
+
+```{r datetime-range}
+fparse(text = '
+VALUE shift (datetime_range)
+  [2024-01-15 00:00, 2024-01-15 08:00) = "Night"
+  [2024-01-15 08:00, 2024-01-15 16:00) = "Day"
+  [2024-01-15 16:00, 2024-01-16 00:00) = "Evening"
+;
+')
+
+timestamps <- as.POSIXct(
+  c("2024-01-15 03:22:00", "2024-01-15 11:45:00",
+    "2024-01-15 19:00:00"),
+  tz = "UTC"
+)
+
+data.frame(
+  ts    = format(timestamps, tz = "UTC"),
+  shift = fput(timestamps, "shift")
+)
+```
+
+```{r date-range-cleanup, include=FALSE}
+fclear()
+```

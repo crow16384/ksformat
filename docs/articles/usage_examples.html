@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.7</span>
       </span>
     </div>
 
@@ -488,8 +488,8 @@ once:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;        format             result</span></span>
-<span><span class="co">#&gt; 1 DATETIME20. 11MAY2026:17:12:42</span></span>
-<span><span class="co">#&gt; 2 DATETIME13.      11MAY26:17:12</span></span>
+<span><span class="co">#&gt; 1 DATETIME20. 11MAY2026:19:56:03</span></span>
+<span><span class="co">#&gt; 2 DATETIME13.      11MAY26:19:56</span></span>
 <span><span class="co">#&gt; 3     DTDATE.          11MAY2026</span></span>
 <span><span class="co">#&gt; 4   DTYYMMDD.         2026-05-11</span></span>
 <span></span>
@@ -1045,7 +1045,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpKnPy0g/temp_libpath2c714b5b3b31/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpG6itwb/temp_libpath38ca69a13f2d/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">imported</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "AGEGRP"   "BMICAT"   "GENDER"   "RACEIN"   "SMISSING"</span></span>
 <span></span>
@@ -1173,7 +1173,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpKnPy0g/temp_libpath2c714b5b3b31/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpG6itwb/temp_libpath38ca69a13f2d/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span></span>
 <span><span class="co"># Library should be empty</span></span>
 <span><span class="fu"><a href="../reference/flist.html">flist</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -1727,6 +1727,202 @@ arbitrary vectors:</p>
 <span><span class="co">#&gt; 1   8   22    TRUE     TRUE</span></span>
 <span><span class="co">#&gt; 2  NA   NA      NA       NA</span></span>
 <span><span class="co">#&gt; 3  22   36    TRUE     TRUE</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="example-25-date-range-bucketing">Example 25: Date Range Bucketing<a class="anchor" aria-label="anchor" href="#example-25-date-range-bucketing"></a>
+</h2>
+<p><code>date_range</code> and <code>datetime_range</code> formats
+bucket <code>Date</code> or <code>POSIXct</code> input into character
+labels using ISO date/datetime interval bounds. They reuse the same
+range-table engine as numeric ranges, so the <code><a href="https://rdrr.io/r/base/findInterval.html" class="external-link">findInterval()</a></code>
+fast path is active for sorted, disjoint buckets.</p>
+<div class="section level3">
+<h3 id="fiscal-year-bucketing">Fiscal-year bucketing<a class="anchor" aria-label="anchor" href="#fiscal-year-bucketing"></a>
+</h3>
+<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span></span>
+<span>  <span class="st">"2023-01-01,2024-01-01,TRUE,FALSE"</span> <span class="op">=</span> <span class="st">"FY23"</span>,</span>
+<span>  <span class="st">"2024-01-01,2025-01-01,TRUE,FALSE"</span> <span class="op">=</span> <span class="st">"FY24"</span>,</span>
+<span>  <span class="st">"2025-01-01,2026-01-01,TRUE,FALSE"</span> <span class="op">=</span> <span class="st">"FY25"</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"date_range"</span>,</span>
+<span>  name <span class="op">=</span> <span class="st">"fiscal_year"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">dates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2023-06-15"</span>, <span class="st">"2024-03-01"</span>, <span class="st">"2024-12-31"</span>,</span>
+<span>                   <span class="st">"2025-07-04"</span>, <span class="st">"2022-01-01"</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  date  <span class="op">=</span> <span class="va">dates</span>,</span>
+<span>  fy    <span class="op">=</span> <span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="va">dates</span>, <span class="st">"fiscal_year"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;         date         fy</span></span>
+<span><span class="co">#&gt; 1 2023-06-15       FY23</span></span>
+<span><span class="co">#&gt; 2 2024-03-01       FY24</span></span>
+<span><span class="co">#&gt; 3 2024-12-31       FY24</span></span>
+<span><span class="co">#&gt; 4 2025-07-04       FY25</span></span>
+<span><span class="co">#&gt; 5 2022-01-01 2022-01-01</span></span>
+<span><span class="co">#&gt; 6       &lt;NA&gt;       &lt;NA&gt;</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="define-from-text-with-fparse">Define from text with <code>fparse()</code><a class="anchor" aria-label="anchor" href="#define-from-text-with-fparse"></a>
+</h3>
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
+<span><span class="st">VALUE quarter (date_range)</span></span>
+<span><span class="st">  [2024-01-01, 2024-04-01) = "Q1-2024"</span></span>
+<span><span class="st">  [2024-04-01, 2024-07-01) = "Q2-2024"</span></span>
+<span><span class="st">  [2024-07-01, 2024-10-01) = "Q3-2024"</span></span>
+<span><span class="st">  [2024-10-01, 2025-01-01) = "Q4-2024"</span></span>
+<span><span class="st">  .other                   = "Outside 2024"</span></span>
+<span><span class="st">;</span></span>
+<span><span class="st">'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">sample_dates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2024-02-14"</span>, <span class="st">"2024-05-20"</span>, <span class="st">"2024-08-08"</span>,</span>
+<span>                          <span class="st">"2024-11-30"</span>, <span class="st">"2025-03-01"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  date    <span class="op">=</span> <span class="va">sample_dates</span>,</span>
+<span>  quarter <span class="op">=</span> <span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="va">sample_dates</span>, <span class="st">"quarter"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;         date      quarter</span></span>
+<span><span class="co">#&gt; 1 2024-02-14      Q1-2024</span></span>
+<span><span class="co">#&gt; 2 2024-05-20      Q2-2024</span></span>
+<span><span class="co">#&gt; 3 2024-08-08      Q3-2024</span></span>
+<span><span class="co">#&gt; 4 2024-11-30      Q4-2024</span></span>
+<span><span class="co">#&gt; 5 2025-03-01 Outside 2024</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="low-high-open-ended-bounds">
+<code>LOW</code> / <code>HIGH</code> open-ended bounds<a class="anchor" aria-label="anchor" href="#low-high-open-ended-bounds"></a>
+</h3>
+<p><code>LOW</code> and <code>HIGH</code> represent
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mi>∞</mi></mrow><annotation encoding="application/x-tex">-\infty</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>+</mi><mi>∞</mi></mrow><annotation encoding="application/x-tex">+\infty</annotation></semantics></math>
+— any date before or after a cutpoint falls in the open arm.</p>
+<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
+<span><span class="st">VALUE era (date_range)</span></span>
+<span><span class="st">  [LOW,        2000-01-01) = "Pre-2000"</span></span>
+<span><span class="st">  [2000-01-01, 2010-01-01) = "2000s"</span></span>
+<span><span class="st">  [2010-01-01, 2020-01-01) = "2010s"</span></span>
+<span><span class="st">  [2020-01-01, HIGH]       = "2020+"</span></span>
+<span><span class="st">;</span></span>
+<span><span class="st">'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">event_dates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1985-07-04"</span>, <span class="st">"2005-12-25"</span>,</span>
+<span>                         <span class="st">"2015-06-01"</span>, <span class="st">"2023-11-11"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  date <span class="op">=</span> <span class="va">event_dates</span>,</span>
+<span>  era  <span class="op">=</span> <span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="va">event_dates</span>, <span class="st">"era"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;         date      era</span></span>
+<span><span class="co">#&gt; 1 1985-07-04 Pre-2000</span></span>
+<span><span class="co">#&gt; 2 2005-12-25    2000s</span></span>
+<span><span class="co">#&gt; 3 2015-06-01    2010s</span></span>
+<span><span class="co">#&gt; 4 2023-11-11    2020+</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="export-and-roundtrip">Export and roundtrip<a class="anchor" aria-label="anchor" href="#export-and-roundtrip"></a>
+</h3>
+<p>Formats export with ISO date bounds and re-parse without loss:</p>
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">q_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/format_get.html">format_get</a></span><span class="op">(</span><span class="st">"quarter"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="../reference/fexport.html">fexport</a></span><span class="op">(</span>quarter <span class="op">=</span> <span class="va">q_obj</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; VALUE quarter (date_range)</span></span>
+<span><span class="co">#&gt;   [2024-01-01, 2024-04-01) = "Q1-2024"</span></span>
+<span><span class="co">#&gt;   [2024-04-01, 2024-07-01) = "Q2-2024"</span></span>
+<span><span class="co">#&gt;   [2024-07-01, 2024-10-01) = "Q3-2024"</span></span>
+<span><span class="co">#&gt;   [2024-10-01, 2025-01-01) = "Q4-2024"</span></span>
+<span><span class="co">#&gt;   .other = "Outside 2024"</span></span>
+<span><span class="co">#&gt; ;</span></span></code></pre></div>
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Re-parse the exported text</span></span>
+<span><span class="va">txt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fexport.html">fexport</a></span><span class="op">(</span>quarter <span class="op">=</span> <span class="va">q_obj</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; All formats cleared from library.</span></span>
+<span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="va">txt</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2024-02-14"</span>, <span class="st">"2024-08-08"</span><span class="op">)</span><span class="op">)</span>, <span class="st">"quarter"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Q1-2024" "Q3-2024"</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="overlapping-buckets-with-multilabel-and-fput_all">Overlapping buckets with <code>multilabel</code> and
+<code>fput_all()</code><a class="anchor" aria-label="anchor" href="#overlapping-buckets-with-multilabel-and-fput_all"></a>
+</h3>
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
+<span><span class="st">VALUE study_window (date_range, multilabel)</span></span>
+<span><span class="st">  [2024-01-01, 2024-07-01) = "First Half"</span></span>
+<span><span class="st">  [2024-04-01, 2024-10-01) = "Mid-Year"</span></span>
+<span><span class="st">  [2024-07-01, 2025-01-01) = "Second Half"</span></span>
+<span><span class="st">;</span></span>
+<span><span class="st">'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">checkup_dates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2024-02-15"</span>, <span class="st">"2024-05-20"</span>, <span class="st">"2024-09-01"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">all_windows</span>   <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fput_all.html">fput_all</a></span><span class="op">(</span><span class="va">checkup_dates</span>, <span class="st">"study_window"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">checkup_dates</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="va">checkup_dates</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>, <span class="st">"-&gt;"</span>,</span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">all_windows</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>, collapse <span class="op">=</span> <span class="st">" | "</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="co">#&gt; 2024-02-15 -&gt; First Half </span></span>
+<span><span class="co">#&gt; 2024-05-20 -&gt; First Half | Mid-Year </span></span>
+<span><span class="co">#&gt; 2024-09-01 -&gt; Mid-Year | Second Half</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="auto-detection-of-type">Auto-detection of type<a class="anchor" aria-label="anchor" href="#auto-detection-of-type"></a>
+</h3>
+<p>When no explicit type is given, <code><a href="../reference/fparse.html">fparse()</a></code> infers
+<code>date_range</code> from ISO date bounds and
+<code>datetime_range</code> when bounds include a time component:</p>
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
+<span><span class="st">VALUE auto_fy</span></span>
+<span><span class="st">  [2024-01-01, 2025-01-01) = "2024"</span></span>
+<span><span class="st">;</span></span>
+<span><span class="st"></span></span>
+<span><span class="st">VALUE auto_shift</span></span>
+<span><span class="st">  [2024-01-15 08:00, 2024-01-15 16:00) = "Day shift"</span></span>
+<span><span class="st">;</span></span>
+<span><span class="st">'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"auto_fy type   :"</span>, <span class="fu"><a href="../reference/format_get.html">format_get</a></span><span class="op">(</span><span class="st">"auto_fy"</span><span class="op">)</span><span class="op">$</span><span class="va">type</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; auto_fy type   : date_range</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"auto_shift type:"</span>, <span class="fu"><a href="../reference/format_get.html">format_get</a></span><span class="op">(</span><span class="st">"auto_shift"</span><span class="op">)</span><span class="op">$</span><span class="va">type</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; auto_shift type: datetime_range</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="datetime-range-bucketing">Datetime range bucketing<a class="anchor" aria-label="anchor" href="#datetime-range-bucketing"></a>
+</h3>
+<p><code>datetime_range</code> works identically to
+<code>date_range</code> but matches against POSIXct values. Bounds are
+expressed as <code>YYYY-MM-DD HH:MM[:SS]</code> strings.</p>
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
+<span><span class="st">VALUE shift (datetime_range)</span></span>
+<span><span class="st">  [2024-01-15 00:00, 2024-01-15 08:00) = "Night"</span></span>
+<span><span class="st">  [2024-01-15 08:00, 2024-01-15 16:00) = "Day"</span></span>
+<span><span class="st">  [2024-01-15 16:00, 2024-01-16 00:00) = "Evening"</span></span>
+<span><span class="st">;</span></span>
+<span><span class="st">'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">timestamps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2024-01-15 03:22:00"</span>, <span class="st">"2024-01-15 11:45:00"</span>,</span>
+<span>    <span class="st">"2024-01-15 19:00:00"</span><span class="op">)</span>,</span>
+<span>  tz <span class="op">=</span> <span class="st">"UTC"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  ts    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="va">timestamps</span>, tz <span class="op">=</span> <span class="st">"UTC"</span><span class="op">)</span>,</span>
+<span>  shift <span class="op">=</span> <span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="va">timestamps</span>, <span class="st">"shift"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;                    ts   shift</span></span>
+<span><span class="co">#&gt; 1 2024-01-15 03:22:00   Night</span></span>
+<span><span class="co">#&gt; 2 2024-01-15 11:45:00     Day</span></span>
+<span><span class="co">#&gt; 3 2024-01-15 19:00:00 Evening</span></span></code></pre></div>
+</div>
 </div>
   </div>
 

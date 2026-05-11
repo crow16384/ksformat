@@ -17,6 +17,25 @@ NULL
 #' @noRd
 .value_types <- c("Date", "POSIXct", "logical")
 
+#' Range-bucketing types (Date/POSIXct/numeric input -> character labels)
+#' @keywords internal
+#' @noRd
+.range_types <- c("numeric", "date_range", "datetime_range")
+
+#' Check whether a type uses numeric range matching internally
+#' @keywords internal
+#' @noRd
+.is_range_type <- function(type) {
+  type %in% .range_types
+}
+
+#' Check whether a type uses Date/POSIXct range bounds
+#' @keywords internal
+#' @noRd
+.is_date_range_type <- function(type) {
+  type %in% c("date_range", "datetime_range")
+}
+
 #' Check whether a type string is a value type
 #' @keywords internal
 #' @noRd
@@ -88,7 +107,92 @@ NULL
   list(low = low, high = high, inc_low = inc_low, inc_high = inc_high)
 }
 
-#' Convert a typed value to a display string
+#' Parse a POSIXct datetime range key like "2020-01-01 00:00:00,2025-12-31 23:59:59,TRUE,FALSE"
+#'
+#' Returns POSIXct bounds. \code{LOW}/\code{HIGH} map to \code{-Inf}/\code{Inf}.
+#'
+#' @param key Character string to parse.
+#' @param date_format Optional strptime format for parsing datetime bounds.
+#' @return A list with components low, high (POSIXct), inc_low, inc_high
+#'   (logical), or NULL if the key does not look like a datetime range.
+#' @keywords internal
+#' @noRd
+.parse_datetime_range_key <- function(key, date_format = NULL) {
+  parts <- strsplit(key, ",", fixed = TRUE)[[1]]
+  if (length(parts) < 2L || length(parts) > 4L) return(NULL)
+
+  low_str  <- trimws(parts[1])
+  high_str <- trimws(parts[2])
+
+  parse_bound <- function(s) {
+    su <- toupper(s)
+    if (su == "LOW")  return(as.POSIXct(-Inf, origin = "1970-01-01", tz = "UTC"))
+    if (su == "HIGH") return(as.POSIXct(Inf,  origin = "1970-01-01", tz = "UTC"))
+    if (!is.null(date_format)) {
+      d <- suppressWarnings(as.POSIXct(s, format = date_format, tz = "UTC"))
+    } else {
+      d <- suppressWarnings(as.POSIXct(s, tz = "UTC"))
+    }
+    if (is.na(d)) return(NULL)
+    d
+  }
+
+  low  <- parse_bound(low_str)
+  high <- parse_bound(high_str)
+  if (is.null(low) || is.null(high)) return(NULL)
+
+  inc_low  <- TRUE
+  inc_high <- FALSE
+  if (length(parts) >= 3L) inc_low  <- toupper(trimws(parts[3])) == "TRUE"
+  if (length(parts) >= 4L) inc_high <- toupper(trimws(parts[4])) == "TRUE"
+
+  list(low = low, high = high, inc_low = inc_low, inc_high = inc_high)
+}
+
+#' Coerce input vector to numeric for range comparison
+#'
+#' Dispatches based on the format type:
+#' \itemize{
+#'   \item numeric: uses input directly if numeric, else \code{as.numeric()}.
+#'   \item date_range: parses to \code{Date} (via \code{date_format} if
+#'     supplied) and unclasses to numeric (days since 1970).
+#'   \item datetime_range: parses to \code{POSIXct} (UTC) and unclasses to
+#'     numeric (seconds since epoch).
+#' }
+#' @keywords internal
+#' @noRd
+.to_range_numeric <- function(x, type, date_format = NULL) {
+  if (identical(type, "numeric")) {
+    if (is.numeric(x)) return(x)
+    return(suppressWarnings(as.numeric(x)))
+  }
+  if (identical(type, "date_range")) {
+    d <- if (inherits(x, "Date")) {
+      x
+    } else if (inherits(x, "POSIXt")) {
+      as.Date(x)
+    } else if (!is.null(date_format)) {
+      suppressWarnings(as.Date(as.character(x), format = date_format))
+    } else {
+      suppressWarnings(as.Date(as.character(x)))
+    }
+    return(as.numeric(unclass(d)))
+  }
+  if (identical(type, "datetime_range")) {
+    d <- if (inherits(x, "POSIXt")) {
+      x
+    } else if (inherits(x, "Date")) {
+      as.POSIXct(x, tz = "UTC")
+    } else if (!is.null(date_format)) {
+      suppressWarnings(as.POSIXct(as.character(x), format = date_format, tz = "UTC"))
+    } else {
+      suppressWarnings(as.POSIXct(as.character(x), tz = "UTC"))
+    }
+    return(as.numeric(unclass(d)))
+  }
+  suppressWarnings(as.numeric(x))
+}
+
 #' @keywords internal
 #' @noRd
 .typed_value_to_string <- function(value, type, date_format = NULL) {
@@ -445,7 +549,7 @@ in_range <- function(x, range_spec) {
 #'   }
 #' @keywords internal
 #' @noRd
-.build_range_table <- function(mappings, type) {
+.build_range_table <- function(mappings, type, date_format = NULL) {
   n <- length(mappings)
   map_labels <- if (n == 0L) character(0) else unlist(mappings, use.names = FALSE)
   # Vectorized eval-flag detection: .is_expr_label is already vectorized
@@ -469,14 +573,25 @@ in_range <- function(x, range_spec) {
     sort_perm = integer(0)
   )
 
-  if (n == 0L || !identical(type, "numeric")) return(base)
+  if (n == 0L || !.is_range_type(type)) return(base)
+
+  # Pick the right key parser. For date/datetime range types we parse keys
+  # as ISO date strings (or via `date_format` if provided); the resulting
+  # Date/POSIXct bounds are then unclassed to numeric so the rest of the
+  # range-table machinery (findInterval fast path, sorted/disjoint check)
+  # works unchanged.
+  parser <- switch(type,
+    numeric         = function(k) .parse_range_key(k),
+    date_range      = function(k) .parse_date_range_key(k, date_format),
+    datetime_range  = function(k) .parse_datetime_range_key(k, date_format)
+  )
 
   map_keys <- names(mappings)
   # Two-pass build: identify range indices first, then preallocate
   parsed_list <- vector("list", n)
   is_range <- logical(n)
   for (i in seq_len(n)) {
-    p <- .parse_range_key(map_keys[i])
+    p <- parser(map_keys[i])
     if (!is.null(p)) {
       parsed_list[[i]] <- p
       is_range[i] <- TRUE
@@ -486,8 +601,12 @@ in_range <- function(x, range_spec) {
   nr <- length(ridx)
   if (nr == 0L) return(base)
 
-  lows  <- vapply(parsed_list[ridx], `[[`, numeric(1L), "low")
-  highs <- vapply(parsed_list[ridx], `[[`, numeric(1L), "high")
+  # For date_range / datetime_range, unclass the typed bounds to numeric
+  # (days since 1970 for Date, seconds since epoch for POSIXct). The
+  # comparison semantics are identical to numeric ranges.
+  to_num <- function(v) as.numeric(unclass(v))
+  lows  <- vapply(parsed_list[ridx], function(p) to_num(p$low),  numeric(1L))
+  highs <- vapply(parsed_list[ridx], function(p) to_num(p$high), numeric(1L))
   incl  <- vapply(parsed_list[ridx], `[[`, logical(1L), "inc_low")
   inch  <- vapply(parsed_list[ridx], `[[`, logical(1L), "inc_high")
 

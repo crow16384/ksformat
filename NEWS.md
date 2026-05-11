@@ -1,3 +1,35 @@
+# ksformat 0.6.7
+
+## Documentation
+
+* Added vignette **Example 25: Date Range Bucketing** covering `date_range` and
+  `datetime_range` types: fiscal-year bucketing, `fparse()` with ISO bounds,
+  `LOW`/`HIGH` open-ended arms, `fput_all()` multilabel overlapping windows,
+  auto-detection, `fexport()`/`fparse()` roundtrip, and `datetime_range`
+  shift bucketing.
+* Added `examples/DateRanges.R` — a self-contained runnable script with the
+  same scenarios for quick interactive exploration.
+
+# ksformat 0.6.6
+
+## New features
+
+* `date_range` and `datetime_range` format types: bucket Date or POSIXct
+  values into character labels using interval bounds written as ISO
+  date/datetime strings. Both types reuse the numeric range-table fast
+  path (sorted-disjoint ranges hit `findInterval()` in C).
+* `fnew()` accepts `type = "date_range"` / `"datetime_range"` and a new
+  optional `date_format` argument for parsing custom bound strings.
+* `fparse()` accepts interval notation with date/datetime bounds, e.g.
+  `[2024-01-01, 2025-01-01) = "FY24"` and
+  `[2024-01-01 08:00, 2024-01-01 16:00) = "Day"`. The type is auto-detected
+  when no explicit subtype is given.
+* `fexport()` renders date/datetime range bounds as ISO strings, enabling
+  full roundtrip through `fparse()`.
+* Bounds support `LOW` / `HIGH` keywords (rendered as `-Inf` / `+Inf` and
+  emitted back as `LOW` / `HIGH` on export) and exclusive `(` / `)`
+  brackets.
+
 # ksformat 0.6.5
 
 ## Performance
