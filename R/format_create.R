@@ -242,6 +242,7 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
       other_label = other_label,
       multilabel = multilabel,
       ignore_case = ignore_case,
+      range_table = .build_range_table(mappings, type),
       created = Sys.time()
     ),
     class = "ks_format"

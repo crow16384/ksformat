@@ -572,6 +572,7 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
       other_label  = other_label,
       multilabel   = multilabel,
       ignore_case  = FALSE,
+      range_table  = .build_range_table(mappings, type),
       created      = Sys.time()
     ),
     class = "ks_format"
@@ -1033,6 +1034,8 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
       format_obj$type <- detect_format_type(names(mappings))
     }
   }
+
+  format_obj$range_table <- .build_range_table(mappings, format_obj$type)
 
   return(format_obj)
 }

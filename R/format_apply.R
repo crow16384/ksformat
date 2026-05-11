@@ -141,92 +141,125 @@ fput <- function(x, format, ..., keep_na = FALSE) {
   non_miss <- which(!is_miss)
   if (length(non_miss) == 0L) return(result)
 
+  # Use cached range_table when present; fall back to building on the fly
+  # for ks_format objects created before this field existed.
+  rt <- format$range_table
+  if (is.null(rt)) rt <- .build_range_table(format$mappings, format$type)
+
   map_keys <- names(format$mappings)
-  map_labels <- unlist(format$mappings, use.names = FALSE)
-  is_xn_expr <- grepl("\\.x\\d+", map_labels)
-  map_eval <- vapply(format$mappings, .has_eval_attr, logical(1L))
-  is_expr_label <- is_xn_expr | map_eval
+  map_labels <- rt$mapping_labels
+  is_expr_label <- rt$mapping_is_eval
 
-  val_str <- as.character(x[non_miss])
-  pos <- if (nocase) {
-    match(tolower(val_str), tolower(map_keys))
-  } else {
-    match(val_str, map_keys)
-  }
-
-  found <- !is.na(pos)
   matched <- logical(n)
   expr_map <- list()
 
-  if (any(found)) {
-    found_labels <- map_labels[pos[found]]
-    found_nm <- non_miss[found]
-    is_expr <- is_expr_label[pos[found]]
+  # Phase 1: discrete key matching.
+  # Skip the (expensive) as.character + match() step when there are no
+  # discrete keys to look up (pure numeric-range formats with x already
+  # numeric). The discrete keys are the range-encoded strings like
+  # "0,18,TRUE,FALSE" which will never match a numeric stringification.
+  skip_discrete <- format$type == "numeric" &&
+    length(rt$discrete_idx) == 0L &&
+    is.numeric(x)
 
-    # Assign static labels in bulk
-    static <- !is_expr
-    if (any(static)) {
-      result[found_nm[static]] <- found_labels[static]
-      matched[found_nm[static]] <- TRUE
+  if (!skip_discrete) {
+    val_str <- as.character(x[non_miss])
+    pos <- if (nocase) {
+      match(tolower(val_str), tolower(map_keys))
+    } else {
+      match(val_str, map_keys)
     }
 
-    # Defer expression labels — group by label
-    if (any(is_expr)) {
-      expr_idx <- which(is_expr)
-      expr_labels <- found_labels[expr_idx]
-      unique_expr <- unique(expr_labels)
-      if (length(unique_expr) == 1L) {
-        # Fast path: single expression label (common case)
-        expr_map[[unique_expr]] <- c(expr_map[[unique_expr]], found_nm[expr_idx])
-      } else {
-        # General case: multiple expression labels
-        grouped <- split(found_nm[expr_idx], expr_labels)
-        for (lbl in names(grouped)) {
-          expr_map[[lbl]] <- c(expr_map[[lbl]], grouped[[lbl]])
-        }
+    found <- !is.na(pos)
+
+    if (any(found)) {
+      found_labels <- map_labels[pos[found]]
+      found_nm <- non_miss[found]
+      is_expr <- is_expr_label[pos[found]]
+
+      # Assign static labels in bulk
+      static <- !is_expr
+      if (any(static)) {
+        result[found_nm[static]] <- found_labels[static]
+        matched[found_nm[static]] <- TRUE
       }
-      matched[found_nm[is_expr]] <- TRUE
+
+      # Defer expression labels — group by label
+      if (any(is_expr)) {
+        expr_idx <- which(is_expr)
+        expr_labels <- found_labels[expr_idx]
+        unique_expr <- unique(expr_labels)
+        if (length(unique_expr) == 1L) {
+          # Fast path: single expression label (common case)
+          expr_map[[unique_expr]] <- c(expr_map[[unique_expr]], found_nm[expr_idx])
+        } else {
+          # General case: multiple expression labels
+          grouped <- split(found_nm[expr_idx], expr_labels)
+          for (lbl in names(grouped)) {
+            expr_map[[lbl]] <- c(expr_map[[lbl]], grouped[[lbl]])
+          }
+        }
+        matched[found_nm[is_expr]] <- TRUE
+      }
     }
   }
 
-  # Phase 2: Vectorized range match for numeric formats
-  if (format$type == "numeric") {
-    # Pre-parse range entries
-    range_entries <- list()
-    for (i in seq_along(map_keys)) {
-      parsed <- .parse_range_key(map_keys[i])
-      if (!is.null(parsed)) {
-        range_entries[[length(range_entries) + 1L]] <- list(
-          low = parsed$low, high = parsed$high,
-          inc_low = parsed$inc_low, inc_high = parsed$inc_high,
-          label = map_labels[i]
+  # Phase 2: Vectorized range match for numeric formats (uses cached table)
+  if (format$type == "numeric" && length(rt$low) > 0L) {
+    unmatched_nm <- non_miss[!matched[non_miss]]
+    if (length(unmatched_nm) > 0L) {
+      vals <- if (is.numeric(x)) x[unmatched_nm] else suppressWarnings(as.numeric(x[unmatched_nm]))
+      valid_num <- !is.na(vals)
+
+      # Fast path: sorted, non-overlapping ranges with standard half-open
+      # semantics ([low, high), with optional inclusive upper bound on the
+      # last range) and no expression labels. findInterval is O(n log k) in
+      # C; this avoids the per-range R loop entirely.
+      nr <- length(rt$low)
+      fast_ok <- rt$sorted_disjoint && !any(rt$is_eval) && any(valid_num) &&
+                 all(rt$inc_low) &&
+                 (nr == 1L || !any(rt$inc_high[-nr]))
+      if (fast_ok) {
+        breaks <- c(rt$low, rt$high[nr])
+        idx <- findInterval(
+          vals, breaks,
+          rightmost.closed = rt$inc_high[nr]
         )
-      }
-    }
-
-    if (length(range_entries) > 0L) {
-      unmatched_nm <- non_miss[!matched[non_miss]]
-      if (length(unmatched_nm) > 0L) {
-        vals <- suppressWarnings(as.numeric(x[unmatched_nm]))
-        valid_num <- !is.na(vals)
-
-        for (re in range_entries) {
+        # idx == 0 → below first low; idx > nr → above last high
+        in_bounds <- valid_num & idx >= 1L & idx <= nr
+        # Validate against per-range upper bound (handles gaps between ranges).
+        # Last range respects inc_high[nr]; others are exclusive on upper.
+        if (any(in_bounds)) {
+          sel0 <- which(in_bounds)
+          v0 <- vals[sel0]
+          i0 <- idx[sel0]
+          ok <- v0 < rt$high[i0] | (i0 == nr & rt$inc_high[nr] & v0 <= rt$high[nr])
+          in_bounds[sel0] <- ok
+        }
+        sel <- which(in_bounds)
+        if (length(sel) > 0L) {
+          target <- unmatched_nm[sel]
+          result[target] <- rt$label[idx[sel]]
+          matched[target] <- TRUE
+        }
+      } else {
+        # General path: iterate cached numeric vectors directly
+        for (i in seq_along(rt$low)) {
           still_free <- !matched[unmatched_nm] & valid_num
           if (!any(still_free)) break
 
-          idx <- which(still_free)
-          v <- vals[idx]
-          low_ok <- if (re$inc_low) v >= re$low else v > re$low
-          high_ok <- if (re$inc_high) v <= re$high else v < re$high
+          fi <- which(still_free)
+          v <- vals[fi]
+          low_ok  <- if (rt$inc_low[i])  v >= rt$low[i]  else v > rt$low[i]
+          high_ok <- if (rt$inc_high[i]) v <= rt$high[i] else v < rt$high[i]
           in_rng <- low_ok & high_ok
 
           if (any(in_rng)) {
-            target <- unmatched_nm[idx[in_rng]]
-            re_is_eval <- .is_expr_label(re$label) || .has_eval_attr(re$label)
-            if (re_is_eval) {
-              expr_map[[re$label]] <- c(expr_map[[re$label]], target)
+            target <- unmatched_nm[fi[in_rng]]
+            if (rt$is_eval[i]) {
+              expr_map[[rt$label[i]]] <- c(expr_map[[rt$label[i]]], target)
             } else {
-              result[target] <- re$label
+              result[target] <- rt$label[i]
             }
             matched[target] <- TRUE
           }
@@ -635,25 +668,18 @@ fput_all <- function(x, format, ..., keep_na = FALSE) {
 
   result[non_miss] <- list(character(0))
 
+  # Use cached range_table (built at creation time); fall back if missing.
+  rt <- format$range_table
+  if (is.null(rt)) rt <- .build_range_table(format$mappings, format$type)
+
   map_keys <- names(format$mappings)
-  map_labels <- unlist(format$mappings, use.names = FALSE)
-  map_eval <- vapply(format$mappings, .has_eval_attr, logical(1L))
+  map_labels <- rt$mapping_labels
+  map_eval <- rt$mapping_is_eval
   val_str <- as.character(x[non_miss])
   lookup_vals <- if (nocase) tolower(val_str) else val_str
 
-  range_entries <- list()
   if (format$type == "numeric") {
-    is_range <- vapply(map_keys, function(k) !is.null(.parse_range_key(k)), logical(1L))
-    discrete_indices <- which(!is_range)
-    range_idx <- which(is_range)
-    for (i in range_idx) {
-      parsed <- .parse_range_key(map_keys[i])
-      range_entries[[length(range_entries) + 1L]] <- list(
-        low = parsed$low, high = parsed$high,
-        inc_low = parsed$inc_low, inc_high = parsed$inc_high,
-        label = map_labels[i]
-      )
-    }
+    discrete_indices <- rt$discrete_idx
   } else {
     discrete_indices <- seq_along(map_keys)
   }
@@ -679,24 +705,24 @@ fput_all <- function(x, format, ..., keep_na = FALSE) {
     }
   }
 
-  # Vectorized range matching
-  if (length(range_entries) > 0L) {
+  # Vectorized range matching (uses cached range_table)
+  if (length(rt$low) > 0L) {
     vals <- suppressWarnings(as.numeric(x[non_miss]))
     valid_num <- !is.na(vals)
 
-    for (re in range_entries) {
-      low_ok <- if (re$inc_low) vals >= re$low else vals > re$low
-      high_ok <- if (re$inc_high) vals <= re$high else vals < re$high
+    for (i in seq_along(rt$low)) {
+      low_ok  <- if (rt$inc_low[i])  vals >= rt$low[i]  else vals > rt$low[i]
+      high_ok <- if (rt$inc_high[i]) vals <= rt$high[i] else vals < rt$high[i]
       in_rng <- low_ok & high_ok & valid_num
 
       if (any(in_rng)) {
         has_any_match[in_rng] <- TRUE
-        re_is_eval <- .is_expr_label(re$label) || .has_eval_attr(re$label)
+        re_is_eval <- rt$is_eval[i]
         if (re_is_eval) {
-          expr_map[[re$label]] <- c(expr_map[[re$label]], non_miss[which(in_rng)])
+          expr_map[[rt$label[i]]] <- c(expr_map[[rt$label[i]]], non_miss[which(in_rng)])
         } else {
           target <- non_miss[which(in_rng)]
-          result[target] <- Map(c, result[target], list(re$label))
+          result[target] <- Map(c, result[target], list(rt$label[i]))
         }
       }
     }

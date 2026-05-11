@@ -3104,3 +3104,130 @@ test_that("fexport/fparse roundtrip for Date format", {
   expect_equal(fmt$mappings[["B"]], as.Date("2025-02-20"))
   fclear()
 })
+
+# ============================================================================
+# Range table fast path (findInterval-based numeric range matching)
+# ============================================================================
+
+test_that("range_table is attached at format creation (fparse)", {
+  fparse(text = '
+  VALUE age_rt (numeric)
+    [0, 18)    = "Child"
+    [18, 65)   = "Adult"
+    [65, HIGH] = "Senior"
+  ;
+  ')
+  fmt <- format_get("age_rt")
+  rt <- fmt$range_table
+  expect_false(is.null(rt))
+  expect_equal(rt$low, c(0, 18, 65))
+  expect_equal(rt$high, c(18, 65, Inf))
+  expect_true(all(rt$inc_low))
+  expect_equal(rt$inc_high, c(FALSE, FALSE, TRUE))
+  expect_true(rt$sorted_disjoint)
+  fclear()
+})
+
+test_that("range_table is attached by fparse for VALUE blocks", {
+  fparse(text = '
+  VALUE age_p (numeric)
+    [0, 18)    = "Child"
+    [18, 65)   = "Adult"
+    [65, HIGH] = "Senior"
+  ;
+  ')
+  fmt <- format_get("age_p")
+  expect_false(is.null(fmt$range_table))
+  expect_true(fmt$range_table$sorted_disjoint)
+  fclear()
+})
+
+test_that("fput numeric range fast path matches generic path", {
+  fparse(text = '
+  VALUE age_fp (numeric)
+    [0, 18)    = "Child"
+    [18, 65)   = "Adult"
+    [65, HIGH] = "Senior"
+    .missing   = "Unknown"
+  ;
+  ')
+  vals <- c(-1, 0, 5, 17, 18, 30, 64, 65, 100, NA)
+  out <- fput(vals, "age_fp")
+  expect_equal(out, c("-1", "Child", "Child", "Child", "Adult",
+                      "Adult", "Adult", "Senior", "Senior", "Unknown"))
+  fclear()
+})
+
+test_that("fput respects gaps between ranges (fast path)", {
+  fparse(text = '
+  VALUE gap_rt (numeric)
+    [0, 10)  = "Low"
+    [20, 30) = "High"
+  ;
+  ')
+  fmt <- format_get("gap_rt")
+  expect_true(fmt$range_table$sorted_disjoint)
+  out <- fput(c(5, 15, 25, 10, 20), "gap_rt")
+  # 15 falls in gap; 10 excluded by high of first range — both returned as-is
+  expect_equal(out, c("Low", "15", "High", "10", "High"))
+  fclear()
+})
+
+test_that("fput with overlapping multilabel ranges falls back to general path", {
+  fparse(text = '
+  VALUE risk_rt (numeric, multilabel)
+    [0, 3]  = "Low"
+    [0, 7]  = "Monitored"
+    (3, 7]  = "Medium"
+    (7, 10] = "High"
+  ;
+  ')
+  rt <- format_get("risk_rt")$range_table
+  expect_false(rt$sorted_disjoint)
+  # fput_all should return all matching labels
+  out <- fput_all(c(2, 5, 8), "risk_rt")
+  expect_setequal(out[[1]], c("Low", "Monitored"))
+  expect_setequal(out[[2]], c("Monitored", "Medium"))
+  expect_setequal(out[[3]], "High")
+  fclear()
+})
+
+test_that("fput with exclusive lower bound on first range uses general path", {
+  fparse(text = '
+  VALUE excl_rt (numeric)
+    (0, 10)  = "Mid"
+    [10, 20) = "High"
+  ;
+  ')
+  out <- fput(c(0, 5, 10, 15), "excl_rt")
+  # 0 has inc_low=FALSE on first range → no match → returned as-is
+  expect_equal(out, c("0", "Mid", "High", "High"))
+  fclear()
+})
+
+test_that("fput with point range [5,5] matches single value", {
+  fparse(text = '
+  VALUE pt_rt (numeric)
+    [5, 5]   = "Exactly5"
+    [10, 20) = "Teens"
+  ;
+  ')
+  out <- fput(c(4, 5, 6, 15), "pt_rt")
+  expect_equal(out, c("4", "Exactly5", "6", "Teens"))
+  fclear()
+})
+
+test_that("fput numeric ranges work without cached range_table (fallback)", {
+  fparse(text = '
+  VALUE fb_rt (numeric)
+    [0, 10)  = "Low"
+    [10, 20) = "High"
+  ;
+  ')
+  fmt <- format_get("fb_rt")
+  # Strip the cached table to exercise the fallback path
+  fmt$range_table <- NULL
+  out <- fput(c(5, 15, 25), fmt)
+  expect_equal(out[1:2], c("Low", "High"))
+  fclear()
+})

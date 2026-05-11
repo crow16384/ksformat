@@ -400,6 +400,133 @@ in_range <- function(x, range_spec) {
   NULL
 }
 
+
+#' Build a precomputed range table from a mappings list
+#'
+#' Walks the mapping keys once with \code{.parse_range_key()} and returns
+#' parallel atomic vectors describing the range entries, plus indices of the
+#' discrete (non-range) entries and metadata about labels (eval flag, .xN
+#' expression). The result is attached to a \code{ks_format} object so that
+#' \code{fput()} / \code{fput_all()} can skip per-call parsing of range keys.
+#'
+#' Returns \code{NULL} for non-numeric formats (other types do not use the
+#' generic numeric range scan in \code{fput()}).
+#'
+#' @param mappings Named list of label values (the \code{mappings} field of a
+#'   \code{ks_format} object).
+#' @param type Character. Format type. Range table is only built for
+#'   \code{"numeric"}.
+#' @return A list with components:
+#'   \itemize{
+#'     \item \code{low}, \code{high}: numeric vectors of range bounds.
+#'     \item \code{inc_low}, \code{inc_high}: logical vectors of inclusivity.
+#'     \item \code{label}: character vector of range labels (with any
+#'       \code{eval} attribute preserved on each element).
+#'     \item \code{is_eval}: logical vector — TRUE if the label is an
+#'       expression label (\code{.xN} or has \code{eval} attribute).
+#'     \item \code{range_idx}: integer indices of range entries in the
+#'       original \code{mappings}.
+#'     \item \code{discrete_idx}: integer indices of non-range (discrete)
+#'       entries in the original \code{mappings}.
+#'     \item \code{mapping_is_eval}: logical vector (length of
+#'       \code{mappings}) — TRUE if each label is an expression label.
+#'     \item \code{mapping_labels}: character vector of all labels
+#'       (unlisted, names dropped) for fast bulk access.
+#'     \item \code{sorted_disjoint}: logical. TRUE when range entries are
+#'       sorted by \code{low} and non-overlapping (enables
+#'       \code{findInterval()} fast path).
+#'     \item \code{sort_perm}: integer permutation that sorts the range
+#'       entries by \code{low}. When \code{sorted_disjoint} is TRUE, the
+#'       \code{low}/\code{high}/etc. vectors above are already in this
+#'       order; otherwise the original order is preserved and
+#'       \code{sort_perm} is informational.
+#'   }
+#' @keywords internal
+#' @noRd
+.build_range_table <- function(mappings, type) {
+  n <- length(mappings)
+  map_labels <- if (n == 0L) character(0) else unlist(mappings, use.names = FALSE)
+  mapping_is_eval <- if (n == 0L) {
+    logical(0)
+  } else {
+    vapply(seq_len(n), function(i) {
+      lbl <- mappings[[i]]
+      .is_expr_label(lbl) || .has_eval_attr(lbl)
+    }, logical(1L))
+  }
+
+  base <- list(
+    low = numeric(0), high = numeric(0),
+    inc_low = logical(0), inc_high = logical(0),
+    label = character(0), is_eval = logical(0),
+    range_idx = integer(0),
+    discrete_idx = seq_len(n),
+    mapping_is_eval = mapping_is_eval,
+    mapping_labels = map_labels,
+    sorted_disjoint = FALSE,
+    sort_perm = integer(0)
+  )
+
+  if (n == 0L || !identical(type, "numeric")) return(base)
+
+  map_keys <- names(mappings)
+  lows <- numeric(0); highs <- numeric(0)
+  incl <- logical(0); inch <- logical(0)
+  ridx <- integer(0)
+
+  for (i in seq_len(n)) {
+    parsed <- .parse_range_key(map_keys[i])
+    if (!is.null(parsed)) {
+      lows  <- c(lows,  parsed$low)
+      highs <- c(highs, parsed$high)
+      incl  <- c(incl,  parsed$inc_low)
+      inch  <- c(inch,  parsed$inc_high)
+      ridx  <- c(ridx,  i)
+    }
+  }
+
+  if (length(ridx) == 0L) return(base)
+
+  is_eval_r <- mapping_is_eval[ridx]
+  labels_r  <- map_labels[ridx]
+  # Preserve eval attributes from original mappings
+  for (k in seq_along(ridx)) {
+    if (.has_eval_attr(mappings[[ridx[k]]])) {
+      attr(labels_r[k], "eval") <- TRUE
+    }
+  }
+
+  sort_perm <- order(lows, highs)
+  is_sorted <- !is.unsorted(lows)
+  disjoint <- TRUE
+  if (length(lows) > 1L) {
+    # Order by low for overlap check
+    sl <- lows[sort_perm]; sh <- highs[sort_perm]
+    sil <- incl[sort_perm]; sih <- inch[sort_perm]
+    for (j in seq_len(length(sl) - 1L)) {
+      # Adjacent allowed if previous high == next low and not both inclusive
+      if (sh[j] > sl[j + 1L]) { disjoint <- FALSE; break }
+      if (sh[j] == sl[j + 1L] && sih[j] && sil[j + 1L]) {
+        disjoint <- FALSE; break
+      }
+    }
+  }
+  sorted_disjoint <- is_sorted && disjoint
+
+  list(
+    low = lows, high = highs,
+    inc_low = incl, inc_high = inch,
+    label = labels_r, is_eval = is_eval_r,
+    range_idx = ridx,
+    discrete_idx = setdiff(seq_len(n), ridx),
+    mapping_is_eval = mapping_is_eval,
+    mapping_labels = map_labels,
+    sorted_disjoint = sorted_disjoint,
+    sort_perm = sort_perm
+  )
+}
+
+
 #' Extract Range Entries from a Format
 #'
 #' Returns the range-based mappings of a \code{ks_format} object as a tidy
