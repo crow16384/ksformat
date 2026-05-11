@@ -153,12 +153,15 @@ fput <- function(x, format, ..., keep_na = FALSE) {
   matched <- logical(n)
   expr_map <- list()
 
+  # Cache type predicate (used in multiple branches below).
+  is_numeric_fmt <- format$type == "numeric"
+
   # Phase 1: discrete key matching.
   # Skip the (expensive) as.character + match() step when there are no
   # discrete keys to look up (pure numeric-range formats with x already
   # numeric). The discrete keys are the range-encoded strings like
   # "0,18,TRUE,FALSE" which will never match a numeric stringification.
-  skip_discrete <- format$type == "numeric" &&
+  skip_discrete <- is_numeric_fmt &&
     length(rt$discrete_idx) == 0L &&
     is.numeric(x)
 
@@ -205,7 +208,7 @@ fput <- function(x, format, ..., keep_na = FALSE) {
   }
 
   # Phase 2: Vectorized range match for numeric formats (uses cached table)
-  if (format$type == "numeric" && length(rt$low) > 0L) {
+  if (is_numeric_fmt && length(rt$low) > 0L) {
     unmatched_nm <- non_miss[!matched[non_miss]]
     if (length(unmatched_nm) > 0L) {
       vals <- if (is.numeric(x)) x[unmatched_nm] else suppressWarnings(as.numeric(x[unmatched_nm]))
@@ -214,9 +217,11 @@ fput <- function(x, format, ..., keep_na = FALSE) {
       # Fast path: sorted, non-overlapping ranges with standard half-open
       # semantics ([low, high), with optional inclusive upper bound on the
       # last range) and no expression labels. findInterval is O(n log k) in
-      # C; this avoids the per-range R loop entirely.
+      # C; this avoids the per-range R loop entirely. The any(valid_num)
+      # guard is a separate early skip below, not part of the fast-path
+      # eligibility check.
       nr <- length(rt$low)
-      fast_ok <- rt$sorted_disjoint && !any(rt$is_eval) && any(valid_num) &&
+      fast_ok <- any(valid_num) && rt$sorted_disjoint && !any(rt$is_eval) &&
                  all(rt$inc_low) &&
                  (nr == 1L || !any(rt$inc_high[-nr]))
       if (fast_ok) {
@@ -717,11 +722,11 @@ fput_all <- function(x, format, ..., keep_na = FALSE) {
 
       if (any(in_rng)) {
         has_any_match[in_rng] <- TRUE
-        re_is_eval <- rt$is_eval[i]
-        if (re_is_eval) {
-          expr_map[[rt$label[i]]] <- c(expr_map[[rt$label[i]]], non_miss[which(in_rng)])
+        w <- which(in_rng)
+        target <- non_miss[w]
+        if (rt$is_eval[i]) {
+          expr_map[[rt$label[i]]] <- c(expr_map[[rt$label[i]]], target)
         } else {
-          target <- non_miss[which(in_rng)]
           result[target] <- Map(c, result[target], list(rt$label[i]))
         }
       }
