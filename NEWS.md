@@ -1,3 +1,38 @@
+# ksformat 0.7.0
+
+## New features
+
+* New format type **`stratified_range`** — combines a discrete stratum
+  (study arm, subject id, composite key, …) with per-stratum numeric /
+  Date / POSIXct range buckets. Apply with `fputk()`, passing the
+  stratum column(s) first and the value column last.
+* New builder `fmap_strata(stratum, low, high, label, inc_low, inc_high,
+  sep)` — produces a `ks_fmap` ready for
+  `fnew(..., type = "stratified_range")`. The chosen separator is
+  carried as an attribute and picked up automatically by `fnew()`.
+* New builder `fmap_ranges(low, high, label, inc_low, inc_high)` —
+  convenience helper that turns parallel vectors of numeric / Date /
+  POSIXct bounds and labels into canonical range keys, removing the
+  need to hand-craft `"low,high,inc_low,inc_high"` strings.
+* `fparse()` / `fexport()` support the new type via the
+  `VALUE name (stratified_range, range_subtype: numeric|date|datetime,
+  strata_sep: |)` block syntax. Both canonical
+  `"STRATUM|low,high,inc_low,inc_high"` keys and the friendly
+  `"STRATUM"|[low, high)` interval form are accepted, including
+  per-stratum `.missing|STRATUM` / `.other|STRATUM` directives.
+* `print.ks_format()` renders stratified formats grouped under
+  `Stratum "X":` headers.
+
+## Documentation
+
+* Vignette **Example 26: Stratified Range Lookup with `fputk()`** —
+  programmatic and text-based construction, date subtype with
+  per-subject windows, per-stratum and global `.other` fallbacks, and
+  `fexport()`/`fparse()` roundtrip.
+* Vignette **Example 27: Plain Range Lookup with `fmap_ranges()`** —
+  builds a numeric age-band format without hand-crafted canonical keys.
+* `examples/StratifiedRanges.R` — runnable companion script.
+
 # ksformat 0.6.7
 
 ## Documentation

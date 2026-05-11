@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.0</span>
       </span>
     </div>
 
@@ -488,8 +488,8 @@ once:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;        format             result</span></span>
-<span><span class="co">#&gt; 1 DATETIME20. 11MAY2026:19:56:03</span></span>
-<span><span class="co">#&gt; 2 DATETIME13.      11MAY26:19:56</span></span>
+<span><span class="co">#&gt; 1 DATETIME20. 11MAY2026:20:36:25</span></span>
+<span><span class="co">#&gt; 2 DATETIME13.      11MAY26:20:36</span></span>
 <span><span class="co">#&gt; 3     DTDATE.          11MAY2026</span></span>
 <span><span class="co">#&gt; 4   DTYYMMDD.         2026-05-11</span></span>
 <span></span>
@@ -1045,7 +1045,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpG6itwb/temp_libpath38ca69a13f2d/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmp5s2dpp/temp_libpath43421ddd4f66/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">imported</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "AGEGRP"   "BMICAT"   "GENDER"   "RACEIN"   "SMISSING"</span></span>
 <span></span>
@@ -1173,7 +1173,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpG6itwb/temp_libpath38ca69a13f2d/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmp5s2dpp/temp_libpath43421ddd4f66/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span></span>
 <span><span class="co"># Library should be empty</span></span>
 <span><span class="fu"><a href="../reference/flist.html">flist</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -1923,6 +1923,132 @@ expressed as <code>YYYY-MM-DD HH:MM[:SS]</code> strings.</p>
 <span><span class="co">#&gt; 2 2024-01-15 11:45:00     Day</span></span>
 <span><span class="co">#&gt; 3 2024-01-15 19:00:00 Evening</span></span></code></pre></div>
 </div>
+</div>
+<div class="section level2">
+<h2 id="example-26-stratified-range-lookup-with-fputk">Example 26: Stratified Range Lookup with <code>fputk()</code><a class="anchor" aria-label="anchor" href="#example-26-stratified-range-lookup-with-fputk"></a>
+</h2>
+<p>The <code>stratified_range</code> type combines a discrete stratum
+(such as a study arm, subject id, or any composite key) with a numeric /
+Date / POSIXct range. Each stratum has its own bucket boundaries, and
+<code><a href="../reference/fputk.html">fputk()</a></code> dispatches to the right bucket for each row.</p>
+<div class="section level3">
+<h3 id="programmatic-construction-with-fmap_strata">Programmatic construction with <code>fmap_strata()</code><a class="anchor" aria-label="anchor" href="#programmatic-construction-with-fmap_strata"></a>
+</h3>
+<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">visits</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fmap_strata.html">fmap_strata</a></span><span class="op">(</span></span>
+<span>  stratum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ARM_A"</span>, <span class="st">"ARM_A"</span>, <span class="st">"ARM_A"</span>, <span class="st">"ARM_B"</span>, <span class="st">"ARM_B"</span><span class="op">)</span>,</span>
+<span>  low     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,        <span class="fl">7</span>,       <span class="fl">28</span>,      <span class="fl">0</span>,       <span class="fl">14</span><span class="op">)</span>,</span>
+<span>  high    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">7</span>,        <span class="fl">28</span>,      <span class="cn">Inf</span>,     <span class="fl">14</span>,      <span class="cn">Inf</span><span class="op">)</span>,</span>
+<span>  label   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Baseline"</span>, <span class="st">"Wk1-3"</span>, <span class="st">"Wk4+"</span>, <span class="st">"Baseline"</span>, <span class="st">"Wk2+"</span><span class="op">)</span>,</span>
+<span>  inc_high <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="va">visits</span>, type <span class="op">=</span> <span class="st">"stratified_range"</span>,</span>
+<span>     <span class="st">".other|ARM_A"</span> <span class="op">=</span> <span class="st">"A_outside"</span>,</span>
+<span>     .other <span class="op">=</span> <span class="st">"outside_window"</span>,</span>
+<span>     name <span class="op">=</span> <span class="st">"vw"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  arm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ARM_A"</span>, <span class="st">"ARM_A"</span>, <span class="st">"ARM_B"</span>, <span class="st">"ARM_B"</span>, <span class="st">"ARM_C"</span><span class="op">)</span>,</span>
+<span>  day <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,        <span class="fl">35</span>,      <span class="fl">5</span>,       <span class="fl">40</span>,      <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">df</span><span class="op">$</span><span class="va">visit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fputk.html">fputk</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">arm</span>, <span class="va">df</span><span class="op">$</span><span class="va">day</span>, format <span class="op">=</span> <span class="st">"vw"</span><span class="op">)</span></span>
+<span><span class="va">df</span></span>
+<span><span class="co">#&gt;     arm day          visit</span></span>
+<span><span class="co">#&gt; 1 ARM_A   3       Baseline</span></span>
+<span><span class="co">#&gt; 2 ARM_A  35           Wk4+</span></span>
+<span><span class="co">#&gt; 3 ARM_B   5       Baseline</span></span>
+<span><span class="co">#&gt; 4 ARM_B  40           Wk2+</span></span>
+<span><span class="co">#&gt; 5 ARM_C  10 outside_window</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="text-definition-with-fparse">Text definition with <code>fparse()</code><a class="anchor" aria-label="anchor" href="#text-definition-with-fparse"></a>
+</h3>
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
+<span><span class="st">VALUE vw_text (stratified_range, range_subtype: numeric)</span></span>
+<span><span class="st">  "ARM_A"|[0, 7)    = "Baseline"</span></span>
+<span><span class="st">  "ARM_A"|[7, 28)   = "Wk1-3"</span></span>
+<span><span class="st">  "ARM_A"|[28, HIGH]= "Wk4+"</span></span>
+<span><span class="st">  "ARM_B"|[0, 14)   = "Baseline"</span></span>
+<span><span class="st">  "ARM_B"|[14, HIGH]= "Wk2+"</span></span>
+<span><span class="st">  ".other|ARM_A"    = "A_outside"</span></span>
+<span><span class="st">  .other            = "outside_window"</span></span>
+<span><span class="st">  ;</span></span>
+<span><span class="st">'</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fputk.html">fputk</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">arm</span>, <span class="va">df</span><span class="op">$</span><span class="va">day</span>, format <span class="op">=</span> <span class="st">"vw_text"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Baseline"       "Wk4+"           "Baseline"       "Wk2+"          </span></span>
+<span><span class="co">#&gt; [5] "outside_window"</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="date-subtype-per-subject-windows">Date subtype: per-subject windows<a class="anchor" aria-label="anchor" href="#date-subtype-per-subject-windows"></a>
+</h3>
+<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">windows</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fmap_strata.html">fmap_strata</a></span><span class="op">(</span></span>
+<span>  stratum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"S001"</span>, <span class="st">"S001"</span>, <span class="st">"S002"</span>, <span class="st">"S002"</span><span class="op">)</span>,</span>
+<span>  low     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2024-01-01"</span>, <span class="st">"2024-01-15"</span>,</span>
+<span>                       <span class="st">"2024-02-01"</span>, <span class="st">"2024-02-20"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  high    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2024-01-15"</span>, <span class="st">"2024-02-01"</span>,</span>
+<span>                       <span class="st">"2024-02-20"</span>, <span class="st">"2024-03-10"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  label   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Screen"</span>, <span class="st">"Treat"</span>, <span class="st">"Screen"</span>, <span class="st">"Treat"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="va">windows</span>, type <span class="op">=</span> <span class="st">"stratified_range"</span>, range_subtype <span class="op">=</span> <span class="st">"date"</span>,</span>
+<span>     .other <span class="op">=</span> <span class="st">"off-window"</span>, name <span class="op">=</span> <span class="st">"win"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">subj</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"S001"</span>, <span class="st">"S001"</span>, <span class="st">"S002"</span>, <span class="st">"S002"</span>, <span class="st">"S003"</span><span class="op">)</span></span>
+<span><span class="va">visits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2024-01-05"</span>, <span class="st">"2024-01-20"</span>,</span>
+<span>                     <span class="st">"2024-02-10"</span>, <span class="st">"2024-03-01"</span>, <span class="st">"2024-01-01"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  subj  <span class="op">=</span> <span class="va">subj</span>,</span>
+<span>  date  <span class="op">=</span> <span class="va">visits</span>,</span>
+<span>  phase <span class="op">=</span> <span class="fu"><a href="../reference/fputk.html">fputk</a></span><span class="op">(</span><span class="va">subj</span>, <span class="va">visits</span>, format <span class="op">=</span> <span class="st">"win"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;   subj       date      phase</span></span>
+<span><span class="co">#&gt; 1 S001 2024-01-05     Screen</span></span>
+<span><span class="co">#&gt; 2 S001 2024-01-20      Treat</span></span>
+<span><span class="co">#&gt; 3 S002 2024-02-10     Screen</span></span>
+<span><span class="co">#&gt; 4 S002 2024-03-01      Treat</span></span>
+<span><span class="co">#&gt; 5 S003 2024-01-01 off-window</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="roundtrip-via-fexport-fparse">Roundtrip via <code>fexport()</code> / <code>fparse()</code><a class="anchor" aria-label="anchor" href="#roundtrip-via-fexport-fparse"></a>
+</h3>
+<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">txt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fexport.html">fexport</a></span><span class="op">(</span><span class="fu"><a href="../reference/format_get.html">format_get</a></span><span class="op">(</span><span class="st">"vw"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">txt</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; VALUE vw (stratified_range, range_subtype: numeric, strata_sep: |)</span></span>
+<span><span class="co">#&gt;   "ARM_A"|[0, 7) = "Baseline"</span></span>
+<span><span class="co">#&gt;   "ARM_A"|[7, 28) = "Wk1-3"</span></span>
+<span><span class="co">#&gt;   "ARM_A"|[28, HIGH] = "Wk4+"</span></span>
+<span><span class="co">#&gt;   ".other|ARM_A" = "A_outside"</span></span>
+<span><span class="co">#&gt;   "ARM_B"|[0, 14) = "Baseline"</span></span>
+<span><span class="co">#&gt;   "ARM_B"|[14, HIGH] = "Wk2+"</span></span>
+<span><span class="co">#&gt;   .other = "outside_window"</span></span>
+<span><span class="co">#&gt; ;</span></span>
+<span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; All formats cleared from library.</span></span>
+<span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="va">txt</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fputk.html">fputk</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">arm</span>, <span class="va">df</span><span class="op">$</span><span class="va">day</span>, format <span class="op">=</span> <span class="st">"vw"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Baseline"       "Wk4+"           "Baseline"       "Wk2+"          </span></span>
+<span><span class="co">#&gt; [5] "outside_window"</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="example-27-plain-range-lookup-with-fmap_ranges">Example 27: Plain Range Lookup with <code>fmap_ranges()</code><a class="anchor" aria-label="anchor" href="#example-27-plain-range-lookup-with-fmap_ranges"></a>
+</h2>
+<p>For non-stratified numeric / Date ranges, <code><a href="../reference/fmap_ranges.html">fmap_ranges()</a></code>
+saves you from hand-crafting canonical keys.</p>
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">age_groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fmap_ranges.html">fmap_ranges</a></span><span class="op">(</span></span>
+<span>  low   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">18</span>, <span class="fl">65</span><span class="op">)</span>,</span>
+<span>  high  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">18</span>, <span class="fl">65</span>, <span class="cn">Inf</span><span class="op">)</span>,</span>
+<span>  label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Child"</span>, <span class="st">"Adult"</span>, <span class="st">"Senior"</span><span class="op">)</span>,</span>
+<span>  inc_high <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="va">age_groups</span>, type <span class="op">=</span> <span class="st">"numeric"</span>, name <span class="op">=</span> <span class="st">"ag"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">25</span>, <span class="fl">90</span><span class="op">)</span>, <span class="st">"ag"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Child"  "Adult"  "Senior"</span></span>
+<span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
 </div>
   </div>
 

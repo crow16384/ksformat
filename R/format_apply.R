@@ -79,6 +79,14 @@ fput <- function(x, format, ..., keep_na = FALSE) {
     return(character(0))
   }
 
+  # Stratified ranges require fputk() (need both stratum and value)
+  if (.is_stratified_type(format$type)) {
+    cli_abort(c(
+      "{.fn fput} cannot apply a stratified_range format directly.",
+      "i" = "Use {.fn fputk} with at least 2 arguments (stratum(s) and value)."
+    ))
+  }
+
   # Delegate to datetime formatter for date/time/datetime types
   if (format$type %in% c("date", "time", "datetime")) {
     return(.apply_datetime_format(x, format, keep_na = keep_na))
@@ -894,10 +902,196 @@ fputk <- function(..., format, sep = "|", keep_na = FALSE) {
   if (length(args) < 1L) {
     cli_abort("At least one key component must be provided in {.code ...}.")
   }
+
+  # Resolve format upfront for stratified dispatch
+  fmt <- format
+  if (is.character(fmt) && length(fmt) == 1L) {
+    fmt <- .format_get(fmt)
+  }
+
+  # Stratified ranges: last arg is the value, preceding args form the stratum
+  if (inherits(fmt, "ks_format") && .is_stratified_type(fmt$type)) {
+    if (length(args) < 2L) {
+      cli_abort(c(
+        "Stratified ranges require at least 2 arguments to {.fn fputk}.",
+        "i" = "Pass the stratum column(s) first, then the value column."
+      ))
+    }
+    strat_sep <- if (!is.null(fmt$strata_sep)) fmt$strata_sep else sep
+    n_args <- length(args)
+    stratum_args <- args[seq_len(n_args - 1L)]
+    value <- args[[n_args]]
+    stratum <- do.call(paste, c(stratum_args, list(sep = strat_sep)))
+    # Propagate NA in stratum components
+    if (length(stratum_args) > 0L) {
+      strat_na <- Reduce(`|`, lapply(stratum_args, is.na))
+      stratum[strat_na] <- NA_character_
+    }
+    return(.fput_stratified(stratum, value, fmt, keep_na = keep_na))
+  }
+
   keys <- do.call(paste, c(args, list(sep = sep)))
   # Propagate NA: paste() coerces NA to "NA" — restore real NA so
   # fput() can apply .missing handling correctly.
   any_na <- Reduce(`|`, lapply(args, is.na))
   keys[any_na] <- NA_character_
   fput(keys, format, keep_na = keep_na)
+}
+
+
+# ---------------------------------------------------------------------------
+# Internal helper: apply a stratified_range format
+# ---------------------------------------------------------------------------
+
+#' Match a numeric vector against a (precomputed) range table
+#'
+#' Returns a character vector of labels (NA where no range matched).
+#' Mirrors the fast-path / generic-loop logic from \code{fput()}.
+#' @keywords internal
+#' @noRd
+.match_range_table <- function(vals_num, rt) {
+  n <- length(vals_num)
+  out <- rep(NA_character_, n)
+  if (n == 0L || is.null(rt) || length(rt$low) == 0L) return(out)
+
+  valid_num <- !is.na(vals_num)
+  nr <- length(rt$low)
+  fast_ok <- any(valid_num) && rt$sorted_disjoint && !any(rt$is_eval) &&
+             all(rt$inc_low) &&
+             (nr == 1L || !any(rt$inc_high[-nr]))
+
+  if (fast_ok) {
+    breaks <- c(rt$low, rt$high[nr])
+    idx <- findInterval(
+      vals_num, breaks,
+      rightmost.closed = rt$inc_high[nr]
+    )
+    in_bounds <- valid_num & idx >= 1L & idx <= nr
+    if (any(in_bounds)) {
+      sel0 <- which(in_bounds)
+      v0 <- vals_num[sel0]
+      i0 <- idx[sel0]
+      ok <- v0 < rt$high[i0] |
+            (i0 == nr & rt$inc_high[nr] & v0 <= rt$high[nr])
+      in_bounds[sel0] <- ok
+    }
+    sel <- which(in_bounds)
+    if (length(sel) > 0L) {
+      out[sel] <- rt$label[idx[sel]]
+    }
+    return(out)
+  }
+
+  matched <- logical(n)
+  for (i in seq_len(nr)) {
+    still_free <- !matched & valid_num
+    if (!any(still_free)) break
+    fi <- which(still_free)
+    v <- vals_num[fi]
+    low_ok  <- if (rt$inc_low[i])  v >= rt$low[i]  else v > rt$low[i]
+    high_ok <- if (rt$inc_high[i]) v <= rt$high[i] else v < rt$high[i]
+    in_rng <- low_ok & high_ok
+    if (any(in_rng)) {
+      out[fi[in_rng]] <- rt$label[i]
+      matched[fi[in_rng]] <- TRUE
+    }
+  }
+  out
+}
+
+#' Apply a stratified_range format
+#'
+#' @param stratum Character vector of stratum identifiers (NA marks
+#'   stratum-side missing values).
+#' @param value Vector of native values to look up within each stratum
+#'   (numeric, Date, or POSIXct depending on \code{format$range_subtype}).
+#' @param format \code{ks_format} with \code{type == "stratified_range"}.
+#' @param keep_na Logical. If TRUE, preserve NA in inputs rather than
+#'   applying \code{.missing} labels.
+#' @return Character vector of labels, same length as inputs.
+#' @keywords internal
+#' @noRd
+.fput_stratified <- function(stratum, value, format, keep_na = FALSE) {
+  n <- length(stratum)
+  if (length(value) != n) {
+    # Recycle scalar value
+    if (length(value) == 1L) {
+      value <- rep(value, n)
+    } else {
+      cli_abort(
+        "Stratum (length {n}) and value (length {length(value)}) must match."
+      )
+    }
+  }
+  result <- rep(NA_character_, n)
+  if (n == 0L) return(result)
+
+  range_subtype <- format$range_subtype
+  range_type <- .stratified_subtype_to_range_type(range_subtype)
+  rt_list <- format$range_tables
+  miss_by <- format$missing_by_stratum
+  other_by <- format$other_by_stratum
+  global_miss <- format$missing_label
+  global_other <- format$other_label
+
+  is_miss <- is_missing(stratum) | is_missing(value)
+
+  # Missing handling
+  if (!keep_na && any(is_miss)) {
+    miss_idx <- which(is_miss)
+    # Try per-stratum .missing first (when stratum is non-missing)
+    if (!is.null(miss_by) && length(miss_by) > 0L) {
+      strat_known <- !is.na(stratum[miss_idx]) &
+        stratum[miss_idx] %in% names(miss_by)
+      if (any(strat_known)) {
+        idx <- miss_idx[strat_known]
+        result[idx] <- vapply(stratum[idx], function(s) miss_by[[s]],
+                              character(1L))
+      }
+      fallback <- miss_idx[!strat_known]
+    } else {
+      fallback <- miss_idx
+    }
+    if (length(fallback) > 0L && !is.null(global_miss)) {
+      result[fallback] <- as.character(global_miss)
+    }
+  }
+
+  non_miss <- which(!is_miss)
+  if (length(non_miss) == 0L) return(result)
+
+  # Group non-missing positions by stratum
+  groups <- split(non_miss, stratum[non_miss])
+
+  for (s in names(groups)) {
+    idx <- groups[[s]]
+    rt <- rt_list[[s]]
+    if (is.null(rt)) {
+      # Stratum not defined: per-stratum .other → global .other → value
+      if (!is.null(other_by) && s %in% names(other_by)) {
+        result[idx] <- as.character(other_by[[s]])
+      } else if (!is.null(global_other)) {
+        result[idx] <- as.character(global_other)
+      } else {
+        result[idx] <- as.character(value[idx])
+      }
+      next
+    }
+    vals_num <- .to_range_numeric(value[idx], range_type, format$date_format)
+    labels <- .match_range_table(vals_num, rt)
+    # Unmatched within stratum: per-stratum .other → global .other → value
+    unmatched <- is.na(labels)
+    if (any(unmatched)) {
+      um_idx <- idx[unmatched]
+      if (!is.null(other_by) && s %in% names(other_by)) {
+        labels[unmatched] <- as.character(other_by[[s]])
+      } else if (!is.null(global_other)) {
+        labels[unmatched] <- as.character(global_other)
+      } else {
+        labels[unmatched] <- as.character(value[um_idx])
+      }
+    }
+    result[idx] <- labels
+  }
+  result
 }

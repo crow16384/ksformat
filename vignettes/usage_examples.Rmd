@@ -1368,3 +1368,106 @@ data.frame(
 ```{r date-range-cleanup, include=FALSE}
 fclear()
 ```
+
+## Example 26: Stratified Range Lookup with `fputk()`
+
+The `stratified_range` type combines a discrete stratum (such as a study arm,
+subject id, or any composite key) with a numeric / Date / POSIXct range. Each
+stratum has its own bucket boundaries, and `fputk()` dispatches to the right
+bucket for each row.
+
+### Programmatic construction with `fmap_strata()`
+
+```{r strat-num}
+visits <- fmap_strata(
+  stratum = c("ARM_A", "ARM_A", "ARM_A", "ARM_B", "ARM_B"),
+  low     = c(0,        7,       28,      0,       14),
+  high    = c(7,        28,      Inf,     14,      Inf),
+  label   = c("Baseline", "Wk1-3", "Wk4+", "Baseline", "Wk2+"),
+  inc_high = c(FALSE, FALSE, TRUE, FALSE, TRUE)
+)
+fnew(visits, type = "stratified_range",
+     ".other|ARM_A" = "A_outside",
+     .other = "outside_window",
+     name = "vw")
+
+df <- data.frame(
+  arm = c("ARM_A", "ARM_A", "ARM_B", "ARM_B", "ARM_C"),
+  day = c(3,        35,      5,       40,      10)
+)
+df$visit <- fputk(df$arm, df$day, format = "vw")
+df
+```
+
+### Text definition with `fparse()`
+
+```{r strat-text}
+fparse(text = '
+VALUE vw_text (stratified_range, range_subtype: numeric)
+  "ARM_A"|[0, 7)    = "Baseline"
+  "ARM_A"|[7, 28)   = "Wk1-3"
+  "ARM_A"|[28, HIGH]= "Wk4+"
+  "ARM_B"|[0, 14)   = "Baseline"
+  "ARM_B"|[14, HIGH]= "Wk2+"
+  ".other|ARM_A"    = "A_outside"
+  .other            = "outside_window"
+  ;
+')
+fputk(df$arm, df$day, format = "vw_text")
+```
+
+### Date subtype: per-subject windows
+
+```{r strat-date}
+windows <- fmap_strata(
+  stratum = c("S001", "S001", "S002", "S002"),
+  low     = as.Date(c("2024-01-01", "2024-01-15",
+                       "2024-02-01", "2024-02-20")),
+  high    = as.Date(c("2024-01-15", "2024-02-01",
+                       "2024-02-20", "2024-03-10")),
+  label   = c("Screen", "Treat", "Screen", "Treat")
+)
+fnew(windows, type = "stratified_range", range_subtype = "date",
+     .other = "off-window", name = "win")
+
+subj   <- c("S001", "S001", "S002", "S002", "S003")
+visits <- as.Date(c("2024-01-05", "2024-01-20",
+                     "2024-02-10", "2024-03-01", "2024-01-01"))
+data.frame(
+  subj  = subj,
+  date  = visits,
+  phase = fputk(subj, visits, format = "win")
+)
+```
+
+### Roundtrip via `fexport()` / `fparse()`
+
+```{r strat-roundtrip}
+txt <- fexport(format_get("vw"))
+cat(txt, "\n")
+fclear()
+fparse(text = txt)
+fputk(df$arm, df$day, format = "vw")
+```
+
+```{r strat-cleanup, include=FALSE}
+fclear()
+```
+
+## Example 27: Plain Range Lookup with `fmap_ranges()`
+
+For non-stratified numeric / Date ranges, `fmap_ranges()` saves you from
+hand-crafting canonical \code{"low,high,inc_low,inc_high"} keys.
+
+```{r fmap-ranges-num}
+age_groups <- fmap_ranges(
+  low   = c(0, 18, 65),
+  high  = c(18, 65, Inf),
+  label = c("Child", "Adult", "Senior"),
+  inc_high = c(FALSE, FALSE, TRUE)
+)
+fnew(age_groups, type = "numeric", name = "ag")
+fput(c(5, 25, 90), "ag")
+fclear()
+```
+

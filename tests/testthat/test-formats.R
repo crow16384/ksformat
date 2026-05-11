@@ -3401,3 +3401,231 @@ VALUE fast (date_range)
   expect_equal(length(rt$low), 4L)
   fclear()
 })
+
+
+# ===========================================================================
+# Stratified Range Builders
+# ===========================================================================
+
+context("Stratified Range Builders")
+
+test_that("fmap_ranges builds canonical numeric keys", {
+  r <- fmap_ranges(c(0, 7, 14), c(7, 14, 30),
+                   c("Wk0", "Wk1", "Wk2"))
+  expect_s3_class(r, "ks_fmap")
+  expect_equal(names(r), c("0,7,TRUE,FALSE", "7,14,TRUE,FALSE",
+                            "14,30,TRUE,FALSE"))
+  expect_equal(unname(unclass(r)), c("Wk0", "Wk1", "Wk2"))
+})
+
+test_that("fmap_ranges supports Date and POSIXct bounds (ISO format)", {
+  d <- fmap_ranges(
+    low   = as.Date(c("2024-01-01", "2024-02-01")),
+    high  = as.Date(c("2024-02-01", "2024-03-01")),
+    label = c("Jan", "Feb")
+  )
+  expect_equal(names(d), c("2024-01-01,2024-02-01,TRUE,FALSE",
+                            "2024-02-01,2024-03-01,TRUE,FALSE"))
+
+  p <- fmap_ranges(
+    low   = as.POSIXct(c("2024-01-01 00:00:00"), tz = "UTC"),
+    high  = as.POSIXct(c("2024-01-02 00:00:00"), tz = "UTC"),
+    label = "Day1"
+  )
+  expect_true(grepl("^2024-01-01 00:00:00,2024-01-02 00:00:00,TRUE,FALSE$",
+                    names(p)))
+})
+
+test_that("fmap_ranges validates length and ordering", {
+  expect_error(fmap_ranges(c(0, 7), c(7), c("A", "B")),
+               "same length")
+  expect_error(fmap_ranges(c(7), c(0), "X"),
+               "<= corresponding")
+})
+
+test_that("fmap_ranges recycles scalar inclusivity", {
+  r <- fmap_ranges(c(0, 7), c(7, 14), c("A", "B"), inc_high = TRUE)
+  expect_equal(names(r), c("0,7,TRUE,TRUE", "7,14,TRUE,TRUE"))
+})
+
+test_that("fmap_strata prefixes stratum and carries strata_sep attribute", {
+  s <- fmap_strata(c("A", "A", "B"), c(0, 7, 0), c(7, 14, 7),
+                   c("V1", "V2", "V1"), sep = "/")
+  expect_s3_class(s, "ks_fmap")
+  expect_equal(attr(s, "strata_sep"), "/")
+  expect_equal(names(s), c("A/0,7,TRUE,FALSE", "A/7,14,TRUE,FALSE",
+                            "B/0,7,TRUE,FALSE"))
+})
+
+
+# ===========================================================================
+# Stratified Range Lookup
+# ===========================================================================
+
+context("Stratified Range Lookup")
+
+test_that("fnew builds per-stratum range tables", {
+  fclear()
+  fmt <- fnew(
+    fmap_strata(c("A", "A", "B"), c(0, 7, 0), c(7, 14, 10),
+                c("V1", "V2", "V1")),
+    type = "stratified_range", name = "vw"
+  )
+  expect_equal(fmt$type, "stratified_range")
+  expect_equal(fmt$range_subtype, "numeric")
+  expect_equal(names(fmt$range_tables), c("A", "B"))
+  expect_true(fmt$range_tables$A$sorted_disjoint)
+  expect_equal(length(fmt$range_tables$A$low), 2L)
+  fclear()
+})
+
+test_that("fputk applies stratified format with numeric values", {
+  fclear()
+  fnew(
+    fmap_strata(c("A", "A", "B"), c(0, 7, 0), c(7, 14, 10),
+                c("V1", "V2", "V1")),
+    type = "stratified_range", name = "vw", default = "OOR"
+  )
+  res <- fputk(c("A", "A", "B", "B", "C"), c(3, 10, 5, 99, 1),
+               format = "vw")
+  expect_equal(res, c("V1", "V2", "V1", "OOR", "OOR"))
+  fclear()
+})
+
+test_that("fputk applies stratified format with date subtype", {
+  fclear()
+  s <- fmap_strata(
+    stratum = c("S1", "S1", "S2"),
+    low     = as.Date(c("2024-01-01", "2024-02-01", "2024-03-01")),
+    high    = as.Date(c("2024-02-01", "2024-03-01", "2024-04-01")),
+    label   = c("Jan", "Feb", "Mar")
+  )
+  fnew(s, type = "stratified_range", range_subtype = "date", name = "win")
+  v <- as.Date(c("2024-01-15", "2024-02-15", "2024-03-15", "2024-04-15"))
+  res <- fputk(c("S1", "S1", "S2", "S2"), v, format = "win")
+  expect_equal(res, c("Jan", "Feb", "Mar", "2024-04-15"))
+  fclear()
+})
+
+test_that("per-stratum .missing and .other override globals", {
+  fclear()
+  fnew(
+    fmap_strata(c("A", "A", "B"), c(0, 7, 0), c(7, 14, 7),
+                c("V1", "V2", "V1")),
+    ".other|A" = "A_OOR",
+    ".missing|A" = "A_MISS",
+    .other = "GLOBAL_OOR",
+    .missing = "GLOBAL_MISS",
+    type = "stratified_range", name = "vw"
+  )
+  expect_equal(
+    fputk(c("A", "A", "A", "B", "C"), c(3, 99, NA, 99, 99), format = "vw"),
+    c("V1", "A_OOR", "A_MISS", "GLOBAL_OOR", "GLOBAL_OOR")
+  )
+  fclear()
+})
+
+test_that("fput() refuses stratified formats and fputk requires 2+ args", {
+  fclear()
+  fnew(
+    fmap_strata("A", 0, 7, "V1"),
+    type = "stratified_range", name = "vw"
+  )
+  expect_error(fput("foo", "vw"), "fputk")
+  expect_error(fputk(c("A"), format = "vw"),
+               "at least 2 arguments")
+  fclear()
+})
+
+test_that("fparse parses stratified_range with friendly intervals", {
+  fclear()
+  txt <- '
+VALUE visits (stratified_range, range_subtype: numeric)
+  "ARM_A"|[0, 7)  = "Wk1"
+  "ARM_A"|[7, 14) = "Wk2"
+  "ARM_B"|[0, 10) = "Baseline"
+  ".other|ARM_A"  = "A_OOR"
+  .other          = "GLOBAL_OOR"
+  ;
+'
+  fparse(text = txt)
+  fmt <- format_get("visits")
+  expect_equal(fmt$type, "stratified_range")
+  expect_equal(fmt$range_subtype, "numeric")
+  expect_equal(names(fmt$other_by_stratum), "ARM_A")
+  expect_equal(fmt$other_label, "GLOBAL_OOR")
+  expect_equal(
+    fputk(c("ARM_A", "ARM_A", "ARM_B", "ARM_C"),
+          c(3, 99, 5, 1), format = "visits"),
+    c("Wk1", "A_OOR", "Baseline", "GLOBAL_OOR")
+  )
+  fclear()
+})
+
+test_that("fparse handles custom strata_sep and date subtype", {
+  fclear()
+  txt <- '
+VALUE dwin (stratified_range, range_subtype: date, strata_sep: /)
+  "S1"/[2024-01-01, 2024-02-01) = "Jan"
+  "S1"/[2024-02-01, 2024-03-01) = "Feb"
+  "S2"/[2024-03-01, 2024-04-01) = "Mar"
+  ;
+'
+  fparse(text = txt)
+  fmt <- format_get("dwin")
+  expect_equal(fmt$strata_sep, "/")
+  expect_equal(fmt$range_subtype, "date")
+  res <- fputk(
+    c("S1", "S1", "S2"),
+    as.Date(c("2024-01-15", "2024-02-15", "2024-03-15")),
+    format = "dwin"
+  )
+  expect_equal(res, c("Jan", "Feb", "Mar"))
+  fclear()
+})
+
+test_that("fexport / fparse roundtrip preserves stratified format", {
+  fclear()
+  fmt <- fnew(
+    fmap_strata(c("A", "A", "B"), c(0, 7, 0), c(7, 14, 7),
+                c("V1", "V2", "V1")),
+    ".other|A" = "A_OOR",
+    .other = "GLOBAL_OOR",
+    type = "stratified_range", name = "vw"
+  )
+  txt <- fexport(fmt)
+  fclear()
+  fparse(text = txt)
+  fmt2 <- format_get("vw")
+  expect_equal(fmt2$mappings, fmt$mappings)
+  expect_equal(fmt2$range_subtype, fmt$range_subtype)
+  expect_equal(fmt2$strata_sep, fmt$strata_sep)
+  expect_equal(fmt2$other_by_stratum, fmt$other_by_stratum)
+  expect_equal(fmt2$other_label, fmt$other_label)
+  fclear()
+})
+
+test_that("print.ks_format renders stratified groups with headers", {
+  fclear()
+  fmt <- fnew(
+    fmap_strata(c("A", "A", "B"), c(0, 7, 0), c(7, 14, 7),
+                c("V1", "V2", "V1")),
+    type = "stratified_range", name = "vw"
+  )
+  out <- capture.output(print(fmt))
+  expect_true(any(grepl('Stratum "A":', out)))
+  expect_true(any(grepl('Stratum "B":', out)))
+  expect_true(any(grepl("\\[0, 7\\) => V1", out)))
+  fclear()
+})
+
+test_that("fmap_strata strata_sep is auto-picked up by fnew", {
+  fclear()
+  s <- fmap_strata(c("A", "B"), c(0, 0), c(7, 7), c("V1", "V1"),
+                   sep = ":")
+  fmt <- fnew(s, type = "stratified_range", name = "vw")
+  expect_equal(fmt$strata_sep, ":")
+  expect_equal(fputk(c("A", "B"), c(3, 3), format = "vw"),
+               c("V1", "V1"))
+  fclear()
+})

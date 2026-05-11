@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.0</span>
       </span>
     </div>
 
@@ -57,6 +57,26 @@
       <small>Source: <a href="https://github.com/crow16384/ksformat/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.7.0" id="ksformat-070">ksformat 0.7.0<a class="anchor" aria-label="anchor" href="#ksformat-070"></a></h2>
+<div class="section level3">
+<h3 id="new-features-0-7-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-0"></a></h3>
+<ul><li>New format type <strong><code>stratified_range</code></strong> — combines a discrete stratum (study arm, subject id, composite key, …) with per-stratum numeric / Date / POSIXct range buckets. Apply with <code><a href="../reference/fputk.html">fputk()</a></code>, passing the stratum column(s) first and the value column last.</li>
+<li>New builder <code>fmap_strata(stratum, low, high, label, inc_low, inc_high, sep)</code> — produces a <code>ks_fmap</code> ready for <code>fnew(..., type = "stratified_range")</code>. The chosen separator is carried as an attribute and picked up automatically by <code><a href="../reference/fnew.html">fnew()</a></code>.</li>
+<li>New builder <code>fmap_ranges(low, high, label, inc_low, inc_high)</code> — convenience helper that turns parallel vectors of numeric / Date / POSIXct bounds and labels into canonical range keys, removing the need to hand-craft <code>"low,high,inc_low,inc_high"</code> strings.</li>
+<li>
+<code><a href="../reference/fparse.html">fparse()</a></code> / <code><a href="../reference/fexport.html">fexport()</a></code> support the new type via the <code>VALUE name (stratified_range, range_subtype: numeric|date|datetime, strata_sep: |)</code> block syntax. Both canonical <code>"STRATUM|low,high,inc_low,inc_high"</code> keys and the friendly <code>"STRATUM"|[low, high)</code> interval form are accepted, including per-stratum <code>.missing|STRATUM</code> / <code>.other|STRATUM</code> directives.</li>
+<li>
+<code><a href="../reference/print.ks_format.html">print.ks_format()</a></code> renders stratified formats grouped under <code>Stratum "X":</code> headers.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-0-7-0">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-7-0"></a></h3>
+<ul><li>Vignette <strong>Example 26: Stratified Range Lookup with <code><a href="../reference/fputk.html">fputk()</a></code></strong> — programmatic and text-based construction, date subtype with per-subject windows, per-stratum and global <code>.other</code> fallbacks, and <code><a href="../reference/fexport.html">fexport()</a></code>/<code><a href="../reference/fparse.html">fparse()</a></code> roundtrip.</li>
+<li>Vignette <strong>Example 27: Plain Range Lookup with <code><a href="../reference/fmap_ranges.html">fmap_ranges()</a></code></strong> — builds a numeric age-band format without hand-crafted canonical keys.</li>
+<li>
+<code>examples/StratifiedRanges.R</code> — runnable companion script.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.6.7" id="ksformat-067">ksformat 0.6.7<a class="anchor" aria-label="anchor" href="#ksformat-067"></a></h2>
 <div class="section level3">

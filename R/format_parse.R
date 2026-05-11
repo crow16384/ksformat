@@ -773,6 +773,36 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
         }
       }
 
+      # Parse range_subtype: option for stratified_range
+      block_range_subtype <- NULL
+      rs_match <- regmatches(block_subtype, regexec(
+        "range_subtype:\\s*([A-Za-z]+)", block_subtype, ignore.case = TRUE
+      ))[[1]]
+      if (length(rs_match) >= 2 && rs_match[1] != "") {
+        block_range_subtype <- tolower(trimws(rs_match[2]))
+        block_subtype <- gsub(",?\\s*range_subtype:\\s*[A-Za-z]+", "",
+                              block_subtype, ignore.case = TRUE)
+        block_subtype <- gsub("range_subtype:\\s*[A-Za-z]+\\s*,?", "",
+                              block_subtype, ignore.case = TRUE)
+        block_subtype <- trimws(block_subtype)
+        if (block_subtype == "") block_subtype <- "auto"
+      }
+
+      # Parse strata_sep: option for stratified_range
+      block_strata_sep <- NULL
+      ss_match <- regmatches(block_subtype, regexec(
+        "strata_sep:\\s*([^,)\\s]+)", block_subtype, ignore.case = TRUE
+      ))[[1]]
+      if (length(ss_match) >= 2 && ss_match[1] != "") {
+        block_strata_sep <- trimws(ss_match[2])
+        block_subtype <- gsub(",?\\s*strata_sep:\\s*[^,)\\s]+", "",
+                              block_subtype, ignore.case = TRUE)
+        block_subtype <- gsub("strata_sep:\\s*[^,)\\s]+\\s*,?", "",
+                              block_subtype, ignore.case = TRUE)
+        block_subtype <- trimws(block_subtype)
+        if (block_subtype == "") block_subtype <- "auto"
+      }
+
       current_block <- list(
         type = block_type,
         name = block_name,
@@ -780,6 +810,8 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
         multilabel = block_multilabel,
         nocase = block_nocase,
         date_format = block_date_format,
+        range_subtype = block_range_subtype,
+        strata_sep = block_strata_sep,
         entries = list(),
         line_start = i
       )
@@ -1011,6 +1043,11 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
     return(.block_to_ks_datetime_format(block))
   }
 
+  # Stratified range blocks: build mappings then delegate to fnew()
+  if (identical(tolower(block$subtype), "stratified_range")) {
+    return(.block_to_stratified_range_format(block))
+  }
+
   mappings <- list()
   missing_label <- NULL
   other_label <- NULL
@@ -1075,6 +1112,140 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
                                                format_obj$date_format)
 
   return(format_obj)
+}
+
+
+#' Convert VALUE block with stratified_range type to ks_format
+#'
+#' Stratified blocks support both canonical keys
+#' (\code{"STRATUM<sep>low,high,inc_low,inc_high"}) supplied as quoted
+#' discrete LHS, and the friendly interval form
+#' (\code{STRATUM <sep> [low, high)}). Per-stratum directives appear as
+#' \code{"STRATUM<sep>.missing" = "..."} or, with the \code{.missing|S}
+#' shorthand, as plain discrete entries that are recognised here.
+#' @keywords internal
+#' @noRd
+.block_to_stratified_range_format <- function(block) {
+  strata_sep <- if (!is.null(block$strata_sep)) block$strata_sep else "|"
+  range_subtype <- if (!is.null(block$range_subtype)) block$range_subtype else "numeric"
+  date_format <- block$date_format
+
+  # Escape strata_sep for regex use (special chars: . | ( ) [ ] { } * + ? ^ $ \)
+  sep_re <- gsub("([\\.|()\\[\\]{}*+?^$\\\\])", "\\\\\\1", strata_sep,
+                 perl = TRUE)
+
+  num_token <- "(?:-?[0-9]+(?:\\.[0-9]+)?|LOW|HIGH|Inf|-Inf)"
+  date_token <- "(?:\\d{4}-\\d{2}-\\d{2}(?:[ T]\\d{2}:\\d{2}(?::\\d{2})?)?|LOW|HIGH)"
+
+  mappings <- list()
+  missing_label <- NULL
+  other_label <- NULL
+
+  canonicalise <- function(key) {
+    if (startsWith(key, paste0(".missing", strata_sep))) {
+      return(list(kind = "missing_stratum",
+                  stratum = substr(key,
+                                   nchar(".missing") + nchar(strata_sep) + 1L,
+                                   nchar(key))))
+    }
+    if (startsWith(key, paste0(".other", strata_sep))) {
+      return(list(kind = "other_stratum",
+                  stratum = substr(key,
+                                   nchar(".other") + nchar(strata_sep) + 1L,
+                                   nchar(key))))
+    }
+    # Already canonical?
+    split_try <- .split_stratified_key(key, strata_sep, range_subtype,
+                                        date_format)
+    if (!is.null(split_try)) {
+      return(list(kind = "canonical", key = key))
+    }
+    # Friendly interval: stratum<sep>[low,high)
+    tok <- if (range_subtype == "numeric") num_token else date_token
+    pat <- paste0("^(.+?)", sep_re, "\\s*(\\[|\\()\\s*(",
+                  tok, ")\\s*,\\s*(", tok, ")\\s*(\\]|\\))\\s*$")
+    m <- regmatches(key, regexec(pat, key, perl = TRUE))[[1]]
+    if (length(m) == 6L) {
+      stratum <- .unquote(trimws(m[2]))
+      inc_low <- (m[3] == "[")
+      low_str <- m[4]
+      high_str <- m[5]
+      inc_high <- (m[6] == "]")
+      norm_bound <- function(s) {
+        su <- toupper(s)
+        if (range_subtype == "numeric") {
+          if (su %in% c("LOW", "-INF")) return("-Inf")
+          if (su %in% c("HIGH", "INF")) return("Inf")
+          return(s)
+        }
+        # date / datetime
+        if (su %in% c("LOW", "-INF")) return("LOW")
+        if (su %in% c("HIGH", "INF")) return("HIGH")
+        s
+      }
+      low_norm <- norm_bound(low_str)
+      high_norm <- norm_bound(high_str)
+      canon <- paste(low_norm, high_norm, toupper(inc_low),
+                     toupper(inc_high), sep = ",")
+      return(list(kind = "canonical",
+                  key = paste0(stratum, strata_sep, canon)))
+    }
+    NULL
+  }
+
+  for (entry in block$entries) {
+    if (entry$type == "missing") {
+      missing_label <- entry$value
+      next
+    }
+    if (entry$type == "other") {
+      other_label <- entry$value
+      next
+    }
+    if (entry$type == "range") {
+      cli_warn(c(
+        "Bare range entry in stratified_range block has no stratum; ignoring.",
+        "i" = "Use {.val STRATUM{strata_sep}[low, high)} syntax."
+      ))
+      next
+    }
+    if (entry$type != "discrete") next
+
+    info <- canonicalise(entry$key)
+    if (is.null(info)) {
+      cli_warn(c(
+        "Could not parse stratified entry {.val {entry$key}}; treating as discrete.",
+        "i" = "Expected {.val STRATUM{strata_sep}RANGE} key."
+      ))
+      mappings[[entry$key]] <- entry$label
+      next
+    }
+    if (info$kind == "canonical") {
+      mappings[[info$key]] <- entry$label
+    } else if (info$kind == "missing_stratum") {
+      mappings[[paste0(".missing", strata_sep, info$stratum)]] <- entry$label
+    } else if (info$kind == "other_stratum") {
+      mappings[[paste0(".other", strata_sep, info$stratum)]] <- entry$label
+    }
+  }
+
+  # Assemble extras for fnew()
+  extras <- list()
+  if (!is.null(missing_label)) extras[[".missing"]] <- missing_label
+  if (!is.null(other_label)) extras[[".other"]] <- other_label
+
+  do.call(fnew, c(
+    mappings, extras,
+    list(
+      name = block$name,
+      type = "stratified_range",
+      range_subtype = range_subtype,
+      strata_sep = strata_sep,
+      date_format = date_format,
+      multilabel = isTRUE(block$multilabel),
+      ignore_case = isTRUE(block$nocase)
+    )
+  ))
 }
 
 
@@ -1209,6 +1380,9 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
   if (fmt$type %in% c("date", "time", "datetime")) {
     return(.datetime_format_to_text(fmt, name))
   }
+  if (.is_stratified_type(fmt$type)) {
+    return(.stratified_format_to_text(fmt, name))
+  }
 
   parts <- vector("list", length(fmt$mappings) + 4L)
   idx <- 1L
@@ -1305,6 +1479,95 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
   }
   parts[[idx]] <- ";"
   paste(unlist(parts[seq_len(idx)]), collapse = "\n")
+}
+
+
+#' Convert stratified_range ks_format to SAS-like text
+#' @keywords internal
+#' @noRd
+.stratified_format_to_text <- function(fmt, name) {
+  strata_sep <- if (!is.null(fmt$strata_sep)) fmt$strata_sep else "|"
+  range_subtype <- if (!is.null(fmt$range_subtype)) fmt$range_subtype else "numeric"
+
+  header_opts <- c("stratified_range",
+                   paste0("range_subtype: ", range_subtype),
+                   paste0("strata_sep: ", strata_sep))
+  if (isTRUE(fmt$multilabel)) header_opts <- c(header_opts, "multilabel")
+  if (isTRUE(fmt$ignore_case)) header_opts <- c(header_opts, "nocase")
+  if (!is.null(fmt$date_format)) {
+    header_opts <- c(header_opts, paste0("format: ", fmt$date_format))
+  }
+  header <- paste0("VALUE ", name, " (", paste(header_opts, collapse = ", "), ")")
+
+  # Group mappings by stratum, first-seen order
+  strata_order <- character(0)
+  grouped <- list()
+  parser <- switch(range_subtype,
+    numeric  = function(k) .parse_range_key(k),
+    date     = function(k) .parse_date_range_key(k, fmt$date_format),
+    datetime = function(k) .parse_datetime_range_key(k, fmt$date_format)
+  )
+  for (i in seq_along(fmt$mappings)) {
+    key <- names(fmt$mappings)[i]
+    sp <- .split_stratified_key(key, strata_sep, range_subtype,
+                                fmt$date_format)
+    s <- if (is.null(sp)) "" else sp$stratum
+    rk <- if (is.null(sp)) key else sp$range_key
+    if (!s %in% strata_order) {
+      strata_order <- c(strata_order, s)
+      grouped[[s]] <- list()
+    }
+    grouped[[s]][[length(grouped[[s]]) + 1L]] <- list(
+      range_key = rk, label = fmt$mappings[[i]]
+    )
+  }
+
+  is_date_rng <- range_subtype %in% c("date", "datetime")
+  inner_type <- .stratified_subtype_to_range_type(range_subtype)
+  out <- character(0)
+  out <- c(out, header)
+  for (s in strata_order) {
+    for (entry in grouped[[s]]) {
+      parsed <- parser(entry$range_key)
+      label_str <- as.character(entry$label)
+      eval_suffix <- if (.has_eval_attr(entry$label)) " (eval)" else ""
+      if (!is.null(parsed)) {
+        lb <- if (parsed$inc_low) "[" else "("
+        rb <- if (parsed$inc_high) "]" else ")"
+        low <- if (is_date_rng) {
+          .format_date_bound(parsed$low, fmt$date_format, inner_type, is_low = TRUE)
+        } else {
+          .format_range_bound(parsed$low, is_low = TRUE)
+        }
+        high <- if (is_date_rng) {
+          .format_date_bound(parsed$high, fmt$date_format, inner_type, is_low = FALSE)
+        } else {
+          .format_range_bound(parsed$high, is_low = FALSE)
+        }
+        out <- c(out, paste0("  \"", s, "\"", strata_sep, lb, low, ", ",
+                             high, rb, " = \"", label_str, "\"", eval_suffix))
+      } else {
+        out <- c(out, paste0("  \"", s, strata_sep, entry$range_key,
+                             "\" = \"", label_str, "\"", eval_suffix))
+      }
+    }
+    if (!is.null(fmt$missing_by_stratum) && s %in% names(fmt$missing_by_stratum)) {
+      out <- c(out, paste0("  \".missing", strata_sep, s, "\" = \"",
+                           fmt$missing_by_stratum[[s]], "\""))
+    }
+    if (!is.null(fmt$other_by_stratum) && s %in% names(fmt$other_by_stratum)) {
+      out <- c(out, paste0("  \".other", strata_sep, s, "\" = \"",
+                           fmt$other_by_stratum[[s]], "\""))
+    }
+  }
+  if (!is.null(fmt$missing_label)) {
+    out <- c(out, paste0("  .missing = \"", fmt$missing_label, "\""))
+  }
+  if (!is.null(fmt$other_label)) {
+    out <- c(out, paste0("  .other = \"", fmt$other_label, "\""))
+  }
+  out <- c(out, ";")
+  paste(out, collapse = "\n")
 }
 
 

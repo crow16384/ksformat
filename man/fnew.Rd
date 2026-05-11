@@ -12,6 +12,8 @@ fnew(
   multilabel = FALSE,
   ignore_case = FALSE,
   date_format = NULL,
+  range_subtype = c("numeric", "date", "datetime"),
+  strata_sep = "|",
   verbose = FALSE
 )
 }

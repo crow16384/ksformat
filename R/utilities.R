@@ -36,6 +36,29 @@ NULL
   type %in% c("date_range", "datetime_range")
 }
 
+#' Check whether a type is the stratified-range type
+#'
+#' Stratified ranges combine one or more discrete stratum columns with a
+#' numeric / date / datetime range key. They use \code{fputk()} for lookup
+#' and a per-stratum list of range tables internally.
+#' @keywords internal
+#' @noRd
+.is_stratified_type <- function(type) {
+  identical(type, "stratified_range")
+}
+
+#' Map a stratified-range subtype to its underlying range-table type
+#' @keywords internal
+#' @noRd
+.stratified_subtype_to_range_type <- function(range_subtype) {
+  switch(range_subtype,
+    numeric  = "numeric",
+    date     = "date_range",
+    datetime = "datetime_range",
+    cli_abort("Unknown stratified range subtype: {.val {range_subtype}}.")
+  )
+}
+
 #' Check whether a type string is a value type
 #' @keywords internal
 #' @noRd
@@ -646,6 +669,290 @@ in_range <- function(x, range_spec) {
     sorted_disjoint = disjoint,
     sort_perm = sort_perm
   )
+}
+
+
+#' Split a stratified mapping key into (stratum, range_key)
+#'
+#' Stratified keys have the shape \code{"STRATUM<sep>RANGE_KEY"}, where
+#' \code{STRATUM} may itself contain \code{sep} (e.g. composite strata
+#' produced by \code{fputk()}). We split on the rightmost occurrence of
+#' \code{sep} whose suffix is a valid range key for \code{range_subtype}.
+#'
+#' Returns \code{NULL} if no split yields a parseable range key (callers
+#' should treat such keys as not stratified — typically directives like
+#' \code{".missing"} / \code{".other"} that have already been peeled off
+#' before reaching this helper).
+#'
+#' @param key Character scalar.
+#' @param strata_sep Separator string.
+#' @param range_subtype One of \code{"numeric"}, \code{"date"},
+#'   \code{"datetime"}.
+#' @param date_format Optional strptime format passed to date parsers.
+#' @return A list \code{list(stratum, range_key)} or \code{NULL}.
+#' @keywords internal
+#' @noRd
+.split_stratified_key <- function(key, strata_sep, range_subtype,
+                                  date_format = NULL) {
+  if (!is.character(key) || length(key) != 1L || is.na(key)) return(NULL)
+  parser <- switch(range_subtype,
+    numeric  = function(s) .parse_range_key(s),
+    date     = function(s) .parse_date_range_key(s, date_format),
+    datetime = function(s) .parse_datetime_range_key(s, date_format),
+    NULL
+  )
+  if (is.null(parser)) return(NULL)
+
+  # Find all occurrences of strata_sep
+  positions <- gregexpr(strata_sep, key, fixed = TRUE)[[1]]
+  if (length(positions) == 1L && positions[1L] == -1L) return(NULL)
+
+  sep_len <- nchar(strata_sep)
+  # Try rightmost first so longest stratum (with embedded separators) wins.
+  for (pos in rev(positions)) {
+    stratum <- substr(key, 1L, pos - 1L)
+    range_key <- substr(key, pos + sep_len, nchar(key))
+    if (!nzchar(stratum) || !nzchar(range_key)) next
+    parsed <- tryCatch(parser(range_key), error = function(e) NULL)
+    if (!is.null(parsed)) {
+      return(list(stratum = stratum, range_key = range_key))
+    }
+  }
+  NULL
+}
+
+#' Build per-stratum range tables for a stratified_range format
+#'
+#' Groups \code{mappings} by stratum (via \code{.split_stratified_key()})
+#' and builds one numeric range table per stratum using the existing
+#' \code{.build_range_table()} machinery.
+#'
+#' Mapping keys that cannot be split into a valid stratified key are
+#' silently ignored here; \code{fnew()} is responsible for raising an
+#' informative error before this helper is called.
+#'
+#' @return Named list. Each element is the result of
+#'   \code{.build_range_table()} for the mappings belonging to that
+#'   stratum. The list also carries attribute \code{"strata"} (character
+#'   vector of stratum names in first-seen order).
+#' @keywords internal
+#' @noRd
+.build_stratified_range_tables <- function(mappings, range_subtype,
+                                           strata_sep = "|",
+                                           date_format = NULL) {
+  if (length(mappings) == 0L) {
+    return(structure(list(), strata = character(0)))
+  }
+  range_type <- .stratified_subtype_to_range_type(range_subtype)
+  keys <- names(mappings)
+
+  strata <- character(length(keys))
+  range_keys <- character(length(keys))
+  ok <- logical(length(keys))
+  for (i in seq_along(keys)) {
+    sp <- .split_stratified_key(keys[i], strata_sep, range_subtype,
+                                date_format)
+    if (!is.null(sp)) {
+      strata[i] <- sp$stratum
+      range_keys[i] <- sp$range_key
+      ok[i] <- TRUE
+    }
+  }
+  if (!any(ok)) {
+    return(structure(list(), strata = character(0)))
+  }
+
+  # Preserve first-seen stratum order
+  unique_strata <- unique(strata[ok])
+  out <- vector("list", length(unique_strata))
+  names(out) <- unique_strata
+  for (s in unique_strata) {
+    sel <- which(ok & strata == s)
+    sub <- mappings[sel]
+    names(sub) <- range_keys[sel]
+    out[[s]] <- .build_range_table(sub, range_type, date_format)
+  }
+  attr(out, "strata") <- unique_strata
+  out
+}
+
+
+#' Build canonical range keys from low/high/inc vectors
+#'
+#' Internal helper shared by \code{fmap_ranges()} and \code{fmap_strata()}.
+#' Validates inputs, recycles scalar inclusivity flags, formats bounds to
+#' ISO 8601 for Date / POSIXct, and returns a list with the canonical
+#' four-part keys, the bound-type label, and the recycled flags.
+#' @keywords internal
+#' @noRd
+.build_range_keys <- function(low, high, inc_low, inc_high,
+                              date_format = NULL) {
+  n <- length(low)
+  if (length(high) != n) {
+    cli_abort(
+      "{.arg low} (length {n}) and {.arg high} (length {length(high)}) must have the same length."
+    )
+  }
+  if (length(inc_low) == 1L) inc_low <- rep(inc_low, n)
+  if (length(inc_high) == 1L) inc_high <- rep(inc_high, n)
+  if (length(inc_low) != n || length(inc_high) != n) {
+    cli_abort(
+      "{.arg inc_low} and {.arg inc_high} must be length 1 or {n}."
+    )
+  }
+  if (!is.logical(inc_low) || !is.logical(inc_high)) {
+    cli_abort("{.arg inc_low} and {.arg inc_high} must be logical.")
+  }
+  if (anyNA(inc_low) || anyNA(inc_high)) {
+    cli_abort("{.arg inc_low}/{.arg inc_high} must not contain NA.")
+  }
+
+  # Determine bound type and format
+  bound_type <- if (inherits(low, "POSIXt") || inherits(high, "POSIXt")) {
+    "datetime"
+  } else if (inherits(low, "Date") || inherits(high, "Date")) {
+    "date"
+  } else if (is.numeric(low) && is.numeric(high)) {
+    "numeric"
+  } else {
+    cli_abort(
+      "{.arg low}/{.arg high} must be numeric, Date, or POSIXct."
+    )
+  }
+
+  # Validate ordering (allow infinities; LOW/HIGH not supported in builder)
+  if (any(!is.na(low) & !is.na(high) & low > high)) {
+    cli_abort("All {.arg low} values must be <= corresponding {.arg high}.")
+  }
+
+  fmt_bound <- function(v) {
+    if (bound_type == "numeric") {
+      return(as.character(v))
+    }
+    if (bound_type == "date") {
+      d <- as.Date(v)
+      if (!is.null(date_format)) {
+        return(format(d, date_format))
+      }
+      return(format(d, "%Y-%m-%d"))
+    }
+    # datetime
+    p <- as.POSIXct(v, tz = "UTC")
+    if (!is.null(date_format)) {
+      return(format(p, date_format, tz = "UTC"))
+    }
+    format(p, "%Y-%m-%d %H:%M:%S", tz = "UTC")
+  }
+
+  low_str <- fmt_bound(low)
+  high_str <- fmt_bound(high)
+
+  keys <- paste(low_str, high_str, inc_low, inc_high, sep = ",")
+  list(keys = keys, bound_type = bound_type,
+       inc_low = inc_low, inc_high = inc_high)
+}
+
+
+#' Build a Vector of Range Mappings
+#'
+#' Construct a \code{ks_fmap}-classed named character vector whose names
+#' encode numeric / Date / POSIXct range bounds and whose values are the
+#' corresponding labels. The result is intended to be passed to
+#' \code{\link{fnew}} as a single positional argument (it suppresses the
+#' default name reversal).
+#'
+#' Bounds are formatted as ISO 8601: \code{"\%Y-\%m-\%d"} for Date,
+#' \code{"\%Y-\%m-\%d \%H:\%M:\%S"} (UTC) for POSIXct. Override with
+#' \code{date_format} if needed.
+#'
+#' @param low,high Numeric, \code{Date}, or \code{POSIXct} vectors of equal
+#'   length giving the lower / upper bounds of each range.
+#' @param label Character vector of labels (same length as \code{low}).
+#' @param inc_low,inc_high Logical, length 1 or \code{length(low)}. Whether
+#'   each bound is inclusive. Defaults match
+#'   \code{\link{range_spec}}: \code{[low, high)}.
+#' @param date_format Optional strptime format string used when formatting
+#'   \code{Date}/\code{POSIXct} bounds into key strings.
+#'
+#' @return A \code{ks_fmap} object (named character vector) suitable for
+#'   passing to \code{fnew()}.
+#' @export
+#' @seealso \code{\link{fmap}}, \code{\link{fmap_strata}}, \code{\link{fnew}}
+#' @examples
+#' rng <- fmap_ranges(
+#'   low   = c(0, 18, 65),
+#'   high  = c(18, 65, Inf),
+#'   label = c("Child", "Adult", "Senior"),
+#'   inc_high = c(FALSE, FALSE, TRUE)
+#' )
+#' fnew(rng, type = "numeric", name = "age_groups")
+#' fput(c(5, 25, 90), "age_groups")
+#' fclear()
+fmap_ranges <- function(low, high, label,
+                        inc_low = TRUE, inc_high = FALSE,
+                        date_format = NULL) {
+  if (length(low) != length(label)) {
+    cli_abort(
+      "{.arg low}/{.arg high} and {.arg label} must have the same length."
+    )
+  }
+  parts <- .build_range_keys(low, high, inc_low, inc_high, date_format)
+  out <- stats::setNames(as.character(label), parts$keys)
+  class(out) <- c("ks_fmap", class(out))
+  out
+}
+
+
+#' Build a Vector of Stratified Range Mappings
+#'
+#' Companion to \code{\link{fmap_ranges}} for the \code{stratified_range}
+#' format type. Each row pairs a stratum (e.g. study arm, subject id, or a
+#' composite key produced by \code{fputk()}) with a numeric / Date /
+#' POSIXct range and a label. The returned \code{ks_fmap} vector carries
+#' the chosen \code{sep} as an attribute so that
+#' \code{\link{fnew}(type = "stratified_range")} picks it up automatically.
+#'
+#' @param stratum Character vector of stratum identifiers.
+#' @param low,high Range bounds. See \code{\link{fmap_ranges}}.
+#' @param label Character vector of labels.
+#' @param inc_low,inc_high Logical, length 1 or \code{length(low)}. See
+#'   \code{\link{fmap_ranges}}.
+#' @param sep Separator inserted between stratum and range key. Must match
+#'   the \code{sep} subsequently passed to \code{\link{fputk}}.
+#' @param date_format Optional strptime format string.
+#'
+#' @return A \code{ks_fmap} object with an attached \code{"strata_sep"}
+#'   attribute.
+#' @export
+#' @seealso \code{\link{fmap_ranges}}, \code{\link{fputk}}, \code{\link{fnew}}
+#' @examples
+#' visits <- fmap_strata(
+#'   stratum  = c("ARM_A", "ARM_A", "ARM_B"),
+#'   low      = c(0, 7, 0),
+#'   high     = c(7, 14, 10),
+#'   label    = c("Baseline", "Week 1", "Baseline")
+#' )
+#' fnew(visits, type = "stratified_range", range_subtype = "numeric",
+#'      name = "visit_window")
+#' fputk(c("ARM_A", "ARM_B"), c(3, 5), format = "visit_window")
+#' fclear()
+fmap_strata <- function(stratum, low, high, label,
+                        inc_low = TRUE, inc_high = FALSE,
+                        sep = "|", date_format = NULL) {
+  if (!is.character(sep) || length(sep) != 1L || is.na(sep) || !nzchar(sep)) {
+    cli_abort("{.arg sep} must be a single non-empty character string.")
+  }
+  if (length(stratum) != length(label)) {
+    cli_abort(
+      "{.arg stratum} and {.arg label} must have the same length."
+    )
+  }
+  base <- fmap_ranges(low, high, label, inc_low, inc_high, date_format)
+  prefixed_keys <- paste0(as.character(stratum), sep, names(base))
+  out <- stats::setNames(unclass(base), prefixed_keys)
+  attr(out, "strata_sep") <- sep
+  class(out) <- c("ks_fmap", class(out))
+  out
 }
 
 
