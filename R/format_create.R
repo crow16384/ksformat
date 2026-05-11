@@ -54,6 +54,12 @@
 #'   \code{NULL}, ISO 8601 parsing is used. Applies to \code{"date_range"},
 #'   \code{"datetime_range"}, and the value types \code{"Date"} /
 #'   \code{"POSIXct"} when keys are ranges.
+#' @param range_subtype Character. For \code{type = "stratified_range"} only.
+#'   One of \code{"numeric"} (default), \code{"date"}, or \code{"datetime"}.
+#'   Determines how the range part of each stratified key is parsed and compared.
+#' @param strata_sep Character. For \code{type = "stratified_range"} only.
+#'   Single-character (or multi-character) separator between the stratum
+#'   identifier and the range key in each mapping key. Default \code{"|"}.
 #' @param verbose Logical. If \code{TRUE}, returns the format object visibly;
 #'   otherwise returns it invisibly. Default \code{FALSE}.
 #'

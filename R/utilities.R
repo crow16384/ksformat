@@ -298,7 +298,7 @@ NULL
       av <- extra_args[[j]]
       xn_vals[[j]] <- if (length(av) == 1L) av else av[indices]
     }
-    env <- list2env(setNames(xn_vals, xn_names), parent = parent_env)
+    env <- list2env(stats::setNames(xn_vals, xn_names), parent = parent_env)
   } else {
     env <- new.env(parent = parent_env)
   }

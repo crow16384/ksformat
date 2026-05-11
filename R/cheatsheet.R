@@ -25,7 +25,7 @@
 #' @return Invisibly, the path to the opened file. If the file is not found, an error is thrown.
 #' @export
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' ksformat_cheatsheet()           # open HTML in browser
 #' ksformat_cheatsheet("pdf")      # open PDF
 #' }

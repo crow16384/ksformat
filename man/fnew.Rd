@@ -74,6 +74,14 @@ when parsing date/datetime range keys (e.g. \code{"\%d/\%m/\%Y"}). When
 \code{"datetime_range"}, and the value types \code{"Date"} /
 \code{"POSIXct"} when keys are ranges.}
 
+\item{range_subtype}{Character. For \code{type = "stratified_range"} only.
+One of \code{"numeric"} (default), \code{"date"}, or \code{"datetime"}.
+Determines how the range part of each stratified key is parsed and compared.}
+
+\item{strata_sep}{Character. For \code{type = "stratified_range"} only.
+Single-character (or multi-character) separator between the stratum
+identifier and the range key in each mapping key. Default \code{"|"}.}
+
 \item{verbose}{Logical. If \code{TRUE}, returns the format object visibly;
 otherwise returns it invisibly. Default \code{FALSE}.}
 }
