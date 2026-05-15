@@ -14,6 +14,18 @@
   `sep` and `na_as_string` arguments and dispatches on the stored
   invalue's `target_type`.
 
+## Documentation
+
+* Vignette **Example 28: Composite Key Lookup with NA Components** —
+  explains why `paste()`-built keys contain the literal string `"NA"` for
+  `NA` inputs, shows the incorrect result with the default
+  `na_as_string = FALSE`, and demonstrates the correct round-trip with
+  `na_as_string = TRUE` using a clinical LB `PARAMCD` derivation scenario.
+* Vignette **Example 29: Composite Label Invalue Lookup with `finputk()`** —
+  basic two-column reverse lookup and `na_as_string = TRUE` usage with
+  `NA` key components.
+* `examples/CompositeKeyNA.R` — runnable companion script for both examples.
+
 # ksformat 0.7.0
 
 ## New features

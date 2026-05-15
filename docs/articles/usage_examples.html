@@ -488,8 +488,8 @@ once:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;        format             result</span></span>
-<span><span class="co">#&gt; 1 DATETIME20. 15MAY2026:16:09:54</span></span>
-<span><span class="co">#&gt; 2 DATETIME13.      15MAY26:16:09</span></span>
+<span><span class="co">#&gt; 1 DATETIME20. 15MAY2026:16:14:44</span></span>
+<span><span class="co">#&gt; 2 DATETIME13.      15MAY26:16:14</span></span>
 <span><span class="co">#&gt; 3     DTDATE.          15MAY2026</span></span>
 <span><span class="co">#&gt; 4   DTYYMMDD.         2026-05-15</span></span>
 <span></span>
@@ -1045,7 +1045,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmp8Rd69W/temp_libpath2ce73b087e17/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpeQPFoW/temp_libpath3266babbffd/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">imported</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "AGEGRP"   "BMICAT"   "GENDER"   "RACEIN"   "SMISSING"</span></span>
 <span></span>
@@ -1173,7 +1173,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmp8Rd69W/temp_libpath2ce73b087e17/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpeQPFoW/temp_libpath3266babbffd/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span></span>
 <span><span class="co"># Library should be empty</span></span>
 <span><span class="fu"><a href="../reference/flist.html">flist</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -2049,6 +2049,184 @@ saves you from hand-crafting canonical keys.</p>
 <span><span class="co">#&gt; [1] "Child"  "Adult"  "Senior"</span></span>
 <span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="example-28-composite-key-lookup-with-na-components-na_as_string">Example 28: Composite Key Lookup with NA Components
+(<code>na_as_string</code>)<a class="anchor" aria-label="anchor" href="#example-28-composite-key-lookup-with-na-components-na_as_string"></a>
+</h2>
+<p>When building a format from data using
+<code>fmap(paste(..., sep = "|"), values)</code>, base R’s
+<code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste()</a></code> converts any <code>NA</code> component to the
+<strong>literal string</strong> <code>"NA"</code>. The resulting
+composite key is therefore <code>"CAT|TEST|NA"</code>, not a missing
+value.</p>
+<p>By default, <code><a href="../reference/fputk.html">fputk()</a></code> restores <code>NA_character_</code>
+wherever any component is <code>NA</code> before the lookup — so the key
+<code>"CAT|TEST|NA"</code> is never reached and the row falls through to
+<code>.other</code> / <code>.missing</code>.</p>
+<p>Setting <code>na_as_string = TRUE</code> keeps <code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste()</a></code>’s
+literal <code>"NA"</code>, making the round-trip consistent.</p>
+<div class="section level3">
+<h3 id="clinical-example-lb-parameter-derivation">Clinical example — LB parameter derivation<a class="anchor" aria-label="anchor" href="#clinical-example-lb-parameter-derivation"></a>
+</h3>
+<p>A common ADaM task: derive <code>PARAMCD</code> from a combination of
+<code>LBCAT</code>, <code>LBSPEC</code>, <code>LBTESTCD</code>, and
+<code>LBSTRESU</code>, where some rows have <code>LBSTRESU = NA</code>
+(dimensionless tests such as INR).</p>
+<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Source lab mapping (as received from a specification)</span></span>
+<span><span class="va">lb_map</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  LBCAT    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BLOOD CHEMISTRY"</span>, <span class="st">"COAGULOGRAM"</span>, <span class="st">"COAGULATION PANEL"</span>, <span class="st">"COAGULOGRAM"</span><span class="op">)</span>,</span>
+<span>  LBSPEC   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BLOOD"</span>,           <span class="st">"BLOOD"</span>,        <span class="st">"BLOOD"</span>,             <span class="st">"BLOOD"</span><span class="op">)</span>,</span>
+<span>  LBTESTCD <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ALB"</span>,             <span class="st">"FIBRINO"</span>,      <span class="st">"INR"</span>,               <span class="st">"INR"</span><span class="op">)</span>,</span>
+<span>  LBSTRESU <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g/L"</span>,             <span class="st">"g/L"</span>,           <span class="cn">NA</span>,                  <span class="cn">NA</span><span class="op">)</span>,</span>
+<span>  PARAMCD  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ALB"</span>,             <span class="st">"FIBRINO"</span>,       <span class="st">"INR"</span>,               <span class="st">"INR"</span><span class="op">)</span>,</span>
+<span>  stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">lb_map</span></span>
+<span><span class="co">#&gt;               LBCAT LBSPEC LBTESTCD LBSTRESU PARAMCD</span></span>
+<span><span class="co">#&gt; 1   BLOOD CHEMISTRY  BLOOD      ALB      g/L     ALB</span></span>
+<span><span class="co">#&gt; 2       COAGULOGRAM  BLOOD  FIBRINO      g/L FIBRINO</span></span>
+<span><span class="co">#&gt; 3 COAGULATION PANEL  BLOOD      INR     &lt;NA&gt;     INR</span></span>
+<span><span class="co">#&gt; 4       COAGULOGRAM  BLOOD      INR     &lt;NA&gt;     INR</span></span></code></pre></div>
+<p>Build the format with <code>fmap(paste(...), PARAMCD)</code>.<br><code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste()</a></code> converts <code>NA</code> in <code>LBSTRESU</code>
+to <code>"NA"</code>, so the stored keys for INR rows are
+<code>"COAGULATION PANEL|BLOOD|INR|NA"</code> and
+<code>"COAGULOGRAM|BLOOD|INR|NA"</code>.</p>
+<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">lb_map</span>,</span>
+<span>  <span class="fu"><a href="../reference/fmap.html">fmap</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">LBCAT</span>, <span class="va">LBSPEC</span>, <span class="va">LBTESTCD</span>, <span class="va">LBSTRESU</span>, sep <span class="op">=</span> <span class="st">"|"</span><span class="op">)</span>, <span class="va">PARAMCD</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span>ignore_case <span class="op">=</span> <span class="cn">TRUE</span>, .other <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>       type <span class="op">=</span> <span class="st">"character"</span>, name <span class="op">=</span> <span class="st">"lb_param"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/fprint.html">fprint</a></span><span class="op">(</span><span class="st">"lb_param"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; KS Format:lb_param (nocase)</span></span>
+<span><span class="co">#&gt; Type: character </span></span>
+<span><span class="co">#&gt; Mappings:</span></span>
+<span><span class="co">#&gt;   BLOOD CHEMISTRY|BLOOD|ALB|g/L =&gt; ALB</span></span>
+<span><span class="co">#&gt;   COAGULOGRAM|BLOOD|FIBRINO|g/L =&gt; FIBRINO</span></span>
+<span><span class="co">#&gt;   COAGULATION PANEL|BLOOD|INR|NA =&gt; INR</span></span>
+<span><span class="co">#&gt;   COAGULOGRAM|BLOOD|INR|NA =&gt; INR</span></span>
+<span><span class="co">#&gt;   .other =&gt; NA</span></span></code></pre></div>
+<p>Now apply the format.<br>
+With the default <code>na_as_string = FALSE</code>, the INR rows get
+<code>NA</code> (no match):</p>
+<div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lb_map</span><span class="op">$</span><span class="va">PARAMCD_default</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">lb_map</span>,</span>
+<span>  <span class="fu"><a href="../reference/fputk.html">fputk</a></span><span class="op">(</span><span class="va">LBCAT</span>, <span class="va">LBSPEC</span>, <span class="va">LBTESTCD</span>, <span class="va">LBSTRESU</span>, format <span class="op">=</span> <span class="st">"lb_param"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">lb_map</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"LBTESTCD"</span>, <span class="st">"LBSTRESU"</span>, <span class="st">"PARAMCD"</span>, <span class="st">"PARAMCD_default"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;   LBTESTCD LBSTRESU PARAMCD PARAMCD_default</span></span>
+<span><span class="co">#&gt; 1      ALB      g/L     ALB             ALB</span></span>
+<span><span class="co">#&gt; 2  FIBRINO      g/L FIBRINO         FIBRINO</span></span>
+<span><span class="co">#&gt; 3      INR     &lt;NA&gt;     INR            &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 4      INR     &lt;NA&gt;     INR            &lt;NA&gt;</span></span></code></pre></div>
+<p>With <code>na_as_string = TRUE</code>, <code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste()</a></code> also
+converts the lookup-side <code>NA</code> to <code>"NA"</code>, so the
+keys match:</p>
+<div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lb_map</span><span class="op">$</span><span class="va">PARAMCD_back</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">lb_map</span>,</span>
+<span>  <span class="fu"><a href="../reference/fputk.html">fputk</a></span><span class="op">(</span><span class="va">LBCAT</span>, <span class="va">LBSPEC</span>, <span class="va">LBTESTCD</span>, <span class="va">LBSTRESU</span>,</span>
+<span>        format <span class="op">=</span> <span class="st">"lb_param"</span>, na_as_string <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">lb_map</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"LBTESTCD"</span>, <span class="st">"LBSTRESU"</span>, <span class="st">"PARAMCD"</span>, <span class="st">"PARAMCD_back"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;   LBTESTCD LBSTRESU PARAMCD PARAMCD_back</span></span>
+<span><span class="co">#&gt; 1      ALB      g/L     ALB          ALB</span></span>
+<span><span class="co">#&gt; 2  FIBRINO      g/L FIBRINO      FIBRINO</span></span>
+<span><span class="co">#&gt; 3      INR     &lt;NA&gt;     INR          INR</span></span>
+<span><span class="co">#&gt; 4      INR     &lt;NA&gt;     INR          INR</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="the-rule-of-thumb">The rule of thumb<a class="anchor" aria-label="anchor" href="#the-rule-of-thumb"></a>
+</h3>
+<blockquote>
+<p>Use <code>na_as_string = TRUE</code> whenever the format was built
+with<br><code>fmap(paste(...), values)</code> <strong>and</strong> any key
+column can contain <code>NA</code>.</p>
+</blockquote>
+<p>If the format keys were set by hand
+(<code>fnew("CAT|TEST|g/L" = "ALB", ...)</code>), <code>NA</code>
+components should still go through <code>.missing</code> — keep the
+default <code>na_as_string = FALSE</code>.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="example-29-composite-label-invalue-lookup-with-finputk">Example 29: Composite Label Invalue Lookup with
+<code>finputk()</code><a class="anchor" aria-label="anchor" href="#example-29-composite-label-invalue-lookup-with-finputk"></a>
+</h2>
+<p><code><a href="../reference/finputk.html">finputk()</a></code> is the invalue-side mirror of
+<code><a href="../reference/fputk.html">fputk()</a></code>: it pastes multiple columns into a composite label
+and reverse-looks it up in a <code>ks_invalue</code> format. The same
+<code>na_as_string</code> argument applies.</p>
+<div class="section level3">
+<h3 id="basic-usage">Basic usage<a class="anchor" aria-label="anchor" href="#basic-usage"></a>
+</h3>
+<div class="sourceCode" id="cb80"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Build an INVALUE from two-column composite labels</span></span>
+<span><span class="fu"><a href="../reference/finput.html">finput</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/fmap.html">fmap</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BLOOD CHEMISTRY"</span>, <span class="st">"COAGULOGRAM"</span>, <span class="st">"COAGULATION PANEL"</span><span class="op">)</span>,</span>
+<span>             <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ALB"</span>,             <span class="st">"FIBRINO"</span>,      <span class="st">"INR"</span><span class="op">)</span>,</span>
+<span>             sep <span class="op">=</span> <span class="st">"|"</span><span class="op">)</span>,</span>
+<span>       <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1L</span>, <span class="fl">2L</span>, <span class="fl">3L</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  target_type <span class="op">=</span> <span class="st">"integer"</span>,</span>
+<span>  name <span class="op">=</span> <span class="st">"lb_code_inv"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; KS Invalue: lb_code_inv </span></span>
+<span><span class="co">#&gt; Target Type: integer </span></span>
+<span><span class="co">#&gt; Mappings:</span></span>
+<span><span class="co">#&gt;   BLOOD CHEMISTRY|ALB =&gt; 1</span></span>
+<span><span class="co">#&gt;   COAGULOGRAM|FIBRINO =&gt; 2</span></span>
+<span><span class="co">#&gt;   COAGULATION PANEL|INR =&gt; 3</span></span>
+<span></span>
+<span><span class="co"># Reverse lookup: two separate columns → integer code</span></span>
+<span><span class="va">cat_vec</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BLOOD CHEMISTRY"</span>, <span class="st">"COAGULOGRAM"</span>, <span class="st">"COAGULATION PANEL"</span>, <span class="st">"OTHER"</span><span class="op">)</span></span>
+<span><span class="va">test_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ALB"</span>,              <span class="st">"FIBRINO"</span>,     <span class="st">"INR"</span>,               <span class="st">"X"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/finputk.html">finputk</a></span><span class="op">(</span><span class="va">cat_vec</span>, <span class="va">test_vec</span>, invalue_name <span class="op">=</span> <span class="st">"lb_code_inv"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1]  1  2  3 NA</span></span>
+<span><span class="co"># BLOOD CHEMISTRY|ALB → 1, COAGULOGRAM|FIBRINO → 2,</span></span>
+<span><span class="co"># COAGULATION PANEL|INR → 3, OTHER|X → NA (no match → missing_value)</span></span>
+<span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="with-na-components-na_as_string-true">With NA components (<code>na_as_string = TRUE</code>)<a class="anchor" aria-label="anchor" href="#with-na-components-na_as_string-true"></a>
+</h3>
+<p>When the INVALUE was built from data containing <code>NA</code>
+columns, use <code>na_as_string = TRUE</code> on both the build side
+(<code>fmap(paste(...), ...)</code>) and the lookup side
+(<code>finputk(..., na_as_string = TRUE)</code>).</p>
+<div class="sourceCode" id="cb81"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># INVALUE where LBSTRESU can be NA (like INR)</span></span>
+<span><span class="fu"><a href="../reference/finput.html">finput</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/fmap.html">fmap</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">lb_map</span><span class="op">$</span><span class="va">LBCAT</span>, <span class="va">lb_map</span><span class="op">$</span><span class="va">LBTESTCD</span>, <span class="va">lb_map</span><span class="op">$</span><span class="va">LBSTRESU</span>, sep <span class="op">=</span> <span class="st">"|"</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">lb_map</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  target_type <span class="op">=</span> <span class="st">"integer"</span>,</span>
+<span>  name <span class="op">=</span> <span class="st">"lb_row_inv"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; KS Invalue: lb_row_inv </span></span>
+<span><span class="co">#&gt; Target Type: integer </span></span>
+<span><span class="co">#&gt; Mappings:</span></span>
+<span><span class="co">#&gt;   BLOOD CHEMISTRY|ALB|g/L =&gt; 1</span></span>
+<span><span class="co">#&gt;   COAGULOGRAM|FIBRINO|g/L =&gt; 2</span></span>
+<span><span class="co">#&gt;   COAGULATION PANEL|INR|NA =&gt; 3</span></span>
+<span><span class="co">#&gt;   COAGULOGRAM|INR|NA =&gt; 4</span></span>
+<span></span>
+<span><span class="co"># Reconstruct lb_map row indices — works even when LBSTRESU is NA</span></span>
+<span><span class="fu"><a href="../reference/finputk.html">finputk</a></span><span class="op">(</span><span class="va">lb_map</span><span class="op">$</span><span class="va">LBCAT</span>, <span class="va">lb_map</span><span class="op">$</span><span class="va">LBTESTCD</span>, <span class="va">lb_map</span><span class="op">$</span><span class="va">LBSTRESU</span>,</span>
+<span>        invalue_name <span class="op">=</span> <span class="st">"lb_row_inv"</span>, na_as_string <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1 2 3 4</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
+<p>The output type is always determined by the stored invalue’s
+<code>target_type</code> (here <code>integer</code>). For character
+output create the invalue with <code>target_type = "character"</code>
+and <code><a href="../reference/finputk.html">finputk()</a></code> returns a character vector.</p>
+</div>
 </div>
   </div>
 

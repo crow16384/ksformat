@@ -1471,3 +1471,141 @@ fput(c(5, 25, 90), "ag")
 fclear()
 ```
 
+## Example 28: Composite Key Lookup with NA Components (`na_as_string`)
+
+When building a format from data using `fmap(paste(..., sep = "|"), values)`,
+base R's `paste()` converts any `NA` component to the **literal string**
+`"NA"`. The resulting composite key is therefore `"CAT|TEST|NA"`, not a
+missing value.
+
+By default, `fputk()` restores `NA_character_` wherever any component is
+`NA` before the lookup — so the key `"CAT|TEST|NA"` is never reached and
+the row falls through to `.other` / `.missing`.
+
+Setting `na_as_string = TRUE` keeps `paste()`'s literal `"NA"`, making the
+round-trip consistent.
+
+### Clinical example — LB parameter derivation
+
+A common ADaM task: derive `PARAMCD` from a combination of
+`LBCAT`, `LBSPEC`, `LBTESTCD`, and `LBSTRESU`, where some rows have
+`LBSTRESU = NA` (dimensionless tests such as INR).
+
+```{r na-str-setup}
+# Source lab mapping (as received from a specification)
+lb_map <- data.frame(
+  LBCAT    = c("BLOOD CHEMISTRY", "COAGULOGRAM", "COAGULATION PANEL", "COAGULOGRAM"),
+  LBSPEC   = c("BLOOD",           "BLOOD",        "BLOOD",             "BLOOD"),
+  LBTESTCD = c("ALB",             "FIBRINO",      "INR",               "INR"),
+  LBSTRESU = c("g/L",             "g/L",           NA,                  NA),
+  PARAMCD  = c("ALB",             "FIBRINO",       "INR",               "INR"),
+  stringsAsFactors = FALSE
+)
+lb_map
+```
+
+Build the format with `fmap(paste(...), PARAMCD)`.  
+`paste()` converts `NA` in `LBSTRESU` to `"NA"`, so the stored keys for
+INR rows are `"COAGULATION PANEL|BLOOD|INR|NA"` and `"COAGULOGRAM|BLOOD|INR|NA"`.
+
+```{r na-str-build}
+with(lb_map,
+  fmap(paste(LBCAT, LBSPEC, LBTESTCD, LBSTRESU, sep = "|"), PARAMCD)
+) |>
+  fnew(ignore_case = TRUE, .other = NA,
+       type = "character", name = "lb_param")
+
+fprint("lb_param")
+```
+
+Now apply the format.  
+With the default `na_as_string = FALSE`, the INR rows get `NA` (no match):
+
+```{r na-str-default}
+lb_map$PARAMCD_default <- with(lb_map,
+  fputk(LBCAT, LBSPEC, LBTESTCD, LBSTRESU, format = "lb_param")
+)
+lb_map[, c("LBTESTCD", "LBSTRESU", "PARAMCD", "PARAMCD_default")]
+```
+
+With `na_as_string = TRUE`, `paste()` also converts the lookup-side `NA` to
+`"NA"`, so the keys match:
+
+```{r na-str-correct}
+lb_map$PARAMCD_back <- with(lb_map,
+  fputk(LBCAT, LBSPEC, LBTESTCD, LBSTRESU,
+        format = "lb_param", na_as_string = TRUE)
+)
+lb_map[, c("LBTESTCD", "LBSTRESU", "PARAMCD", "PARAMCD_back")]
+```
+
+```{r na-str-cleanup, include=FALSE}
+fclear()
+```
+
+### The rule of thumb
+
+> Use `na_as_string = TRUE` whenever the format was built with  
+> `fmap(paste(...), values)` **and** any key column can contain `NA`.
+
+If the format keys were set by hand
+(`fnew("CAT|TEST|g/L" = "ALB", ...)`), `NA` components should still go
+through `.missing` — keep the default `na_as_string = FALSE`.
+
+## Example 29: Composite Label Invalue Lookup with `finputk()`
+
+`finputk()` is the invalue-side mirror of `fputk()`: it pastes multiple
+columns into a composite label and reverse-looks it up in a `ks_invalue`
+format. The same `na_as_string` argument applies.
+
+### Basic usage
+
+```{r finputk-basic}
+# Build an INVALUE from two-column composite labels
+finput(
+  fmap(paste(c("BLOOD CHEMISTRY", "COAGULOGRAM", "COAGULATION PANEL"),
+             c("ALB",             "FIBRINO",      "INR"),
+             sep = "|"),
+       c(1L, 2L, 3L)),
+  target_type = "integer",
+  name = "lb_code_inv"
+)
+
+# Reverse lookup: two separate columns → integer code
+cat_vec  <- c("BLOOD CHEMISTRY", "COAGULOGRAM", "COAGULATION PANEL", "OTHER")
+test_vec <- c("ALB",              "FIBRINO",     "INR",               "X")
+
+finputk(cat_vec, test_vec, invalue_name = "lb_code_inv")
+# BLOOD CHEMISTRY|ALB → 1, COAGULOGRAM|FIBRINO → 2,
+# COAGULATION PANEL|INR → 3, OTHER|X → NA (no match → missing_value)
+fclear()
+```
+
+### With NA components (`na_as_string = TRUE`)
+
+When the INVALUE was built from data containing `NA` columns, use
+`na_as_string = TRUE` on both the build side (`fmap(paste(...), ...)`) and
+the lookup side (`finputk(..., na_as_string = TRUE)`).
+
+```{r finputk-na}
+# INVALUE where LBSTRESU can be NA (like INR)
+finput(
+  fmap(
+    paste(lb_map$LBCAT, lb_map$LBTESTCD, lb_map$LBSTRESU, sep = "|"),
+    seq_len(nrow(lb_map))
+  ),
+  target_type = "integer",
+  name = "lb_row_inv"
+)
+
+# Reconstruct lb_map row indices — works even when LBSTRESU is NA
+finputk(lb_map$LBCAT, lb_map$LBTESTCD, lb_map$LBSTRESU,
+        invalue_name = "lb_row_inv", na_as_string = TRUE)
+
+fclear()
+```
+
+The output type is always determined by the stored invalue's `target_type`
+(here `integer`). For character output create the invalue with
+`target_type = "character"` and `finputk()` returns a character vector.
+
