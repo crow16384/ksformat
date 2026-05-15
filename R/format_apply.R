@@ -872,6 +872,13 @@ fput_df <- function(data, ..., suffix = "_fmt", replace = FALSE) {
 #'   (default `"|"`).
 #' @param keep_na If `TRUE`, `NA` inputs remain `NA` in the output instead
 #'   of being mapped via `.missing`. Passed through to [fput()].
+#' @param na_as_string If `FALSE` (default), an `NA` in any component
+#'   propagates to the composite key (restored to `NA_character_` after
+#'   the [paste()] step) so that [fput()] can apply `.missing` handling.
+#'   If `TRUE`, the literal string `"NA"` produced by [paste()] is kept,
+#'   which is useful when the format was built with composite keys via
+#'   `fmap(paste(..., sep = "|"), values)` — because [paste()] converts
+#'   `NA` to `"NA"` on both sides, the round-trip lookup then matches.
 #'
 #' @return A character vector of formatted labels, the same length as the
 #'   (recycled) input vectors.
@@ -895,9 +902,25 @@ fput_df <- function(data, ..., suffix = "_fmt", replace = FALSE) {
 #'
 #' fclear()
 #'
-#' @seealso [fput()], [fputn()], [fputc()]
+#' # Composite key with NA components matching a paste()-built format
+#' fnew(
+#'   fmap(
+#'     paste(c("CHEM", "COAG"), c("ALB", "INR"), c("g/L", NA), sep = "|"),
+#'     c("ALB", "INR")
+#'   ),
+#'   name = "lb_param", type = "character"
+#' )
+#'
+#' fputk(c("CHEM", "COAG"), c("ALB", "INR"), c("g/L", NA),
+#'       format = "lb_param", na_as_string = TRUE)
+#' # -> "ALB" "INR"
+#'
+#' fclear()
+#'
+#' @seealso [fput()], [fputn()], [fputc()], [finputk()]
 #' @export
-fputk <- function(..., format, sep = "|", keep_na = FALSE) {
+fputk <- function(..., format, sep = "|", keep_na = FALSE,
+                  na_as_string = FALSE) {
   args <- list(...)
   if (length(args) < 1L) {
     cli_abort("At least one key component must be provided in {.code ...}.")
@@ -922,8 +945,8 @@ fputk <- function(..., format, sep = "|", keep_na = FALSE) {
     stratum_args <- args[seq_len(n_args - 1L)]
     value <- args[[n_args]]
     stratum <- do.call(paste, c(stratum_args, list(sep = strat_sep)))
-    # Propagate NA in stratum components
-    if (length(stratum_args) > 0L) {
+    # Propagate NA in stratum components unless na_as_string keeps "NA"
+    if (!na_as_string && length(stratum_args) > 0L) {
       strat_na <- Reduce(`|`, lapply(stratum_args, is.na))
       stratum[strat_na] <- NA_character_
     }
@@ -932,9 +955,12 @@ fputk <- function(..., format, sep = "|", keep_na = FALSE) {
 
   keys <- do.call(paste, c(args, list(sep = sep)))
   # Propagate NA: paste() coerces NA to "NA" — restore real NA so
-  # fput() can apply .missing handling correctly.
-  any_na <- Reduce(`|`, lapply(args, is.na))
-  keys[any_na] <- NA_character_
+  # fput() can apply .missing handling correctly. When na_as_string = TRUE
+  # the literal "NA" is kept so paste()/fmap()-built keys round-trip.
+  if (!na_as_string) {
+    any_na <- Reduce(`|`, lapply(args, is.na))
+    keys[any_na] <- NA_character_
+  }
   fput(keys, format, keep_na = keep_na)
 }
 

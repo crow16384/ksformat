@@ -2773,6 +2773,107 @@ test_that("fputk accepts a ks_format object directly", {
   expect_equal(result, c("hit", "miss"))
 })
 
+test_that("fputk na_as_string matches paste()/fmap()-built keys", {
+  # Format built via fmap(paste(...), values) — paste() stores literal "NA"
+  fnew(
+    fmap(
+      paste(c("CHEM", "COAG", "COAG"), c("ALB", "FIBRINO", "INR"),
+            c("g/L", "g/L", NA), sep = "|"),
+      c("ALB", "FIBRINO", "INR")
+    ),
+    .other = NA, name = "fputk_na_string", type = "character"
+  )
+
+  # With na_as_string = TRUE the literal "NA" propagates and matches
+  res_keep <- fputk(c("CHEM", "COAG", "COAG"),
+                    c("ALB", "FIBRINO", "INR"),
+                    c("g/L", "g/L", NA),
+                    format = "fputk_na_string", na_as_string = TRUE)
+  expect_equal(res_keep, c("ALB", "FIBRINO", "INR"))
+
+  # Default (FALSE) restores NA so the third row falls through to .other
+  res_default <- fputk(c("CHEM", "COAG", "COAG"),
+                       c("ALB", "FIBRINO", "INR"),
+                       c("g/L", "g/L", NA),
+                       format = "fputk_na_string")
+  expect_equal(res_default, c("ALB", "FIBRINO", NA_character_))
+  fclear()
+})
+
+test_that("fputk na_as_string default still routes NA via .missing", {
+  fnew("A|1" = "hit", .missing = "MISS",
+       name = "fputk_default_na", type = "character")
+  # Default behavior unchanged
+  expect_equal(fputk(NA, 1, format = "fputk_default_na"), "MISS")
+  # na_as_string = TRUE keeps the literal "NA|1" key — no .missing routing
+  expect_equal(
+    fputk(NA, 1, format = "fputk_default_na", na_as_string = TRUE),
+    "NA|1"
+  )
+  fclear()
+})
+
+
+# --- finputk (composite label invalue lookup) ---
+
+test_that("finputk pastes labels and applies invalue", {
+  finput(
+    fmap(paste(c("A", "A", "B"), c(1, 2, 1), sep = "|"), c(10, 20, 30)),
+    name = "finputk_test"
+  )
+  result <- finputk(c("A", "A", "B"), c(1, 2, 1),
+                    invalue_name = "finputk_test")
+  expect_equal(result, c(10, 20, 30))
+  fclear()
+})
+
+test_that("finputk supports custom separator", {
+  finput("A-1" = 7, name = "finputk_sep")
+  result <- finputk("A", 1, invalue_name = "finputk_sep", sep = "-")
+  expect_equal(result, 7)
+  fclear()
+})
+
+test_that("finputk na_as_string matches paste()/fmap()-built labels", {
+  finput(
+    fmap(paste(c("CHEM", "COAG"), c("INR", "INR"),
+               c("g/L", NA), sep = "|"),
+         c(1, 2)),
+    name = "finputk_na_string"
+  )
+  res_keep <- finputk(c("CHEM", "COAG"), c("INR", "INR"), c("g/L", NA),
+                      invalue_name = "finputk_na_string",
+                      na_as_string = TRUE)
+  expect_equal(res_keep, c(1, 2))
+
+  res_default <- finputk(c("CHEM", "COAG"), c("INR", "INR"), c("g/L", NA),
+                         invalue_name = "finputk_na_string")
+  expect_equal(res_default, c(1, NA_real_))
+  fclear()
+})
+
+test_that("finputk respects target_type from stored invalue", {
+  finput("A|1" = "X", name = "finputk_char", target_type = "character")
+  expect_type(finputk("A", 1, invalue_name = "finputk_char"), "character")
+  fclear()
+})
+
+test_that("finputk errors on non-ks_invalue lookup", {
+  fnew("A|1" = "X", name = "finputk_not_inv", type = "character")
+  expect_error(
+    finputk("A", 1, invalue_name = "finputk_not_inv"),
+    "not an INVALUE format"
+  )
+  fclear()
+})
+
+test_that("finputk errors when no components are provided", {
+  finput("A" = 1, name = "finputk_empty")
+  expect_error(finputk(invalue_name = "finputk_empty"),
+               "At least one label component")
+  fclear()
+})
+
 
 # ===========================================================================
 # Value Type System (Date, POSIXct, logical)

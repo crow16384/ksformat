@@ -253,6 +253,76 @@ finputc <- function(x, invalue_name) {
   as.character(result)
 }
 
+#' Apply Invalue Using a Composite Label
+#'
+#' Convenience wrapper around an INVALUE lookup that pastes multiple vectors
+#' together into a composite label before reverse lookup. Mirrors
+#' [fputk()] on the invalue side, for INVALUE formats built with composite
+#' labels such as `fmap(paste(col1, col2, sep = "|"), codes)`.
+#'
+#' The output type is determined by the stored invalue's `target_type`
+#' (numeric / integer → numeric, character → character, logical →
+#' logical).
+#'
+#' @param ... Vectors to paste together into a composite label.
+#'   All vectors are recycled to a common length by [paste()].
+#' @param invalue_name Character. Name of a registered INVALUE format.
+#' @param sep Separator inserted between the pasted components
+#'   (default `"|"`).
+#' @param na_as_string If `FALSE` (default), an `NA` in any component
+#'   propagates to the composite label (restored to `NA_character_` after
+#'   the [paste()] step) so the invalue's `missing_value` applies.
+#'   If `TRUE`, the literal string `"NA"` produced by [paste()] is kept,
+#'   which is useful when the invalue was built with composite labels via
+#'   `fmap(paste(..., sep = "|"), values)`.
+#'
+#' @return A vector whose type depends on the invalue's `target_type`.
+#'
+#' @examples
+#' # Build an INVALUE keyed on two columns via paste()
+#' finput(
+#'   fmap(paste(c("A", "A", "B"), c(1, 2, 1), sep = "|"), c(10, 20, 30)),
+#'   name = "ab_inv"
+#' )
+#'
+#' finputk(c("A", "A", "B"), c(1, 2, 1), invalue_name = "ab_inv")
+#' # -> 10 20 30
+#'
+#' fclear()
+#'
+#' @seealso [finput()], [finputn()], [finputc()], [fputk()]
+#' @export
+finputk <- function(..., invalue_name, sep = "|", na_as_string = FALSE) {
+  args <- list(...)
+  if (length(args) < 1L) {
+    cli_abort("At least one label component must be provided in {.code ...}.")
+  }
+
+  inv_obj <- .format_get(invalue_name)
+  if (!inherits(inv_obj, "ks_invalue")) {
+    cli_abort("{.val {invalue_name}} is not an INVALUE format ({.cls ks_invalue}).")
+  }
+
+  keys <- do.call(paste, c(args, list(sep = sep)))
+  # Propagate NA: paste() coerces NA to "NA" — restore real NA so the
+  # invalue's missing_value applies. When na_as_string = TRUE the literal
+  # "NA" is kept so paste()/fmap()-built labels round-trip.
+  if (!na_as_string) {
+    any_na <- Reduce(`|`, lapply(args, is.na))
+    keys[any_na] <- NA_character_
+  }
+
+  result <- .invalue_apply(keys, inv_obj)
+  switch(
+    inv_obj$target_type,
+    "numeric"   = as.numeric(result),
+    "integer"   = as.integer(result),
+    "character" = as.character(result),
+    "logical"   = as.logical(result),
+    result
+  )
+}
+
 #' Create Bidirectional Format
 #'
 #' Creates both a format and its corresponding invalue for bidirectional conversion.

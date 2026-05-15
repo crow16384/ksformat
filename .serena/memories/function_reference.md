@@ -8,12 +8,13 @@
 | `fput(x, format, ..., keep_na)` | format_apply.R | Apply format to vector |
 | `fputn(x, format_name, ...)` | format_apply.R | Apply numeric format by name |
 | `fputc(x, format_name, ...)` | format_apply.R | Apply character format by name |
-| `fputk(..., format, sep, keep_na)` | format_apply.R | Apply format with composite paste key (e.g. SUBJ\|VISIT) |
+| `fputk(..., format, sep, keep_na, na_as_string)` | format_apply.R | Apply format with composite paste key; `na_as_string=TRUE` keeps literal "NA" for paste()/fmap()-built keys |
 | `fput_all(x, format, ..., keep_na)` | format_apply.R | Multilabel: all matching labels |
 | `fput_df(data, ..., suffix, replace)` | format_apply.R | Apply formats to data frame cols |
 | `finput(...)` | format_invalue.R | Create ks_invalue (label→value) |
 | `finputn(x, invalue_name)` | format_invalue.R | Apply numeric invalue by name |
 | `finputc(x, invalue_name)` | format_invalue.R | Apply character invalue by name |
+| `finputk(..., invalue_name, sep, na_as_string)` | format_invalue.R | Apply invalue with composite paste label; mirrors `fputk()` on the invalue side |
 | `fnew_bid(...)` | format_invalue.R | Create bidirectional format+invalue |
 | `fnew_date(pattern, name, type, .missing)` | format_datetime.R | Create date/time/datetime format |
 | `format_library_app(port, launch.browser)` | format_library_app.R | Launch Shiny browser for format library |

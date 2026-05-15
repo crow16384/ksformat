@@ -4,7 +4,7 @@
 \alias{fputk}
 \title{Apply Format Using a Composite Key}
 \usage{
-fputk(..., format, sep = "|", keep_na = FALSE)
+fputk(..., format, sep = "|", keep_na = FALSE, na_as_string = FALSE)
 }
 \arguments{
 \item{...}{Vectors to paste together into a composite key.
@@ -18,6 +18,14 @@ string).}
 
 \item{keep_na}{If `TRUE`, `NA` inputs remain `NA` in the output instead
 of being mapped via `.missing`. Passed through to [fput()].}
+
+\item{na_as_string}{If `FALSE` (default), an `NA` in any component
+propagates to the composite key (restored to `NA_character_` after
+the [paste()] step) so that [fput()] can apply `.missing` handling.
+If `TRUE`, the literal string `"NA"` produced by [paste()] is kept,
+which is useful when the format was built with composite keys via
+`fmap(paste(..., sep = "|"), values)` — because [paste()] converts
+`NA` to `"NA"` on both sides, the round-trip lookup then matches.}
 }
 \value{
 A character vector of formatted labels, the same length as the
@@ -47,7 +55,22 @@ fputk(subj, visit, format = "visit_date")
 
 fclear()
 
+# Composite key with NA components matching a paste()-built format
+fnew(
+  fmap(
+    paste(c("CHEM", "COAG"), c("ALB", "INR"), c("g/L", NA), sep = "|"),
+    c("ALB", "INR")
+  ),
+  name = "lb_param", type = "character"
+)
+
+fputk(c("CHEM", "COAG"), c("ALB", "INR"), c("g/L", NA),
+      format = "lb_param", na_as_string = TRUE)
+# -> "ALB" "INR"
+
+fclear()
+
 }
 \seealso{
-[fput()], [fputn()], [fputc()]
+[fput()], [fputn()], [fputc()], [finputk()]
 }

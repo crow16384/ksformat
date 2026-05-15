@@ -1,3 +1,19 @@
+# ksformat 0.7.1
+
+## New features
+
+* `fputk()` gains a `na_as_string` argument. When `TRUE`, an `NA` in any
+  key component is preserved as the literal string `"NA"` produced by
+  `paste()` instead of being restored to `NA_character_`. This enables
+  round-trip lookups against formats built via
+  `fmap(paste(..., sep = "|"), values)`, where the stored keys
+  themselves contain `"NA"`. Default `FALSE` preserves existing behavior
+  (NA → `.missing` / `keep_na`).
+* New `finputk()` — composite-label wrapper around INVALUE lookup,
+  mirroring `fputk()` on the reverse direction. Supports the same
+  `sep` and `na_as_string` arguments and dispatches on the stored
+  invalue's `target_type`.
+
 # ksformat 0.7.0
 
 ## New features

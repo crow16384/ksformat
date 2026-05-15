@@ -14,7 +14,7 @@ Maps values to labels (formats), labels back to values (invalues), with range, d
 - **uv**: installed at ~/.local/bin/uv (for Serena MCP)
 
 ## Version
-- Current: 0.6.5
+- Current: 0.7.1
 - License: GPL-3
 
 ## Core Concepts
@@ -45,8 +45,8 @@ Maps values to labels (formats), labels back to values (invalues), with range, d
 - `tests/testthat/test-formats.R` — comprehensive test suite (~2162 lines, ~130+ test cases)
 - `tests/testthat/test-format-library-app.R` — focused tests for app helper and launcher behavior
 
-## Exported Functions (25 total via NAMESPACE)
-e, fclear, fexport, fimport, finput, finputc, finputn, flist, fmap, fnew,
+## Exported Functions (26 total via NAMESPACE)
+e, fclear, fexport, fimport, finput, finputc, finputk, finputn, flist, fmap, fnew,
 fnew_bid, fnew_date, format_get, format_library_app, fparse, fprint, fput,
 fput_all, fput_df, fputc, fputk, fputn, is_missing, ksformat_cheatsheet,
 range_spec

@@ -19,7 +19,7 @@ combination of several columns (e.g., `USUBJID|VISITNUM`)."><meta property="og:i
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.1</span>
       </span>
     </div>
 
@@ -67,7 +67,7 @@ combination of several columns (e.g., `USUBJID|VISITNUM`).</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fputk</span><span class="op">(</span><span class="va">...</span>, <span class="va">format</span>, sep <span class="op">=</span> <span class="st">"|"</span>, keep_na <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fputk</span><span class="op">(</span><span class="va">...</span>, <span class="va">format</span>, sep <span class="op">=</span> <span class="st">"|"</span>, keep_na <span class="op">=</span> <span class="cn">FALSE</span>, na_as_string <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -93,6 +93,16 @@ string).</p></dd>
 <dd><p>If `TRUE`, `NA` inputs remain `NA` in the output instead
 of being mapped via `.missing`. Passed through to [fput()].</p></dd>
 
+
+<dt id="arg-na-as-string">na_as_string<a class="anchor" aria-label="anchor" href="#arg-na-as-string"></a></dt>
+<dd><p>If `FALSE` (default), an `NA` in any component
+propagates to the composite key (restored to `NA_character_` after
+the [paste()] step) so that [fput()] can apply `.missing` handling.
+If `TRUE`, the literal string `"NA"` produced by [paste()] is kept,
+which is useful when the format was built with composite keys via
+`fmap(paste(..., sep = "|"), values)` — because [paste()] converts
+`NA` to `"NA"` on both sides, the round-trip lookup then matches.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -101,7 +111,7 @@ of being mapped via `.missing`. Passed through to [fput()].</p></dd>
     </div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p>[fput()], [fputn()], [fputc()]</p></div>
+    <div class="dont-index"><p>[fput()], [fputn()], [fputc()], [finputk()]</p></div>
     </div>
 
     <div id="ref-examples">
@@ -122,6 +132,23 @@ of being mapped via `.missing`. Passed through to [fput()].</p></dd>
 <span class="r-in"><span><span class="fu">fputk</span><span class="op">(</span><span class="va">subj</span>, <span class="va">visit</span>, format <span class="op">=</span> <span class="st">"visit_date"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "2025-01-15" "2025-02-20" "2025-03-10" "NOT FOUND" </span>
 <span class="r-in"><span><span class="co"># -&gt; "2025-01-15" "2025-02-20" "2025-03-10" "NOT FOUND"</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> All formats cleared from library.</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Composite key with NA components matching a paste()-built format</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="fnew.html">fnew</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="fmap.html">fmap</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CHEM"</span>, <span class="st">"COAG"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ALB"</span>, <span class="st">"INR"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g/L"</span>, <span class="cn">NA</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"|"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ALB"</span>, <span class="st">"INR"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span>,</span></span>
+<span class="r-in"><span>  name <span class="op">=</span> <span class="st">"lb_param"</span>, type <span class="op">=</span> <span class="st">"character"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">fputk</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CHEM"</span>, <span class="st">"COAG"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ALB"</span>, <span class="st">"INR"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g/L"</span>, <span class="cn">NA</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>      format <span class="op">=</span> <span class="st">"lb_param"</span>, na_as_string <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "ALB" "INR"</span>
+<span class="r-in"><span><span class="co"># -&gt; "ALB" "INR"</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> All formats cleared from library.</span>

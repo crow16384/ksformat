@@ -20,7 +20,7 @@ is provided."><meta property="og:image" content="/logo.svg"><!-- mathjax --><scr
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.1</span>
       </span>
     </div>
 
@@ -150,6 +150,18 @@ when parsing date/datetime range keys (e.g. <code>"%d/%m/%Y"</code>). When
 <code>NULL</code>, ISO 8601 parsing is used. Applies to <code>"date_range"</code>,
 <code>"datetime_range"</code>, and the value types <code>"Date"</code> /
 <code>"POSIXct"</code> when keys are ranges.</p></dd>
+
+
+<dt id="arg-range-subtype">range_subtype<a class="anchor" aria-label="anchor" href="#arg-range-subtype"></a></dt>
+<dd><p>Character. For <code>type = "stratified_range"</code> only.
+One of <code>"numeric"</code> (default), <code>"date"</code>, or <code>"datetime"</code>.
+Determines how the range part of each stratified key is parsed and compared.</p></dd>
+
+
+<dt id="arg-strata-sep">strata_sep<a class="anchor" aria-label="anchor" href="#arg-strata-sep"></a></dt>
+<dd><p>Character. For <code>type = "stratified_range"</code> only.
+Single-character (or multi-character) separator between the stratum
+identifier and the range key in each mapping key. Default <code>"|"</code>.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
