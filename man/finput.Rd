@@ -4,7 +4,13 @@
 \alias{finput}
 \title{Create Invalue Format (Reverse Formatting like 'SAS' INVALUE)}
 \usage{
-finput(..., name = NULL, target_type = "numeric", missing_value = NA)
+finput(
+  ...,
+  name = NULL,
+  target_type = "numeric",
+  missing_value = NA,
+  ignore_case = FALSE
+)
 }
 \arguments{
 \item{...}{Named arguments defining label-value mappings (reverse of \code{\link{fnew}}),

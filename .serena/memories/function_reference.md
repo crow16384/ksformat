@@ -11,7 +11,7 @@
 | `fputk(..., format, sep, keep_na, na_as_string)` | format_apply.R | Apply format with composite paste key; `na_as_string=TRUE` keeps literal "NA" for paste()/fmap()-built keys |
 | `fput_all(x, format, ..., keep_na)` | format_apply.R | Multilabel: all matching labels |
 | `fput_df(data, ..., suffix, replace)` | format_apply.R | Apply formats to data frame cols |
-| `finput(...)` | format_invalue.R | Create ks_invalue (label→value) |
+| `finput(..., ignore_case)` | format_invalue.R | Create ks_invalue (label→value); `ignore_case=TRUE` enables case-insensitive lookup |
 | `finputn(x, invalue_name)` | format_invalue.R | Apply numeric invalue by name |
 | `finputc(x, invalue_name)` | format_invalue.R | Apply character invalue by name |
 | `finputk(..., invalue_name, sep, na_as_string)` | format_invalue.R | Apply invalue with composite paste label; mirrors `fputk()` on the invalue side |
@@ -81,5 +81,5 @@
 
 ## Class Hierarchy
 - `ks_format` — VALUE format (value→label). Fields: name, type, mappings, missing_label, other_label, multilabel, ignore_case, created. For datetime: dt_pattern, dt_toupper, sas_name. For value types: date_format. Type can be "character", "numeric", "Date", "POSIXct", "logical", or datetime types.
-- `ks_invalue` — INVALUE format (label→value). Fields: name, target_type, mappings, missing_value, created.
+- `ks_invalue` — INVALUE format (label→value). Fields: name, target_type, mappings, missing_value, ignore_case, created.
 - `range_spec` — Range specification. Fields: low, high, label, inc_low, inc_high.

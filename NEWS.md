@@ -1,3 +1,19 @@
+# ksformat 0.7.2
+
+## New features
+
+* `finput()` gains an `ignore_case` argument. When `TRUE`, label lookup is
+  case-insensitive (equivalent to SAS `INVALUE name (nocase)`). Default
+  `FALSE` preserves existing behaviour.
+* `fparse()` now correctly propagates the `(nocase)` option on `INVALUE`
+  blocks to the resulting `ks_invalue` object. Previously the flag was
+  parsed but silently discarded.
+* `fexport()` / `fparse()` round-trips now preserve `ignore_case` for
+  invalue objects: exporting a `nocase` invalue emits `INVALUE name (nocase)`
+  which re-imports with `ignore_case = TRUE`.
+* `print.ks_invalue()` now displays a `(nocase)` flag in the header when
+  `ignore_case = TRUE`.
+
 # ksformat 0.7.1
 
 ## New features

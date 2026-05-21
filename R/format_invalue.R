@@ -39,12 +39,16 @@
 #' finputn(c("Male", "Female"), "sex_inv2")
 #' # [1] 1 2
 #' fclear()
-finput <- function(..., name = NULL, target_type = "numeric", missing_value = NA) {
+finput <- function(..., name = NULL, target_type = "numeric", missing_value = NA,
+                   ignore_case = FALSE) {
   target_type <- match.arg(target_type, c("numeric", "integer", "character", "logical"))
   if (!is.null(name)) {
     if (!is.character(name) || length(name) != 1L || is.na(name) || !nzchar(name)) {
       cli_abort("{.arg name} must be a single non-empty character string.")
     }
+  }
+  if (!is.logical(ignore_case) || length(ignore_case) != 1L || is.na(ignore_case)) {
+    cli_abort("{.arg ignore_case} must be TRUE or FALSE.")
   }
 
   mappings <- list(...)
@@ -71,6 +75,7 @@ finput <- function(..., name = NULL, target_type = "numeric", missing_value = NA
       target_type = target_type,
       mappings = mappings,
       missing_value = missing_value,
+      ignore_case = ignore_case,
       created = Sys.time()
     ),
     class = "ks_invalue"
@@ -129,7 +134,12 @@ finput <- function(..., name = NULL, target_type = "numeric", missing_value = NA
   # Vectorized lookup using match()
   labels <- as.character(x[non_miss])
   map_keys <- names(invalue$mappings)
-  pos <- match(labels, map_keys)
+  nocase <- isTRUE(invalue$ignore_case)
+  pos <- if (nocase) {
+    match(tolower(labels), tolower(map_keys))
+  } else {
+    match(labels, map_keys)
+  }
   found <- !is.na(pos)
 
   if (any(found)) {
@@ -408,7 +418,10 @@ fnew_bid <- function(..., name = NULL, type = "auto") {
 #' @return The input \code{x}, returned invisibly.
 #' @export
 print.ks_invalue <- function(x, ...) {
-  cat("KS Invalue:", if (!is.null(x$name)) x$name else "(unnamed)", "\n")
+  flags <- character(0)
+  if (isTRUE(x$ignore_case)) flags <- c(flags, "nocase")
+  flags_str <- if (length(flags)) paste0(" (", paste(flags, collapse = ", "), ")") else ""
+  cat("KS Invalue: ", if (!is.null(x$name)) x$name else "(unnamed)", flags_str, "\n", sep = "")
   cat("Target Type:", x$target_type, "\n")
   cat("Mappings:\n")
 

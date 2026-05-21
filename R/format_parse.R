@@ -1361,6 +1361,7 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
       target_type = target_type,
       mappings = mappings,
       missing_value = missing_value,
+      ignore_case = isTRUE(block$nocase),
       created = Sys.time()
     ),
     class = "ks_invalue"
@@ -1577,8 +1578,12 @@ fimport <- function(file, register = TRUE, overwrite = TRUE) {
   parts <- vector("list", length(inv$mappings) + 3L)
   idx <- 1L
 
-  type_part <- if (!is.null(inv$target_type) && inv$target_type != "numeric") {
-    paste0(" (", inv$target_type, ")")
+  type_opts <- c(
+    if (!is.null(inv$target_type) && inv$target_type != "numeric") inv$target_type else NULL,
+    if (isTRUE(inv$ignore_case)) "nocase" else NULL
+  )
+  type_part <- if (length(type_opts)) {
+    paste0(" (", paste(type_opts, collapse = ", "), ")")
   } else {
     ""
   }

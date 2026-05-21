@@ -140,6 +140,66 @@ test_that("finputc applies character invalue by name", {
   fclear()
 })
 
+test_that("finput with ignore_case matches labels case-insensitively", {
+  finput("MALE" = 1, "FEMALE" = 2,
+         name = "sex_inv", target_type = "integer",
+         ignore_case = TRUE)
+
+  expect_equal(finputn(c("Male", "female", "MALE", "FEMALE"), "sex_inv"),
+               c(1L, 2L, 1L, 2L))
+  fclear()
+})
+
+test_that("finput ignore_case defaults to case-sensitive", {
+  finput("MALE" = 1, "FEMALE" = 2,
+         name = "sex_inv", target_type = "integer")
+
+  expect_equal(finputn(c("Male", "MALE"), "sex_inv"),
+               c(NA_integer_, 1L))
+  fclear()
+})
+
+test_that("finput ignore_case validates input", {
+  expect_error(finput("M" = 1, ignore_case = "yes"))
+  expect_error(finput("M" = 1, ignore_case = c(TRUE, FALSE)))
+  expect_error(finput("M" = 1, ignore_case = NA))
+})
+
+test_that("fparse INVALUE (nocase) sets ignore_case and matches case-insensitively", {
+  parsed <- fparse(text = '
+INVALUE sex_inv2 (nocase)
+  "MALE" = 1
+  "FEMALE" = 2
+;')
+  expect_true(isTRUE(parsed$sex_inv2$ignore_case))
+  expect_equal(finputn(c("Male", "female"), "sex_inv2"), c(1, 2))
+  fclear()
+})
+
+test_that("fexport/fparse round-trip preserves ks_invalue ignore_case", {
+  inv <- finput("YES" = 1, "NO" = 0,
+                name = "yn_inv", target_type = "integer",
+                ignore_case = TRUE)
+  txt <- fexport(yn_inv = inv)
+  expect_match(txt, "nocase")
+
+  fclear()
+  parsed <- fparse(text = txt)
+  expect_true(isTRUE(parsed$yn_inv$ignore_case))
+  expect_equal(finputn(c("yes", "No"), "yn_inv"), c(1L, 0L))
+  fclear()
+})
+
+test_that("print.ks_invalue shows (nocase) flag when ignore_case is TRUE", {
+  inv <- finput("M" = 1, ignore_case = TRUE)
+  out <- capture.output(print(inv))
+  expect_true(any(grepl("\\(nocase\\)", out)))
+
+  inv2 <- finput("M" = 1)
+  out2 <- capture.output(print(inv2))
+  expect_false(any(grepl("\\(nocase\\)", out2)))
+})
+
 test_that(".find_cheatsheet_path returns a path for known formats", {
   html_result <- ksformat:::.find_cheatsheet_path("html")
   expect_type(html_result, "character")

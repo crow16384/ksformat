@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.2</span>
       </span>
     </div>
 
@@ -58,12 +58,33 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.7.1" id="ksformat-071">ksformat 0.7.1<a class="anchor" aria-label="anchor" href="#ksformat-071"></a></h2>
+<h2 class="page-header" data-toc-text="0.7.2" id="ksformat-072">ksformat 0.7.2<a class="anchor" aria-label="anchor" href="#ksformat-072"></a></h2>
+<div class="section level3">
+<h3 id="new-features-0-7-2">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-2"></a></h3>
+<ul><li>
+<code><a href="../reference/finput.html">finput()</a></code> gains an <code>ignore_case</code> argument. When <code>TRUE</code>, label lookup is case-insensitive (equivalent to SAS <code>INVALUE name (nocase)</code>). Default <code>FALSE</code> preserves existing behaviour.</li>
+<li>
+<code><a href="../reference/fparse.html">fparse()</a></code> now correctly propagates the <code>(nocase)</code> option on <code>INVALUE</code> blocks to the resulting <code>ks_invalue</code> object. Previously the flag was parsed but silently discarded.</li>
+<li>
+<code><a href="../reference/fexport.html">fexport()</a></code> / <code><a href="../reference/fparse.html">fparse()</a></code> round-trips now preserve <code>ignore_case</code> for invalue objects: exporting a <code>nocase</code> invalue emits <code>INVALUE name (nocase)</code> which re-imports with <code>ignore_case = TRUE</code>.</li>
+<li>
+<code><a href="../reference/print.ks_invalue.html">print.ks_invalue()</a></code> now displays a <code>(nocase)</code> flag in the header when <code>ignore_case = TRUE</code>.</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.7.1" id="ksformat-071">ksformat 0.7.1<small>2026-05-21</small><a class="anchor" aria-label="anchor" href="#ksformat-071"></a></h2>
 <div class="section level3">
 <h3 id="new-features-0-7-1">New features<a class="anchor" aria-label="anchor" href="#new-features-0-7-1"></a></h3>
 <ul><li>
 <code><a href="../reference/fputk.html">fputk()</a></code> gains a <code>na_as_string</code> argument. When <code>TRUE</code>, an <code>NA</code> in any key component is preserved as the literal string <code>"NA"</code> produced by <code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste()</a></code> instead of being restored to <code>NA_character_</code>. This enables round-trip lookups against formats built via <code>fmap(paste(..., sep = "|"), values)</code>, where the stored keys themselves contain <code>"NA"</code>. Default <code>FALSE</code> preserves existing behavior (NA → <code>.missing</code> / <code>keep_na</code>).</li>
 <li>New <code><a href="../reference/finputk.html">finputk()</a></code> — composite-label wrapper around INVALUE lookup, mirroring <code><a href="../reference/fputk.html">fputk()</a></code> on the reverse direction. Supports the same <code>sep</code> and <code>na_as_string</code> arguments and dispatches on the stored invalue’s <code>target_type</code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-0-7-1">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-7-1"></a></h3>
+<ul><li>Vignette <strong>Example 28: Composite Key Lookup with NA Components</strong> — explains why <code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste()</a></code>-built keys contain the literal string <code>"NA"</code> for <code>NA</code> inputs, shows the incorrect result with the default <code>na_as_string = FALSE</code>, and demonstrates the correct round-trip with <code>na_as_string = TRUE</code> using a clinical LB <code>PARAMCD</code> derivation scenario.</li>
+<li>Vignette <strong>Example 29: Composite Label Invalue Lookup with <code><a href="../reference/finputk.html">finputk()</a></code></strong> — basic two-column reverse lookup and <code>na_as_string = TRUE</code> usage with <code>NA</code> key components.</li>
+<li>
+<code>examples/CompositeKeyNA.R</code> — runnable companion script for both examples.</li>
 </ul></div>
 </div>
     <div class="section level2">

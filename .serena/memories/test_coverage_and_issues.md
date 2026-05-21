@@ -20,7 +20,7 @@ Single test file, ~130+ test cases, ~2162 lines.
 14. **Datetime** — fnew_date (date/time/TOD/datetime), auto-register, default widths, R-epoch, fput with various SAS formats
 15. **Multilabel** — fput_all with overlapping ranges, NA, keep_na, .other
 16. **Date format parsing** — fparse date/time/datetime blocks
-17. **ignore_case / nocase** — fnew, fput, fparse, fexport with case-insensitive matching
+17. **ignore_case / nocase** — fnew, fput, fparse, fexport with case-insensitive matching; also finput/finputn/fparse INVALUE blocks (added 0.7.2)
 18. **Expression labels** — .is_expr_label, fput with .x1/.x2, mixed labels, ifelse, .other
 19. **Edge Cases: Format Creation** — empty mappings, default param, detect_format_type edge cases
 20. **Edge Cases: Format Application** — empty vector, all-NA, NaN, single element, invalid format, non-numeric in range
