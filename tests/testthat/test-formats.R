@@ -3790,3 +3790,92 @@ test_that("fmap_strata strata_sep is auto-picked up by fnew", {
                c("V1", "V1"))
   fclear()
 })
+
+# ---------------------------------------------------------------------------
+# Internal helper tests (Phase 2 DRY refactor)
+# ---------------------------------------------------------------------------
+
+test_that(".is_eval_label detects expression labels and eval attribute", {
+  expect_false(ksformat:::.is_eval_label("plain"))
+  expect_true(ksformat:::.is_eval_label(".x1 + 1"))
+  attr_label <- structure("static", eval = TRUE)
+  expect_true(ksformat:::.is_eval_label(attr_label))
+  # precomputed shortcut
+  expect_true(ksformat:::.is_eval_label("plain", precomputed = TRUE))
+  expect_false(ksformat:::.is_eval_label("plain", precomputed = FALSE))
+  expect_false(ksformat:::.is_eval_label("plain", precomputed = NA))
+})
+
+test_that(".parse_range_key_by_type dispatches by type", {
+  # numeric
+  p <- ksformat:::.parse_range_key_by_type("0,18,TRUE,FALSE", "numeric")
+  expect_equal(p$low, 0); expect_equal(p$high, 18)
+  expect_true(p$inc_low); expect_false(p$inc_high)
+  # date_range and Date (value type) share the date parser
+  p2 <- ksformat:::.parse_range_key_by_type(
+    "2020-01-01,2025-12-31,TRUE,FALSE", "date_range"
+  )
+  expect_s3_class(p2$low, "Date")
+  p3 <- ksformat:::.parse_range_key_by_type(
+    "2020-01-01,2025-12-31,TRUE,FALSE", "Date"
+  )
+  expect_s3_class(p3$low, "Date")
+  # unknown type returns NULL
+  expect_null(ksformat:::.parse_range_key_by_type("0,18", "character"))
+  # unparseable key returns NULL
+  expect_null(ksformat:::.parse_range_key_by_type("not-a-range", "numeric"))
+})
+
+test_that(".format_range_interval renders bracket notation", {
+  p <- list(low = 0, high = 18, inc_low = TRUE, inc_high = FALSE)
+  expect_equal(ksformat:::.format_range_interval(p), "[0, 18)")
+  p2 <- list(low = -Inf, high = 0, inc_low = TRUE, inc_high = TRUE)
+  expect_equal(ksformat:::.format_range_interval(p2), "[LOW, 0]")
+  p3 <- list(low = 65, high = Inf, inc_low = FALSE, inc_high = TRUE)
+  expect_equal(ksformat:::.format_range_interval(p3), "(65, HIGH]")
+})
+
+test_that("range_table discrete_numeric_possible flag is set correctly", {
+  # Pure range format: no discrete keys
+  rt1 <- ksformat:::.build_range_table(
+    list("0,18,TRUE,FALSE" = "Child", "18,65,TRUE,FALSE" = "Adult"),
+    "numeric"
+  )
+  expect_false(rt1$discrete_numeric_possible)
+
+  # Range format with a numeric discrete key
+  rt2 <- ksformat:::.build_range_table(
+    list("999" = "Refused", "0,18,TRUE,FALSE" = "Child"),
+    "numeric"
+  )
+  expect_true(rt2$discrete_numeric_possible)
+
+  # Range format with only non-numeric discrete keys
+  rt3 <- ksformat:::.build_range_table(
+    list("Refused" = "X", "0,18,TRUE,FALSE" = "Child"),
+    "numeric"
+  )
+  expect_false(rt3$discrete_numeric_possible)
+
+  # Non-range type defaults to TRUE (conservative)
+  rt4 <- ksformat:::.build_range_table(list("M" = "Male"), "character")
+  expect_true(rt4$discrete_numeric_possible)
+
+  # Empty mappings: no discrete keys possible
+  rt5 <- ksformat:::.build_range_table(list(), "numeric")
+  expect_false(rt5$discrete_numeric_possible)
+})
+
+test_that("fput skips discrete match when no numeric discrete key exists", {
+  # Range format with non-numeric discrete fallback "Refused"
+  fmt <- suppressWarnings(fnew(
+    "0,18,TRUE,FALSE" = "Child",
+    "18,65,TRUE,FALSE" = "Adult",
+    "Refused" = "X",
+    type = "numeric"
+  ))
+  # Numeric input: "Refused" cannot match; range still works
+  expect_equal(fput(c(5, 30), fmt), c("Child", "Adult"))
+  # Character input: discrete "Refused" still works
+  expect_equal(fput("Refused", fmt), "X")
+})

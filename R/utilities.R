@@ -172,6 +172,63 @@ NULL
   list(low = low, high = high, inc_low = inc_low, inc_high = inc_high)
 }
 
+#' Dispatch a range-key parser by format type
+#'
+#' Unifies the per-type \code{switch()} used in
+#' \code{print.ks_format()}, \code{.build_range_table()},
+#' \code{.split_stratified_key()}, and the Shiny library app. Accepts both
+#' format-type strings (\code{"numeric"}, \code{"date_range"},
+#' \code{"datetime_range"}, value types \code{"Date"} / \code{"POSIXct"})
+#' and stratified range subtype strings (\code{"date"}, \code{"datetime"}).
+#'
+#' @param key Character scalar key to parse.
+#' @param type Format type or range subtype string.
+#' @param date_format Optional strptime format for date/datetime bounds.
+#' @return The parsed range list (see \code{.parse_range_key()} and friends)
+#'   or \code{NULL} for non-range types / unparseable keys.
+#' @keywords internal
+#' @noRd
+.parse_range_key_by_type <- function(key, type, date_format = NULL) {
+  switch(type,
+    numeric         = .parse_range_key(key),
+    date_range      = .parse_date_range_key(key, date_format),
+    datetime_range  = .parse_datetime_range_key(key, date_format),
+    Date            = .parse_date_range_key(key, date_format),
+    POSIXct         = .parse_datetime_range_key(key, date_format),
+    date            = .parse_date_range_key(key, date_format),
+    datetime        = .parse_datetime_range_key(key, date_format),
+    NULL
+  )
+}
+
+#' Render a parsed range as bracket-notation interval text
+#'
+#' Produces strings like \code{"[0, 18)"} or \code{"[2020-01-01, HIGH)"}
+#' from a parsed range list (as returned by \code{.parse_range_key_by_type()}).
+#' Used by the print method, Shiny library app, and text export to remove
+#' three near-duplicate formatters.
+#'
+#' @param parsed List with \code{low}, \code{high}, \code{inc_low},
+#'   \code{inc_high}. Must not be \code{NULL}.
+#' @return Character scalar.
+#' @keywords internal
+#' @noRd
+.format_range_interval <- function(parsed) {
+  lb <- if (parsed$inc_low)  "[" else "("
+  rb <- if (parsed$inc_high) "]" else ")"
+
+  fmt_bound <- function(v, is_low) {
+    vn <- suppressWarnings(as.numeric(v))
+    if (!is.na(vn) && is.infinite(vn)) {
+      return(if (is_low) "LOW" else "HIGH")
+    }
+    as.character(v)
+  }
+
+  paste0(lb, fmt_bound(parsed$low, TRUE), ", ",
+         fmt_bound(parsed$high, FALSE), rb)
+}
+
 #' Coerce input vector to numeric for range comparison
 #'
 #' Dispatches based on the format type:
@@ -273,6 +330,25 @@ NULL
 #' @noRd
 .has_eval_attr <- function(label) {
   isTRUE(attr(label, "eval"))
+}
+
+
+#' Check whether a label should be evaluated as an expression
+#'
+#' Unified predicate combining \code{.is_expr_label()} and \code{.has_eval_attr()}.
+#' Optionally short-circuits via a precomputed \code{is_eval} flag (e.g. an entry
+#' of the cached \code{range_table$mapping_is_eval} vector) to avoid recomputing.
+#'
+#' @param label Character scalar (the label/value side of a mapping).
+#' @param precomputed Optional logical scalar. When \code{TRUE}, the function
+#'   returns \code{TRUE} without inspecting \code{label}. \code{NULL} (default)
+#'   means no shortcut.
+#' @return Logical scalar.
+#' @keywords internal
+#' @noRd
+.is_eval_label <- function(label, precomputed = NULL) {
+  if (isTRUE(precomputed)) return(TRUE)
+  .has_eval_attr(label) || .is_expr_label(label)
 }
 
 
@@ -584,6 +660,10 @@ in_range <- function(x, range_spec) {
       vapply(mappings, .has_eval_attr, logical(1L))
   }
 
+  # discrete_numeric_possible: TRUE iff at least one discrete key parses as
+  # a finite number. When FALSE on a range format, fput()/fput_all() can
+  # skip the as.character() + match() pass for numeric / Date / POSIXt
+  # inputs — those will never match a non-numeric discrete key string.
   base <- list(
     low = numeric(0), high = numeric(0),
     inc_low = logical(0), inc_high = logical(0),
@@ -593,7 +673,8 @@ in_range <- function(x, range_spec) {
     mapping_is_eval = mapping_is_eval,
     mapping_labels = map_labels,
     sorted_disjoint = FALSE,
-    sort_perm = integer(0)
+    sort_perm = integer(0),
+    discrete_numeric_possible = n > 0L
   )
 
   if (n == 0L || !.is_range_type(type)) return(base)
@@ -603,11 +684,7 @@ in_range <- function(x, range_spec) {
   # Date/POSIXct bounds are then unclassed to numeric so the rest of the
   # range-table machinery (findInterval fast path, sorted/disjoint check)
   # works unchanged.
-  parser <- switch(type,
-    numeric         = function(k) .parse_range_key(k),
-    date_range      = function(k) .parse_date_range_key(k, date_format),
-    datetime_range  = function(k) .parse_datetime_range_key(k, date_format)
-  )
+  parser <- function(k) .parse_range_key_by_type(k, type, date_format)
 
   map_keys <- names(mappings)
   # Two-pass build: identify range indices first, then preallocate
@@ -667,7 +744,12 @@ in_range <- function(x, range_spec) {
     mapping_is_eval = mapping_is_eval,
     mapping_labels = map_labels,
     sorted_disjoint = disjoint,
-    sort_perm = sort_perm
+    sort_perm = sort_perm,
+    discrete_numeric_possible = {
+      d_idx <- setdiff(seq_len(n), ridx)
+      if (length(d_idx) == 0L) FALSE
+      else any(is.finite(suppressWarnings(as.numeric(map_keys[d_idx]))))
+    }
   )
 }
 
@@ -695,13 +777,8 @@ in_range <- function(x, range_spec) {
 .split_stratified_key <- function(key, strata_sep, range_subtype,
                                   date_format = NULL) {
   if (!is.character(key) || length(key) != 1L || is.na(key)) return(NULL)
-  parser <- switch(range_subtype,
-    numeric  = function(s) .parse_range_key(s),
-    date     = function(s) .parse_date_range_key(s, date_format),
-    datetime = function(s) .parse_datetime_range_key(s, date_format),
-    NULL
-  )
-  if (is.null(parser)) return(NULL)
+  if (!range_subtype %in% c("numeric", "date", "datetime")) return(NULL)
+  parser <- function(s) .parse_range_key_by_type(s, range_subtype, date_format)
 
   # Find all occurrences of strata_sep
   positions <- gregexpr(strata_sep, key, fixed = TRUE)[[1]]

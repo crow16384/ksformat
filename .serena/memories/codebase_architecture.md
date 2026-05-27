@@ -1,7 +1,7 @@
 # ksformat Codebase Architecture (updated 2026-04-15)
 
 ## Package Overview
-R package providing SAS PROC FORMAT-like functionality. Version 0.6.5.
+R package providing SAS PROC FORMAT-like functionality. Version 0.8.0.
 Depends on: cli. Suggests: testthat (>= 3.0.0).
 
 ## File Structure
@@ -43,24 +43,29 @@ Depends on: cli. Suggests: testthat (>= 3.0.0).
 - `.to_r_date(x, origin)` — Convert various inputs to R Date.
 - `.to_r_datetime(x, origin)` — Convert various inputs to R POSIXct.
 
-### R/format_parse.R (lines ~1154)
+### R/format_parse.R (874 lines after split)
 - `fparse(text, file)` — Parse SAS-like text into format/invalue objects. Auto-registers.
-- `fexport(..., formats, file)` — Export formats to SAS-like text.
-- `fimport(file, register, overwrite)` — Import formats from SAS CNTLOUT CSV file.
-- `.cntlout_to_ks_format(...)` — Convert CNTLOUT data to ks_format objects.
-- `.cntlout_to_ks_invalue(...)` — Convert CNTLOUT data to ks_invalue objects.
 - `.parse_blocks(lines)` — Parse text lines into block structures.
-- `.parse_mapping_line(line, line_num)` — Parse single mapping line (LHS = RHS).
+- `.parse_mapping_line(line, line_num)` — Parse single mapping line.
 - `.parse_range_bound(s, is_low)` — Parse range bound (LOW→-Inf, HIGH→Inf).
 - `.unquote(s)` — Remove surrounding quotes.
 - `.block_to_format(block)` — Dispatch to ks_format or ks_invalue converter.
 - `.block_to_ks_format(block)` — Convert VALUE block to ks_format.
+- `.block_to_stratified_range_format(block)` — Convert stratified_range block.
 - `.block_to_ks_datetime_format(block)` — Convert datetime VALUE block.
 - `.block_to_ks_invalue(block)` — Convert INVALUE block to ks_invalue.
+
+### R/format_serialize.R (755 lines — new in 0.8.0)
+- `fexport(..., formats, file)` — Export formats to SAS-like text.
+- `fimport(file, register, overwrite)` — Import formats from SAS CNTLOUT CSV file.
+- `.cntlout_to_ks_format(...)` — Convert CNTLOUT data to ks_format objects.
+- `.cntlout_to_ks_invalue(...)` — Convert CNTLOUT data to ks_invalue objects.
 - `.format_to_text(fmt, name)` — Convert ks_format to SAS-like text.
 - `.datetime_format_to_text(fmt, name)` — Convert datetime format to text.
+- `.stratified_format_to_text(fmt, name)` — Convert stratified_range format to text.
 - `.invalue_to_text(inv, name)` — Convert ks_invalue to text.
 - `.format_range_bound(val, is_low)` — Format numeric bound for text output.
+- `.format_date_bound(val, date_format, type, is_low)` — Format Date/POSIXct bound.
 
 ### R/utilities.R
 - `.is_expr_label(label)` — Check if label contains .x1, .x2, etc.
@@ -91,17 +96,23 @@ Depends on: cli. Suggests: testthat (>= 3.0.0).
 
 ## Performance Notes (updated 0.6.5)
 - `fput` Phase 1: vectorized `match()` for discrete keys (O(n) amortized).
-  - `skip_discrete` optimisation: skipped entirely for pure numeric-range formats with numeric input.
+  - `skip_discrete` optimisation (broadened 0.8.0): skipped when `rt$discrete_numeric_possible == FALSE` — covers formats where all discrete keys are non-numeric strings, not just formats with zero discrete keys.
 - `fput` Phase 2: range matching via **cached `range_table`** on the `ks_format` object (built once at creation).
   - **`findInterval()` fast path**: sorted, non-overlapping ranges with half-open `[low, high)` semantics use `findInterval()` (O(n log k) C code) — ~10–14× faster on 1M rows.
   - General path: iterates pre-parsed `rt$low`/`rt$high`/etc. vectors directly (no per-call key parsing).
 - `fput_all` iterates all keys/ranges against all values (no early exit); uses cached `range_table`.
 - `.fput_vectorized` groups by format name for efficiency.
 - Range table entries are sorted by `(low, high)` at build time so the fast path triggers regardless of definition order.
+- `.block_to_stratified_range_format()`: friendly-interval regex is built once per format parse (not per mapping entry).
 - `is_missing()` numeric path is a single `is.na()` pass (NaN ⊆ NA for numerics).
+- Three DRY helpers in `utilities.R` (added 0.8.0):
+  - `.is_eval_label(label, precomputed)` — combines `.is_expr_label() || .has_eval_attr()` with optional precomputed shortcut
+  - `.parse_range_key_by_type(key, type, date_format)` — switch dispatch to the right range parser by type
+  - `.format_range_interval(parsed)` — render parsed range as `"[low, high)"` bracket notation
 
 ## `ks_format` Object Fields (as of 0.6.5)
 - `mappings`: named list of label→value(s)
 - `type`: "character", "numeric", "Date", "POSIXct", "logical", "date", "time", "datetime"
 - `missing_label`, `other_label`, `ignore_case`, `name`, `dt_pattern`, `date_format`
-- `range_table`: pre-built list with fields `low`, `high`, `inc_low`, `inc_high`, `label`, `is_eval`, `range_idx`, `discrete_idx`, `mapping_is_eval`, `mapping_labels`, `sorted_disjoint`, `sort_perm`
+- `range_table`: pre-built list with fields `low`, `high`, `inc_low`, `inc_high`, `label`, `is_eval`, `range_idx`, `discrete_idx`, `mapping_is_eval`, `mapping_labels`, `sorted_disjoint`, `sort_perm`, `discrete_numeric_possible`
+  - `discrete_numeric_possible`: FALSE when no discrete key parses as a finite number — enables a broader `skip_discrete` fast path in `fput()`/`fput_all()` for numeric/Date/POSIXt inputs

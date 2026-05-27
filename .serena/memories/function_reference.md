@@ -19,8 +19,8 @@
 | `fnew_date(pattern, name, type, .missing)` | format_datetime.R | Create date/time/datetime format |
 | `format_library_app(port, launch.browser)` | format_library_app.R | Launch Shiny browser for format library |
 | `fparse(text, file)` | format_parse.R | Parse SAS-like text definitions |
-| `fexport(..., formats, file)` | format_parse.R | Export formats to SAS-like text |
-| `fimport(file, register, overwrite)` | format_parse.R | Import SAS CNTLOUT CSV |
+| `fexport(..., formats, file)` | format_serialize.R | Export formats to SAS-like text |
+| `fimport(file, register, overwrite)` | format_serialize.R | Import SAS CNTLOUT CSV |
 | `flist()` | utilities.R | Return character vector of registered format names |
 | `fprint(name)` | utilities.R | Print/list formats from library |
 | `fclear(name)` | utilities.R | Remove format(s) from library |
@@ -55,6 +55,9 @@
 | `.format_datetime_values()` | format_datetime.R | Format datetime values |
 | `.to_r_date()` | format_datetime.R | Convert to R Date |
 | `.to_r_datetime()` | format_datetime.R | Convert to R POSIXct |
+| `.is_eval_label(label, precomputed)` | utilities.R | Combines `.is_expr_label()` + `.has_eval_attr()`; optional precomputed shortcut |
+| `.parse_range_key_by_type(key, type, date_format)` | utilities.R | Dispatch to correct range key parser by format type |
+| `.format_range_interval(parsed)` | utilities.R | Render parsed range list as `"[low, high)"` string |
 | `.parse_blocks()` | format_parse.R | Parse text to blocks |
 | `.parse_mapping_line()` | format_parse.R | Parse mapping line |
 | `.parse_range_bound()` | format_parse.R | Parse range bound |
@@ -63,12 +66,14 @@
 | `.block_to_ks_format()` | format_parse.R | Block → ks_format |
 | `.block_to_ks_datetime_format()` | format_parse.R | Block → datetime format |
 | `.block_to_ks_invalue()` | format_parse.R | Block → ks_invalue |
-| `.format_to_text()` | format_parse.R | ks_format → text |
-| `.datetime_format_to_text()` | format_parse.R | datetime format → text |
-| `.invalue_to_text()` | format_parse.R | ks_invalue → text |
-| `.format_range_bound()` | format_parse.R | Format range bound for text |
-| `.cntlout_to_ks_format()` | format_parse.R | CNTLOUT → ks_format |
-| `.cntlout_to_ks_invalue()` | format_parse.R | CNTLOUT → ks_invalue |
+| `.format_to_text()` | format_serialize.R | ks_format → text |
+| `.datetime_format_to_text()` | format_serialize.R | datetime format → text |
+| `.stratified_format_to_text()` | format_serialize.R | stratified_range format → text |
+| `.invalue_to_text()` | format_serialize.R | ks_invalue → text |
+| `.format_range_bound()` | format_serialize.R | Format numeric range bound for text |
+| `.format_date_bound()` | format_serialize.R | Format Date/POSIXct bound for text |
+| `.cntlout_to_ks_format()` | format_serialize.R | CNTLOUT → ks_format |
+| `.cntlout_to_ks_invalue()` | format_serialize.R | CNTLOUT → ks_invalue |
 | `.fput_value_type()` | format_apply.R | Apply format for value types (Date/POSIXct/logical) |
 | `.value_types` | utilities.R | Constant: c("Date", "POSIXct", "logical") |
 | `.is_value_type()` | utilities.R | Check if type string is a value type |

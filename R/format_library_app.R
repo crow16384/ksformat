@@ -149,33 +149,11 @@
         key <- names(obj$mappings)[i]
         value <- obj$mappings[[i]]
 
-        parsed <- if (.is_value_type(obj$type) && obj$type %in% c("Date", "POSIXct")) {
-          .parse_date_range_key(key, obj$date_format)
-        } else {
-          .parse_range_key(key)
-        }
+        parsed <- .parse_range_key_by_type(key, obj$type, obj$date_format)
 
         rule <- key
         if (!is.null(parsed)) {
-          left_bracket <- if (parsed$inc_low) "[" else "("
-          right_bracket <- if (parsed$inc_high) "]" else ")"
-
-          low_num <- suppressWarnings(as.numeric(parsed$low))
-          high_num <- suppressWarnings(as.numeric(parsed$high))
-
-          low_str <- if (!is.na(low_num) && is.infinite(low_num) && low_num < 0) {
-            "LOW"
-          } else {
-            as.character(parsed$low)
-          }
-
-          high_str <- if (!is.na(high_num) && is.infinite(high_num) && high_num > 0) {
-            "HIGH"
-          } else {
-            as.character(parsed$high)
-          }
-
-          rule <- paste0(left_bracket, low_str, ", ", high_str, right_bracket)
+          rule <- .format_range_interval(parsed)
         }
 
         value_str <- if (.is_value_type(obj$type)) {

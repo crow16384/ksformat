@@ -449,18 +449,6 @@ print.ks_format <- function(x, ...) {
     cat("Mappings:\n")
     sep <- x$strata_sep
     rs <- x$range_subtype
-    .render_bound <- function(b, kind) {
-      bn <- suppressWarnings(as.numeric(b))
-      if (is.na(bn)) return(as.character(b))
-      if (kind == "low" && is.infinite(bn) && bn < 0) return("LOW")
-      if (kind == "high" && is.infinite(bn) && bn > 0) return("HIGH")
-      as.character(b)
-    }
-    parser <- switch(rs,
-      numeric  = function(k) .parse_range_key(k),
-      date     = function(k) .parse_date_range_key(k, x$date_format),
-      datetime = function(k) .parse_datetime_range_key(k, x$date_format)
-    )
     # Group mappings by stratum, preserving first-seen order
     strata_seen <- character(0)
     groups <- list()
@@ -480,13 +468,9 @@ print.ks_format <- function(x, ...) {
     for (s in strata_seen) {
       cat("  Stratum \"", s, "\":\n", sep = "")
       for (entry in groups[[s]]) {
-        parsed <- parser(entry$range_key)
+        parsed <- .parse_range_key_by_type(entry$range_key, rs, x$date_format)
         if (!is.null(parsed)) {
-          lb <- if (parsed$inc_low) "[" else "("
-          rb <- if (parsed$inc_high) "]" else ")"
-          low_s <- .render_bound(parsed$low, "low")
-          high_s <- .render_bound(parsed$high, "high")
-          cat("    ", lb, low_s, ", ", high_s, rb,
+          cat("    ", .format_range_interval(parsed),
               " => ", entry$value, "\n", sep = "")
         } else {
           cat("    ", entry$range_key, " => ", entry$value, "\n", sep = "")
@@ -515,23 +499,9 @@ print.ks_format <- function(x, ...) {
       }
 
       # Try to display range keys in interval notation
-      parsed <- if (is_vtype && x$type %in% c("Date", "POSIXct")) {
-        .parse_date_range_key(key, x$date_format)
-      } else if (x$type == "date_range") {
-        .parse_date_range_key(key, x$date_format)
-      } else if (x$type == "datetime_range") {
-        .parse_datetime_range_key(key, x$date_format)
-      } else {
-        .parse_range_key(key)
-      }
+      parsed <- .parse_range_key_by_type(key, x$type, x$date_format)
       if (!is.null(parsed)) {
-        left_bracket <- if (parsed$inc_low) "[" else "("
-        right_bracket <- if (parsed$inc_high) "]" else ")"
-        low_num  <- as.numeric(parsed$low)
-        high_num <- as.numeric(parsed$high)
-        low_str <- if (is.infinite(low_num) && low_num < 0) "LOW" else as.character(parsed$low)
-        high_str <- if (is.infinite(high_num) && high_num > 0) "HIGH" else as.character(parsed$high)
-        cat("  ", left_bracket, low_str, ", ", high_str, right_bracket,
+        cat("  ", .format_range_interval(parsed),
             " => ", value_str, "\n", sep = "")
       } else {
         cat("  ", key, " => ", value_str, "\n", sep = "")

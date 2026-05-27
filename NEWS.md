@@ -1,3 +1,23 @@
+# ksformat 0.8.0
+
+## Internal refactoring (no breaking changes)
+
+* `R/format_parse.R` has been split in two: text-to-object parsing stays in
+  `format_parse.R` (874 lines); object-to-text rendering and CSV CNTLOUT
+  import/export (`fexport()`, `fimport()`, `.format_to_text()`, etc.) moves to
+  the new `R/format_serialize.R` (755 lines).
+* Three DRY internal helpers added to `utilities.R`:
+  `.is_eval_label()`, `.parse_range_key_by_type()`, `.format_range_interval()`.
+  Duplicate switch/if-chains across `format_apply.R`, `format_create.R`,
+  and `format_library_app.R` now delegate to these helpers.
+* Range-table now carries a `discrete_numeric_possible` flag computed at
+  format creation time. `fput()` / `fput_all()` use it to skip the
+  `as.character()` + `match()` discrete-key pass for numeric / Date / POSIXt
+  inputs against formats whose discrete keys are all non-numeric strings,
+  broadening the existing fast path.
+* Friendly-interval regex in `.block_to_stratified_range_format()` is now
+  built once per format parse instead of once per mapping entry.
+
 # ksformat 0.7.2
 
 ## New features

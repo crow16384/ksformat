@@ -13,9 +13,7 @@ Maps values to labels (formats), labels back to values (invalues), with range, d
 - **OS**: macOS / Linux (cross-platform development)
 - **uv**: installed at ~/.local/bin/uv (for Serena MCP)
 
-## Version
-- Current: 0.7.2
-- License: GPL-3
+## Version\n- Current: 0.8.0\n- License: GPL-3
 
 ## Core Concepts
 - **Format** (`ks_format` S3 class): value → label mapping (like SAS PUT)
@@ -38,7 +36,8 @@ Maps values to labels (formats), labels back to values (invalues), with range, d
 - `R/format_apply.R` — `fput()`, `fputn()`, `fputc()`, `fput_all()`, `fput_df()`
 - `R/format_invalue.R` — `finput()`, `.invalue_apply()`, `finputn()`, `finputc()`, `fnew_bid()`, `print.ks_invalue()`
 - `R/format_datetime.R` — `fnew_date()`, `.apply_datetime_format()`, SAS datetime format definitions
-- `R/format_parse.R` — `fparse()`, `fexport()`, `fimport()` (CNTLOUT CSV import)
+- `R/format_parse.R` — `fparse()` (text → object parsing only, 874 lines)
+- `R/format_serialize.R` — `fexport()`, `fimport()`, text rendering helpers (755 lines)
 - `R/utilities.R` — `is_missing()`, `range_spec()`, `in_range()`, library management, expression label helpers
 - `R/format_library_app.R` — `format_library_app()`, app data adapters, Shiny UI/server
 - `R/ksformat-package.R` — package-level documentation

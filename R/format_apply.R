@@ -134,7 +134,7 @@ fput <- function(x, format, ..., keep_na = FALSE) {
   # Apply missing label
   if (!is.null(format$missing_label) && !keep_na) {
     miss_label <- format$missing_label
-    if (.has_eval_attr(miss_label) || .is_expr_label(miss_label)) {
+    if (.is_eval_label(miss_label)) {
       miss_idx <- which(is_miss)
       if (length(miss_idx) > 0L) {
         result[miss_idx] <- .eval_expr_label(
@@ -166,12 +166,12 @@ fput <- function(x, format, ..., keep_na = FALSE) {
   is_range_fmt <- .is_range_type(format$type)
 
   # Phase 1: discrete key matching.
-  # Skip the (expensive) as.character + match() step when there are no
-  # discrete keys to look up (pure numeric-range formats with x already
-  # numeric). The discrete keys are the range-encoded strings like
-  # "0,18,TRUE,FALSE" which will never match a numeric stringification.
+  # Skip the (expensive) as.character + match() step when no discrete key
+  # in the mapping could ever match a numeric / date stringification of
+  # x. This covers pure range formats (no discrete keys) and range formats
+  # whose discrete keys are all non-numeric strings (e.g. "Refused").
   skip_discrete <- is_range_fmt &&
-    length(rt$discrete_idx) == 0L &&
+    isFALSE(rt$discrete_numeric_possible) &&
     (is.numeric(x) || inherits(x, "Date") || inherits(x, "POSIXt"))
 
   if (!skip_discrete) {
@@ -290,8 +290,7 @@ fput <- function(x, format, ..., keep_na = FALSE) {
   unmatched_final <- non_miss[!matched[non_miss]]
   if (length(unmatched_final) > 0L) {
     if (!is.null(format$other_label)) {
-      other_is_eval <- .is_expr_label(format$other_label) ||
-                       .has_eval_attr(format$other_label)
+      other_is_eval <- .is_eval_label(format$other_label)
       if (other_is_eval) {
         expr_map[[format$other_label]] <- c(
           expr_map[[format$other_label]], unmatched_final
@@ -667,7 +666,7 @@ fput_all <- function(x, format, ..., keep_na = FALSE) {
   miss_idx <- which(is_miss)
   if (!keep_na && !is.null(format$missing_label)) {
     miss_label <- format$missing_label
-    if (.has_eval_attr(miss_label) || .is_expr_label(miss_label)) {
+    if (.is_eval_label(miss_label)) {
       if (length(miss_idx) > 0L) {
         evaled <- .eval_expr_label(
           miss_label, extra_args, miss_idx, parent_env = caller_env
@@ -713,7 +712,7 @@ fput_all <- function(x, format, ..., keep_na = FALSE) {
     if (length(matched_pos) > 0L) {
       label <- map_labels[i]
       has_any_match[matched_pos] <- TRUE
-      label_is_eval <- .is_expr_label(label) || map_eval[i]
+      label_is_eval <- .is_eval_label(label, precomputed = map_eval[i])
       if (label_is_eval) {
         expr_map[[label]] <- c(expr_map[[label]], non_miss[matched_pos])
       } else {
@@ -767,8 +766,7 @@ fput_all <- function(x, format, ..., keep_na = FALSE) {
   }
   for (idx in no_match) {
     if (!is.null(format$other_label)) {
-      other_is_eval <- .is_expr_label(format$other_label) ||
-                       .has_eval_attr(format$other_label)
+      other_is_eval <- .is_eval_label(format$other_label)
       if (other_is_eval) {
         evaled <- .eval_expr_label(
           format$other_label, extra_args, idx, parent_env = caller_env

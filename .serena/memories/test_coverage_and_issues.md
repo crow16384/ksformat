@@ -49,7 +49,10 @@ Single test file, ~130+ test cases, ~2162 lines.
 
 ### Performance Tests (added 0.6.5)
 - 8 tests covering `range_table` attachment, fast-path output, gap handling, multilabel (skips fast path), exclusive lower bound, point range `[5,5]`, fallback path with stripped `range_table`, and out-of-order range definitions being auto-sorted.
-- Test count: **628** (as of 0.6.5).
+- Test count: **732** (as of 0.8.0); 725 from prior sessions + 7 new.
+  - 3 new test blocks for `.is_eval_label`, `.parse_range_key_by_type`, `.format_range_interval`.
+  - 1 new test block for `rt$discrete_numeric_possible` flag.
+  - 1 new test block for `fput` skip_discrete behaviour with non-numeric discrete keys.
 
 ### Known Issues
 - None currently tracked. Previous issues (range matching not implemented, stub functions, POSIXct tzone loss) have been resolved.

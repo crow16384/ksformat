@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.0</span>
       </span>
     </div>
 
@@ -57,6 +57,17 @@
       <small>Source: <a href="https://github.com/crow16384/ksformat/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.8.0" id="ksformat-080">ksformat 0.8.0<a class="anchor" aria-label="anchor" href="#ksformat-080"></a></h2>
+<div class="section level3">
+<h3 id="internal-refactoring-no-breaking-changes-0-8-0">Internal refactoring (no breaking changes)<a class="anchor" aria-label="anchor" href="#internal-refactoring-no-breaking-changes-0-8-0"></a></h3>
+<ul><li>
+<code>R/format_parse.R</code> has been split in two: text-to-object parsing stays in <code>format_parse.R</code> (874 lines); object-to-text rendering and CSV CNTLOUT import/export (<code><a href="../reference/fexport.html">fexport()</a></code>, <code><a href="../reference/fimport.html">fimport()</a></code>, <code><a href="../reference/dot-format_to_text.html">.format_to_text()</a></code>, etc.) moves to the new <code>R/format_serialize.R</code> (755 lines).</li>
+<li>Three DRY internal helpers added to <code>utilities.R</code>: <code>.is_eval_label()</code>, <code>.parse_range_key_by_type()</code>, <code>.format_range_interval()</code>. Duplicate switch/if-chains across <code>format_apply.R</code>, <code>format_create.R</code>, and <code>format_library_app.R</code> now delegate to these helpers.</li>
+<li>Range-table now carries a <code>discrete_numeric_possible</code> flag computed at format creation time. <code><a href="../reference/fput.html">fput()</a></code> / <code><a href="../reference/fput_all.html">fput_all()</a></code> use it to skip the <code><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character()</a></code> + <code><a href="https://rdrr.io/r/base/match.html" class="external-link">match()</a></code> discrete-key pass for numeric / Date / POSIXt inputs against formats whose discrete keys are all non-numeric strings, broadening the existing fast path.</li>
+<li>Friendly-interval regex in <code>.block_to_stratified_range_format()</code> is now built once per format parse instead of once per mapping entry.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.7.2" id="ksformat-072">ksformat 0.7.2<a class="anchor" aria-label="anchor" href="#ksformat-072"></a></h2>
 <div class="section level3">
