@@ -26,6 +26,9 @@ INVALUE formats produce numeric output by default; character-to-character
 conversion should use a regular VALUE format (\code{\link{fnew}}) instead.}
 
 \item{missing_value}{Value to use for missing inputs (default: \code{NA})}
+
+\item{ignore_case}{Logical. If \code{TRUE}, label matching is case-insensitive
+(default: \code{FALSE}).}
 }
 \value{
 An object of class \code{"ks_invalue"} containing the invalue definition.

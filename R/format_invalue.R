@@ -15,6 +15,8 @@
 #'   INVALUE formats produce numeric output by default; character-to-character
 #'   conversion should use a regular VALUE format (\code{\link{fnew}}) instead.
 #' @param missing_value Value to use for missing inputs (default: \code{NA})
+#' @param ignore_case Logical. If \code{TRUE}, label matching is case-insensitive
+#'   (default: \code{FALSE}).
 #'
 #' @return An object of class \code{"ks_invalue"} containing the invalue definition.
 #'   The object is also stored in the format library if \code{name} is given.
