@@ -31,9 +31,11 @@ Depends:
 Imports:
     cli
 Suggests: 
+    dplyr,
     knitr,
     rmarkdown,
     shiny,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    tidyr
 VignetteBuilder: knitr
 Config/roxygen2/version: 8.0.0
