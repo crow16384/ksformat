@@ -1,4 +1,10 @@
-# ksformat 0.8.0
+# ksformat 0.8.1
+
+## Documentation refresh
+
+* Added a vignette example showing how to use `franges()` labels directly with
+  `tidyr::complete()` and how to extract unique labels from the `aesev` format
+  mappings without converting to `factor()`.
 
 ## Internal refactoring (no breaking changes)
 

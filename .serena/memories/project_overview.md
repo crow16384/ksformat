@@ -13,7 +13,7 @@ Maps values to labels (formats), labels back to values (invalues), with range, d
 - **OS**: macOS / Linux (cross-platform development)
 - **uv**: installed at ~/.local/bin/uv (for Serena MCP)
 
-## Version\n- Current: 0.8.0\n- License: GPL-3
+## Version\n- Current: 0.8.1\n- License: GPL-3
 
 ## Core Concepts
 - **Format** (`ks_format` S3 class): value → label mapping (like SAS PUT)

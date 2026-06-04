@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.1</span>
       </span>
     </div>
 
@@ -58,9 +58,13 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.8.0" id="ksformat-080">ksformat 0.8.0<a class="anchor" aria-label="anchor" href="#ksformat-080"></a></h2>
+<h2 class="page-header" data-toc-text="0.8.1" id="ksformat-081">ksformat 0.8.1<a class="anchor" aria-label="anchor" href="#ksformat-081"></a></h2>
 <div class="section level3">
-<h3 id="internal-refactoring-no-breaking-changes-0-8-0">Internal refactoring (no breaking changes)<a class="anchor" aria-label="anchor" href="#internal-refactoring-no-breaking-changes-0-8-0"></a></h3>
+<h3 id="documentation-refresh-0-8-1">Documentation refresh<a class="anchor" aria-label="anchor" href="#documentation-refresh-0-8-1"></a></h3>
+<ul><li>Added a vignette example showing how to use <code><a href="../reference/franges.html">franges()</a></code> labels directly with <code><a href="https://tidyr.tidyverse.org/reference/complete.html" class="external-link">tidyr::complete()</a></code> and how to extract unique labels from the <code>aesev</code> format mappings without converting to <code><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor()</a></code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="internal-refactoring-no-breaking-changes-0-8-1">Internal refactoring (no breaking changes)<a class="anchor" aria-label="anchor" href="#internal-refactoring-no-breaking-changes-0-8-1"></a></h3>
 <ul><li>
 <code>R/format_parse.R</code> has been split in two: text-to-object parsing stays in <code>format_parse.R</code> (874 lines); object-to-text rendering and CSV CNTLOUT import/export (<code><a href="../reference/fexport.html">fexport()</a></code>, <code><a href="../reference/fimport.html">fimport()</a></code>, <code><a href="../reference/dot-format_to_text.html">.format_to_text()</a></code>, etc.) moves to the new <code>R/format_serialize.R</code> (755 lines).</li>
 <li>Three DRY internal helpers added to <code>utilities.R</code>: <code>.is_eval_label()</code>, <code>.parse_range_key_by_type()</code>, <code>.format_range_interval()</code>. Duplicate switch/if-chains across <code>format_apply.R</code>, <code>format_create.R</code>, and <code>format_library_app.R</code> now delegate to these helpers.</li>

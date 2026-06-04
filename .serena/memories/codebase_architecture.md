@@ -1,7 +1,7 @@
 # ksformat Codebase Architecture (updated 2026-04-15)
 
 ## Package Overview
-R package providing SAS PROC FORMAT-like functionality. Version 0.8.0.
+R package providing SAS PROC FORMAT-like functionality. Version 0.8.1.
 Depends on: cli. Suggests: testthat (>= 3.0.0).
 
 ## File Structure

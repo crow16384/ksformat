@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.1</span>
       </span>
     </div>
 
@@ -426,15 +426,15 @@ once:</p>
 <span>    <span class="fu"><a href="../reference/fputn.html">fputn</a></span><span class="op">(</span><span class="va">today</span>, <span class="st">"QTR."</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt;      format       result</span></span>
-<span><span class="co">#&gt; 1    DATE9.    31MAY2026</span></span>
-<span><span class="co">#&gt; 2 MMDDYY10.   05/31/2026</span></span>
-<span><span class="co">#&gt; 3 DDMMYY10.   31/05/2026</span></span>
-<span><span class="co">#&gt; 4 YYMMDD10.   2026-05-31</span></span>
-<span><span class="co">#&gt; 5   MONYY7.      MAY2026</span></span>
-<span><span class="co">#&gt; 6 WORDDATE. May 31, 2026</span></span>
-<span><span class="co">#&gt; 7    YEAR4.         2026</span></span>
-<span><span class="co">#&gt; 8      QTR.            2</span></span>
+<span><span class="co">#&gt;      format        result</span></span>
+<span><span class="co">#&gt; 1    DATE9.     04JUN2026</span></span>
+<span><span class="co">#&gt; 2 MMDDYY10.    06/04/2026</span></span>
+<span><span class="co">#&gt; 3 DDMMYY10.    04/06/2026</span></span>
+<span><span class="co">#&gt; 4 YYMMDD10.    2026-06-04</span></span>
+<span><span class="co">#&gt; 5   MONYY7.       JUN2026</span></span>
+<span><span class="co">#&gt; 6 WORDDATE. June 04, 2026</span></span>
+<span><span class="co">#&gt; 7    YEAR4.          2026</span></span>
+<span><span class="co">#&gt; 8      QTR.             2</span></span>
 <span></span>
 <span><span class="co"># Multiple dates</span></span>
 <span><span class="va">dates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2020-01-15"</span>, <span class="st">"2020-06-30"</span>, <span class="st">"2020-12-25"</span><span class="op">)</span><span class="op">)</span></span>
@@ -488,10 +488,10 @@ once:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;        format             result</span></span>
-<span><span class="co">#&gt; 1 DATETIME20. 31MAY2026:11:10:23</span></span>
-<span><span class="co">#&gt; 2 DATETIME13.      31MAY26:11:10</span></span>
-<span><span class="co">#&gt; 3     DTDATE.          31MAY2026</span></span>
-<span><span class="co">#&gt; 4   DTYYMMDD.         2026-05-31</span></span>
+<span><span class="co">#&gt; 1 DATETIME20. 04JUN2026:11:48:26</span></span>
+<span><span class="co">#&gt; 2 DATETIME13.      04JUN26:11:48</span></span>
+<span><span class="co">#&gt; 3     DTDATE.          04JUN2026</span></span>
+<span><span class="co">#&gt; 4   DTYYMMDD.         2026-06-04</span></span>
 <span></span>
 <span><span class="co"># From numeric R-epoch seconds</span></span>
 <span><span class="va">r_secs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2025-06-15 14:30:00"</span>, tz <span class="op">=</span> <span class="st">"UTC"</span><span class="op">)</span><span class="op">)</span></span>
@@ -1045,7 +1045,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmp32wSHB/temp_libpath65be1f276b0b/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmp607hZD/temp_libpathb0325e81fa4f/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">imported</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "AGEGRP"   "BMICAT"   "GENDER"   "RACEIN"   "SMISSING"</span></span>
 <span></span>
@@ -1173,7 +1173,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmp32wSHB/temp_libpath65be1f276b0b/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmp607hZD/temp_libpathb0325e81fa4f/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span></span>
 <span><span class="co"># Library should be empty</span></span>
 <span><span class="fu"><a href="../reference/flist.html">flist</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -1686,6 +1686,51 @@ same columns when the format contains no ranges.</p>
 <span><span class="fu"><a href="../reference/franges.html">franges</a></span><span class="op">(</span><span class="st">"sex"</span><span class="op">)</span>   <span class="co"># 0 rows</span></span>
 <span><span class="co">#&gt; [1] low      high     inc_low  inc_high label   </span></span>
 <span><span class="co">#&gt; &lt;0 rows&gt; (or 0-length row.names)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="completing-a-summary-against-format-labels">Completing a Summary Against Format Labels<a class="anchor" aria-label="anchor" href="#completing-a-summary-against-format-labels"></a>
+</h3>
+<p>You can also use the labels returned by <code><a href="../reference/franges.html">franges()</a></code> as the
+full category set for <code><a href="https://tidyr.tidyverse.org/reference/complete.html" class="external-link">tidyr::complete()</a></code>, without converting
+the column to a factor first.</p>
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">age_levels</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/franges.html">franges</a></span><span class="op">(</span><span class="st">"age"</span><span class="op">)</span><span class="op">$</span><span class="va">label</span></span>
+<span></span>
+<span><span class="va">ages</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">17</span>, <span class="fl">18</span>, <span class="fl">42</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span>  age_group <span class="op">=</span> <span class="fu"><a href="../reference/fputn.html">fputn</a></span><span class="op">(</span><span class="va">ages</span>, <span class="st">"age"</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">age_group</span>, name <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/complete.html" class="external-link">complete</a></span><span class="op">(</span>age_group <span class="op">=</span> <span class="va">age_levels</span>, fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 2</span></span></span>
+<span><span class="co">#&gt;   age_group     n</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Adult         2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Child         2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Senior        0</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="getting-unique-labels-from-a-format">Getting Unique Labels from a Format<a class="anchor" aria-label="anchor" href="#getting-unique-labels-from-a-format"></a>
+</h3>
+<p>If a format is already defined, you can inspect its label values
+directly from the stored mappings. For this <code>aesev</code> example,
+the labels are plain character values, so <code><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique()</a></code> gives
+the full set without needing <code><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor()</a></code>.</p>
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/fmap.html">fmap</a></span><span class="op">(</span></span>
+<span>    <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Mild"</span>, <span class="st">"Moderate"</span>, <span class="st">"Severe"</span>, <span class="st">"Life-threatening"</span>, <span class="st">"Death"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"numeric"</span>,</span>
+<span>  name <span class="op">=</span> <span class="st">"aesev"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">aesev_labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="fu"><a href="../reference/format_get.html">format_get</a></span><span class="op">(</span><span class="st">"aesev"</span><span class="op">)</span><span class="op">$</span><span class="va">mappings</span>, use.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">aesev_labels</span></span>
+<span><span class="co">#&gt; [1] "Mild"             "Moderate"         "Severe"           "Life-threatening"</span></span>
+<span><span class="co">#&gt; [5] "Death"</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="example-24-reverse-range-lookup-with-fmap_to_ranges">Example 24: Reverse Range Lookup with
@@ -1696,7 +1741,7 @@ labels (e.g. visit windows coded as weeks),
 <code><a href="../reference/fmap_to_ranges.html">fmap_to_ranges()</a></code> turns a vector of those codes back into
 the original <code>[low, high]</code> bounds — one row per input
 value.</p>
-<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
 <span><span class="st">VALUE visit_ther (numeric)</span></span>
 <span><span class="st">  [LOW,  1] =  0</span></span>
@@ -1721,7 +1766,7 @@ value.</p>
 <span><span class="co">#&gt; 7   79   91    TRUE     TRUE</span></span></code></pre></div>
 <p>Unmatched values produce <code>NA</code> rows, making it safe to pass
 arbitrary vectors:</p>
-<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fmap_to_ranges.html">fmap_to_ranges</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">99</span>, <span class="fl">4</span><span class="op">)</span>, <span class="st">"visit_ther"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   low high inc_low inc_high</span></span>
 <span><span class="co">#&gt; 1   8   22    TRUE     TRUE</span></span>
@@ -1739,7 +1784,7 @@ fast path is active for sorted, disjoint buckets.</p>
 <div class="section level3">
 <h3 id="fiscal-year-bucketing">Fiscal-year bucketing<a class="anchor" aria-label="anchor" href="#fiscal-year-bucketing"></a>
 </h3>
-<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span></span>
 <span>  <span class="st">"2023-01-01,2024-01-01,TRUE,FALSE"</span> <span class="op">=</span> <span class="st">"FY23"</span>,</span>
 <span>  <span class="st">"2024-01-01,2025-01-01,TRUE,FALSE"</span> <span class="op">=</span> <span class="st">"FY24"</span>,</span>
@@ -1766,7 +1811,7 @@ fast path is active for sorted, disjoint buckets.</p>
 <div class="section level3">
 <h3 id="define-from-text-with-fparse">Define from text with <code>fparse()</code><a class="anchor" aria-label="anchor" href="#define-from-text-with-fparse"></a>
 </h3>
-<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
 <span><span class="st">VALUE quarter (date_range)</span></span>
 <span><span class="st">  [2024-01-01, 2024-04-01) = "Q1-2024"</span></span>
@@ -1800,7 +1845,7 @@ fast path is active for sorted, disjoint buckets.</p>
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>+</mi><mi>∞</mi></mrow><annotation encoding="application/x-tex">+\infty</annotation></semantics></math>
 — any date before or after a cutpoint falls in the open arm.</p>
-<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
 <span><span class="st">VALUE era (date_range)</span></span>
 <span><span class="st">  [LOW,        2000-01-01) = "Pre-2000"</span></span>
@@ -1827,7 +1872,7 @@ and
 <h3 id="export-and-roundtrip">Export and roundtrip<a class="anchor" aria-label="anchor" href="#export-and-roundtrip"></a>
 </h3>
 <p>Formats export with ISO date bounds and re-parse without loss:</p>
-<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">q_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/format_get.html">format_get</a></span><span class="op">(</span><span class="st">"quarter"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="../reference/fexport.html">fexport</a></span><span class="op">(</span>quarter <span class="op">=</span> <span class="va">q_obj</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; VALUE quarter (date_range)</span></span>
@@ -1837,7 +1882,7 @@ and
 <span><span class="co">#&gt;   [2024-10-01, 2025-01-01) = "Q4-2024"</span></span>
 <span><span class="co">#&gt;   .other = "Outside 2024"</span></span>
 <span><span class="co">#&gt; ;</span></span></code></pre></div>
-<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Re-parse the exported text</span></span>
 <span><span class="va">txt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fexport.html">fexport</a></span><span class="op">(</span>quarter <span class="op">=</span> <span class="va">q_obj</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -1851,7 +1896,7 @@ and
 <h3 id="overlapping-buckets-with-multilabel-and-fput_all">Overlapping buckets with <code>multilabel</code> and
 <code>fput_all()</code><a class="anchor" aria-label="anchor" href="#overlapping-buckets-with-multilabel-and-fput_all"></a>
 </h3>
-<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
 <span><span class="st">VALUE study_window (date_range, multilabel)</span></span>
 <span><span class="st">  [2024-01-01, 2024-07-01) = "First Half"</span></span>
@@ -1877,7 +1922,7 @@ and
 <p>When no explicit type is given, <code><a href="../reference/fparse.html">fparse()</a></code> infers
 <code>date_range</code> from ISO date bounds and
 <code>datetime_range</code> when bounds include a time component:</p>
-<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
 <span><span class="st">VALUE auto_fy</span></span>
 <span><span class="st">  [2024-01-01, 2025-01-01) = "2024"</span></span>
@@ -1899,7 +1944,7 @@ and
 <p><code>datetime_range</code> works identically to
 <code>date_range</code> but matches against POSIXct values. Bounds are
 expressed as <code>YYYY-MM-DD HH:MM[:SS]</code> strings.</p>
-<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
 <span><span class="st">VALUE shift (datetime_range)</span></span>
 <span><span class="st">  [2024-01-15 00:00, 2024-01-15 08:00) = "Night"</span></span>
@@ -1934,7 +1979,7 @@ Date / POSIXct range. Each stratum has its own bucket boundaries, and
 <div class="section level3">
 <h3 id="programmatic-construction-with-fmap_strata">Programmatic construction with <code>fmap_strata()</code><a class="anchor" aria-label="anchor" href="#programmatic-construction-with-fmap_strata"></a>
 </h3>
-<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">visits</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fmap_strata.html">fmap_strata</a></span><span class="op">(</span></span>
 <span>  stratum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ARM_A"</span>, <span class="st">"ARM_A"</span>, <span class="st">"ARM_A"</span>, <span class="st">"ARM_B"</span>, <span class="st">"ARM_B"</span><span class="op">)</span>,</span>
 <span>  low     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,        <span class="fl">7</span>,       <span class="fl">28</span>,      <span class="fl">0</span>,       <span class="fl">14</span><span class="op">)</span>,</span>
@@ -1963,7 +2008,7 @@ Date / POSIXct range. Each stratum has its own bucket boundaries, and
 <div class="section level3">
 <h3 id="text-definition-with-fparse">Text definition with <code>fparse()</code><a class="anchor" aria-label="anchor" href="#text-definition-with-fparse"></a>
 </h3>
-<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
 <span><span class="st">VALUE vw_text (stratified_range, range_subtype: numeric)</span></span>
 <span><span class="st">  "ARM_A"|[0, 7)    = "Baseline"</span></span>
@@ -1982,7 +2027,7 @@ Date / POSIXct range. Each stratum has its own bucket boundaries, and
 <div class="section level3">
 <h3 id="date-subtype-per-subject-windows">Date subtype: per-subject windows<a class="anchor" aria-label="anchor" href="#date-subtype-per-subject-windows"></a>
 </h3>
-<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">windows</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fmap_strata.html">fmap_strata</a></span><span class="op">(</span></span>
 <span>  stratum <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"S001"</span>, <span class="st">"S001"</span>, <span class="st">"S002"</span>, <span class="st">"S002"</span><span class="op">)</span>,</span>
 <span>  low     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2024-01-01"</span>, <span class="st">"2024-01-15"</span>,</span>
@@ -2012,7 +2057,7 @@ Date / POSIXct range. Each stratum has its own bucket boundaries, and
 <div class="section level3">
 <h3 id="roundtrip-via-fexport-fparse">Roundtrip via <code>fexport()</code> / <code>fparse()</code><a class="anchor" aria-label="anchor" href="#roundtrip-via-fexport-fparse"></a>
 </h3>
-<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">txt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fexport.html">fexport</a></span><span class="op">(</span><span class="fu"><a href="../reference/format_get.html">format_get</a></span><span class="op">(</span><span class="st">"vw"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">txt</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; VALUE vw (stratified_range, range_subtype: numeric, strata_sep: |)</span></span>
@@ -2037,7 +2082,7 @@ Date / POSIXct range. Each stratum has its own bucket boundaries, and
 </h2>
 <p>For non-stratified numeric / Date ranges, <code><a href="../reference/fmap_ranges.html">fmap_ranges()</a></code>
 saves you from hand-crafting canonical keys.</p>
-<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">age_groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fmap_ranges.html">fmap_ranges</a></span><span class="op">(</span></span>
 <span>  low   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">18</span>, <span class="fl">65</span><span class="op">)</span>,</span>
 <span>  high  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">18</span>, <span class="fl">65</span>, <span class="cn">Inf</span><span class="op">)</span>,</span>
@@ -2073,7 +2118,7 @@ literal <code>"NA"</code>, making the round-trip consistent.</p>
 <code>LBCAT</code>, <code>LBSPEC</code>, <code>LBTESTCD</code>, and
 <code>LBSTRESU</code>, where some rows have <code>LBSTRESU = NA</code>
 (dimensionless tests such as INR).</p>
-<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Source lab mapping (as received from a specification)</span></span>
 <span><span class="va">lb_map</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  LBCAT    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BLOOD CHEMISTRY"</span>, <span class="st">"COAGULOGRAM"</span>, <span class="st">"COAGULATION PANEL"</span>, <span class="st">"COAGULOGRAM"</span><span class="op">)</span>,</span>
@@ -2093,7 +2138,7 @@ literal <code>"NA"</code>, making the round-trip consistent.</p>
 to <code>"NA"</code>, so the stored keys for INR rows are
 <code>"COAGULATION PANEL|BLOOD|INR|NA"</code> and
 <code>"COAGULOGRAM|BLOOD|INR|NA"</code>.</p>
-<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">lb_map</span>,</span>
 <span>  <span class="fu"><a href="../reference/fmap.html">fmap</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">LBCAT</span>, <span class="va">LBSPEC</span>, <span class="va">LBTESTCD</span>, <span class="va">LBSTRESU</span>, sep <span class="op">=</span> <span class="st">"|"</span><span class="op">)</span>, <span class="va">PARAMCD</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -2112,7 +2157,7 @@ to <code>"NA"</code>, so the stored keys for INR rows are
 <p>Now apply the format.<br>
 With the default <code>na_as_string = FALSE</code>, the INR rows get
 <code>NA</code> (no match):</p>
-<div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb80"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lb_map</span><span class="op">$</span><span class="va">PARAMCD_default</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">lb_map</span>,</span>
 <span>  <span class="fu"><a href="../reference/fputk.html">fputk</a></span><span class="op">(</span><span class="va">LBCAT</span>, <span class="va">LBSPEC</span>, <span class="va">LBTESTCD</span>, <span class="va">LBSTRESU</span>, format <span class="op">=</span> <span class="st">"lb_param"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -2125,7 +2170,7 @@ With the default <code>na_as_string = FALSE</code>, the INR rows get
 <p>With <code>na_as_string = TRUE</code>, <code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste()</a></code> also
 converts the lookup-side <code>NA</code> to <code>"NA"</code>, so the
 keys match:</p>
-<div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb81"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lb_map</span><span class="op">$</span><span class="va">PARAMCD_back</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">lb_map</span>,</span>
 <span>  <span class="fu"><a href="../reference/fputk.html">fputk</a></span><span class="op">(</span><span class="va">LBCAT</span>, <span class="va">LBSPEC</span>, <span class="va">LBTESTCD</span>, <span class="va">LBSTRESU</span>,</span>
 <span>        format <span class="op">=</span> <span class="st">"lb_param"</span>, na_as_string <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -2162,7 +2207,7 @@ and reverse-looks it up in a <code>ks_invalue</code> format. The same
 <div class="section level3">
 <h3 id="basic-usage">Basic usage<a class="anchor" aria-label="anchor" href="#basic-usage"></a>
 </h3>
-<div class="sourceCode" id="cb80"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb82"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Build an INVALUE from two-column composite labels</span></span>
 <span><span class="fu"><a href="../reference/finput.html">finput</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/fmap.html">fmap</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BLOOD CHEMISTRY"</span>, <span class="st">"COAGULOGRAM"</span>, <span class="st">"COAGULATION PANEL"</span><span class="op">)</span>,</span>
@@ -2197,7 +2242,7 @@ and reverse-looks it up in a <code>ks_invalue</code> format. The same
 columns, use <code>na_as_string = TRUE</code> on both the build side
 (<code>fmap(paste(...), ...)</code>) and the lookup side
 (<code>finputk(..., na_as_string = TRUE)</code>).</p>
-<div class="sourceCode" id="cb81"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb83"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># INVALUE where LBSTRESU can be NA (like INR)</span></span>
 <span><span class="fu"><a href="../reference/finput.html">finput</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/fmap.html">fmap</a></span><span class="op">(</span></span>

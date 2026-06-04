@@ -1171,6 +1171,43 @@ fnew("M" = "Male", "F" = "Female", .missing = "Unknown", name = "sex")
 franges("sex")   # 0 rows
 ```
 
+### Completing a Summary Against Format Labels
+
+You can also use the labels returned by `franges()` as the full category set
+for `tidyr::complete()`, without converting the column to a factor first.
+
+```{r franges-complete}
+age_levels <- franges("age")$label
+
+ages <- c(5, 17, 18, 42)
+
+dplyr::tibble(
+  age_group = fputn(ages, "age")
+) |>
+  dplyr::count(age_group, name = "n") |>
+  tidyr::complete(age_group = age_levels, fill = list(n = 0))
+```
+
+### Getting Unique Labels from a Format
+
+If a format is already defined, you can inspect its label values directly from
+the stored mappings. For this `aesev` example, the labels are plain character
+values, so `unique()` gives the full set without needing `factor()`.
+
+```{r franges-aesev}
+fnew(
+  fmap(
+    1:5,
+    c("Mild", "Moderate", "Severe", "Life-threatening", "Death")
+  ),
+  type = "numeric",
+  name = "aesev"
+)
+
+aesev_labels <- unique(unlist(format_get("aesev")$mappings, use.names = FALSE))
+aesev_labels
+```
+
 ```{r franges-cleanup, include=FALSE}
 fclear()
 ```
