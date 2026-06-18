@@ -209,7 +209,7 @@ Options: `keep_na = TRUE`, `na_if`, `include_empty = TRUE`.
 ## Cheat sheet
 
 - **In R:** run `ksformat_cheatsheet()` to open the cheat sheet in your browser (HTML), or `ksformat_cheatsheet("pdf")` for the PDF.
-- **In this repo:** [HTML](inst/doc/ksformat-cheatsheet.html) | [PDF](inst/doc/ksformat-Cheat-Sheet.pdf)
+- **In this repo:** [HTML](inst/doc/ksformat-cheatsheet.html) | [PDF](inst/doc/ksformat-cheatsheet.pdf)
 
 ## Function reference
 
