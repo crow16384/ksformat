@@ -1004,6 +1004,55 @@ test_that("in_range respects bound inclusivity", {
 })
 
 # ===================================================================
+# flevels()
+# ===================================================================
+
+context("flevels")
+
+test_that("flevels extracts value-label entries from a format", {
+  fmt <- fnew(
+    "PBO" = "Placebo",
+    "D50" = "Drug A 50 mg",
+    "D100" = "Drug A 100 mg"
+  )
+
+  lvls <- flevels(fmt)
+
+  expect_s3_class(lvls, "data.frame")
+  expect_equal(names(lvls), c("value", "label"))
+  expect_equal(lvls$value, c("PBO", "D50", "D100"))
+  expect_equal(lvls$label, c("Placebo", "Drug A 50 mg", "Drug A 100 mg"))
+})
+
+test_that("flevels accepts a registered format name", {
+  fnew(
+    "PBO" = "Placebo",
+    "D50" = "Drug A 50 mg",
+    "D100" = "Drug A 100 mg",
+    name = "trt"
+  )
+
+  lvls <- flevels("trt")
+  expect_equal(lvls$value, c("PBO", "D50", "D100"))
+  expect_equal(lvls$label, c("Placebo", "Drug A 50 mg", "Drug A 100 mg"))
+
+  fclear()
+})
+
+test_that("flevels errors on ks_invalue object", {
+  inv <- fparse(text = '
+INVALUE yn
+  "Yes" = 1
+  "No"  = 0
+;
+')$yn
+
+  expect_error(flevels(inv), "ks_format")
+
+  fclear()
+})
+
+# ===================================================================
 # franges()
 # ===================================================================
 

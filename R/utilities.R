@@ -1033,6 +1033,59 @@ fmap_strata <- function(stratum, low, high, label,
 }
 
 
+#' Extract Value/Label Levels from a Format
+#'
+#' Returns the mappings of a \code{ks_format} object as a tidy two-column
+#' data frame with \code{value} and \code{label}.
+#'
+#' @param fmt A \code{ks_format} object, or a character name of a format
+#'   registered in the global library.
+#'
+#' @return A \code{data.frame} with columns \code{value} and \code{label}.
+#'   Rows are returned in the order entries appear in the format. If the
+#'   format has no mappings, an empty data frame with the same columns is
+#'   returned.
+#'
+#' @details
+#' For range-based formats, \code{value} contains the internal range key
+#' representation (for example, \code{"0,18,TRUE,FALSE"}). Use
+#' \code{\link{franges}()} to retrieve parsed range bounds.
+#'
+#' @export
+#'
+#' @examples
+#' fmt <- fnew(
+#'   "PBO" = "Placebo",
+#'   "D50" = "Drug A 50 mg",
+#'   "D100" = "Drug A 100 mg"
+#' )
+#' flevels(fmt)
+flevels <- function(fmt) {
+  if (is.character(fmt) && length(fmt) == 1L) {
+    fmt <- format_get(fmt)
+  }
+  if (!inherits(fmt, "ks_format")) {
+    cli_abort("{.arg fmt} must be a {.cls ks_format} object or the name of a registered format.")
+  }
+
+  if (length(fmt$mappings) == 0L) {
+    return(data.frame(
+      value = character(0),
+      label = character(0),
+      stringsAsFactors = FALSE,
+      row.names = NULL
+    ))
+  }
+
+  data.frame(
+    value = unname(names(fmt$mappings)),
+    label = unname(vapply(fmt$mappings, function(x) paste(as.character(x), collapse = ", "), character(1L))),
+    stringsAsFactors = FALSE,
+    row.names = NULL
+  )
+}
+
+
 #' Extract Range Entries from a Format
 #'
 #' Returns the range-based mappings of a \code{ks_format} object as a tidy

@@ -1646,3 +1646,32 @@ The output type is always determined by the stored invalue's `target_type`
 (here `integer`). For character output create the invalue with
 `target_type = "character"` and `finputk()` returns a character vector.
 
+## Example 30: Extract Discrete Levels with `flevels()`
+
+`flevels()` returns a tidy two-column lookup (`value`, `label`) from a
+`ks_format` object (or a registered format name). This is handy when you want
+to inspect, join, or export the exact mapping table used by a format.
+
+```{r flevels-basic}
+fnew(
+  "PBO"  = "Placebo",
+  "D50"  = "Drug A 50 mg",
+  "D100" = "Drug A 100 mg",
+  name = "trt"
+)
+
+flevels("trt")
+```
+
+Because the result is a regular `data.frame`, you can filter/select with your
+preferred tools:
+
+```{r flevels-filter}
+lvls <- flevels("trt")
+lvls[lvls$value != "PBO", , drop = FALSE]
+```
+
+```{r flevels-cleanup, include=FALSE}
+fclear()
+```
+

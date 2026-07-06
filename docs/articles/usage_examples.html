@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.2</span>
       </span>
     </div>
 
@@ -427,14 +427,14 @@ once:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;      format        result</span></span>
-<span><span class="co">#&gt; 1    DATE9.     04JUN2026</span></span>
-<span><span class="co">#&gt; 2 MMDDYY10.    06/04/2026</span></span>
-<span><span class="co">#&gt; 3 DDMMYY10.    04/06/2026</span></span>
-<span><span class="co">#&gt; 4 YYMMDD10.    2026-06-04</span></span>
-<span><span class="co">#&gt; 5   MONYY7.       JUN2026</span></span>
-<span><span class="co">#&gt; 6 WORDDATE. June 04, 2026</span></span>
+<span><span class="co">#&gt; 1    DATE9.     06JUL2026</span></span>
+<span><span class="co">#&gt; 2 MMDDYY10.    07/06/2026</span></span>
+<span><span class="co">#&gt; 3 DDMMYY10.    06/07/2026</span></span>
+<span><span class="co">#&gt; 4 YYMMDD10.    2026-07-06</span></span>
+<span><span class="co">#&gt; 5   MONYY7.       JUL2026</span></span>
+<span><span class="co">#&gt; 6 WORDDATE. July 06, 2026</span></span>
 <span><span class="co">#&gt; 7    YEAR4.          2026</span></span>
-<span><span class="co">#&gt; 8      QTR.             2</span></span>
+<span><span class="co">#&gt; 8      QTR.             3</span></span>
 <span></span>
 <span><span class="co"># Multiple dates</span></span>
 <span><span class="va">dates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2020-01-15"</span>, <span class="st">"2020-06-30"</span>, <span class="st">"2020-12-25"</span><span class="op">)</span><span class="op">)</span></span>
@@ -488,10 +488,10 @@ once:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;        format             result</span></span>
-<span><span class="co">#&gt; 1 DATETIME20. 04JUN2026:11:48:26</span></span>
-<span><span class="co">#&gt; 2 DATETIME13.      04JUN26:11:48</span></span>
-<span><span class="co">#&gt; 3     DTDATE.          04JUN2026</span></span>
-<span><span class="co">#&gt; 4   DTYYMMDD.         2026-06-04</span></span>
+<span><span class="co">#&gt; 1 DATETIME20. 06JUL2026:11:50:26</span></span>
+<span><span class="co">#&gt; 2 DATETIME13.      06JUL26:11:50</span></span>
+<span><span class="co">#&gt; 3     DTDATE.          06JUL2026</span></span>
+<span><span class="co">#&gt; 4   DTYYMMDD.         2026-07-06</span></span>
 <span></span>
 <span><span class="co"># From numeric R-epoch seconds</span></span>
 <span><span class="va">r_secs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2025-06-15 14:30:00"</span>, tz <span class="op">=</span> <span class="st">"UTC"</span><span class="op">)</span><span class="op">)</span></span>
@@ -1045,7 +1045,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmp607hZD/temp_libpathb0325e81fa4f/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpDKFRrK/temp_libpath1d0523f9d107/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">imported</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "AGEGRP"   "BMICAT"   "GENDER"   "RACEIN"   "SMISSING"</span></span>
 <span></span>
@@ -1173,7 +1173,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmp607hZD/temp_libpathb0325e81fa4f/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpDKFRrK/temp_libpath1d0523f9d107/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span></span>
 <span><span class="co"># Library should be empty</span></span>
 <span><span class="fu"><a href="../reference/flist.html">flist</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -2272,6 +2272,35 @@ columns, use <code>na_as_string = TRUE</code> on both the build side
 output create the invalue with <code>target_type = "character"</code>
 and <code><a href="../reference/finputk.html">finputk()</a></code> returns a character vector.</p>
 </div>
+</div>
+<div class="section level2">
+<h2 id="example-30-extract-discrete-levels-with-flevels">Example 30: Extract Discrete Levels with <code>flevels()</code><a class="anchor" aria-label="anchor" href="#example-30-extract-discrete-levels-with-flevels"></a>
+</h2>
+<p><code><a href="../reference/flevels.html">flevels()</a></code> returns a tidy two-column lookup
+(<code>value</code>, <code>label</code>) from a <code>ks_format</code>
+object (or a registered format name). This is handy when you want to
+inspect, join, or export the exact mapping table used by a format.</p>
+<div class="sourceCode" id="cb84"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span></span>
+<span>  <span class="st">"PBO"</span>  <span class="op">=</span> <span class="st">"Placebo"</span>,</span>
+<span>  <span class="st">"D50"</span>  <span class="op">=</span> <span class="st">"Drug A 50 mg"</span>,</span>
+<span>  <span class="st">"D100"</span> <span class="op">=</span> <span class="st">"Drug A 100 mg"</span>,</span>
+<span>  name <span class="op">=</span> <span class="st">"trt"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/flevels.html">flevels</a></span><span class="op">(</span><span class="st">"trt"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   value         label</span></span>
+<span><span class="co">#&gt; 1   PBO       Placebo</span></span>
+<span><span class="co">#&gt; 2   D50  Drug A 50 mg</span></span>
+<span><span class="co">#&gt; 3  D100 Drug A 100 mg</span></span></code></pre></div>
+<p>Because the result is a regular <code>data.frame</code>, you can
+filter/select with your preferred tools:</p>
+<div class="sourceCode" id="cb85"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lvls</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/flevels.html">flevels</a></span><span class="op">(</span><span class="st">"trt"</span><span class="op">)</span></span>
+<span><span class="va">lvls</span><span class="op">[</span><span class="va">lvls</span><span class="op">$</span><span class="va">value</span> <span class="op">!=</span> <span class="st">"PBO"</span>, , drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span></span>
+<span><span class="co">#&gt;   value         label</span></span>
+<span><span class="co">#&gt; 2   D50  Drug A 50 mg</span></span>
+<span><span class="co">#&gt; 3  D100 Drug A 100 mg</span></span></code></pre></div>
 </div>
   </div>
 

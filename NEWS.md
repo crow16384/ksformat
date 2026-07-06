@@ -1,3 +1,11 @@
+# ksformat 0.8.2
+
+## New features
+
+* Added `flevels()`: extracts discrete value-label mappings from a
+  `ks_format` object (or registered format name) as a tidy two-column
+  `data.frame` (`value`, `label`).
+
 # ksformat 0.8.1
 
 ## Documentation refresh
