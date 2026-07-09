@@ -1447,6 +1447,16 @@ fclear <- function(name = NULL) {
       ""
     }
 
+    if (!is.null(format_obj$num_pattern)) {
+      if (!identical(format_obj$type, "numeric")) {
+        cli_abort(c(
+          "Format{name_str}: {.arg num_pattern} is only supported for numeric formats.",
+          "x" = "Got {.arg type} = {.val {format_obj$type}}."
+        ))
+      }
+      .parse_num_pattern(format_obj$num_pattern)
+    }
+
     # Check that all labels are character strings (not for value types)
     if (length(format_obj$mappings) > 0 && !.is_value_type(format_obj$type)) {
       labels <- unlist(format_obj$mappings)

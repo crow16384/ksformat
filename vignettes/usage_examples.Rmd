@@ -1675,3 +1675,43 @@ lvls[lvls$value != "PBO", , drop = FALSE]
 fclear()
 ```
 
+## Example 31: Numeric Pattern Formatting
+
+Numeric pattern formats are useful for continuous values such as currency,
+percentages, and fixed-precision displays.
+
+Define a currency format with grouping and two decimals:
+
+```{r numeric-pattern-currency}
+fnew(
+  "$%,.2f",
+  .missing = "NO DATA",
+  .other = "INVALID",
+  type = "numeric",
+  name = "currency"
+)
+
+amounts <- c(1234.56, -7890.12, 0, NA, "oops")
+
+data.frame(
+  raw = amounts,
+  formatted = fput(amounts, "currency")
+)
+```
+
+Percent-like suffixes are supported via literal text around the numeric token:
+
+```{r numeric-pattern-percent}
+fnew("%.1f%%", type = "numeric", name = "pct")
+
+values <- c(0, 12.345, -7.8)
+data.frame(
+  raw = values,
+  pct = fputn(values, "pct")
+)
+```
+
+```{r numeric-pattern-cleanup, include=FALSE}
+fclear()
+```
+

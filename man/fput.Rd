@@ -46,6 +46,11 @@ fput(c("n", "pct"), stat_fmt, c(42, 0.15))
 # Returns: "42" "15.0\%"
 }
 
+\strong{Numeric patterns:} If a numeric format was created with a single
+unnamed pattern string (for example \code{fnew("$\%,.2f", type = "numeric")}),
+\code{fput}/\code{fputn} apply that pattern to numeric values directly,
+including grouping marks and literal prefix/suffix text.
+
 \strong{Case-insensitive matching:} When a format has \code{ignore_case = TRUE},
 key matching is case-insensitive for character formats.
 }

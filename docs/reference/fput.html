@@ -18,7 +18,7 @@ Properly handles NA, NULL, NaN, and other missing values."><meta property="og:im
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.3</span>
       </span>
     </div>
 
@@ -111,6 +111,10 @@ as positional arguments:</p>
 <span><span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n"</span>, <span class="st">"pct"</span><span class="op">)</span>, <span class="va">stat_fmt</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">42</span>, <span class="fl">0.15</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># Returns: "42" "15.0%"</span></span></code></pre></div>
 
+<p><strong>Numeric patterns:</strong> If a numeric format was created with a single
+unnamed pattern string (for example <code>fnew("$%,.2f", type = "numeric")</code>),
+<code>fput</code>/<code>fputn</code> apply that pattern to numeric values directly,
+including grouping marks and literal prefix/suffix text.</p>
 <p><strong>Case-insensitive matching:</strong> When a format has <code>ignore_case = TRUE</code>,
 key matching is case-insensitive for character formats.</p>
     </div>

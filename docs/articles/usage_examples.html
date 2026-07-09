@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.3</span>
       </span>
     </div>
 
@@ -427,12 +427,12 @@ once:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;      format        result</span></span>
-<span><span class="co">#&gt; 1    DATE9.     06JUL2026</span></span>
-<span><span class="co">#&gt; 2 MMDDYY10.    07/06/2026</span></span>
-<span><span class="co">#&gt; 3 DDMMYY10.    06/07/2026</span></span>
-<span><span class="co">#&gt; 4 YYMMDD10.    2026-07-06</span></span>
+<span><span class="co">#&gt; 1    DATE9.     09JUL2026</span></span>
+<span><span class="co">#&gt; 2 MMDDYY10.    07/09/2026</span></span>
+<span><span class="co">#&gt; 3 DDMMYY10.    09/07/2026</span></span>
+<span><span class="co">#&gt; 4 YYMMDD10.    2026-07-09</span></span>
 <span><span class="co">#&gt; 5   MONYY7.       JUL2026</span></span>
-<span><span class="co">#&gt; 6 WORDDATE. July 06, 2026</span></span>
+<span><span class="co">#&gt; 6 WORDDATE. July 09, 2026</span></span>
 <span><span class="co">#&gt; 7    YEAR4.          2026</span></span>
 <span><span class="co">#&gt; 8      QTR.             3</span></span>
 <span></span>
@@ -488,10 +488,10 @@ once:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;        format             result</span></span>
-<span><span class="co">#&gt; 1 DATETIME20. 06JUL2026:11:52:50</span></span>
-<span><span class="co">#&gt; 2 DATETIME13.      06JUL26:11:52</span></span>
-<span><span class="co">#&gt; 3     DTDATE.          06JUL2026</span></span>
-<span><span class="co">#&gt; 4   DTYYMMDD.         2026-07-06</span></span>
+<span><span class="co">#&gt; 1 DATETIME20. 09JUL2026:13:11:37</span></span>
+<span><span class="co">#&gt; 2 DATETIME13.      09JUL26:13:11</span></span>
+<span><span class="co">#&gt; 3     DTDATE.          09JUL2026</span></span>
+<span><span class="co">#&gt; 4   DTYYMMDD.         2026-07-09</span></span>
 <span></span>
 <span><span class="co"># From numeric R-epoch seconds</span></span>
 <span><span class="va">r_secs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2025-06-15 14:30:00"</span>, tz <span class="op">=</span> <span class="st">"UTC"</span><span class="op">)</span><span class="op">)</span></span>
@@ -1045,7 +1045,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmprpJbrV/temp_libpath255a3fb387b9/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmp9NRp6m/temp_libpathd3c94f55e28a/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">imported</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "AGEGRP"   "BMICAT"   "GENDER"   "RACEIN"   "SMISSING"</span></span>
 <span></span>
@@ -1173,7 +1173,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmprpJbrV/temp_libpath255a3fb387b9/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmp9NRp6m/temp_libpathd3c94f55e28a/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span></span>
 <span><span class="co"># Library should be empty</span></span>
 <span><span class="fu"><a href="../reference/flist.html">flist</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -2301,6 +2301,48 @@ filter/select with your preferred tools:</p>
 <span><span class="co">#&gt;   value         label</span></span>
 <span><span class="co">#&gt; 2   D50  Drug A 50 mg</span></span>
 <span><span class="co">#&gt; 3  D100 Drug A 100 mg</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="example-31-numeric-pattern-formatting">Example 31: Numeric Pattern Formatting<a class="anchor" aria-label="anchor" href="#example-31-numeric-pattern-formatting"></a>
+</h2>
+<p>Numeric pattern formats are useful for continuous values such as
+currency, percentages, and fixed-precision displays.</p>
+<p>Define a currency format with grouping and two decimals:</p>
+<div class="sourceCode" id="cb86"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span></span>
+<span>  <span class="st">"$%,.2f"</span>,</span>
+<span>  .missing <span class="op">=</span> <span class="st">"NO DATA"</span>,</span>
+<span>  .other <span class="op">=</span> <span class="st">"INVALID"</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"numeric"</span>,</span>
+<span>  name <span class="op">=</span> <span class="st">"currency"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">amounts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1234.56</span>, <span class="op">-</span><span class="fl">7890.12</span>, <span class="fl">0</span>, <span class="cn">NA</span>, <span class="st">"oops"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  raw <span class="op">=</span> <span class="va">amounts</span>,</span>
+<span>  formatted <span class="op">=</span> <span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="va">amounts</span>, <span class="st">"currency"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;        raw  formatted</span></span>
+<span><span class="co">#&gt; 1  1234.56  $1,234.56</span></span>
+<span><span class="co">#&gt; 2 -7890.12 -$7,890.12</span></span>
+<span><span class="co">#&gt; 3        0      $0.00</span></span>
+<span><span class="co">#&gt; 4     &lt;NA&gt;    NO DATA</span></span>
+<span><span class="co">#&gt; 5     oops    INVALID</span></span></code></pre></div>
+<p>Percent-like suffixes are supported via literal text around the
+numeric token:</p>
+<div class="sourceCode" id="cb87"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="st">"%.1f%%"</span>, type <span class="op">=</span> <span class="st">"numeric"</span>, name <span class="op">=</span> <span class="st">"pct"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">values</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">12.345</span>, <span class="op">-</span><span class="fl">7.8</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  raw <span class="op">=</span> <span class="va">values</span>,</span>
+<span>  pct <span class="op">=</span> <span class="fu"><a href="../reference/fputn.html">fputn</a></span><span class="op">(</span><span class="va">values</span>, <span class="st">"pct"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;      raw   pct</span></span>
+<span><span class="co">#&gt; 1  0.000  0.0%</span></span>
+<span><span class="co">#&gt; 2 12.345 12.3%</span></span>
+<span><span class="co">#&gt; 3 -7.800 -7.8%</span></span></code></pre></div>
 </div>
   </div>
 

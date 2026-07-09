@@ -12,6 +12,9 @@
 #'     \item Discrete values: \code{"M" = "Male", "F" = "Female"}
 #'     \item Named vector: \code{c(Male = "M", Female = "F")}
 #'     \item Named list: \code{list(Male = "M", Female = "F")}
+#'     \item Numeric pattern string: one unnamed \code{\%f}-style pattern
+#'       such as \code{"\%,.2f"}, \code{"$\%,.2f"}, or
+#'       \code{"\%.1f\%\%"} (for \code{type = "numeric"})
 #'     \item \code{\link{fmap}} vector: \code{fmap(keys, values)} for
 #'       data-driven formats (no reversal)
 #'     \item Special values: \code{.missing = "Missing"}, \code{.other = "Other"}
@@ -42,7 +45,9 @@
 #'   \code{.missing} and \code{.other} are always typed NA.
 #'   Range-bucketing types (\code{"date_range"}, \code{"datetime_range"})
 #'   bucket \code{Date}/\code{POSIXct} input into character labels using
-#'   ISO date/datetime strings as range bounds.
+#'   ISO date/datetime strings as range bounds. For \code{type = "numeric"},
+#'   a single unnamed \code{\%f}-style pattern in \code{...} creates a
+#'   numeric pattern format (no explicit value-label mappings required).
 #' @param default Character. Default label for unmatched values (overrides .other)
 #' @param multilabel Logical. If \code{TRUE}, the format supports overlapping
 #'   ranges where a single value can match multiple labels. Used with
@@ -112,6 +117,16 @@
 #' # Returns: "42" "15.0\%"
 #' }
 #'
+#' \strong{Numeric pattern mode:} For \code{type = "numeric"}, you may pass
+#' one unnamed \code{\%f}-style pattern string in \code{...} instead of mapping
+#' keys. This creates a continuous numeric display format:
+#' \preformatted{
+#' fnew("$\%,.2f", name = "currency", type = "numeric")
+#' fnew("\%.1f\%\%", name = "pct", type = "numeric")
+#' }
+#' The pattern may include literal prefix/suffix text and exactly one numeric
+#' conversion token (\code{\%f} / \code{\%F} with flags/width/precision).
+#'
 #' @export
 #'
 #' @examples
@@ -154,6 +169,12 @@
 #' fput(c("M", "F", NA), sex_vec)
 #' # [1] "Male" "Female" "Unknown"
 #' fclear()
+#'
+#' # Numeric pattern format
+#' fnew("$%,.2f", name = "currency", type = "numeric")
+#' fputn(c(1234.56, -7890.12, 0), "currency")
+#' # [1] "$1,234.56" "-$7,890.12" "$0.00"
+#' fclear()
 fnew <- function(..., name = NULL, type = "auto", default = NULL,
                  multilabel = FALSE, ignore_case = FALSE,
                  date_format = NULL,
@@ -187,6 +208,32 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
   }
 
   mappings <- list(...)
+  num_pattern <- NULL
+  num_pattern_spec <- NULL
+
+  # Numeric pattern mode: one unnamed scalar pattern plus optional directives
+  # like .missing/.other, e.g. fnew("$%,.2f", .missing = "N/A", type = "numeric").
+  if (type %in% c("auto", "numeric") && length(mappings) > 0L) {
+    arg_names0 <- names(mappings)
+    is_unnamed <- if (is.null(arg_names0)) {
+      rep(TRUE, length(mappings))
+    } else {
+      is.na(arg_names0) | !nzchar(arg_names0)
+    }
+
+    if (sum(is_unnamed) == 1L) {
+      pat_idx <- which(is_unnamed)[1L]
+      pat_candidate <- mappings[[pat_idx]]
+      if (is.character(pat_candidate) && length(pat_candidate) == 1L &&
+          grepl("%", pat_candidate, fixed = TRUE)) {
+        num_pattern_spec <- .parse_num_pattern(pat_candidate)
+        num_pattern <- pat_candidate
+        mappings[[pat_idx]] <- NULL
+        if (identical(type, "auto")) type <- "numeric"
+        is_vtype <- FALSE
+      }
+    }
+  }
 
   # Detect if any unnamed argument uses ks_fmap (suppresses reversal)
   has_fmap <- FALSE
@@ -231,7 +278,7 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
   do_reverse <- if (has_fmap || is_strat) FALSE else !is_vtype
   mappings <- .expand_named_vectors(mappings, reverse = do_reverse)
 
-  if (length(mappings) == 0L) {
+  if (length(mappings) == 0L && is.null(num_pattern)) {
     cli_abort("At least one value-label mapping must be provided.")
   }
 
@@ -335,6 +382,8 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
       multilabel = multilabel,
       ignore_case = ignore_case,
       date_format = date_format,
+      num_pattern = num_pattern,
+      num_pattern_spec = num_pattern_spec,
       range_table = range_table,
       range_tables = range_tables,
       created = Sys.time()
@@ -443,6 +492,8 @@ print.ks_format <- function(x, ...) {
       pattern_str <- paste0(pattern_str, " (", x$sas_name, ".)")
     }
     cat("Pattern:", pattern_str, "\n")
+  } else if (!is.null(x$num_pattern)) {
+    cat("Pattern:", x$num_pattern, "\n")
   } else if (.is_stratified_type(x$type)) {
     cat("Range subtype:", x$range_subtype, "\n")
     cat("Strata separator:", x$strata_sep, "\n")

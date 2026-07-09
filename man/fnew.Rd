@@ -25,6 +25,9 @@ fnew(
     \item Discrete values: \code{"M" = "Male", "F" = "Female"}
     \item Named vector: \code{c(Male = "M", Female = "F")}
     \item Named list: \code{list(Male = "M", Female = "F")}
+    \item Numeric pattern string: one unnamed \code{\%f}-style pattern
+      such as \code{"\%,.2f"}, \code{"$\%,.2f"}, or
+      \code{"\%.1f\%\%"} (for \code{type = "numeric"})
     \item \code{\link{fmap}} vector: \code{fmap(keys, values)} for
       data-driven formats (no reversal)
     \item Special values: \code{.missing = "Missing"}, \code{.other = "Other"}
@@ -57,7 +60,9 @@ native R objects instead of character labels. For value types,
 \code{.missing} and \code{.other} are always typed NA.
 Range-bucketing types (\code{"date_range"}, \code{"datetime_range"})
 bucket \code{Date}/\code{POSIXct} input into character labels using
-ISO date/datetime strings as range bounds.}
+ISO date/datetime strings as range bounds. For \code{type = "numeric"},
+a single unnamed \code{\%f}-style pattern in \code{...} creates a
+numeric pattern format (no explicit value-label mappings required).}
 
 \item{default}{Character. Default label for unmatched values (overrides .other)}
 
@@ -140,6 +145,16 @@ stat_fmt <- fnew("n" = "sprintf('\%s', .x1)",
 fput(c("n", "pct"), stat_fmt, c(42, 0.15))
 # Returns: "42" "15.0\%"
 }
+
+\strong{Numeric pattern mode:} For \code{type = "numeric"}, you may pass
+one unnamed \code{\%f}-style pattern string in \code{...} instead of mapping
+keys. This creates a continuous numeric display format:
+\preformatted{
+fnew("$\%,.2f", name = "currency", type = "numeric")
+fnew("\%.1f\%\%", name = "pct", type = "numeric")
+}
+The pattern may include literal prefix/suffix text and exactly one numeric
+conversion token (\code{\%f} / \code{\%F} with flags/width/precision).
 }
 \examples{
 # Discrete value format (auto-stored as "sex")
@@ -180,5 +195,11 @@ sex_vec <- fnew(c(Male = "M", Female = "F"), .missing = "Unknown",
                name = "sex_vec")
 fput(c("M", "F", NA), sex_vec)
 # [1] "Male" "Female" "Unknown"
+fclear()
+
+# Numeric pattern format
+fnew("$\%,.2f", name = "currency", type = "numeric")
+fputn(c(1234.56, -7890.12, 0), "currency")
+# [1] "$1,234.56" "-$7,890.12" "$0.00"
 fclear()
 }

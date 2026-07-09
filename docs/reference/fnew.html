@@ -20,7 +20,7 @@ is provided."><meta property="og:image" content="/logo.svg"><!-- mathjax --><scr
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.3</span>
       </span>
     </div>
 
@@ -93,6 +93,9 @@ is provided.</p>
   Can be:</p><ul><li><p>Discrete values: <code>"M" = "Male", "F" = "Female"</code></p></li>
 <li><p>Named vector: <code>c(Male = "M", Female = "F")</code></p></li>
 <li><p>Named list: <code>list(Male = "M", Female = "F")</code></p></li>
+<li><p>Numeric pattern string: one unnamed <code>%f</code>-style pattern
+      such as <code>"%,.2f"</code>, <code>"$%,.2f"</code>, or
+      <code>"%.1f%%"</code> (for <code>type = "numeric"</code>)</p></li>
 <li><p><code><a href="fmap.html">fmap</a></code> vector: <code>fmap(keys, values)</code> for
       data-driven formats (no reversal)</p></li>
 <li><p>Special values: <code>.missing = "Missing"</code>, <code>.other = "Other"</code></p></li>
@@ -126,7 +129,9 @@ native R objects instead of character labels. For value types,
 <code>.missing</code> and <code>.other</code> are always typed NA.
 Range-bucketing types (<code>"date_range"</code>, <code>"datetime_range"</code>)
 bucket <code>Date</code>/<code>POSIXct</code> input into character labels using
-ISO date/datetime strings as range bounds.</p></dd>
+ISO date/datetime strings as range bounds. For <code>type = "numeric"</code>,
+a single unnamed <code>%f</code>-style pattern in <code>...</code> creates a
+numeric pattern format (no explicit value-label mappings required).</p></dd>
 
 
 <dt id="arg-default">default<a class="anchor" aria-label="anchor" href="#arg-default"></a></dt>
@@ -207,6 +212,12 @@ are passed positionally via <code>...</code> in <code><a href="fput.html">fput</
 <span><span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n"</span>, <span class="st">"pct"</span><span class="op">)</span>, <span class="va">stat_fmt</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">42</span>, <span class="fl">0.15</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># Returns: "42" "15.0%"</span></span></code></pre></div>
 
+<p><strong>Numeric pattern mode:</strong> For <code>type = "numeric"</code>, you may pass
+one unnamed <code>%f</code>-style pattern string in <code>...</code> instead of mapping
+keys. This creates a continuous numeric display format:</p><div class="sourceCode"><pre><code><span></span>
+<span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="st">"$%,.2f"</span>, name <span class="op">=</span> <span class="st">"currency"</span>, type <span class="op">=</span> <span class="st">"numeric"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="st">"%.1f%%"</span>, name <span class="op">=</span> <span class="st">"pct"</span>, type <span class="op">=</span> <span class="st">"numeric"</span><span class="op">)</span></span></code></pre></div><p>The pattern may include literal prefix/suffix text and exactly one numeric
+conversion token (<code>%f</code> / <code>%F</code> with flags/width/precision).</p>
     </div>
 
     <div id="ref-examples">
@@ -266,6 +277,14 @@ are passed positionally via <code>...</code> in <code><a href="fput.html">fput</
 <span class="r-in"><span><span class="fu"><a href="fput.html">fput</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M"</span>, <span class="st">"F"</span>, <span class="cn">NA</span><span class="op">)</span>, <span class="va">sex_vec</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Male"    "Female"  "Unknown"</span>
 <span class="r-in"><span><span class="co"># [1] "Male" "Female" "Unknown"</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> All formats cleared from library.</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Numeric pattern format</span></span></span>
+<span class="r-in"><span><span class="fu">fnew</span><span class="op">(</span><span class="st">"$%,.2f"</span>, name <span class="op">=</span> <span class="st">"currency"</span>, type <span class="op">=</span> <span class="st">"numeric"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="fputn.html">fputn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1234.56</span>, <span class="op">-</span><span class="fl">7890.12</span>, <span class="fl">0</span><span class="op">)</span>, <span class="st">"currency"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "$1,234.56"  "-$7,890.12" "$0.00"     </span>
+<span class="r-in"><span><span class="co"># [1] "$1,234.56" "-$7,890.12" "$0.00"</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> All formats cleared from library.</span>
 </code></pre></div>

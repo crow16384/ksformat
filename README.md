@@ -37,6 +37,7 @@ devtools::install()
 - **Multilabel** — A single value can match multiple labels (`fput_all`)
 - **Expression labels** — Dynamic labels with `.x1`, `.x2`, … evaluated at apply-time
 - **Case-insensitive matching** — `ignore_case = TRUE` in `fnew`
+- **Numeric patterns** — `%f`-style continuous formatting with grouping, prefix/suffix text, and currency-style output
 - **Date/time/datetime** — Built-in SAS format names and custom `strftime` patterns
 - **Import/export** — Parse SAS-like text (`fparse`), export (`fexport`), import CNTLOUT CSV (`fimport`)
 - **Format library** — Register and retrieve formats globally

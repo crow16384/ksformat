@@ -1,10 +1,19 @@
-# ksformat 0.8.2
+# ksformat 0.8.3
 
 ## New features
 
 * Added `flevels()`: extracts discrete value-label mappings from a
   `ks_format` object (or registered format name) as a tidy two-column
   `data.frame` (`value`, `label`).
+* `fnew()` now supports numeric pattern mode for `type = "numeric"`:
+  pass one unnamed `%f`-style pattern (for example `"$%,.2f"` or
+  `"%.1f%%"`) to format continuous numeric values directly.
+
+## Documentation
+
+* Added vignette **Example 31: Numeric Pattern Formatting** covering
+  currency/grouping, suffix text, and `.missing`/`.other` handling.
+* Added runnable companion script: `examples/NumericPatterns.R`.
 
 # ksformat 0.8.1
 

@@ -3928,3 +3928,54 @@ test_that("fput skips discrete match when no numeric discrete key exists", {
   # Character input: discrete "Refused" still works
   expect_equal(fput("Refused", fmt), "X")
 })
+
+
+# ---------------------------------------------------------------------------
+# Numeric pattern formatting (%f-style)
+# ---------------------------------------------------------------------------
+
+test_that("fnew accepts numeric pattern and auto-sets numeric type", {
+  fmt <- fnew("%,.2f")
+  expect_equal(fmt$type, "numeric")
+  expect_equal(fmt$num_pattern, "%,.2f")
+  expect_equal(length(fmt$mappings), 0L)
+})
+
+test_that("fputn applies grouping and decimal precision from numeric pattern", {
+  fnew("%,.2f", name = "num_pat", type = "numeric")
+  on.exit(fclear(), add = TRUE)
+
+  out <- fputn(c(1234.56, -7890.12, 0), "num_pat")
+  expect_equal(out, c("1,234.56", "-7,890.12", "0.00"))
+})
+
+test_that("fputn places sign before currency prefix", {
+  fnew("$%,.2f", name = "currency_pat", type = "numeric")
+  on.exit(fclear(), add = TRUE)
+
+  out <- fputn(c(1234.56, -7890.12), "currency_pat")
+  expect_equal(out, c("$1,234.56", "-$7,890.12"))
+})
+
+test_that("numeric pattern honors .missing, .other, keep_na and suffix", {
+  fmt <- fnew("%.1f%%", .missing = "NO DATA", .other = "INVALID",
+              type = "numeric")
+
+  out1 <- fput(c(12.34, NA, "abc"), fmt)
+  expect_equal(out1, c("12.3%", "NO DATA", "INVALID"))
+
+  out2 <- fput(c(NA_real_, 7.2), fmt, keep_na = TRUE)
+  expect_true(is.na(out2[1]))
+  expect_equal(out2[2], "7.2%")
+})
+
+test_that("fnew errors on invalid numeric pattern specifiers", {
+  expect_error(
+    fnew("%q", type = "numeric"),
+    "exactly one"
+  )
+  expect_error(
+    fnew("%,.2f %.1f", type = "numeric"),
+    "exactly one"
+  )
+})

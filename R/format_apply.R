@@ -34,6 +34,11 @@
 #' # Returns: "42" "15.0\%"
 #' }
 #'
+#' \strong{Numeric patterns:} If a numeric format was created with a single
+#' unnamed pattern string (for example \code{fnew("$\%,.2f", type = "numeric")}),
+#' \code{fput}/\code{fputn} apply that pattern to numeric values directly,
+#' including grouping marks and literal prefix/suffix text.
+#'
 #' \strong{Case-insensitive matching:} When a format has \code{ignore_case = TRUE},
 #' key matching is case-insensitive for character formats.
 #'
@@ -95,6 +100,11 @@ fput <- function(x, format, ..., keep_na = FALSE) {
   # Delegate to value type handler for Date/POSIXct/logical types
   if (.is_value_type(format$type)) {
     return(.fput_value_type(x, format, keep_na = keep_na))
+  }
+
+  # Numeric pattern formats apply directly to numeric-like input.
+  if (!is.null(format$num_pattern)) {
+    return(.apply_numeric_pattern(x, format, keep_na = keep_na))
   }
 
   extra_args <- list(...)
@@ -310,6 +320,140 @@ fput <- function(x, format, ..., keep_na = FALSE) {
       result[indices] <- .eval_expr_label(
         expr_str, extra_args, indices, parent_env = caller_env
       )
+    }
+  }
+
+  result
+}
+
+
+#' Parse Numeric Format Pattern
+#'
+#' Supports one printf-style numeric specifier with optional literal
+#' prefix/suffix, for example ",%.2f", "$%,.2f", or "%.1f%%".
+#' @keywords internal
+.parse_num_pattern <- function(pattern) {
+  if (!is.character(pattern) || length(pattern) != 1L ||
+      is.na(pattern) || !nzchar(pattern)) {
+    cli_abort("{.arg pattern} must be a single non-empty character string.")
+  }
+
+  spec_re <- "%[-+ #0,']*[0-9]*(?:\\.[0-9]+)?[fF]"
+  loc <- gregexpr(spec_re, pattern, perl = TRUE)[[1]]
+
+  if (length(loc) != 1L || loc[1] < 0L) {
+    cli_abort(c(
+      "Numeric pattern must contain exactly one {.val %f}-style specifier.",
+      "i" = "Examples: {.val %,.2f}, {.val $%,.2f}, {.val %.1f%%}."
+    ))
+  }
+
+  # Guard against additional unescaped '%' outside the numeric specifier.
+  mlen <- attr(loc, "match.length")[1]
+  prefix_raw <- substr(pattern, 1L, loc[1] - 1L)
+  suffix_raw <- substr(pattern, loc[1] + mlen, nchar(pattern))
+  has_unescaped_percent <- function(txt) {
+    stripped <- gsub("%%", "", txt, fixed = TRUE)
+    grepl("%", stripped, fixed = TRUE)
+  }
+  if (has_unescaped_percent(prefix_raw) || has_unescaped_percent(suffix_raw)) {
+    cli_abort(c(
+      "Numeric pattern contains unsupported {.val %} usage.",
+      "i" = "Use {.val %%} for literal percent signs outside the numeric specifier."
+    ))
+  }
+
+  token <- substr(pattern, loc[1], loc[1] + mlen - 1L)
+  token_parts <- regmatches(
+    token,
+    regexec("^%([-+ #0,']*)([0-9]*)(?:\\.([0-9]+))?([fF])$", token, perl = TRUE)
+  )[[1]]
+
+  if (length(token_parts) != 5L) {
+    cli_abort("Failed to parse numeric pattern {.val {pattern}}.")
+  }
+
+  flags <- token_parts[2]
+  width_txt <- token_parts[3]
+  digits_txt <- token_parts[4]
+
+  out_flags <- ""
+  if (grepl("\\+", flags)) out_flags <- paste0(out_flags, "+")
+  if (grepl("-", flags, fixed = TRUE)) out_flags <- paste0(out_flags, "-")
+  if (grepl("0", flags, fixed = TRUE) && !grepl("-", flags, fixed = TRUE)) {
+    out_flags <- paste0(out_flags, "0")
+  }
+  if (grepl(" ", flags, fixed = TRUE)) out_flags <- paste0(out_flags, " ")
+
+  list(
+    pattern = pattern,
+    token = token,
+    prefix = gsub("%%", "%", prefix_raw, fixed = TRUE),
+    suffix = gsub("%%", "%", suffix_raw, fixed = TRUE),
+    width = if (nzchar(width_txt)) as.integer(width_txt) else 0L,
+    digits = if (nzchar(digits_txt)) as.integer(digits_txt) else 6L,
+    flags = out_flags,
+    use_grouping = grepl(",", flags, fixed = TRUE)
+  )
+}
+
+
+#' Apply Numeric Pattern to Values
+#'
+#' @keywords internal
+.apply_numeric_pattern <- function(x, format, keep_na = FALSE) {
+  spec <- format$num_pattern_spec
+  if (is.null(spec)) {
+    spec <- .parse_num_pattern(format$num_pattern)
+  }
+
+  n <- length(x)
+  result <- rep(NA_character_, n)
+
+  is_miss <- is_missing(x)
+  if (!is.null(format$missing_label) && !keep_na) {
+    result[is_miss] <- format$missing_label
+  }
+
+  non_miss <- which(!is_miss)
+  if (length(non_miss) == 0L) return(result)
+
+  vals <- suppressWarnings(as.numeric(x[non_miss]))
+  good <- !is.na(vals)
+
+  if (any(good)) {
+    num <- vals[good]
+    out <- formatC(
+      num,
+      format = "f",
+      digits = spec$digits,
+      width = spec$width,
+      flag = spec$flags,
+      big.mark = if (isTRUE(spec$use_grouping)) "," else ""
+    )
+
+    if (nzchar(spec$prefix)) {
+      # Keep sign before currency/symbol: -$1,234.56 (not $-1,234.56).
+      out <- sub(
+        "^([[:space:]]*)([+-]?)(.*)$",
+        paste0("\\1\\2", spec$prefix, "\\3"),
+        out,
+        perl = TRUE
+      )
+    }
+    if (nzchar(spec$suffix)) {
+      out <- paste0(out, spec$suffix)
+    }
+
+    result[non_miss[good]] <- out
+  }
+
+  if (any(!good)) {
+    bad_idx <- non_miss[!good]
+    if (!is.null(format$other_label)) {
+      result[bad_idx] <- format$other_label
+    } else {
+      result[bad_idx] <- as.character(x[bad_idx])
     }
   }
 

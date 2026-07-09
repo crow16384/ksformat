@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ksformat</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.3</span>
       </span>
     </div>
 
@@ -58,10 +58,17 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.8.2" id="ksformat-082">ksformat 0.8.2<a class="anchor" aria-label="anchor" href="#ksformat-082"></a></h2>
+<h2 class="page-header" data-toc-text="0.8.3" id="ksformat-083">ksformat 0.8.3<a class="anchor" aria-label="anchor" href="#ksformat-083"></a></h2>
 <div class="section level3">
-<h3 id="new-features-0-8-2">New features<a class="anchor" aria-label="anchor" href="#new-features-0-8-2"></a></h3>
+<h3 id="new-features-0-8-3">New features<a class="anchor" aria-label="anchor" href="#new-features-0-8-3"></a></h3>
 <ul><li>Added <code><a href="../reference/flevels.html">flevels()</a></code>: extracts discrete value-label mappings from a <code>ks_format</code> object (or registered format name) as a tidy two-column <code>data.frame</code> (<code>value</code>, <code>label</code>).</li>
+<li>
+<code><a href="../reference/fnew.html">fnew()</a></code> now supports numeric pattern mode for <code>type = "numeric"</code>: pass one unnamed <code>%f</code>-style pattern (for example <code>"$%,.2f"</code> or <code>"%.1f%%"</code>) to format continuous numeric values directly.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-0-8-3">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-8-3"></a></h3>
+<ul><li>Added vignette <strong>Example 31: Numeric Pattern Formatting</strong> covering currency/grouping, suffix text, and <code>.missing</code>/<code>.other</code> handling.</li>
+<li>Added runnable companion script: <code>examples/NumericPatterns.R</code>.</li>
 </ul></div>
 </div>
     <div class="section level2">
