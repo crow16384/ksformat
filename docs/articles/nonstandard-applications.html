@@ -41,7 +41,7 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/nonstandard-applications.html">Non-standard Applications of ksformat for Clinical Trials and Other Tasks</a></li>
+<li><a class="dropdown-item" href="../articles/nonstandard-applications.html">Non-standard Applications of `ksformat` for Clinical Trials and Other Tasks</a></li>
     <li><a class="dropdown-item" href="../articles/usage_examples.html">ksformat Usage Examples</a></li>
   </ul>
 </li>
@@ -60,7 +60,7 @@
 </nav><div class="container template-quarto">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.svg" class="logo" alt=""><h1>Non-standard Applications of ksformat for Clinical Trials and Other Tasks</h1>
+      <img src="../logo.svg" class="logo" alt=""><h1>Non-standard Applications of <code>ksformat</code> for Clinical Trials and Other Tasks</h1>
 
 
 
@@ -77,7 +77,7 @@
     <section class="section level2" data-number="1"><h2 data-number="1" id="overview">
 <span class="header-section-number">1</span> Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p><code>ksformat</code> is usually described as a SAS PROC FORMAT-like tool for ordinary value-to-label lookup. In practice, the package is useful in places where a clinical trial workflow needs more than a plain dictionary:</p>
+<p><code>ksformat</code> is usually described as a <strong>SAS PROC FORMAT-like tool</strong> for ordinary value-to-label lookup. In practice, the package is useful in places where a clinical trial workflow needs more than a plain dictionary:</p>
 <ul>
 <li>protocol-defined visit windows</li>
 <li>subject- or arm-specific bucketing rules</li>
@@ -107,11 +107,13 @@
 <span>  .other <span class="op">=</span> <span class="st">"Outside window"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">visit_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span><span class="va">visit_df</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span></span>
 <span>  arm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ARM_A"</span>, <span class="st">"ARM_A"</span>, <span class="st">"ARM_B"</span>, <span class="st">"ARM_B"</span>, <span class="st">"ARM_C"</span><span class="op">)</span>,</span>
 <span>  day <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">35</span>, <span class="fl">5</span>, <span class="fl">40</span>, <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">mutate</span><span class="op">(</span></span>
+<span>  window <span class="op">=</span> <span class="fu"><a href="../reference/fputk.html">fputk</a></span><span class="op">(</span><span class="va">arm</span>, <span class="va">day</span>, format <span class="op">=</span> <span class="st">"visit_window"</span><span class="op">)</span>,</span>
 <span><span class="op">)</span></span>
-<span><span class="va">visit_df</span><span class="op">$</span><span class="va">window</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fputk.html">fputk</a></span><span class="op">(</span><span class="va">visit_df</span><span class="op">$</span><span class="va">arm</span>, <span class="va">visit_df</span><span class="op">$</span><span class="va">day</span>, format <span class="op">=</span> <span class="st">"visit_window"</span><span class="op">)</span></span>
+<span></span>
 <span><span class="va">visit_df</span></span></code></pre></div>
 </div>
 <p>This is useful for:</p>
@@ -142,21 +144,15 @@
 <span>  .other <span class="op">=</span> <span class="cn">NA</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">lab_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span><span class="va">lab_df</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span></span>
 <span>  LBCAT <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BLOOD CHEMISTRY"</span>, <span class="st">"COAGULOGRAM"</span>, <span class="st">"COAGULATION PANEL"</span><span class="op">)</span>,</span>
 <span>  LBSPEC <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BLOOD"</span>, <span class="st">"BLOOD"</span>, <span class="st">"BLOOD"</span><span class="op">)</span>,</span>
 <span>  LBTESTCD <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ALB"</span>, <span class="st">"INR"</span>, <span class="st">"INR"</span><span class="op">)</span>,</span>
 <span>  LBSTRESU <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g/L"</span>, <span class="cn">NA</span>, <span class="cn">NA</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">mutate</span><span class="op">(</span></span>
+<span>  PARAMCD <span class="op">=</span> <span class="fu"><a href="../reference/fputk.html">fputk</a></span><span class="op">(</span><span class="va">LBCAT</span>, <span class="va">LBSPEC</span>, <span class="va">LBTESTCD</span>, <span class="va">LBSTRESU</span>, format <span class="op">=</span> <span class="st">"lb_param"</span>, na_as_string <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">lab_df</span><span class="op">$</span><span class="va">PARAMCD</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fputk.html">fputk</a></span><span class="op">(</span></span>
-<span>  <span class="va">lab_df</span><span class="op">$</span><span class="va">LBCAT</span>,</span>
-<span>  <span class="va">lab_df</span><span class="op">$</span><span class="va">LBSPEC</span>,</span>
-<span>  <span class="va">lab_df</span><span class="op">$</span><span class="va">LBTESTCD</span>,</span>
-<span>  <span class="va">lab_df</span><span class="op">$</span><span class="va">LBSTRESU</span>,</span>
-<span>  format <span class="op">=</span> <span class="st">"lb_param"</span>,</span>
-<span>  na_as_string <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span>
 <span><span class="va">lab_df</span></span></code></pre></div>
 </div>
 <p>The same pattern is useful for:</p>
@@ -179,12 +175,13 @@
 <span>  name <span class="op">=</span> <span class="st">"trt_code_inv"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">trt_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span><span class="va">trt_df</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span></span>
 <span>  ARMN <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PLACEBO"</span>, <span class="st">"DRUG A"</span>, <span class="st">"DRUG B"</span>, <span class="st">"UNKNOWN"</span><span class="op">)</span>,</span>
 <span>  TRTCD <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PBO"</span>, <span class="st">"A50"</span>, <span class="st">"B100"</span>, <span class="st">"X"</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">mutate</span><span class="op">(</span></span>
+<span>  TRTSEQ <span class="op">=</span> <span class="fu"><a href="../reference/finputk.html">finputk</a></span><span class="op">(</span><span class="va">ARMN</span>, <span class="va">TRTCD</span>, invalue_name <span class="op">=</span> <span class="st">"trt_code_inv"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">trt_df</span><span class="op">$</span><span class="va">TRTSEQ</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/finputk.html">finputk</a></span><span class="op">(</span><span class="va">trt_df</span><span class="op">$</span><span class="va">ARMN</span>, <span class="va">trt_df</span><span class="op">$</span><span class="va">TRTCD</span>, invalue_name <span class="op">=</span> <span class="st">"trt_code_inv"</span><span class="op">)</span></span>
 <span><span class="va">trt_df</span></span></code></pre></div>
 </div>
 <p>Typical uses include:</p>
@@ -201,15 +198,34 @@
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="st">"$%,.2f"</span>, type <span class="op">=</span> <span class="st">"numeric"</span>, name <span class="op">=</span> <span class="st">"currency"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="st">"%.1f%%"</span>, type <span class="op">=</span> <span class="st">"numeric"</span>, name <span class="op">=</span> <span class="st">"pct"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">summary_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span><span class="va">summary_df</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span></span>
 <span>  metric <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Cost"</span>, <span class="st">"Response rate"</span><span class="op">)</span>,</span>
 <span>  raw <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1234.56</span>, <span class="fl">0.153</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">mutate</span><span class="op">(</span></span>
+<span>  display <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/fputn.html">fputn</a></span><span class="op">(</span><span class="va">raw</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="st">"currency"</span><span class="op">)</span>, <span class="fu"><a href="../reference/fputn.html">fputn</a></span><span class="op">(</span><span class="va">raw</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">*</span> <span class="fl">100</span>, <span class="st">"pct"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">summary_df</span><span class="op">$</span><span class="va">display</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="../reference/fputn.html">fputn</a></span><span class="op">(</span><span class="va">summary_df</span><span class="op">$</span><span class="va">raw</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="st">"currency"</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/fputn.html">fputn</a></span><span class="op">(</span><span class="va">summary_df</span><span class="op">$</span><span class="va">raw</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">*</span> <span class="fl">100</span>, <span class="st">"pct"</span><span class="op">)</span></span>
+<span><span class="va">summary_df</span></span></code></pre></div>
+</div>
+<p>Same result could be achieved using expression labels, but in base R, <code><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf()</a></code> itself does not support thousands separators such as commas. We can use <code>formatC</code> for the formatting purposes. <strong>Pattern-driven formatter</strong> looks simplier for such case.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">stat_fmt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span></span>
+<span>  <span class="co">#"currency"   = "sprintf('$%,.2f', .x1)", # Will not work!</span></span>
+<span>  <span class="st">"currency"</span>   <span class="op">=</span> <span class="st">"formatC(.x1, digits = 2, big.mark = ',', format = 'f', decimal.mark = '.')"</span>,</span>
+<span>  <span class="st">"pct"</span> <span class="op">=</span> <span class="st">"sprintf('%.1f%%', .x1 * 100)"</span>,</span>
+<span>  name <span class="op">=</span> <span class="st">"stat"</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"character"</span></span>
 <span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">summary_df</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span></span>
+<span>  metric <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Cost"</span>, <span class="st">"Response rate"</span><span class="op">)</span>,</span>
+<span>  raw <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1234.56</span>, <span class="fl">0.153</span><span class="op">)</span>,</span>
+<span>  format <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"currency"</span>,<span class="st">"pct"</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">mutate</span><span class="op">(</span></span>
+<span>  display <span class="op">=</span> <span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="va">format</span>, <span class="va">stat_fmt</span>, <span class="va">raw</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
 <span><span class="va">summary_df</span></span></code></pre></div>
 </div>
 <p>This is useful for:</p>
@@ -222,7 +238,7 @@
 </h2>
 <p>Clinical teams often work with periods such as screening, treatment, follow-up, and analysis cut-offs. <code>date_range</code> and <code>datetime_range</code> let you keep those rules in one place instead of duplicating them in ad hoc code.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
 <span><span class="st">VALUE study_period (date_range)</span></span>
 <span><span class="st">  [2024-01-01, 2024-02-01) = "Screening"</span></span>
@@ -233,7 +249,7 @@
 <span><span class="st">'</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">obs_dates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2024-01-15"</span>, <span class="st">"2024-03-10"</span>, <span class="st">"2024-07-01"</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span><span class="fu">tibble</span><span class="op">(</span></span>
 <span>  date <span class="op">=</span> <span class="va">obs_dates</span>,</span>
 <span>  period <span class="op">=</span> <span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="va">obs_dates</span>, <span class="st">"study_period"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -243,7 +259,7 @@
 </h2>
 <p>Expression labels make <code>ksformat</code> useful for building small text fragments in reports. In clinical settings, that can be handy for reviewer comments, summary phrases, or footnotes.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span></span>
 <span>  <span class="st">"high"</span> <span class="op">=</span> <span class="st">"sprintf('Above threshold: %s', .x1)"</span>,</span>
 <span>  <span class="st">"low"</span> <span class="op">=</span> <span class="st">"sprintf('Below threshold: %s', .x1)"</span>,</span>
@@ -275,13 +291,14 @@
 <li>use <code>VALUE</code> for forward lookup formats</li>
 <li>use <code>INVALUE</code> for reverse lookup formats</li>
 <li>use <code>pattern = ...</code> only for date/time/datetime formats</li>
+<li>use <code>pattern: ...</code> in the VALUE header for numeric display patterns</li>
 <li>use interval syntax for numeric, date, datetime, and stratified ranges</li>
 </ul>
 <section class="level2" data-number="9.1"><h3 data-number="9.1" id="value-blocks-for-discrete-lookup">
 <span class="header-section-number">9.1</span> VALUE blocks for discrete lookup<a class="anchor" aria-label="anchor" href="#value-blocks-for-discrete-lookup"></a>
 </h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
 <span><span class="st">VALUE sex (character)</span></span>
 <span><span class="st">  "M" = "Male"</span></span>
@@ -301,7 +318,7 @@
 <span class="header-section-number">9.2</span> INVALUE blocks for reverse lookup<a class="anchor" aria-label="anchor" href="#invalue-blocks-for-reverse-lookup"></a>
 </h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
 <span><span class="st">INVALUE sex_inv</span></span>
 <span><span class="st">  "Male" = "M"</span></span>
@@ -315,7 +332,7 @@
 </h3>
 <p>This is the direct <code><a href="../reference/fparse.html">fparse()</a></code> equivalent of <code><a href="../reference/fnew_date.html">fnew_date()</a></code>. For these blocks, <code>pattern = ...</code> is the right way to specify the display format.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
 <span><span class="st">VALUE enrldt (date)</span></span>
 <span><span class="st">  pattern = "DATE9."</span></span>
@@ -331,12 +348,33 @@
 <span><span class="st">;</span></span>
 <span><span class="st">'</span><span class="op">)</span></span></code></pre></div>
 </div>
-</section><section class="level2" data-number="9.4"><h3 data-number="9.4" id="range-formats">
-<span class="header-section-number">9.4</span> Range formats<a class="anchor" aria-label="anchor" href="#range-formats"></a>
+</section><section class="level2" data-number="9.4"><h3 data-number="9.4" id="numeric-display-patterns">
+<span class="header-section-number">9.4</span> Numeric display patterns<a class="anchor" aria-label="anchor" href="#numeric-display-patterns"></a>
+</h3>
+<p>Numeric display formatting now has its own parser syntax. Put the pattern in the VALUE header and keep the block otherwise empty except for optional <code>.missing</code> / <code>.other</code> directives.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
+<span><span class="st">VALUE currency (numeric, pattern: "$%,.2f")</span></span>
+<span><span class="st">  .missing = "NO DATA"</span></span>
+<span><span class="st">;</span></span>
+<span><span class="st"></span></span>
+<span><span class="st">VALUE pct (numeric, pattern: "%.1f%%")</span></span>
+<span><span class="st">;</span></span>
+<span><span class="st">'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">tibble</span><span class="op">(</span></span>
+<span>  raw <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1234.56</span>, <span class="op">-</span><span class="fl">7890.12</span>, <span class="fl">0</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
+<span>  currency <span class="op">=</span> <span class="fu"><a href="../reference/fputn.html">fputn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1234.56</span>, <span class="op">-</span><span class="fl">7890.12</span>, <span class="fl">0</span>, <span class="cn">NA</span><span class="op">)</span>, <span class="st">"currency"</span><span class="op">)</span>,</span>
+<span>  pct <span class="op">=</span> <span class="fu"><a href="../reference/fputn.html">fputn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">12.3</span>, <span class="op">-</span><span class="fl">4.5</span>, <span class="cn">NA</span><span class="op">)</span>, <span class="st">"pct"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+</section><section class="level2" data-number="9.5"><h3 data-number="9.5" id="range-formats">
+<span class="header-section-number">9.5</span> Range formats<a class="anchor" aria-label="anchor" href="#range-formats"></a>
 </h3>
 <p>Range formats are expressed with interval notation. The same syntax works for numeric, <code>date_range</code>, and <code>datetime_range</code> blocks.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
 <span><span class="st">VALUE study_period (date_range)</span></span>
 <span><span class="st">  [2024-01-01, 2024-02-01) = "Screening"</span></span>
@@ -351,12 +389,12 @@
 <span><span class="st">;</span></span>
 <span><span class="st">'</span><span class="op">)</span></span></code></pre></div>
 </div>
-</section><section class="level2" data-number="9.5"><h3 data-number="9.5" id="stratified-range-formats">
-<span class="header-section-number">9.5</span> Stratified range formats<a class="anchor" aria-label="anchor" href="#stratified-range-formats"></a>
+</section><section class="level2" data-number="9.6"><h3 data-number="9.6" id="stratified-range-formats">
+<span class="header-section-number">9.6</span> Stratified range formats<a class="anchor" aria-label="anchor" href="#stratified-range-formats"></a>
 </h3>
 <p><code>stratified_range</code> combines a stratum with an inner range. The parser accepts the friendly <code>STRATUM|[low, high)</code> form.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
 <span><span class="st">VALUE visit_window (stratified_range, range_subtype: numeric)</span></span>
 <span><span class="st">  "ARM_A"|[0, 7)     = "Baseline"</span></span>
@@ -366,16 +404,21 @@
 <span><span class="st">;</span></span>
 <span><span class="st">'</span><span class="op">)</span></span></code></pre></div>
 </div>
-</section><section class="level2" data-number="9.6"><h3 data-number="9.6" id="what-about-numeric-display-patterns">
-<span class="header-section-number">9.6</span> What about numeric display patterns?<a class="anchor" aria-label="anchor" href="#what-about-numeric-display-patterns"></a>
+</section><section class="level2" data-number="9.7"><h3 data-number="9.7" id="when-to-use-fnew-anyway">
+<span class="header-section-number">9.7</span> When to use <code>fnew()</code> anyway<a class="anchor" aria-label="anchor" href="#when-to-use-fnew-anyway"></a>
 </h3>
-<p>The numeric pattern form of <code><a href="../reference/fnew.html">fnew()</a></code> is still a direct constructor feature. There is no dedicated <code><a href="../reference/fparse.html">fparse()</a></code> syntax for a display pattern such as <code>fnew("$%,.2f", type = "numeric")</code> yet. If you need a textual definition for a numeric lookup, use a standard <code>VALUE</code> block; if you need a formatted numeric display, keep using <code><a href="../reference/fnew.html">fnew()</a></code>.</p>
+<p><code><a href="../reference/fnew.html">fnew()</a></code> remains the most concise way to create a report-formatting object when you already know you want a display pattern. <code><a href="../reference/fparse.html">fparse()</a></code> is useful when the rule needs to be stored as text, versioned in a spec, or generated from another tool.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="st">"$%,.2f"</span>, type <span class="op">=</span> <span class="st">"numeric"</span>, name <span class="op">=</span> <span class="st">"currency_direct"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fputn.html">fputn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1234.56</span>, <span class="op">-</span><span class="fl">7890.12</span>, <span class="fl">0</span><span class="op">)</span>, <span class="st">"currency_direct"</span><span class="op">)</span></span></code></pre></div>
+</div>
 </section></section><section class="section level2" data-number="10"><h2 data-number="10" id="conclusion">
 <span class="header-section-number">10</span> Conclusion<a class="anchor" aria-label="anchor" href="#conclusion"></a>
 </h2>
 <p><code>ksformat</code> is not limited to simple code-to-label dictionaries. In clinical trials it can also serve as a compact rule engine for visit windows, composite keys, reverse mappings, report formatting, and small narrative fragments. That makes it useful anywhere repeated conditional logic would otherwise be spread across scripts, spreadsheets, or one-off helper functions.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 </section><script id="quarto-html-after-body" type="application/javascript">

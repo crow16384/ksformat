@@ -3299,6 +3299,20 @@ test_that("fparse creates logical format from text", {
   fclear()
 })
 
+test_that("fparse creates numeric pattern format from text", {
+  fparse(text = '
+  VALUE currency (numeric, pattern: "$%,.2f")
+    .missing = "NO DATA"
+  ;
+  ')
+  fmt <- format_get("currency")
+  expect_equal(fmt$type, "numeric")
+  expect_equal(fmt$num_pattern, "$%,.2f")
+  expect_identical(fputn(c(1234.56, -7890.12, 0, NA), "currency"),
+                   c("$1,234.56", "-$7,890.12", "$0.00", "NO DATA"))
+  fclear()
+})
+
 # --- fexport roundtrip with value types ---
 
 test_that("fexport/fparse roundtrip for Date format", {

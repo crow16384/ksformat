@@ -1,5 +1,5 @@
 ---
-title: "Non-standard Applications of ksformat for Clinical Trials and Other Tasks"
+title: "Non-standard Applications of `ksformat` for Clinical Trials and Other Tasks"
 format:
   html:
     toc: true
@@ -13,11 +13,13 @@ execute:
 #| include: false
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(ksformat)
+library(tidyr)
+library(dplyr, warn.conflicts = FALSE)
 ```
 
 # Overview
 
-`ksformat` is usually described as a SAS PROC FORMAT-like tool for ordinary
+`ksformat` is usually described as a **SAS PROC FORMAT-like tool** for ordinary
 value-to-label lookup. In practice, the package is useful in places where a
 clinical trial workflow needs more than a plain dictionary:
 
@@ -53,11 +55,13 @@ fnew(
   .other = "Outside window"
 )
 
-visit_df <- data.frame(
+visit_df <- tibble(
   arm = c("ARM_A", "ARM_A", "ARM_B", "ARM_B", "ARM_C"),
   day = c(3, 35, 5, 40, 10)
+) |> mutate(
+  window = fputk(arm, day, format = "visit_window"),
 )
-visit_df$window <- fputk(visit_df$arm, visit_df$day, format = "visit_window")
+
 visit_df
 ```
 
@@ -92,21 +96,15 @@ fnew(
   .other = NA
 )
 
-lab_df <- data.frame(
+lab_df <- tibble(
   LBCAT = c("BLOOD CHEMISTRY", "COAGULOGRAM", "COAGULATION PANEL"),
   LBSPEC = c("BLOOD", "BLOOD", "BLOOD"),
   LBTESTCD = c("ALB", "INR", "INR"),
   LBSTRESU = c("g/L", NA, NA)
+) |> mutate(
+  PARAMCD = fputk(LBCAT, LBSPEC, LBTESTCD, LBSTRESU, format = "lb_param", na_as_string = TRUE)
 )
 
-lab_df$PARAMCD <- fputk(
-  lab_df$LBCAT,
-  lab_df$LBSPEC,
-  lab_df$LBTESTCD,
-  lab_df$LBSTRESU,
-  format = "lb_param",
-  na_as_string = TRUE
-)
 lab_df
 ```
 
@@ -133,12 +131,13 @@ finput(
   name = "trt_code_inv"
 )
 
-trt_df <- data.frame(
+trt_df <- tibble(
   ARMN = c("PLACEBO", "DRUG A", "DRUG B", "UNKNOWN"),
   TRTCD = c("PBO", "A50", "B100", "X")
+) |> mutate(
+  TRTSEQ = finputk(ARMN, TRTCD, invalue_name = "trt_code_inv")
 )
 
-trt_df$TRTSEQ <- finputk(trt_df$ARMN, trt_df$TRTCD, invalue_name = "trt_code_inv")
 trt_df
 ```
 
@@ -158,17 +157,38 @@ presentation. This is not a lookup table; it is a pattern-driven formatter.
 fnew("$%,.2f", type = "numeric", name = "currency")
 fnew("%.1f%%", type = "numeric", name = "pct")
 
-summary_df <- data.frame(
+summary_df <- tibble(
   metric = c("Cost", "Response rate"),
   raw = c(1234.56, 0.153)
+) |> mutate(
+  display = c(fputn(raw[1], "currency"), fputn(raw[2] * 100, "pct"))
 )
 
-summary_df$display <- c(
-  fputn(summary_df$raw[1], "currency"),
-  fputn(summary_df$raw[2] * 100, "pct")
-)
 summary_df
 ```
+
+Same result could be achieved using expression labels, but in base R, `sprintf()` itself does not support thousands separators such as commas. We can use `formatC` for the formatting purposes. **Pattern-driven formatter** looks simplier for such case.
+
+```{r}
+stat_fmt <- fnew(
+  #"currency"   = "sprintf('$%,.2f', .x1)", # Will not work!
+  "currency"   = "formatC(.x1, digits = 2, big.mark = ',', format = 'f', decimal.mark = '.')",
+  "pct" = "sprintf('%.1f%%', .x1 * 100)",
+  name = "stat",
+  type = "character"
+)
+
+summary_df <- tibble(
+  metric = c("Cost", "Response rate"),
+  raw = c(1234.56, 0.153),
+  format = c("currency","pct")
+) |> mutate(
+  display = fput(format, stat_fmt, raw)
+)
+
+summary_df
+```
+
 
 This is useful for:
 
@@ -194,7 +214,7 @@ VALUE study_period (date_range)
 ')
 
 obs_dates <- as.Date(c("2024-01-15", "2024-03-10", "2024-07-01", NA))
-data.frame(
+tibble(
   date = obs_dates,
   period = fput(obs_dates, "study_period")
 )
@@ -242,6 +262,7 @@ same VALUE/INVALUE families as the package parser. The main idea is:
 - use `VALUE` for forward lookup formats
 - use `INVALUE` for reverse lookup formats
 - use `pattern = ...` only for date/time/datetime formats
+- use `pattern: ...` in the VALUE header for numeric display patterns
 - use interval syntax for numeric, date, datetime, and stratified ranges
 
 ## VALUE blocks for discrete lookup
@@ -297,6 +318,29 @@ VALUE stamp (datetime)
 ')
 ```
 
+## Numeric display patterns
+
+Numeric display formatting now has its own parser syntax. Put the pattern in
+the VALUE header and keep the block otherwise empty except for optional
+`.missing` / `.other` directives.
+
+```{r}
+fparse(text = '
+VALUE currency (numeric, pattern: "$%,.2f")
+  .missing = "NO DATA"
+;
+
+VALUE pct (numeric, pattern: "%.1f%%")
+;
+')
+
+tibble(
+  raw = c(1234.56, -7890.12, 0, NA),
+  currency = fputn(c(1234.56, -7890.12, 0, NA), "currency"),
+  pct = fputn(c(0, 12.3, -4.5, NA), "pct")
+)
+```
+
 ## Range formats
 
 Range formats are expressed with interval notation. The same syntax works for
@@ -334,13 +378,17 @@ VALUE visit_window (stratified_range, range_subtype: numeric)
 ')
 ```
 
-## What about numeric display patterns?
+## When to use `fnew()` anyway
 
-The numeric pattern form of `fnew()` is still a direct constructor feature.
-There is no dedicated `fparse()` syntax for a display pattern such as
-`fnew("$%,.2f", type = "numeric")` yet. If you need a textual definition
-for a numeric lookup, use a standard `VALUE` block; if you need a formatted
-numeric display, keep using `fnew()`.
+`fnew()` remains the most concise way to create a report-formatting object when
+you already know you want a display pattern. `fparse()` is useful when the rule
+needs to be stored as text, versioned in a spec, or generated from another
+tool.
+
+```{r}
+fnew("$%,.2f", type = "numeric", name = "currency_direct")
+fputn(c(1234.56, -7890.12, 0), "currency_direct")
+```
 
 # Conclusion
 

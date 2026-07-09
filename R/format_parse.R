@@ -26,6 +26,7 @@
 #'   "value2" = "Label 2"
 #'   [low, high) = "Range Label (half-open)"
 #'   (low, high] = "Range Label (open-low, closed-high)"
+#'   pattern = "..."  # date/time/datetime patterns, or numeric display patterns
 #'   .missing = "Missing Label"
 #'   .other = "Other Label"
 #' ;
@@ -44,6 +45,8 @@
 #'   \item Blocks start with \code{VALUE} or \code{INVALUE} keyword and end with \code{;}
 #'   \item The type in parentheses is optional; defaults to \code{"auto"} for VALUE,
 #'         \code{"numeric"} for INVALUE
+#'   \\item Use \code{pattern = "..."} for date/time/datetime display patterns
+#'         and \code{pattern: "..."} in the block header for numeric display patterns
 #'   \item Values can be quoted or unquoted
 #'   \item Ranges use interval notation with explicit bounds
 #'   \item Legacy range syntax \code{low - high} is also supported
@@ -114,6 +117,15 @@
 #' fput(as.Date("2025-03-01"), "enrldt")
 #' fput(36000, "visit_time")
 #' fput(as.POSIXct("2025-03-01 10:00:00", tz = "UTC"), "stamp")
+#' fclear()
+#'
+#' # Numeric display pattern format
+#' fparse(text = '
+#' VALUE currency (numeric, pattern: "$%,.2f")
+#'   .missing = "NO DATA"
+#' ;
+#' ')
+#' fputn(c(1234.56, -7890.12, NA), "currency")
 #' fclear()
 #'
 #' # Case-insensitive format (nocase option)
@@ -305,6 +317,31 @@ fparse <- function(text = NULL, file = NULL, verbose = FALSE) {
         if (block_subtype == "") block_subtype <- "auto"
       }
 
+      # Parse pattern: option for numeric display formats
+      block_num_pattern <- NULL
+      pattern_match <- regmatches(block_subtype, regexec(
+        "pattern:\\s*(?:\"([^\"]*)\"|'([^']*)'|([^,)]+))",
+        block_subtype, ignore.case = TRUE, perl = TRUE
+      ))[[1]]
+      if (length(pattern_match) >= 2 && pattern_match[1] != "") {
+        block_num_pattern <- if (length(pattern_match) >= 2 && nzchar(pattern_match[2])) {
+          pattern_match[2]
+        } else if (length(pattern_match) >= 3 && nzchar(pattern_match[3])) {
+          pattern_match[3]
+        } else {
+          pattern_match[4]
+        }
+        block_subtype <- gsub(
+          ",?\\s*pattern:\\s*(?:\"[^\"]*\"|'[^']*'|[^,)]+)",
+          "",
+          block_subtype,
+          ignore.case = TRUE,
+          perl = TRUE
+        )
+        block_subtype <- trimws(block_subtype)
+        if (block_subtype == "") block_subtype <- if (block_type == "INVALUE") "numeric" else "auto"
+      }
+
       current_block <- list(
         type = block_type,
         name = block_name,
@@ -312,6 +349,7 @@ fparse <- function(text = NULL, file = NULL, verbose = FALSE) {
         multilabel = block_multilabel,
         nocase = block_nocase,
         date_format = block_date_format,
+        num_pattern = block_num_pattern,
         range_subtype = block_range_subtype,
         strata_sep = block_strata_sep,
         entries = list(),
@@ -550,6 +588,14 @@ fparse <- function(text = NULL, file = NULL, verbose = FALSE) {
     return(.block_to_stratified_range_format(block))
   }
 
+  # Numeric display pattern formats: VALUE name (numeric, pattern: "...")
+  if (tolower(block$subtype) %in% c("auto", "numeric") &&
+      (!is.null(block$num_pattern) || any(vapply(block$entries, function(e) {
+        identical(e$type, "discrete") && tolower(e$key) == "pattern"
+      }, logical(1L)))) ) {
+    return(.block_to_numeric_pattern_format(block))
+  }
+
   mappings <- list()
   missing_label <- NULL
   other_label <- NULL
@@ -614,6 +660,67 @@ fparse <- function(text = NULL, file = NULL, verbose = FALSE) {
                                                format_obj$date_format)
 
   return(format_obj)
+}
+
+
+#' Convert VALUE block with numeric display pattern to ks_format
+#' @keywords internal
+#' @noRd
+.block_to_numeric_pattern_format <- function(block) {
+  pattern <- block$num_pattern
+  missing_label <- NULL
+  other_label <- NULL
+
+  pattern_entry <- NULL
+  other_entries <- 0L
+
+  for (entry in block$entries) {
+    if (entry$type == "missing") {
+      missing_label <- entry$value
+    } else if (entry$type == "other") {
+      other_label <- entry$value
+    } else if (entry$type == "discrete" && tolower(entry$key) == "pattern") {
+      pattern_entry <- entry$label
+    } else if (entry$type %in% c("discrete", "range")) {
+      other_entries <- other_entries + 1L
+    }
+  }
+
+  if (is.null(pattern) && !is.null(pattern_entry)) {
+    pattern <- pattern_entry
+  }
+
+  if (is.null(pattern)) {
+    cli_abort(c(
+      "Numeric pattern format {.val {block$name}} must define a {.val pattern}.",
+      "i" = 'Use {.val pattern: "$%,.2f"} inside the block header or {.val pattern = "$%,.2f"} inside the block body.'
+    ))
+  }
+
+  if (!is.null(block$num_pattern) && !is.null(pattern_entry) &&
+      !identical(block$num_pattern, pattern_entry)) {
+    cli_abort(c(
+      "Conflicting numeric patterns were provided for {.val {block$name}}.",
+      "i" = "Keep only one pattern source in the block."
+    ))
+  }
+
+  if (other_entries > 0L) {
+    cli_abort(c(
+      "Numeric pattern formats cannot mix a pattern with explicit mappings.",
+      "i" = "Keep only {.val .missing} / {.val .other} directives in the block."
+    ))
+  }
+
+  fmt <- fnew(
+    pattern,
+    name = block$name,
+    type = "numeric",
+    .missing = missing_label,
+    .other = other_label
+  )
+
+  return(fmt)
 }
 
 

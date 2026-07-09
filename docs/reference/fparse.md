@@ -45,6 +45,7 @@ The syntax supports two block types:
       "value2" = "Label 2"
       [low, high) = "Range Label (half-open)"
       (low, high] = "Range Label (open-low, closed-high)"
+      pattern = "..."  # date/time/datetime patterns, or numeric display patterns
       .missing = "Missing Label"
       .other = "Other Label"
     ;
@@ -61,7 +62,9 @@ The syntax supports two block types:
 - Blocks start with `VALUE` or `INVALUE` keyword and end with `;`
 
 - The type in parentheses is optional; defaults to `"auto"` for VALUE,
-  `"numeric"` for INVALUE
+  `"numeric"` for INVALUE \item Use `pattern = "..."` for
+  date/time/datetime display patterns and `pattern: "..."` in the block
+  header for numeric display patterns
 
 - Values can be quoted or unquoted
 
@@ -152,6 +155,17 @@ fput(36000, "visit_time")
 #> [1] "10:00:00"
 fput(as.POSIXct("2025-03-01 10:00:00", tz = "UTC"), "stamp")
 #> [1] "01MAR2025:10:00:00"
+fclear()
+#> All formats cleared from library.
+
+# Numeric display pattern format
+fparse(text = '
+VALUE currency (numeric, pattern: "$%,.2f")
+  .missing = "NO DATA"
+;
+')
+fputn(c(1234.56, -7890.12, NA), "currency")
+#> [1] "$1,234.56"  "-$7,890.12" "NO DATA"   
 fclear()
 #> All formats cleared from library.
 

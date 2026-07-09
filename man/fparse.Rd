@@ -37,6 +37,7 @@ VALUE name (type)
   "value2" = "Label 2"
   [low, high) = "Range Label (half-open)"
   (low, high] = "Range Label (open-low, closed-high)"
+  pattern = "..."  # date/time/datetime patterns, or numeric display patterns
   .missing = "Missing Label"
   .other = "Other Label"
 ;
@@ -55,6 +56,8 @@ INVALUE name
   \item Blocks start with \code{VALUE} or \code{INVALUE} keyword and end with \code{;}
   \item The type in parentheses is optional; defaults to \code{"auto"} for VALUE,
         \code{"numeric"} for INVALUE
+  \\item Use \code{pattern = "..."} for date/time/datetime display patterns
+        and \code{pattern: "..."} in the block header for numeric display patterns
   \item Values can be quoted or unquoted
   \item Ranges use interval notation with explicit bounds
   \item Legacy range syntax \code{low - high} is also supported
@@ -124,6 +127,15 @@ VALUE stamp (datetime)
 fput(as.Date("2025-03-01"), "enrldt")
 fput(36000, "visit_time")
 fput(as.POSIXct("2025-03-01 10:00:00", tz = "UTC"), "stamp")
+fclear()
+
+# Numeric display pattern format
+fparse(text = '
+VALUE currency (numeric, pattern: "$\%,.2f")
+  .missing = "NO DATA"
+;
+')
+fputn(c(1234.56, -7890.12, NA), "currency")
 fclear()
 
 # Case-insensitive format (nocase option)

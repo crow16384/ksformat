@@ -332,6 +332,6 @@ GPL-3. See <https://www.gnu.org/licenses/gpl-3.0.html>.
 
 ### All vignettes
 
-- [Non-standard Applications of ksformat for Clinical Trials and Other
-  Tasks](nonstandard-applications.md):
+- [Non-standard Applications of \`ksformat\` for Clinical Trials and
+  Other Tasks](nonstandard-applications.md):
 - [ksformat Usage Examples](usage_examples.md):

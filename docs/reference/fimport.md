@@ -83,7 +83,7 @@ imported <- fimport(csv_file)
 #> Warning: Skipped incompatible entry in format "SMISSING":
 #> ✖ SAS special missing value '.B' (HLO='S') has no R equivalent.
 #> ✔ Imported 4 formats and 1 invalue from
-#>   /private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmp9LlFRT/temp_libpathe7bf16b1e45a/ksformat/extdata/test_cntlout.csv.
+#>   /private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpLTJGZ4/temp_libpathf0d97beed76a/ksformat/extdata/test_cntlout.csv.
 flist()
 #> [1] "AGEGRP"   "BMICAT"   "GENDER"   "RACEIN"   "SMISSING"
 fprint()
