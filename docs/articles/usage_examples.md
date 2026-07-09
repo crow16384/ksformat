@@ -415,8 +415,8 @@ data.frame(
   )
 )
 #>        format             result
-#> 1 DATETIME20. 09JUL2026:13:24:44
-#> 2 DATETIME13.      09JUL26:13:24
+#> 1 DATETIME20. 09JUL2026:13:58:59
+#> 2 DATETIME13.      09JUL26:13:58
 #> 3     DTDATE.          09JUL2026
 #> 4   DTYYMMDD.         2026-07-09
 
@@ -1001,7 +1001,7 @@ imported <- fimport(csv_path)
 #> Warning: Skipped incompatible entry in format "SMISSING":
 #> ✖ SAS special missing value '.B' (HLO='S') has no R equivalent.
 #> ✔ Imported 4 formats and 1 invalue from
-#>   /private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmppXdY8X/temp_libpathe375453e87ab/ksformat/extdata/test_cntlout.csv.
+#>   /private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmp9LlFRT/temp_libpathe7bf16b1e45a/ksformat/extdata/test_cntlout.csv.
 names(imported)
 #> [1] "AGEGRP"   "BMICAT"   "GENDER"   "RACEIN"   "SMISSING"
 
@@ -1134,7 +1134,7 @@ manual <- fimport(csv_path, register = FALSE)
 #> Warning: Skipped incompatible entry in format "SMISSING":
 #> ✖ SAS special missing value '.B' (HLO='S') has no R equivalent.
 #> ✔ Imported 4 formats and 1 invalue from
-#>   /private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmppXdY8X/temp_libpathe375453e87ab/ksformat/extdata/test_cntlout.csv.
+#>   /private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmp9LlFRT/temp_libpathe7bf16b1e45a/ksformat/extdata/test_cntlout.csv.
 
 # Library should be empty
 flist()

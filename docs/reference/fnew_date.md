@@ -120,7 +120,7 @@ fputn(c(0, 3600, 45000), "HHMM.")
 # Datetime formatting
 now <- Sys.time()
 fputn(now, "DATETIME20.")
-#> [1] "09JUL2026:13:24:38"
+#> [1] "09JUL2026:13:58:52"
 fputn(now, "DTDATE.")
 #> [1] "09JUL2026"
 fputn(now, "DTYYMMDD.")

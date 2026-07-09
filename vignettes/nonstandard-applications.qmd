@@ -234,6 +234,114 @@ stable and owned by the analysis team. A few guardrails help:
 - use `na_as_string = TRUE` only when the key was built with literal `"NA"`
   components from `paste()`
 
+# 8. `fparse()` syntax for all format families
+
+If you want to express `fnew()`-style rules as text, `fparse()` supports the
+same VALUE/INVALUE families as the package parser. The main idea is:
+
+- use `VALUE` for forward lookup formats
+- use `INVALUE` for reverse lookup formats
+- use `pattern = ...` only for date/time/datetime formats
+- use interval syntax for numeric, date, datetime, and stratified ranges
+
+## VALUE blocks for discrete lookup
+
+```{r}
+fparse(text = '
+VALUE sex (character)
+  "M" = "Male"
+  "F" = "Female"
+  .missing = "Unknown"
+  .other = "Other"
+;
+
+VALUE age_group (numeric)
+  [0, 18)    = "Child"
+  [18, 65)   = "Adult"
+  [65, HIGH] = "Senior"
+;
+')
+```
+
+## INVALUE blocks for reverse lookup
+
+```{r}
+fparse(text = '
+INVALUE sex_inv
+  "Male" = "M"
+  "Female" = "F"
+  .missing = "U"
+;
+')
+```
+
+## Date, time, and datetime patterns
+
+This is the direct `fparse()` equivalent of `fnew_date()`. For these blocks,
+`pattern = ...` is the right way to specify the display format.
+
+```{r}
+fparse(text = '
+VALUE enrldt (date)
+  pattern = "DATE9."
+  .missing = "Not Enrolled"
+;
+
+VALUE visit_time (time)
+  pattern = "TIME8."
+;
+
+VALUE stamp (datetime)
+  pattern = "DATETIME20."
+;
+')
+```
+
+## Range formats
+
+Range formats are expressed with interval notation. The same syntax works for
+numeric, `date_range`, and `datetime_range` blocks.
+
+```{r}
+fparse(text = '
+VALUE study_period (date_range)
+  [2024-01-01, 2024-02-01) = "Screening"
+  [2024-02-01, 2024-06-01) = "Treatment"
+  [2024-06-01, HIGH]       = "Follow-up"
+;
+
+VALUE shift (datetime_range)
+  [2024-01-15 00:00, 2024-01-15 08:00) = "Night"
+  [2024-01-15 08:00, 2024-01-15 16:00) = "Day"
+  [2024-01-15 16:00, 2024-01-16 00:00) = "Evening"
+;
+')
+```
+
+## Stratified range formats
+
+`stratified_range` combines a stratum with an inner range. The parser accepts
+the friendly `STRATUM|[low, high)` form.
+
+```{r}
+fparse(text = '
+VALUE visit_window (stratified_range, range_subtype: numeric)
+  "ARM_A"|[0, 7)     = "Baseline"
+  "ARM_A"|[7, 28)    = "Wk1-3"
+  "ARM_B"|[0, 14)    = "Baseline"
+  .other              = "Outside"
+;
+')
+```
+
+## What about numeric display patterns?
+
+The numeric pattern form of `fnew()` is still a direct constructor feature.
+There is no dedicated `fparse()` syntax for a display pattern such as
+`fnew("$%,.2f", type = "numeric")` yet. If you need a textual definition
+for a numeric lookup, use a standard `VALUE` block; if you need a formatted
+numeric display, keep using `fnew()`.
+
 # Conclusion
 
 `ksformat` is not limited to simple code-to-label dictionaries. In clinical

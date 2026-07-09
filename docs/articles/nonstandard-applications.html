@@ -267,12 +267,115 @@
 <li>use <code><a href="../reference/fclear.html">fclear()</a></code> in examples and tests to avoid leaking state between steps</li>
 <li>use <code>na_as_string = TRUE</code> only when the key was built with literal <code>"NA"</code> components from <code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste()</a></code>
 </li>
-</ul></section><section class="section level2" data-number="9"><h2 data-number="9" id="conclusion">
-<span class="header-section-number">9</span> Conclusion<a class="anchor" aria-label="anchor" href="#conclusion"></a>
+</ul></section><section class="section level2" data-number="9"><h2 data-number="9" id="fparse-syntax-for-all-format-families">
+<span class="header-section-number">9</span> 8. <code>fparse()</code> syntax for all format families<a class="anchor" aria-label="anchor" href="#fparse-syntax-for-all-format-families"></a>
+</h2>
+<p>If you want to express <code><a href="../reference/fnew.html">fnew()</a></code>-style rules as text, <code><a href="../reference/fparse.html">fparse()</a></code> supports the same VALUE/INVALUE families as the package parser. The main idea is:</p>
+<ul>
+<li>use <code>VALUE</code> for forward lookup formats</li>
+<li>use <code>INVALUE</code> for reverse lookup formats</li>
+<li>use <code>pattern = ...</code> only for date/time/datetime formats</li>
+<li>use interval syntax for numeric, date, datetime, and stratified ranges</li>
+</ul>
+<section class="level2" data-number="9.1"><h3 data-number="9.1" id="value-blocks-for-discrete-lookup">
+<span class="header-section-number">9.1</span> VALUE blocks for discrete lookup<a class="anchor" aria-label="anchor" href="#value-blocks-for-discrete-lookup"></a>
+</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
+<span><span class="st">VALUE sex (character)</span></span>
+<span><span class="st">  "M" = "Male"</span></span>
+<span><span class="st">  "F" = "Female"</span></span>
+<span><span class="st">  .missing = "Unknown"</span></span>
+<span><span class="st">  .other = "Other"</span></span>
+<span><span class="st">;</span></span>
+<span><span class="st"></span></span>
+<span><span class="st">VALUE age_group (numeric)</span></span>
+<span><span class="st">  [0, 18)    = "Child"</span></span>
+<span><span class="st">  [18, 65)   = "Adult"</span></span>
+<span><span class="st">  [65, HIGH] = "Senior"</span></span>
+<span><span class="st">;</span></span>
+<span><span class="st">'</span><span class="op">)</span></span></code></pre></div>
+</div>
+</section><section class="level2" data-number="9.2"><h3 data-number="9.2" id="invalue-blocks-for-reverse-lookup">
+<span class="header-section-number">9.2</span> INVALUE blocks for reverse lookup<a class="anchor" aria-label="anchor" href="#invalue-blocks-for-reverse-lookup"></a>
+</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
+<span><span class="st">INVALUE sex_inv</span></span>
+<span><span class="st">  "Male" = "M"</span></span>
+<span><span class="st">  "Female" = "F"</span></span>
+<span><span class="st">  .missing = "U"</span></span>
+<span><span class="st">;</span></span>
+<span><span class="st">'</span><span class="op">)</span></span></code></pre></div>
+</div>
+</section><section class="level2" data-number="9.3"><h3 data-number="9.3" id="date-time-and-datetime-patterns">
+<span class="header-section-number">9.3</span> Date, time, and datetime patterns<a class="anchor" aria-label="anchor" href="#date-time-and-datetime-patterns"></a>
+</h3>
+<p>This is the direct <code><a href="../reference/fparse.html">fparse()</a></code> equivalent of <code><a href="../reference/fnew_date.html">fnew_date()</a></code>. For these blocks, <code>pattern = ...</code> is the right way to specify the display format.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
+<span><span class="st">VALUE enrldt (date)</span></span>
+<span><span class="st">  pattern = "DATE9."</span></span>
+<span><span class="st">  .missing = "Not Enrolled"</span></span>
+<span><span class="st">;</span></span>
+<span><span class="st"></span></span>
+<span><span class="st">VALUE visit_time (time)</span></span>
+<span><span class="st">  pattern = "TIME8."</span></span>
+<span><span class="st">;</span></span>
+<span><span class="st"></span></span>
+<span><span class="st">VALUE stamp (datetime)</span></span>
+<span><span class="st">  pattern = "DATETIME20."</span></span>
+<span><span class="st">;</span></span>
+<span><span class="st">'</span><span class="op">)</span></span></code></pre></div>
+</div>
+</section><section class="level2" data-number="9.4"><h3 data-number="9.4" id="range-formats">
+<span class="header-section-number">9.4</span> Range formats<a class="anchor" aria-label="anchor" href="#range-formats"></a>
+</h3>
+<p>Range formats are expressed with interval notation. The same syntax works for numeric, <code>date_range</code>, and <code>datetime_range</code> blocks.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
+<span><span class="st">VALUE study_period (date_range)</span></span>
+<span><span class="st">  [2024-01-01, 2024-02-01) = "Screening"</span></span>
+<span><span class="st">  [2024-02-01, 2024-06-01) = "Treatment"</span></span>
+<span><span class="st">  [2024-06-01, HIGH]       = "Follow-up"</span></span>
+<span><span class="st">;</span></span>
+<span><span class="st"></span></span>
+<span><span class="st">VALUE shift (datetime_range)</span></span>
+<span><span class="st">  [2024-01-15 00:00, 2024-01-15 08:00) = "Night"</span></span>
+<span><span class="st">  [2024-01-15 08:00, 2024-01-15 16:00) = "Day"</span></span>
+<span><span class="st">  [2024-01-15 16:00, 2024-01-16 00:00) = "Evening"</span></span>
+<span><span class="st">;</span></span>
+<span><span class="st">'</span><span class="op">)</span></span></code></pre></div>
+</div>
+</section><section class="level2" data-number="9.5"><h3 data-number="9.5" id="stratified-range-formats">
+<span class="header-section-number">9.5</span> Stratified range formats<a class="anchor" aria-label="anchor" href="#stratified-range-formats"></a>
+</h3>
+<p><code>stratified_range</code> combines a stratum with an inner range. The parser accepts the friendly <code>STRATUM|[low, high)</code> form.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
+<span><span class="st">VALUE visit_window (stratified_range, range_subtype: numeric)</span></span>
+<span><span class="st">  "ARM_A"|[0, 7)     = "Baseline"</span></span>
+<span><span class="st">  "ARM_A"|[7, 28)    = "Wk1-3"</span></span>
+<span><span class="st">  "ARM_B"|[0, 14)    = "Baseline"</span></span>
+<span><span class="st">  .other              = "Outside"</span></span>
+<span><span class="st">;</span></span>
+<span><span class="st">'</span><span class="op">)</span></span></code></pre></div>
+</div>
+</section><section class="level2" data-number="9.6"><h3 data-number="9.6" id="what-about-numeric-display-patterns">
+<span class="header-section-number">9.6</span> What about numeric display patterns?<a class="anchor" aria-label="anchor" href="#what-about-numeric-display-patterns"></a>
+</h3>
+<p>The numeric pattern form of <code><a href="../reference/fnew.html">fnew()</a></code> is still a direct constructor feature. There is no dedicated <code><a href="../reference/fparse.html">fparse()</a></code> syntax for a display pattern such as <code>fnew("$%,.2f", type = "numeric")</code> yet. If you need a textual definition for a numeric lookup, use a standard <code>VALUE</code> block; if you need a formatted numeric display, keep using <code><a href="../reference/fnew.html">fnew()</a></code>.</p>
+</section></section><section class="section level2" data-number="10"><h2 data-number="10" id="conclusion">
+<span class="header-section-number">10</span> Conclusion<a class="anchor" aria-label="anchor" href="#conclusion"></a>
 </h2>
 <p><code>ksformat</code> is not limited to simple code-to-label dictionaries. In clinical trials it can also serve as a compact rule engine for visit windows, composite keys, reverse mappings, report formatting, and small narrative fragments. That makes it useful anywhere repeated conditional logic would otherwise be spread across scripts, spreadsheets, or one-off helper functions.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 </section><script id="quarto-html-after-body" type="application/javascript">
@@ -358,7 +461,8 @@
       }
     }
   });
-  </script></main>
+  </script></main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
