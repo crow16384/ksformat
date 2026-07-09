@@ -1,0 +1,248 @@
+---
+title: "Non-standard Applications of ksformat for Clinical Trials and Other Tasks"
+format:
+  html:
+    toc: true
+    number-sections: true
+execute:
+  enabled: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(ksformat)
+```
+
+# Overview
+
+`ksformat` is usually described as a SAS PROC FORMAT-like tool for ordinary
+value-to-label lookup. In practice, the package is useful in places where a
+clinical trial workflow needs more than a plain dictionary:
+
+- protocol-defined visit windows
+- subject- or arm-specific bucketing rules
+- composite keys built from multiple columns
+- reverse lookups for data cleaning and QC
+- report-ready numeric display for listings and summaries
+
+This article shows a few non-standard uses that come up in clinical trials and
+adjacent data tasks.
+
+# 1. Protocol windows and subject-specific buckets
+
+A common clinical-trials task is mapping visit-day values into protocol-defined
+windows. The same idea extends to arm-specific rules, where one stratum has a
+slightly different window structure from another.
+
+```{r}
+#| label: protocol-windows
+windows <- fmap_strata(
+  stratum = c("ARM_A", "ARM_A", "ARM_A", "ARM_B", "ARM_B"),
+  low     = c(0,        7,       28,      0,       14),
+  high    = c(7,        28,      Inf,     14,      Inf),
+  label   = c("Baseline", "Wk1-3", "Wk4+", "Baseline", "Wk2+"),
+  inc_high = c(FALSE, FALSE, TRUE, FALSE, TRUE)
+)
+
+fnew(
+  windows,
+  type = "stratified_range",
+  name = "visit_window",
+  .other = "Outside window"
+)
+
+visit_df <- data.frame(
+  arm = c("ARM_A", "ARM_A", "ARM_B", "ARM_B", "ARM_C"),
+  day = c(3, 35, 5, 40, 10)
+)
+visit_df$window <- fputk(visit_df$arm, visit_df$day, format = "visit_window")
+visit_df
+```
+
+This is useful for:
+
+- visit window derivation in ADaM outputs
+- protocol deviation checks
+- windowed endpoint calculations
+
+# 2. Composite keys for clinical mappings
+
+Clinical trial data often uses multi-column logic: lab category + test code +
+unit, or population + analysis flag + visit type. `fputk()` can build a lookup
+from multiple fields without manually concatenating in the analysis step.
+
+```{r}
+#| label: composite-keys
+fnew(
+  fmap(
+    paste(
+      c("BLOOD CHEMISTRY", "COAGULOGRAM", "COAGULATION PANEL", "COAGULOGRAM"),
+      c("BLOOD",           "BLOOD",        "BLOOD",             "BLOOD"),
+      c("ALB",             "FIBRINO",      "INR",               "INR"),
+      c("g/L",             "g/L",           NA,                  NA),
+      sep = "|"
+    ),
+    c("ALB", "FIBRINO", "INR", "INR")
+  ),
+  type = "character",
+  name = "lb_param",
+  ignore_case = TRUE,
+  .other = NA
+)
+
+lab_df <- data.frame(
+  LBCAT = c("BLOOD CHEMISTRY", "COAGULOGRAM", "COAGULATION PANEL"),
+  LBSPEC = c("BLOOD", "BLOOD", "BLOOD"),
+  LBTESTCD = c("ALB", "INR", "INR"),
+  LBSTRESU = c("g/L", NA, NA)
+)
+
+lab_df$PARAMCD <- fputk(
+  lab_df$LBCAT,
+  lab_df$LBSPEC,
+  lab_df$LBTESTCD,
+  lab_df$LBSTRESU,
+  format = "lb_param",
+  na_as_string = TRUE
+)
+lab_df
+```
+
+The same pattern is useful for:
+
+- AE grouping by term + severity + relation
+- CM coding by medication + route + dose form
+- endpoint derivations from multiple source fields
+
+# 3. Reverse lookup for QC and cleaning
+
+`finputk()` is helpful when raw labels must be normalized back to codes. In
+clinical programming, that makes it suitable for QC checks, mapping vendor text,
+and validating reviewer-facing labels.
+
+```{r}
+#| label: reverse-lookup
+finput(
+  fmap(
+    paste(c("PLACEBO", "DRUG A", "DRUG B"), c("PBO", "A50", "B100"), sep = "|"),
+    c(1L, 2L, 3L)
+  ),
+  target_type = "integer",
+  name = "trt_code_inv"
+)
+
+trt_df <- data.frame(
+  ARMN = c("PLACEBO", "DRUG A", "DRUG B", "UNKNOWN"),
+  TRTCD = c("PBO", "A50", "B100", "X")
+)
+
+trt_df$TRTSEQ <- finputk(trt_df$ARMN, trt_df$TRTCD, invalue_name = "trt_code_inv")
+trt_df
+```
+
+Typical uses include:
+
+- deriving internal codes from decoded labels in QC datasets
+- validating data entry against controlled terminology
+- reconciling spreadsheet exports back to source codes
+
+# 4. Report-ready numeric formatting
+
+`ksformat` can also be used where report output needs consistent numeric
+presentation. This is not a lookup table; it is a pattern-driven formatter.
+
+```{r}
+#| label: numeric-display
+fnew("$%,.2f", type = "numeric", name = "currency")
+fnew("%.1f%%", type = "numeric", name = "pct")
+
+summary_df <- data.frame(
+  metric = c("Cost", "Response rate"),
+  raw = c(1234.56, 0.153)
+)
+
+summary_df$display <- c(
+  fputn(summary_df$raw[1], "currency"),
+  fputn(summary_df$raw[2] * 100, "pct")
+)
+summary_df
+```
+
+This is useful for:
+
+- CSR and TLF output generation
+- QA listings for counts and rates
+- ad hoc review tables where consistent display matters
+
+# 5. Bucketing dates into operational periods
+
+Clinical teams often work with periods such as screening, treatment, follow-up,
+and analysis cut-offs. `date_range` and `datetime_range` let you keep those
+rules in one place instead of duplicating them in ad hoc code.
+
+```{r}
+#| label: operational-periods
+fparse(text = '
+VALUE study_period (date_range)
+  [2024-01-01, 2024-02-01) = "Screening"
+  [2024-02-01, 2024-06-01) = "Treatment"
+  [2024-06-01, HIGH]       = "Follow-up"
+  .missing                 = "No date"
+;
+')
+
+obs_dates <- as.Date(c("2024-01-15", "2024-03-10", "2024-07-01", NA))
+data.frame(
+  date = obs_dates,
+  period = fput(obs_dates, "study_period")
+)
+```
+
+# 6. Text generation for listings and narratives
+
+Expression labels make `ksformat` useful for building small text fragments in
+reports. In clinical settings, that can be handy for reviewer comments, summary
+phrases, or footnotes.
+
+```{r}
+#| label: narrative-fragments
+fnew(
+  "high" = "sprintf('Above threshold: %s', .x1)",
+  "low" = "sprintf('Below threshold: %s', .x1)",
+  name = "thr_note"
+)
+
+fput(c("high", "low"), "thr_note", c(18.2, 7.4))
+```
+
+This is especially useful when the label depends on:
+
+- a measurement value
+- a threshold or cohort-specific cutoff
+- an external text fragment such as a reviewer comment
+
+# 7. Practical cautions
+
+These patterns are powerful, but they work best when the mapping rules are
+stable and owned by the analysis team. A few guardrails help:
+
+- keep the format definition close to the analysis spec
+- prefer a named format for rules reused across tables and datasets
+- use `fclear()` in examples and tests to avoid leaking state between steps
+- use `na_as_string = TRUE` only when the key was built with literal `"NA"`
+  components from `paste()`
+
+# Conclusion
+
+`ksformat` is not limited to simple code-to-label dictionaries. In clinical
+trials it can also serve as a compact rule engine for visit windows, composite
+keys, reverse mappings, report formatting, and small narrative fragments.
+That makes it useful anywhere repeated conditional logic would otherwise be
+spread across scripts, spreadsheets, or one-off helper functions.
+
+```{r}
+#| label: cleanup
+fclear()
+```
