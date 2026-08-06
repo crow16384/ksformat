@@ -1,4 +1,4 @@
-# ksformat 0.8.3
+# ksformat 0.8.4
 
 ## New features
 
@@ -8,6 +8,9 @@
 * `fnew()` now supports numeric pattern mode for `type = "numeric"`:
   pass one unnamed `%f`-style pattern (for example `"$%,.2f"` or
   `"%.1f%%"`) to format continuous numeric values directly.
+* `fnew_bid()` gains an `ignore_case` argument. When `TRUE`, both the
+  forward format and reverse invalue use case-insensitive matching.
+  Default `FALSE` preserves existing behaviour.
 
 ## Documentation
 

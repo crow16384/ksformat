@@ -1,6 +1,6 @@
 # Changelog
 
-## ksformat 0.8.3
+## ksformat 0.8.4
 
 ### New features
 

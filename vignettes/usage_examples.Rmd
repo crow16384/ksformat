@@ -1715,3 +1715,30 @@ data.frame(
 fclear()
 ```
 
+## Example 32: Bidirectional `nocase` for Character Types
+
+`fnew_bid()` can now set `ignore_case = TRUE` so that both directions are
+case-insensitive:
+
+- forward lookup: code -> label (`fput*`)
+- reverse lookup: label -> code (`finput*`)
+
+```{r bidirectional-nocase}
+fnew_bid(
+  "Y" = "Yes",
+  "N" = "No",
+  name = "yesno_nc",
+  ignore_case = TRUE
+)
+
+# Forward (mixed-case codes)
+fputc(c("y", "N", "YES"), "yesno_nc")
+
+# Reverse (mixed-case labels)
+finputc(c("yes", "NO", "Yes"), "yesno_nc_inv")
+```
+
+```{r bidirectional-nocase-cleanup, include=FALSE}
+fclear()
+```
+

@@ -345,6 +345,8 @@ finputk <- function(..., invalue_name, sep = "|", na_as_string = FALSE) {
 #' @param name Character. Base name for both formats. The invalue will be
 #'   named \code{paste0(name, "_inv")}.
 #' @param type Character. Format type
+#' @param ignore_case Logical. If \code{TRUE}, both the format and invalue
+#'   use case-insensitive matching (default: \code{FALSE}).
 #'
 #' @return List with \code{format} (ks_format) and \code{invalue} (ks_invalue)
 #'   components.
@@ -374,7 +376,27 @@ finputk <- function(..., invalue_name, sep = "|", na_as_string = FALSE) {
 #' fputc(c("M", "F"), "sex_bid")
 #' finputc(c("Male", "Female"), "sex_bid_inv")
 #' fclear()
-fnew_bid <- function(..., name = NULL, type = "auto") {
+#'
+#' # Case-insensitive bidirectional format
+#' fnew_bid(
+#'   "Y" = "Yes",
+#'   "N" = "No",
+#'   name = "yesno_nc",
+#'   ignore_case = TRUE
+#' )
+#' # Forward with mixed case
+#' fputc(c("y", "N", "YES"), "yesno_nc")
+#' # [1] "Yes" "No" "Yes"
+#'
+#' # Reverse with mixed case
+#' finputc(c("yes", "NO", "Yes"), "yesno_nc_inv")
+#' # [1] "Y" "N" "Y"
+#' fclear()
+fnew_bid <- function(..., name = NULL, type = "auto", ignore_case = FALSE) {
+  if (!is.logical(ignore_case) || length(ignore_case) != 1L || is.na(ignore_case)) {
+    cli_abort("{.arg ignore_case} must be TRUE or FALSE.")
+  }
+
   mappings <- list(...)
 
   # Expand named vectors (c(Label = "Code") -> individual mappings, reversed)
@@ -391,7 +413,8 @@ fnew_bid <- function(..., name = NULL, type = "auto") {
   }
 
   # Create format (value -> label)
-  format_obj <- do.call(fnew, c(mappings, list(name = name, type = type)))
+  format_obj <- do.call(fnew, c(mappings, list(name = name, type = type,
+                                                 ignore_case = ignore_case)))
 
   # Create invalue (label -> value)
   # Reverse the mappings
@@ -406,7 +429,8 @@ fnew_bid <- function(..., name = NULL, type = "auto") {
     finput,
     c(reversed_mappings, list(
       name = inv_name,
-      target_type = "character"
+      target_type = "character",
+      ignore_case = ignore_case
     ))
   )
 

@@ -4,7 +4,7 @@
 \alias{fnew_bid}
 \title{Create Bidirectional Format}
 \usage{
-fnew_bid(..., name = NULL, type = "auto")
+fnew_bid(..., name = NULL, type = "auto", ignore_case = FALSE)
 }
 \arguments{
 \item{...}{Named arguments for format mappings}
@@ -13,6 +13,9 @@ fnew_bid(..., name = NULL, type = "auto")
 named \code{paste0(name, "_inv")}.}
 
 \item{type}{Character. Format type}
+
+\item{ignore_case}{Logical. If \code{TRUE}, both the format and invalue
+use case-insensitive matching (default: \code{FALSE}).}
 }
 \value{
 List with \code{format} (ks_format) and \code{invalue} (ks_invalue)
@@ -45,5 +48,21 @@ fclear()
 fnew_bid(c(Male = "M", Female = "F"), name = "sex_bid")
 fputc(c("M", "F"), "sex_bid")
 finputc(c("Male", "Female"), "sex_bid_inv")
+fclear()
+
+# Case-insensitive bidirectional format
+fnew_bid(
+  "Y" = "Yes",
+  "N" = "No",
+  name = "yesno_nc",
+  ignore_case = TRUE
+)
+# Forward with mixed case
+fputc(c("y", "N", "YES"), "yesno_nc")
+# [1] "Yes" "No" "Yes"
+
+# Reverse with mixed case
+finputc(c("yes", "NO", "Yes"), "yesno_nc_inv")
+# [1] "Y" "N" "Y"
 fclear()
 }

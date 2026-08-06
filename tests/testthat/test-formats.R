@@ -460,6 +460,108 @@ test_that("fnew_bid creates both format and invalue", {
   fclear()
 })
 
+test_that("fnew_bid with ignore_case creates case-insensitive format and invalue", {
+  bi <- fnew_bid(
+    "Y" = "Yes",
+    "N" = "No",
+    "M" = "Maybe",
+    name = "yesno_nc",
+    ignore_case = TRUE
+  )
+
+  expect_s3_class(bi$format, "ks_format")
+  expect_s3_class(bi$invalue, "ks_invalue")
+
+  # Verify ignore_case flags are set
+  expect_true(bi$format$ignore_case)
+  expect_true(bi$invalue$ignore_case)
+
+  # Test forward with mixed case
+  result_fwd <- fputc(c("y", "N", "m", "Y", "n", "M"), "yesno_nc")
+  expect_equal(result_fwd, c("Yes", "No", "Maybe", "Yes", "No", "Maybe"))
+
+  # Test reverse with mixed case
+  result_rev <- finputc(c("yes", "NO", "Maybe", "YES", "no", "MAYBE"), "yesno_nc_inv")
+  expect_equal(result_rev, c("Y", "N", "M", "Y", "N", "M"))
+
+  fclear()
+})
+
+test_that("fnew_bid ignore_case works with named vector", {
+  bi <- fnew_bid(c(Male = "M", Female = "F"), name = "sex_nc", ignore_case = TRUE)
+
+  # Forward direction
+  expect_equal(fputc(c("m", "F", "M", "f"), "sex_nc"),
+               c("Male", "Female", "Male", "Female"))
+
+  # Reverse direction
+  expect_equal(finputc(c("MALE", "female", "Male"), "sex_nc_inv"),
+               c("M", "F", "M"))
+
+  fclear()
+})
+
+test_that("fnew_bid without ignore_case is case-sensitive (default)", {
+  bi <- fnew_bid("A" = "Alpha", "B" = "Beta", name = "ab_cs")
+
+  expect_false(isTRUE(bi$format$ignore_case))
+  expect_false(isTRUE(bi$invalue$ignore_case))
+
+  # Forward: lowercase doesn't match
+  result_fwd <- fputc(c("a", "A"), "ab_cs")
+  expect_equal(result_fwd, c("a", "Alpha"))  # "a" unchanged
+
+  # Reverse: lowercase doesn't match
+  result_rev <- finputc(c("alpha", "Alpha"), "ab_cs_inv")
+  expect_equal(result_rev, c(NA_character_, "A"))  # "alpha" returns NA
+
+  fclear()
+})
+
+test_that("fnew_bid ignore_case validates input", {
+  expect_error(fnew_bid("X" = "Ex", ignore_case = "yes"),
+               "ignore_case.*must be TRUE or FALSE")
+  expect_error(fnew_bid("X" = "Ex", ignore_case = c(TRUE, FALSE)),
+               "ignore_case.*must be TRUE or FALSE")
+  expect_error(fnew_bid("X" = "Ex", ignore_case = NA),
+               "ignore_case.*must be TRUE or FALSE")
+})
+
+test_that("print methods show (nocase) flag for fnew_bid objects", {
+  bi <- fnew_bid("Y" = "Yes", "N" = "No", name = "yn_print", ignore_case = TRUE)
+
+  out_fmt <- capture.output(print(bi$format))
+  expect_true(any(grepl("nocase", out_fmt)))
+
+  out_inv <- capture.output(print(bi$invalue))
+  expect_true(any(grepl("nocase", out_inv)))
+
+  fclear()
+})
+
+test_that("fnew_bid ignore_case works with both directions consistently", {
+  # Create bidirectional format
+  bi <- fnew_bid(
+    "1" = "One",
+    "2" = "Two",
+    "3" = "Three",
+    name = "numbers",
+    ignore_case = TRUE
+  )
+
+  # Test round-trip: code -> label -> code (with case changes)
+  codes <- c("1", "2", "3")
+  labels <- fputc(codes, "numbers")
+  expect_equal(labels, c("One", "Two", "Three"))
+
+  # Convert labels back with different cases
+  labels_mixed <- c("ONE", "two", "ThReE")
+  codes_back <- finputc(labels_mixed, "numbers_inv")
+  expect_equal(codes_back, c("1", "2", "3"))
+
+  fclear()
+})
+
 # ===================================================================
 # SAS-like text parsing and export
 # ===================================================================

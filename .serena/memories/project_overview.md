@@ -13,7 +13,7 @@ Maps values to labels (formats), labels back to values (invalues), with range, d
 - **OS**: macOS / Linux (cross-platform development)
 - **uv**: installed at ~/.local/bin/uv (for Serena MCP)
 
-## Version\n- Current: 0.8.1\n- License: GPL-3
+## Version\n- Current: 0.8.4\n- License: GPL-3
 
 ## Core Concepts
 - **Format** (`ks_format` S3 class): value → label mapping (like SAS PUT)
@@ -25,7 +25,7 @@ Maps values to labels (formats), labels back to values (invalues), with range, d
 - **Expression labels**: labels with `.x1`, `.x2` placeholders evaluated lazily
 - **Multilabel**: `fput_all` returns all matching labels per element
 - **ignore_case**: case-insensitive matching support
-- **Bidirectional**: `fnew_bid` creates both format and invalue simultaneously
+- **Bidirectional**: `fnew_bid` creates both format and invalue simultaneously\n- **Bidirectional nocase (0.8.4)**: `fnew_bid(..., ignore_case = TRUE)` applies case-insensitive matching in both directions
 
 ## Dependencies
 - **Runtime**: cli
