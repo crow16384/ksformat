@@ -33,9 +33,10 @@ Imports:
 Suggests: 
     dplyr,
     knitr,
+  quarto,
     rmarkdown,
     shiny,
     testthat (>= 3.0.0),
     tidyr
-VignetteBuilder: knitr
+VignetteBuilder: knitr, quarto
 Config/roxygen2/version: 8.1.0

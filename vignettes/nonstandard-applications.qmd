@@ -1,5 +1,9 @@
 ---
 title: "Non-standard Applications of `ksformat` for Clinical Trials and Other Tasks"
+vignette: >
+  %\VignetteIndexEntry{Non-standard Applications of ksformat for Clinical Trials and Other Tasks}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
 format:
   html:
     toc: true
