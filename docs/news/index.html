@@ -43,6 +43,8 @@
 <ul><li>Added <code><a href="../reference/flevels.html">flevels()</a></code>: extracts discrete value-label mappings from a <code>ks_format</code> object (or registered format name) as a tidy two-column <code>data.frame</code> (<code>value</code>, <code>label</code>).</li>
 <li>
 <code><a href="../reference/fnew.html">fnew()</a></code> now supports numeric pattern mode for <code>type = "numeric"</code>: pass one unnamed <code>%f</code>-style pattern (for example <code>"$%,.2f"</code> or <code>"%.1f%%"</code>) to format continuous numeric values directly.</li>
+<li>
+<code><a href="../reference/fnew_bid.html">fnew_bid()</a></code> gains an <code>ignore_case</code> argument. When <code>TRUE</code>, both the forward format and reverse invalue use case-insensitive matching. Default <code>FALSE</code> preserves existing behaviour.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="documentation-0-8-4">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-8-4"></a></h3>
@@ -245,7 +247,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

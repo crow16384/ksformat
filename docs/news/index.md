@@ -11,6 +11,10 @@
   `type = "numeric"`: pass one unnamed `%f`-style pattern (for example
   `"$%,.2f"` or `"%.1f%%"`) to format continuous numeric values
   directly.
+- [`fnew_bid()`](../reference/fnew_bid.md) gains an `ignore_case`
+  argument. When `TRUE`, both the forward format and reverse invalue use
+  case-insensitive matching. Default `FALSE` preserves existing
+  behaviour.
 
 ### Documentation
 

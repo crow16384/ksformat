@@ -33,6 +33,8 @@ export(franges)
 export(is_missing)
 export(ksformat_cheatsheet)
 export(range_spec)
-importFrom(cli,cli_abort)
-importFrom(cli,cli_inform)
-importFrom(cli,cli_warn)
+importFrom(cli,
+  cli_abort,
+  cli_inform,
+  cli_warn
+)

@@ -169,7 +169,7 @@ fput_all(c(10, 30), ml)
 
 # Date format (SAS-style, auto-resolved)
 fputn(Sys.Date(), "DATE9.")
-#> [1] "09JUL2026"
+#> [1] "13AUG2026"
 
 # Export and library management
 cat(fexport(sex = format_get("sex")))

@@ -65,14 +65,7 @@ R CMD check .
 R CMD build .
 ```
 
-``` r
-
-# From R console (devtools)
-devtools::document()   # regenerate docs from roxygen2
-devtools::test()       # run tests
-devtools::check()      # full CRAN check
-devtools::load_all()   # load for interactive dev
-```
+`# From R console (devtools)`` ``devtools``::`[`document`](https://devtools.r-lib.org/reference/document.html)`(``)`` ``# regenerate docs from roxygen2`` ``devtools``::`[`test`](https://devtools.r-lib.org/reference/test.html)`(``)`` ``# run tests`` ``devtools``::`[`check`](https://devtools.r-lib.org/reference/check.html)`(``)`` ``# full CRAN check`` ``devtools``::`[`load_all`](https://devtools.r-lib.org/reference/load_all.html)`(``)`` ``# load for interactive dev`
 
 ``` bash
 # Run tests from shell
@@ -117,20 +110,11 @@ For data-driven formats, use `fmap(keys, values)` to suppress
 auto-reversal for all types. This ensures `keys → values` direction
 regardless of type:
 
-``` r
-
-# Same pattern for character and Date formats
-fnew(fmap(ids, date_strings), type = "character")
-fnew(fmap(ids, dates), type = "Date")
-```
+`# Same pattern for character and Date formats`` `[`fnew`](reference/fnew.md)`(`[`fmap`](reference/fmap.md)`(``ids``, ``date_strings``)``, type ``=`` ``"character"``)`` `[`fnew`](reference/fnew.md)`(`[`fmap`](reference/fmap.md)`(``ids``, ``dates``)``, type ``=`` ``"Date"``)`
 
 Hand-written formats continue to use the R convention:
 
-``` r
-
-fnew(c(Male = "M", Female = "F"))  # auto-reversed: "M" → "Male"
-fnew("M" = "Male", "F" = "Female") # explicit: same result
-```
+[`fnew`](reference/fnew.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``Male ``=`` ``"M"``, Female ``=`` ``"F"``)``)`` ``# auto-reversed: "M" → "Male"`` `[`fnew`](reference/fnew.md)`(``"M"`` ``=`` ``"Male"``, ``"F"`` ``=`` ``"Female"``)`` ``# explicit: same result`
 
 ## Missing Value Priority
 

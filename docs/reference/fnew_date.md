@@ -99,15 +99,15 @@ fputn(r_days, "DATE9.")
 # Multiple SAS date formats applied directly
 today <- Sys.Date()
 fputn(today, "DATE9.")
-#> [1] "09JUL2026"
+#> [1] "13AUG2026"
 fputn(today, "MMDDYY10.")
-#> [1] "07/09/2026"
+#> [1] "08/13/2026"
 fputn(today, "YYMMDD10.")
-#> [1] "2026-07-09"
+#> [1] "2026-08-13"
 fputn(today, "MONYY7.")
-#> [1] "JUL2026"
+#> [1] "AUG2026"
 fputn(today, "WORDDATE.")
-#> [1] "July 09, 2026"
+#> [1] "August 13, 2026"
 fputn(today, "QTR.")
 #> [1] "3"
 
@@ -120,11 +120,11 @@ fputn(c(0, 3600, 45000), "HHMM.")
 # Datetime formatting
 now <- Sys.time()
 fputn(now, "DATETIME20.")
-#> [1] "09JUL2026:14:51:34"
+#> [1] "13AUG2026:14:24:46"
 fputn(now, "DTDATE.")
-#> [1] "09JUL2026"
+#> [1] "13AUG2026"
 fputn(now, "DTYYMMDD.")
-#> [1] "2026-07-09"
+#> [1] "2026-08-13"
 fclear()
 #> All formats cleared from library.
 ```

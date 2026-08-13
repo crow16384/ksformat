@@ -21,20 +21,11 @@ source code, issue tracker, and development.
 
 **From GitHub** (after cloning or from your repo URL):
 
-``` r
-
-# install.packages("remotes")
-remotes::install_github("crow16384/ksformat")
-```
+`# install.packages("remotes")`` ``remotes``::`[`install_github`](https://remotes.r-lib.org/reference/install_github.html)`(``"crow16384/ksformat"``)`
 
 **From local source:**
 
-``` r
-
-install.packages(".", repos = NULL, type = "source")
-# or
-devtools::install()
-```
+[`install.packages`](https://rdrr.io/r/utils/install.packages.html)`(``"."``, repos ``=`` ``NULL``, type ``=`` ``"source"``)`` ``# or`` ``devtools``::`[`install`](https://devtools.r-lib.org/reference/install.html)`(``)`
 
 ## Features
 
@@ -59,66 +50,23 @@ devtools::install()
 
 ### Discrete formatting
 
-``` r
-
-library(ksformat)
-
-fnew(
-  "M" = "Male",
-  "F" = "Female",
-  .missing = "Unknown",
-  name = "sex"
-)
-
-fput(c("M", "F", NA, "X"), "sex")
-# [1] "Male"    "Female"  "Unknown" "X"
-```
+[`library`](https://rdrr.io/r/base/library.html)`(`[`ksformat`](https://github.com/crow16384/ksformat)`)`` `` `[`fnew`](reference/fnew.md)`(`` `` ``"M"`` ``=`` ``"Male"``,`` `` ``"F"`` ``=`` ``"Female"``,`` `` .missing ``=`` ``"Unknown"``,`` `` name ``=`` ``"sex"`` ``)`` `` `[`fput`](reference/fput.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"M"``, ``"F"``, ``NA``, ``"X"``)``, ``"sex"``)`` ``# [1] "Male" "Female" "Unknown" "X"`
 
 ### Numeric ranges
 
-``` r
-
-fparse(text = '
-VALUE age (numeric)
-  [0, 18)   = "Child"
-  [18, 65)  = "Adult"
-  [65, HIGH] = "Senior"
-  .missing   = "Age Unknown"
-;
-')
-
-fputn(c(5, 25, 70, NA), "age")
-# [1] "Child"       "Adult"       "Senior"      "Age Unknown"
-```
+[`fparse`](reference/fparse.md)`(``text ``=`` ``'`` ``VALUE age (numeric)`` `` [0, 18) = "Child"`` `` [18, 65) = "Adult"`` `` [65, HIGH] = "Senior"`` `` .missing = "Age Unknown"`` ``;`` ``'``)`` `` `[`fputn`](reference/fputn.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``5``, ``25``, ``70``, ``NA``)``, ``"age"``)`` ``# [1] "Child" "Adult" "Senior" "Age Unknown"`
 
 ### Reverse formatting (invalue)
 
-``` r
-
-finput("Male" = 1, "Female" = 2, name = "sex_inv")
-
-finputn(c("Male", "Female", "Unknown"), "sex_inv")
-# [1]  1  2 NA
-```
+[`finput`](reference/finput.md)`(``"Male"`` ``=`` ``1``, ``"Female"`` ``=`` ``2``, name ``=`` ``"sex_inv"``)`` `` `[`finputn`](reference/finputn.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"Male"``, ``"Female"``, ``"Unknown"``)``, ``"sex_inv"``)`` ``# [1] 1 2 NA`
 
 ### Format library
 
-``` r
-
-fprint()              # list all registered formats
-fmt <- format_get("sex")
-fclear("sex")         # remove one format
-fclear()              # clear all
-```
+[`fprint`](reference/fprint.md)`(``)`` ``# list all registered formats`` ``fmt`` ``<-`` `[`format_get`](reference/format_get.md)`(``"sex"``)`` `[`fclear`](reference/fclear.md)`(``"sex"``)`` ``# remove one format`` `[`fclear`](reference/fclear.md)`(``)`` ``# clear all`
 
 ### Interactive library browser (Shiny)
 
-``` r
-
-if (interactive() && requireNamespace("shiny", quietly = TRUE)) {
-  format_library_app()
-}
-```
+`if`` ``(`[`interactive`](https://rdrr.io/r/base/interactive.html)`(``)`` ``&&`` `[`requireNamespace`](https://rdrr.io/r/base/ns-load.html)`(``"shiny"``, quietly ``=`` ``TRUE``)``)`` ``{`` `` `[`format_library_app`](reference/format_library_app.md)`(``)`` ``}`
 
 The app shows both VALUE (`ks_format`) and INVALUE (`ks_invalue`)
 objects, supports name/type filtering, shows a formatted mapping table,
@@ -130,100 +78,40 @@ Browser**.
 
 ### Data frames
 
-``` r
-
-df <- data.frame(
-  sex = c("M", "F", "M", NA),
-  age = c(15, 25, 70, 35)
-)
-
-fput_df(df, sex = format_get("sex"), age = format_get("age"), suffix = "_label")
-```
+`df`` ``<-`` `[`data.frame`](https://rdrr.io/r/base/data.frame.html)`(`` `` sex ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"M"``, ``"F"``, ``"M"``, ``NA``)``,`` `` age ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``15``, ``25``, ``70``, ``35``)`` ``)`` `` `[`fput_df`](reference/fput_df.md)`(``df``, sex ``=`` `[`format_get`](reference/format_get.md)`(``"sex"``)``, age ``=`` `[`format_get`](reference/format_get.md)`(``"age"``)``, suffix ``=`` ``"_label"``)`
 
 ## Multilabel formats
 
 With `multilabel = TRUE`, a single value can match multiple labels. Use
 [`fput_all()`](reference/fput_all.md) to collect all matches:
 
-``` r
-
-fnew(
-  "0,17,TRUE,TRUE"  = "Pediatric",
-  "18,Inf,TRUE,TRUE" = "Adult",
-  "3,5,TRUE,TRUE"   = "Serious",
-  name = "ae_age", type = "numeric", multilabel = TRUE
-)
-
-fput_all(c(10, 25, 4), "ae_age")
-# [[1]] "Pediatric"
-# [[2]] "Adult"
-# [[3]] "Pediatric" "Serious"
-```
+[`fnew`](reference/fnew.md)`(`` `` ``"0,17,TRUE,TRUE"`` ``=`` ``"Pediatric"``,`` `` ``"18,Inf,TRUE,TRUE"`` ``=`` ``"Adult"``,`` `` ``"3,5,TRUE,TRUE"`` ``=`` ``"Serious"``,`` `` name ``=`` ``"ae_age"``, type ``=`` ``"numeric"``, multilabel ``=`` ``TRUE`` ``)`` `` `[`fput_all`](reference/fput_all.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``10``, ``25``, ``4``)``, ``"ae_age"``)`` ``# [[1]] "Pediatric"`` ``# [[2]] "Adult"`` ``# [[3]] "Pediatric" "Serious"`
 
 ## Date/time/datetime formats
 
 SAS date format names are auto-resolved — no pre-creation needed:
 
-``` r
-
-fputn(Sys.Date(), "DATE9.")
-# [1] "25MAR2026"
-
-fputn(Sys.Date(), "MMDDYY10.")
-# [1] "03/25/2026"
-
-# Custom strftime pattern
-fnew_date("%d.%m.%Y", name = "ru_date", type = "date")
-fput(Sys.Date(), "ru_date")
-# [1] "25.03.2026"
-```
+[`fputn`](reference/fputn.md)`(`[`Sys.Date`](https://rdrr.io/r/base/Sys.time.html)`(``)``, ``"DATE9."``)`` ``# [1] "25MAR2026"`` `` `[`fputn`](reference/fputn.md)`(`[`Sys.Date`](https://rdrr.io/r/base/Sys.time.html)`(``)``, ``"MMDDYY10."``)`` ``# [1] "03/25/2026"`` `` ``# Custom strftime pattern`` `[`fnew_date`](reference/fnew_date.md)`(``"%d.%m.%Y"``, name ``=`` ``"ru_date"``, type ``=`` ``"date"``)`` `[`fput`](reference/fput.md)`(`[`Sys.Date`](https://rdrr.io/r/base/Sys.time.html)`(``)``, ``"ru_date"``)`` ``# [1] "25.03.2026"`
 
 Time (seconds since midnight) and datetime are also supported:
 
-``` r
-
-fputn(3600, "TIME8.")
-# [1] "1:00:00"
-
-fputn(Sys.time(), "DATETIME20.")
-```
+[`fputn`](reference/fputn.md)`(``3600``, ``"TIME8."``)`` ``# [1] "1:00:00"`` `` `[`fputn`](reference/fputn.md)`(`[`Sys.time`](https://rdrr.io/r/base/Sys.time.html)`(``)``, ``"DATETIME20."``)`
 
 ## Expression labels
 
 Labels containing `.x1`, `.x2`, etc. are evaluated as R expressions at
 apply-time. Pass extra arguments through `fput(x, fmt, ...)`:
 
-``` r
-
-stat_fmt <- fnew(
-  "n"   = "sprintf('%s', .x1)",
-  "pct" = "sprintf('%.1f%%', .x1 * 100)",
-  name = "stat", type = "character"
-)
-
-fput(c("n", "pct"), stat_fmt, c(42, 0.053))
-# [1] "42"   "5.3%"
-```
+`stat_fmt`` ``<-`` `[`fnew`](reference/fnew.md)`(`` `` ``"n"`` ``=`` ``"sprintf('%s', .x1)"``,`` `` ``"pct"`` ``=`` ``"sprintf('%.1f%%', .x1 * 100)"``,`` `` name ``=`` ``"stat"``, type ``=`` ``"character"`` ``)`` `` `[`fput`](reference/fput.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"n"``, ``"pct"``)``, ``stat_fmt``, `[`c`](https://rdrr.io/r/base/c.html)`(``42``, ``0.053``)``)`` ``# [1] "42" "5.3%"`
 
 Use [`e()`](reference/e.md) to mark a label for evaluation even without
 `.xN` placeholders:
 
-``` r
-
-fnew("ts" = e("format(Sys.time(), '%Y-%m-%d')"), name = "demo")
-fput("ts", "demo")
-```
+[`fnew`](reference/fnew.md)`(``"ts"`` ``=`` `[`e`](reference/e.md)`(``"format(Sys.time(), '%Y-%m-%d')"``)``, name ``=`` ``"demo"``)`` `[`fput`](reference/fput.md)`(``"ts"``, ``"demo"``)`
 
 ## Case-insensitive matching
 
-``` r
-
-fnew("M" = "Male", "F" = "Female", name = "sex_nc",
-     type = "character", ignore_case = TRUE)
-
-fput(c("m", "F", "M", "f"), "sex_nc")
-# [1] "Male"   "Female" "Male"   "Female"
-```
+[`fnew`](reference/fnew.md)`(``"M"`` ``=`` ``"Male"``, ``"F"`` ``=`` ``"Female"``, name ``=`` ``"sex_nc"``,`` `` type ``=`` ``"character"``, ignore_case ``=`` ``TRUE``)`` `` `[`fput`](reference/fput.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"m"``, ``"F"``, ``"M"``, ``"f"``)``, ``"sex_nc"``)`` ``# [1] "Male" "Female" "Male" "Female"`
 
 ## Missing value handling
 
@@ -258,13 +146,7 @@ Options: `keep_na = TRUE`, `na_if`, `include_empty = TRUE`.
 
 ## Development
 
-``` r
-
-install.packages(c("roxygen2", "testthat", "devtools"))
-devtools::document()
-devtools::test()
-devtools::check()
-```
+[`install.packages`](https://rdrr.io/r/utils/install.packages.html)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"roxygen2"``, ``"testthat"``, ``"devtools"``)``)`` ``devtools``::`[`document`](https://devtools.r-lib.org/reference/document.html)`(``)`` ``devtools``::`[`test`](https://devtools.r-lib.org/reference/test.html)`(``)`` ``devtools``::`[`check`](https://devtools.r-lib.org/reference/check.html)`(``)`
 
 When bumping the package version, update `DESCRIPTION` and then run\
 `Rscript scripts/sync-version.R` to refresh version references in

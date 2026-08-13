@@ -40,7 +40,7 @@ fmt <- fnew(
   name = "demo_eval"
 )
 fput(c("timestamp", "static"), fmt)
-#> [1] "2026-07-09" "Hello"     
+#> [1] "2026-08-13" "Hello"     
 fclear()
 #> All formats cleared from library.
 ```

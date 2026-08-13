@@ -49,7 +49,7 @@ is provided.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fnew_bid</span><span class="op">(</span><span class="va">...</span>, name <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="st">"auto"</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fnew_bid</span><span class="op">(</span><span class="va">...</span>, name <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="st">"auto"</span>, ignore_case <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -67,6 +67,11 @@ named <code>paste0(name, "_inv")</code>.</p></dd>
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
 <dd><p>Character. Format type</p></dd>
+
+
+<dt id="arg-ignore-case">ignore_case<a class="anchor" aria-label="anchor" href="#arg-ignore-case"></a></dt>
+<dd><p>Logical. If <code>TRUE</code>, both the format and invalue
+use case-insensitive matching (default: <code>FALSE</code>).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -119,6 +124,39 @@ named <code>paste0(name, "_inv")</code>.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "M" "F"</span>
 <span class="r-in"><span><span class="fu"><a href="fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> All formats cleared from library.</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Case-insensitive bidirectional format</span></span></span>
+<span class="r-in"><span><span class="fu">fnew_bid</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"Y"</span> <span class="op">=</span> <span class="st">"Yes"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"N"</span> <span class="op">=</span> <span class="st">"No"</span>,</span></span>
+<span class="r-in"><span>  name <span class="op">=</span> <span class="st">"yesno_nc"</span>,</span></span>
+<span class="r-in"><span>  ignore_case <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $format</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> KS Format:yesno_nc (nocase)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Type: character </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mappings:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Y =&gt; Yes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   N =&gt; No</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $invalue</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> KS Invalue: yesno_nc_inv (nocase)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Target Type: character </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mappings:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Yes =&gt; Y</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   No =&gt; N</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="co"># Forward with mixed case</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="fputc.html">fputc</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"y"</span>, <span class="st">"N"</span>, <span class="st">"YES"</span><span class="op">)</span>, <span class="st">"yesno_nc"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Yes" "No"  "YES"</span>
+<span class="r-in"><span><span class="co"># [1] "Yes" "No" "Yes"</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Reverse with mixed case</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="finputc.html">finputc</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"yes"</span>, <span class="st">"NO"</span>, <span class="st">"Yes"</span><span class="op">)</span>, <span class="st">"yesno_nc_inv"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Y" "N" "Y"</span>
+<span class="r-in"><span><span class="co"># [1] "Y" "N" "Y"</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> All formats cleared from library.</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -130,7 +168,7 @@ named <code>paste0(name, "_inv")</code>.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>
