@@ -1,14 +1,8 @@
 {
   "project_name": "ksformat",
-  "project_root": "/home/rdev/ksformat",
+  "project_root": "/Users/meguty/Develop/R/ksformat",
   "project_type": "r-package",
   "language": "r",
-  "remote": {
-    "type": "ssh",
-    "host": "debian13",
-    "user": "rdev",
-    "path": "/home/rdev/ksformat"
-  },
   "source_directories": ["R"],
   "test_directories": ["tests"],
   "documentation_directories": ["man"],

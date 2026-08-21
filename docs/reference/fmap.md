@@ -1,9 +1,10 @@
 # Create a Key-Value Mapping for Format Creation
 
 Convenience helper for building data-driven formats with
-[`fnew`](fnew.md). Returns a named vector (or list) with class
-`"ks_fmap"` that signals [`fnew()`](fnew.md) to use the natural
-direction: names are **input keys**, values are **output
+[`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md).
+Returns a named vector (or list) with class `"ks_fmap"` that signals
+[`fnew()`](https://crow16384.github.io/ksformat/reference/fnew.md) to
+use the natural direction: names are **input keys**, values are **output
 labels/objects** — regardless of the format type.
 
 ## Usage
@@ -30,8 +31,9 @@ A named vector (or list, for non-atomic values) with class
 
 ## Details
 
-Without `fmap()`, [`fnew()`](fnew.md) reverses named vectors for
-character and numeric types (the
+Without `fmap()`,
+[`fnew()`](https://crow16384.github.io/ksformat/reference/fnew.md)
+reverses named vectors for character and numeric types (the
 [`factor()`](https://rdrr.io/r/base/factor.html) convention
 `c(Label = "Code")`). Wrapping your data in `fmap()` suppresses this
 reversal, so `fmap(keys, values)` works identically for character,
@@ -39,7 +41,8 @@ numeric, Date, POSIXct, and logical formats.
 
 ## See also
 
-[`fnew`](fnew.md) for format creation.
+[`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md) for
+format creation.
 
 ## Examples
 

@@ -3,8 +3,8 @@
 Construct a `ks_fmap`-classed named character vector whose names encode
 numeric / Date / POSIXct range bounds and whose values are the
 corresponding labels. The result is intended to be passed to
-[`fnew`](fnew.md) as a single positional argument (it suppresses the
-default name reversal).
+[`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md) as a
+single positional argument (it suppresses the default name reversal).
 
 ## Usage
 
@@ -33,7 +33,9 @@ fmap_ranges(
 - inc_low, inc_high:
 
   Logical, length 1 or `length(low)`. Whether each bound is inclusive.
-  Defaults match [`range_spec`](range_spec.md): `[low, high)`.
+  Defaults match
+  [`range_spec`](https://crow16384.github.io/ksformat/reference/range_spec.md):
+  `[low, high)`.
 
 - date_format:
 
@@ -43,7 +45,7 @@ fmap_ranges(
 ## Value
 
 A `ks_fmap` object (named character vector) suitable for passing to
-[`fnew()`](fnew.md).
+[`fnew()`](https://crow16384.github.io/ksformat/reference/fnew.md).
 
 ## Details
 
@@ -53,7 +55,9 @@ needed.
 
 ## See also
 
-[`fmap`](fmap.md), [`fmap_strata`](fmap_strata.md), [`fnew`](fnew.md)
+[`fmap`](https://crow16384.github.io/ksformat/reference/fmap.md),
+[`fmap_strata`](https://crow16384.github.io/ksformat/reference/fmap_strata.md),
+[`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md)
 
 ## Examples
 

@@ -1,12 +1,14 @@
 # Build a Vector of Stratified Range Mappings
 
-Companion to [`fmap_ranges`](fmap_ranges.md) for the `stratified_range`
-format type. Each row pairs a stratum (e.g. study arm, subject id, or a
-composite key produced by [`fputk()`](fputk.md)) with a numeric / Date /
-POSIXct range and a label. The returned `ks_fmap` vector carries the
-chosen `sep` as an attribute so that
-[`fnew`](fnew.md)`(type = "stratified_range")` picks it up
-automatically.
+Companion to
+[`fmap_ranges`](https://crow16384.github.io/ksformat/reference/fmap_ranges.md)
+for the `stratified_range` format type. Each row pairs a stratum (e.g.
+study arm, subject id, or a composite key produced by
+[`fputk()`](https://crow16384.github.io/ksformat/reference/fputk.md))
+with a numeric / Date / POSIXct range and a label. The returned
+`ks_fmap` vector carries the chosen `sep` as an attribute so that
+[`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md)`(type = "stratified_range")`
+picks it up automatically.
 
 ## Usage
 
@@ -31,7 +33,8 @@ fmap_strata(
 
 - low, high:
 
-  Range bounds. See [`fmap_ranges`](fmap_ranges.md).
+  Range bounds. See
+  [`fmap_ranges`](https://crow16384.github.io/ksformat/reference/fmap_ranges.md).
 
 - label:
 
@@ -40,12 +43,13 @@ fmap_strata(
 - inc_low, inc_high:
 
   Logical, length 1 or `length(low)`. See
-  [`fmap_ranges`](fmap_ranges.md).
+  [`fmap_ranges`](https://crow16384.github.io/ksformat/reference/fmap_ranges.md).
 
 - sep:
 
   Separator inserted between stratum and range key. Must match the `sep`
-  subsequently passed to [`fputk`](fputk.md).
+  subsequently passed to
+  [`fputk`](https://crow16384.github.io/ksformat/reference/fputk.md).
 
 - date_format:
 
@@ -57,7 +61,9 @@ A `ks_fmap` object with an attached `"strata_sep"` attribute.
 
 ## See also
 
-[`fmap_ranges`](fmap_ranges.md), [`fputk`](fputk.md), [`fnew`](fnew.md)
+[`fmap_ranges`](https://crow16384.github.io/ksformat/reference/fmap_ranges.md),
+[`fputk`](https://crow16384.github.io/ksformat/reference/fputk.md),
+[`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md)
 
 ## Examples
 

@@ -33,11 +33,13 @@ range label contain `NA`.
 
 For `multilabel` formats where the same label maps to several ranges,
 only the *first* matching range is returned. For full multi-match
-behaviour, call [`franges()`](franges.md) directly and join on `label`.
+behaviour, call
+[`franges()`](https://crow16384.github.io/ksformat/reference/franges.md)
+directly and join on `label`.
 
 ## See also
 
-[`franges`](franges.md)
+[`franges`](https://crow16384.github.io/ksformat/reference/franges.md)
 
 ## Examples
 

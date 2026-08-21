@@ -4,10 +4,11 @@
 R](https://img.shields.io/badge/PROC%20FORMAT%20for%20R-ksformat-217346?logo=r)](https://github.com/crow16384/ksformat)
 [![GitHub](https://img.shields.io/badge/GitHub-crow16384%2Fksformat-181717?logo=github)](https://github.com/crow16384/ksformat)
 [![License: GPL
-v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://spdx.org/licenses/GPL-3.0-only.html)
 [![R
 package](https://img.shields.io/badge/R-package-276DC3?logo=r)](https://www.r-project.org/)
-[![](https://cranlogs.r-pkg.org/badges/ksformat)](https://cran.r-project.org/package=ksformat)
+[![CRAN downloads for
+ksformat](https://cranlogs.r-pkg.org/badges/ksformat)](https://cran.r-project.org/package=ksformat)
 
 SAS-style **PROC FORMAT** for R: create and apply value formats,
 range-based formatting, reverse formatting (invalue), and consistent
@@ -50,23 +51,23 @@ source code, issue tracker, and development.
 
 ### Discrete formatting
 
-[`library`](https://rdrr.io/r/base/library.html)`(`[`ksformat`](https://github.com/crow16384/ksformat)`)`` `` `[`fnew`](reference/fnew.md)`(`` `` ``"M"`` ``=`` ``"Male"``,`` `` ``"F"`` ``=`` ``"Female"``,`` `` .missing ``=`` ``"Unknown"``,`` `` name ``=`` ``"sex"`` ``)`` `` `[`fput`](reference/fput.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"M"``, ``"F"``, ``NA``, ``"X"``)``, ``"sex"``)`` ``# [1] "Male" "Female" "Unknown" "X"`
+[`library`](https://rdrr.io/r/base/library.html)`(`[`ksformat`](https://crow16384.github.io/ksformat/)`)`` `` `[`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md)`(`` `` ``"M"`` ``=`` ``"Male"``,`` `` ``"F"`` ``=`` ``"Female"``,`` `` .missing ``=`` ``"Unknown"``,`` `` name ``=`` ``"sex"`` ``)`` `` `[`fput`](https://crow16384.github.io/ksformat/reference/fput.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"M"``, ``"F"``, ``NA``, ``"X"``)``, ``"sex"``)`` ``# [1] "Male" "Female" "Unknown" "X"`
 
 ### Numeric ranges
 
-[`fparse`](reference/fparse.md)`(``text ``=`` ``'`` ``VALUE age (numeric)`` `` [0, 18) = "Child"`` `` [18, 65) = "Adult"`` `` [65, HIGH] = "Senior"`` `` .missing = "Age Unknown"`` ``;`` ``'``)`` `` `[`fputn`](reference/fputn.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``5``, ``25``, ``70``, ``NA``)``, ``"age"``)`` ``# [1] "Child" "Adult" "Senior" "Age Unknown"`
+[`fparse`](https://crow16384.github.io/ksformat/reference/fparse.md)`(``text ``=`` ``'`` ``VALUE age (numeric)`` `` [0, 18) = "Child"`` `` [18, 65) = "Adult"`` `` [65, HIGH] = "Senior"`` `` .missing = "Age Unknown"`` ``;`` ``'``)`` `` `[`fputn`](https://crow16384.github.io/ksformat/reference/fputn.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``5``, ``25``, ``70``, ``NA``)``, ``"age"``)`` ``# [1] "Child" "Adult" "Senior" "Age Unknown"`
 
 ### Reverse formatting (invalue)
 
-[`finput`](reference/finput.md)`(``"Male"`` ``=`` ``1``, ``"Female"`` ``=`` ``2``, name ``=`` ``"sex_inv"``)`` `` `[`finputn`](reference/finputn.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"Male"``, ``"Female"``, ``"Unknown"``)``, ``"sex_inv"``)`` ``# [1] 1 2 NA`
+[`finput`](https://crow16384.github.io/ksformat/reference/finput.md)`(``"Male"`` ``=`` ``1``, ``"Female"`` ``=`` ``2``, name ``=`` ``"sex_inv"``)`` `` `[`finputn`](https://crow16384.github.io/ksformat/reference/finputn.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"Male"``, ``"Female"``, ``"Unknown"``)``, ``"sex_inv"``)`` ``# [1] 1 2 NA`
 
 ### Format library
 
-[`fprint`](reference/fprint.md)`(``)`` ``# list all registered formats`` ``fmt`` ``<-`` `[`format_get`](reference/format_get.md)`(``"sex"``)`` `[`fclear`](reference/fclear.md)`(``"sex"``)`` ``# remove one format`` `[`fclear`](reference/fclear.md)`(``)`` ``# clear all`
+[`fprint`](https://crow16384.github.io/ksformat/reference/fprint.md)`(``)`` ``# list all registered formats`` ``fmt`` ``<-`` `[`format_get`](https://crow16384.github.io/ksformat/reference/format_get.md)`(``"sex"``)`` `[`fclear`](https://crow16384.github.io/ksformat/reference/fclear.md)`(``"sex"``)`` ``# remove one format`` `[`fclear`](https://crow16384.github.io/ksformat/reference/fclear.md)`(``)`` ``# clear all`
 
 ### Interactive library browser (Shiny)
 
-`if`` ``(`[`interactive`](https://rdrr.io/r/base/interactive.html)`(``)`` ``&&`` `[`requireNamespace`](https://rdrr.io/r/base/ns-load.html)`(``"shiny"``, quietly ``=`` ``TRUE``)``)`` ``{`` `` `[`format_library_app`](reference/format_library_app.md)`(``)`` ``}`
+`if`` ``(`[`interactive`](https://rdrr.io/r/base/interactive.html)`(``)`` ``&&`` `[`requireNamespace`](https://rdrr.io/r/base/ns-load.html)`(``"shiny"``, quietly ``=`` ``TRUE``)``)`` ``{`` `` `[`format_library_app`](https://crow16384.github.io/ksformat/reference/format_library_app.md)`(``)`` ``}`
 
 The app shows both VALUE (`ks_format`) and INVALUE (`ks_invalue`)
 objects, supports name/type filtering, shows a formatted mapping table,
@@ -78,40 +79,41 @@ Browser**.
 
 ### Data frames
 
-`df`` ``<-`` `[`data.frame`](https://rdrr.io/r/base/data.frame.html)`(`` `` sex ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"M"``, ``"F"``, ``"M"``, ``NA``)``,`` `` age ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``15``, ``25``, ``70``, ``35``)`` ``)`` `` `[`fput_df`](reference/fput_df.md)`(``df``, sex ``=`` `[`format_get`](reference/format_get.md)`(``"sex"``)``, age ``=`` `[`format_get`](reference/format_get.md)`(``"age"``)``, suffix ``=`` ``"_label"``)`
+`df`` ``<-`` `[`data.frame`](https://rdrr.io/r/base/data.frame.html)`(`` `` sex ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"M"``, ``"F"``, ``"M"``, ``NA``)``,`` `` age ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``15``, ``25``, ``70``, ``35``)`` ``)`` `` `[`fput_df`](https://crow16384.github.io/ksformat/reference/fput_df.md)`(``df``, sex ``=`` `[`format_get`](https://crow16384.github.io/ksformat/reference/format_get.md)`(``"sex"``)``, age ``=`` `[`format_get`](https://crow16384.github.io/ksformat/reference/format_get.md)`(``"age"``)``, suffix ``=`` ``"_label"``)`
 
 ## Multilabel formats
 
 With `multilabel = TRUE`, a single value can match multiple labels. Use
-[`fput_all()`](reference/fput_all.md) to collect all matches:
+[`fput_all()`](https://crow16384.github.io/ksformat/reference/fput_all.md)
+to collect all matches:
 
-[`fnew`](reference/fnew.md)`(`` `` ``"0,17,TRUE,TRUE"`` ``=`` ``"Pediatric"``,`` `` ``"18,Inf,TRUE,TRUE"`` ``=`` ``"Adult"``,`` `` ``"3,5,TRUE,TRUE"`` ``=`` ``"Serious"``,`` `` name ``=`` ``"ae_age"``, type ``=`` ``"numeric"``, multilabel ``=`` ``TRUE`` ``)`` `` `[`fput_all`](reference/fput_all.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``10``, ``25``, ``4``)``, ``"ae_age"``)`` ``# [[1]] "Pediatric"`` ``# [[2]] "Adult"`` ``# [[3]] "Pediatric" "Serious"`
+[`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md)`(`` `` ``"0,17,TRUE,TRUE"`` ``=`` ``"Pediatric"``,`` `` ``"18,Inf,TRUE,TRUE"`` ``=`` ``"Adult"``,`` `` ``"3,5,TRUE,TRUE"`` ``=`` ``"Serious"``,`` `` name ``=`` ``"ae_age"``, type ``=`` ``"numeric"``, multilabel ``=`` ``TRUE`` ``)`` `` `[`fput_all`](https://crow16384.github.io/ksformat/reference/fput_all.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``10``, ``25``, ``4``)``, ``"ae_age"``)`` ``# [[1]] "Pediatric"`` ``# [[2]] "Adult"`` ``# [[3]] "Pediatric" "Serious"`
 
 ## Date/time/datetime formats
 
 SAS date format names are auto-resolved — no pre-creation needed:
 
-[`fputn`](reference/fputn.md)`(`[`Sys.Date`](https://rdrr.io/r/base/Sys.time.html)`(``)``, ``"DATE9."``)`` ``# [1] "25MAR2026"`` `` `[`fputn`](reference/fputn.md)`(`[`Sys.Date`](https://rdrr.io/r/base/Sys.time.html)`(``)``, ``"MMDDYY10."``)`` ``# [1] "03/25/2026"`` `` ``# Custom strftime pattern`` `[`fnew_date`](reference/fnew_date.md)`(``"%d.%m.%Y"``, name ``=`` ``"ru_date"``, type ``=`` ``"date"``)`` `[`fput`](reference/fput.md)`(`[`Sys.Date`](https://rdrr.io/r/base/Sys.time.html)`(``)``, ``"ru_date"``)`` ``# [1] "25.03.2026"`
+[`fputn`](https://crow16384.github.io/ksformat/reference/fputn.md)`(`[`Sys.Date`](https://rdrr.io/r/base/Sys.time.html)`(``)``, ``"DATE9."``)`` ``# [1] "25MAR2026"`` `` `[`fputn`](https://crow16384.github.io/ksformat/reference/fputn.md)`(`[`Sys.Date`](https://rdrr.io/r/base/Sys.time.html)`(``)``, ``"MMDDYY10."``)`` ``# [1] "03/25/2026"`` `` ``# Custom strftime pattern`` `[`fnew_date`](https://crow16384.github.io/ksformat/reference/fnew_date.md)`(``"%d.%m.%Y"``, name ``=`` ``"ru_date"``, type ``=`` ``"date"``)`` `[`fput`](https://crow16384.github.io/ksformat/reference/fput.md)`(`[`Sys.Date`](https://rdrr.io/r/base/Sys.time.html)`(``)``, ``"ru_date"``)`` ``# [1] "25.03.2026"`
 
 Time (seconds since midnight) and datetime are also supported:
 
-[`fputn`](reference/fputn.md)`(``3600``, ``"TIME8."``)`` ``# [1] "1:00:00"`` `` `[`fputn`](reference/fputn.md)`(`[`Sys.time`](https://rdrr.io/r/base/Sys.time.html)`(``)``, ``"DATETIME20."``)`
+[`fputn`](https://crow16384.github.io/ksformat/reference/fputn.md)`(``3600``, ``"TIME8."``)`` ``# [1] "1:00:00"`` `` `[`fputn`](https://crow16384.github.io/ksformat/reference/fputn.md)`(`[`Sys.time`](https://rdrr.io/r/base/Sys.time.html)`(``)``, ``"DATETIME20."``)`
 
 ## Expression labels
 
 Labels containing `.x1`, `.x2`, etc. are evaluated as R expressions at
 apply-time. Pass extra arguments through `fput(x, fmt, ...)`:
 
-`stat_fmt`` ``<-`` `[`fnew`](reference/fnew.md)`(`` `` ``"n"`` ``=`` ``"sprintf('%s', .x1)"``,`` `` ``"pct"`` ``=`` ``"sprintf('%.1f%%', .x1 * 100)"``,`` `` name ``=`` ``"stat"``, type ``=`` ``"character"`` ``)`` `` `[`fput`](reference/fput.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"n"``, ``"pct"``)``, ``stat_fmt``, `[`c`](https://rdrr.io/r/base/c.html)`(``42``, ``0.053``)``)`` ``# [1] "42" "5.3%"`
+`stat_fmt`` ``<-`` `[`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md)`(`` `` ``"n"`` ``=`` ``"sprintf('%s', .x1)"``,`` `` ``"pct"`` ``=`` ``"sprintf('%.1f%%', .x1 * 100)"``,`` `` name ``=`` ``"stat"``, type ``=`` ``"character"`` ``)`` `` `[`fput`](https://crow16384.github.io/ksformat/reference/fput.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"n"``, ``"pct"``)``, ``stat_fmt``, `[`c`](https://rdrr.io/r/base/c.html)`(``42``, ``0.053``)``)`` ``# [1] "42" "5.3%"`
 
-Use [`e()`](reference/e.md) to mark a label for evaluation even without
-`.xN` placeholders:
+Use [`e()`](https://crow16384.github.io/ksformat/reference/e.md) to mark
+a label for evaluation even without `.xN` placeholders:
 
-[`fnew`](reference/fnew.md)`(``"ts"`` ``=`` `[`e`](reference/e.md)`(``"format(Sys.time(), '%Y-%m-%d')"``)``, name ``=`` ``"demo"``)`` `[`fput`](reference/fput.md)`(``"ts"``, ``"demo"``)`
+[`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md)`(``"ts"`` ``=`` `[`e`](https://crow16384.github.io/ksformat/reference/e.md)`(``"format(Sys.time(), '%Y-%m-%d')"``)``, name ``=`` ``"demo"``)`` `[`fput`](https://crow16384.github.io/ksformat/reference/fput.md)`(``"ts"``, ``"demo"``)`
 
 ## Case-insensitive matching
 
-[`fnew`](reference/fnew.md)`(``"M"`` ``=`` ``"Male"``, ``"F"`` ``=`` ``"Female"``, name ``=`` ``"sex_nc"``,`` `` type ``=`` ``"character"``, ignore_case ``=`` ``TRUE``)`` `` `[`fput`](reference/fput.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"m"``, ``"F"``, ``"M"``, ``"f"``)``, ``"sex_nc"``)`` ``# [1] "Male" "Female" "Male" "Female"`
+[`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md)`(``"M"`` ``=`` ``"Male"``, ``"F"`` ``=`` ``"Female"``, name ``=`` ``"sex_nc"``,`` `` type ``=`` ``"character"``, ignore_case ``=`` ``TRUE``)`` `` `[`fput`](https://crow16384.github.io/ksformat/reference/fput.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"m"``, ``"F"``, ``"M"``, ``"f"``)``, ``"sex_nc"``)`` ``# [1] "Male" "Female" "Male" "Female"`
 
 ## Missing value handling
 
@@ -127,22 +129,24 @@ Options: `keep_na = TRUE`, `na_if`, `include_empty = TRUE`.
 ## Cheat sheet
 
 - **In R:** run
-  [`ksformat_cheatsheet()`](reference/ksformat_cheatsheet.md) to open
-  the cheat sheet in your browser (HTML), or
+  [`ksformat_cheatsheet()`](https://crow16384.github.io/ksformat/reference/ksformat_cheatsheet.md)
+  to open the cheat sheet in your browser (HTML), or
   `ksformat_cheatsheet("pdf")` for the PDF.
-- **In this repo:** [HTML](inst/doc/ksformat-cheatsheet.md) \|
-  [PDF](inst/doc/ksformat-cheatsheet.pdf)
+- **In this repo:**
+  [HTML](https://crow16384.github.io/ksformat/inst/doc/ksformat-cheatsheet.md)
+  \|
+  [PDF](https://crow16384.github.io/ksformat/inst/doc/ksformat-cheatsheet.pdf)
 
 ## Function reference
 
 | Area | Functions |
 |----|----|
-| **Creation** | [`fnew()`](reference/fnew.md), [`finput()`](reference/finput.md), [`fnew_bid()`](reference/fnew_bid.md), [`fnew_date()`](reference/fnew_date.md), [`fparse()`](reference/fparse.md), [`e()`](reference/e.md) |
-| **Application** | [`fput()`](reference/fput.md), [`fputn()`](reference/fputn.md), [`fputc()`](reference/fputc.md), [`fput_all()`](reference/fput_all.md), [`fput_df()`](reference/fput_df.md) |
-| **Reverse** | [`finputn()`](reference/finputn.md), [`finputc()`](reference/finputc.md) |
-| **Library** | [`format_get()`](reference/format_get.md), [`fprint()`](reference/fprint.md), [`fclear()`](reference/fclear.md), [`fexport()`](reference/fexport.md), [`fimport()`](reference/fimport.md), [`format_library_app()`](reference/format_library_app.md) |
-| **Utilities** | [`is_missing()`](reference/is_missing.md), [`range_spec()`](reference/range_spec.md) |
-| **Documentation** | [`ksformat_cheatsheet()`](reference/ksformat_cheatsheet.md) — open cheat sheet |
+| **Creation** | [`fnew()`](https://crow16384.github.io/ksformat/reference/fnew.md), [`finput()`](https://crow16384.github.io/ksformat/reference/finput.md), [`fnew_bid()`](https://crow16384.github.io/ksformat/reference/fnew_bid.md), [`fnew_date()`](https://crow16384.github.io/ksformat/reference/fnew_date.md), [`fparse()`](https://crow16384.github.io/ksformat/reference/fparse.md), [`e()`](https://crow16384.github.io/ksformat/reference/e.md) |
+| **Application** | [`fput()`](https://crow16384.github.io/ksformat/reference/fput.md), [`fputn()`](https://crow16384.github.io/ksformat/reference/fputn.md), [`fputc()`](https://crow16384.github.io/ksformat/reference/fputc.md), [`fput_all()`](https://crow16384.github.io/ksformat/reference/fput_all.md), [`fput_df()`](https://crow16384.github.io/ksformat/reference/fput_df.md) |
+| **Reverse** | [`finputn()`](https://crow16384.github.io/ksformat/reference/finputn.md), [`finputc()`](https://crow16384.github.io/ksformat/reference/finputc.md) |
+| **Library** | [`format_get()`](https://crow16384.github.io/ksformat/reference/format_get.md), [`fprint()`](https://crow16384.github.io/ksformat/reference/fprint.md), [`fclear()`](https://crow16384.github.io/ksformat/reference/fclear.md), [`fexport()`](https://crow16384.github.io/ksformat/reference/fexport.md), [`fimport()`](https://crow16384.github.io/ksformat/reference/fimport.md), [`format_library_app()`](https://crow16384.github.io/ksformat/reference/format_library_app.md) |
+| **Utilities** | [`is_missing()`](https://crow16384.github.io/ksformat/reference/is_missing.md), [`range_spec()`](https://crow16384.github.io/ksformat/reference/range_spec.md) |
+| **Documentation** | [`ksformat_cheatsheet()`](https://crow16384.github.io/ksformat/reference/ksformat_cheatsheet.md) — open cheat sheet |
 
 ## Development
 
@@ -154,4 +158,4 @@ When bumping the package version, update `DESCRIPTION` and then run\
 
 ## License
 
-GPL-3. See <https://www.gnu.org/licenses/gpl-3.0.html>.
+GPL-3. See <https://spdx.org/licenses/GPL-3.0-only.html>.

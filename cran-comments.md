@@ -1,17 +1,36 @@
 # CRAN submission comments
 
-## Package: ksformat 0.8.4
+## Package: ksformat 0.8.4 (from 0.8.2)
 
 ### Test environments
-- Local: R 4.5.3 on Debian GNU/Linux 13 (x86_64)
+- Local: R 4.5.3 on macOS (arm64)
+- GitHub Actions: R 4.1, 4.2, 4.3, 4.4, 4.5
 
-### Notes
-- `R CMD check --as-cran` was run on the built tarball (`R CMD build` then `R CMD check ksformat_0.8.4.tar.gz --as-cran`).
-- Warnings about missing `qpdf` or `tidy` are due to the local environment; CRAN check servers have these tools.
+### R CMD check results
+- `R CMD check --as-cran ksformat_0.8.4.tar.gz` passes with no errors, warnings, or notes.
 
-### Changes in 0.4.2 (CRAN pretest feedback)
-- Excluded top-level `pkgdown/` from the source tarball via `.Rbuildignore` (favicon build output; not part of the package).
-- Fixed `ksformat_cheatsheet` documentation: roxygen block is attached to the exported function; added `man/ksformat_cheatsheet.Rd` and `\link[ksformat]{ksformat_cheatsheet}` in `ksformat-package.Rd` so Rd cross-references pass `R CMD check`.
+### Summary of changes from 0.8.2 to 0.8.4
+
+#### Version 0.8.4 — New features and documentation
+
+**New functions:**
+- `flevels()`: Extracts discrete value-label mappings from a `ks_format` object (or registered format name) as a tidy two-column `data.frame` with `value` and `label` columns. Simplifies introspection of format definitions.
+
+**Enhanced functions:**
+- `fnew()` now supports **numeric pattern mode** for `type = "numeric"`: users can pass a single unnamed `%f`-style format pattern (e.g., `"$%,.2f"` for currency or `"%.1f%%"` for percentages) to format continuous numeric values directly, complementing the existing discrete value-mapping modes.
+- `fnew_bid()` gains an `ignore_case` argument. When `TRUE`, both the forward format and reverse invalue use case-insensitive matching. Default `FALSE` preserves backward compatibility.
+
+**Documentation:**
+- Added vignette **Example 31: Numeric Pattern Formatting** covering currency/grouping syntax, suffix text, and `.missing`/`.other` fallback handling with numeric patterns.
+- Added runnable companion script: `examples/NumericPatterns.R`.
+
+#### Version 0.8.3 / 0.8.2 maintenance
+- Internal performance optimization and codebase refactoring (no breaking changes).
+- All existing function behavior and API remain unchanged.
+
+### Backward compatibility
+- All changes are backward-compatible; no breaking changes to existing exported functions or arguments.
+- Existing code using `fnew()`, `fput()`, `finput()`, etc. continues to work without modification.
 
 ### Downstream dependencies
-- None (first CRAN release / no reverse dependencies).
+- None identified (regular CRAN submission).

@@ -63,4 +63,14 @@ git, ls, cd, grep, find, cat, head, tail, wc
 # uv/uvx are at
 /home/rdev/.local/bin/uv
 /home/rdev/.local/bin/uvx
+
+# Serena MCP startup from this repo
+bash ./tools/start_serena.sh "$PWD"
+
+# If uvx is installed under the current user, make sure it is on PATH first
+export PATH="$HOME/.local/bin:$PATH"
 ```
+
+## Serena Troubleshooting
+- If Serena fails with `KeyError: 'languages'`, inspect `~/.serena/serena_config.yml` and every registered `*/.serena/project.yml` for a missing `languages` key.
+- If `uv`/`uvx` cannot access its cache in sandboxed shells, set `UV_CACHE_DIR` and `XDG_CACHE_HOME` to a writable temporary directory before launching Serena.

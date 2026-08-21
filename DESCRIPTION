@@ -22,7 +22,7 @@ Description: Provides 'SAS' 'PROC FORMAT'-like functionality for creating and ap
   names, multi-label formats, expression labels evaluated at apply-time,
     case-insensitive matching, import/export of format definitions, and proper handling
     of missing values (NA, NULL, NaN).
-URL: https://github.com/crow16384/ksformat
+URL: https://crow16384.github.io/ksformat/, https://github.com/crow16384/ksformat
 BugReports: https://github.com/crow16384/ksformat/issues
 License: GPL-3
 Encoding: UTF-8

@@ -23,8 +23,9 @@ fputn(x, format_name, ...)
 
 - ...:
 
-  Additional arguments passed to [`fput`](fput.md) for expression labels
-  (mapped to `.x1`, `.x2`, etc.).
+  Additional arguments passed to
+  [`fput`](https://crow16384.github.io/ksformat/reference/fput.md) for
+  expression labels (mapped to `.x1`, `.x2`, etc.).
 
 ## Value
 

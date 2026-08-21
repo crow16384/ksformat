@@ -84,10 +84,12 @@ Comma-separated options can be placed inside the parentheses after the
 type:
 
 - `nocase` — enables case-insensitive key matching (equivalent to
-  `ignore_case = TRUE` in [`fnew`](fnew.md)).
+  `ignore_case = TRUE` in
+  [`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md)).
 
 - `multilabel` — allows overlapping ranges where a single value matches
-  multiple labels (used with [`fput_all`](fput_all.md)).
+  multiple labels (used with
+  [`fput_all`](https://crow16384.github.io/ksformat/reference/fput_all.md)).
 
 Options can be combined: `VALUE name (character, nocase, multilabel)`.
 

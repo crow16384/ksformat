@@ -26,7 +26,8 @@ an empty data frame with the same columns is returned.
 
 For range-based formats, `value` contains the internal range key
 representation (for example, `"0,18,TRUE,FALSE"`). Use
-[`franges()`](franges.md) to retrieve parsed range bounds.
+[`franges()`](https://crow16384.github.io/ksformat/reference/franges.md)
+to retrieve parsed range bounds.
 
 ## Examples
 

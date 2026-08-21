@@ -22,9 +22,9 @@ finput(
 - ...:
 
   Named arguments defining label-value mappings (reverse of
-  [`fnew`](fnew.md)), or one or more named vectors/lists using
-  `c(Label = value)`. Example: `"Male" = 1, "Female" = 2` or
-  `c(Male = 1, Female = 2)`.
+  [`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md)), or
+  one or more named vectors/lists using `c(Label = value)`. Example:
+  `"Male" = 1, "Female" = 2` or `c(Male = 1, Female = 2)`.
 
 - name:
 
@@ -36,7 +36,9 @@ finput(
   Character. Type to convert to: `"numeric"` (default), `"integer"`,
   `"character"`, or `"logical"`. INVALUE formats produce numeric output
   by default; character-to-character conversion should use a regular
-  VALUE format ([`fnew`](fnew.md)) instead.
+  VALUE format
+  ([`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md))
+  instead.
 
 - missing_value:
 

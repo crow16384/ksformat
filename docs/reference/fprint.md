@@ -23,8 +23,9 @@ Invisible `NULL`. This function is for display only.
 
 ## See also
 
-[`flist`](flist.md) for a programmatic alternative that returns a
-character vector of registered names.
+[`flist`](https://crow16384.github.io/ksformat/reference/flist.md) for a
+programmatic alternative that returns a character vector of registered
+names.
 
 ## Examples
 

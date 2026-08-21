@@ -9,5 +9,8 @@
 .DS_*
 ._.DS_*
 ._*
+/.serena/
+/.serena.project
+/.serenaproject
 /doc/
 /Meta/

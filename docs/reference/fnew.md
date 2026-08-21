@@ -38,8 +38,8 @@ fnew(
   - Numeric pattern string: one unnamed `%f`-style pattern such as
     `"%,.2f"`, `"$%,.2f"`, or `"%.1f%%"` (for `type = "numeric"`)
 
-  - [`fmap`](fmap.md) vector: `fmap(keys, values)` for data-driven
-    formats (no reversal)
+  - [`fmap`](https://crow16384.github.io/ksformat/reference/fmap.md)
+    vector: `fmap(keys, values)` for data-driven formats (no reversal)
 
   - Special values: `.missing = "Missing"`, `.other = "Other"`
 
@@ -56,10 +56,11 @@ fnew(
   names.
 
   **Data-driven formats:** For formats built programmatically from data,
-  wrap your data in [`fmap`](fmap.md)`(keys, values)` to suppress
-  automatic reversal for all types. See
-  [`vignette("usage_examples")`](../articles/usage_examples.md) Example
-  21 for a detailed walkthrough.
+  wrap your data in
+  [`fmap`](https://crow16384.github.io/ksformat/reference/fmap.md)`(keys, values)`
+  to suppress automatic reversal for all types. See
+  [`vignette("usage_examples")`](https://crow16384.github.io/ksformat/articles/usage_examples.md)
+  Example 21 for a detailed walkthrough.
 
 - name:
 
@@ -87,8 +88,8 @@ fnew(
 
   Logical. If `TRUE`, the format supports overlapping ranges where a
   single value can match multiple labels. Used with
-  [`fput_all`](fput_all.md) to retrieve all matching labels. Default
-  `FALSE`.
+  [`fput_all`](https://crow16384.github.io/ksformat/reference/fput_all.md)
+  to retrieve all matching labels. Default `FALSE`.
 
 - ignore_case:
 
@@ -151,8 +152,9 @@ depends on the output `type`:
 
 This means the *same data* may need to be arranged differently depending
 on the target type. To avoid this inconsistency for data-driven formats,
-use [`fmap`](fmap.md)`(keys, values)` which works identically for all
-types:
+use
+[`fmap`](https://crow16384.github.io/ksformat/reference/fmap.md)`(keys, values)`
+which works identically for all types:
 
     fnew(fmap(ids, dates), type = "Date")
     fnew(fmap(ids, date_strings), type = "character")
@@ -162,7 +164,8 @@ reversed regardless of type.
 
 **Expression labels:** If a label contains `.x1`, `.x2`, etc., it is
 treated as an R expression that is evaluated at apply-time. Extra
-arguments are passed positionally via `...` in [`fput`](fput.md):
+arguments are passed positionally via `...` in
+[`fput`](https://crow16384.github.io/ksformat/reference/fput.md):
 
     stat_fmt <- fnew("n" = "sprintf('%s', .x1)",
                      "pct" = "sprintf('%.1f%%', .x1 * 100)")

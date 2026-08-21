@@ -13,6 +13,12 @@ Maps values to labels (formats), labels back to values (invalues), with range, d
 - **OS**: macOS / Linux (cross-platform development)
 - **uv**: installed at ~/.local/bin/uv (for Serena MCP)
 
+## Serena MCP Notes
+- VS Code MCP entry points to `tools/start_serena.sh` via `.vscode/mcp.json`.
+- The launcher now prefers absolute binaries from `~/.local/bin` and sets writable `UV_CACHE_DIR`/`XDG_CACHE_HOME` defaults when the shell environment is restricted.
+- Serena startup depends on the global config at `~/.serena/serena_config.yml`; stale registered projects with `.serena/project.yml` missing `languages` can crash startup with `KeyError: 'languages'`.
+- During repair, multiple older Serena project configs under `~/Develop/*/.serena/project.yml` were migrated to include `languages`.
+
 ## Version\n- Current: 0.8.4\n- License: GPL-3
 
 ## Core Concepts

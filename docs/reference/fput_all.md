@@ -1,8 +1,10 @@
 # Apply Format and Return All Matches (Multilabel)
 
 For multilabel formats, returns all matching labels for each input
-value. Regular [`fput`](fput.md) returns only the first match; this
-function returns all matches as a list of character vectors.
+value. Regular
+[`fput`](https://crow16384.github.io/ksformat/reference/fput.md) returns
+only the first match; this function returns all matches as a list of
+character vectors.
 
 ## Usage
 

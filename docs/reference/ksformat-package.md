@@ -10,65 +10,77 @@ date/time/datetime formatting, and proper handling of missing values
 
 **Format creation:**
 
-- [`fnew`](fnew.md) — create value-to-label mappings (formats)
+- [`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md) —
+  create value-to-label mappings (formats)
 
-- [`finput`](finput.md) — create reverse mappings (label-to-value
-  invalues)
+- [`finput`](https://crow16384.github.io/ksformat/reference/finput.md) —
+  create reverse mappings (label-to-value invalues)
 
-- [`fnew_bid`](fnew_bid.md) — create both format and invalue
-  simultaneously
+- [`fnew_bid`](https://crow16384.github.io/ksformat/reference/fnew_bid.md)
+  — create both format and invalue simultaneously
 
-- [`fnew_date`](fnew_date.md) — create date/time/datetime formats
-  ('SAS'-style or custom `strftime` patterns)
+- [`fnew_date`](https://crow16384.github.io/ksformat/reference/fnew_date.md)
+  — create date/time/datetime formats ('SAS'-style or custom `strftime`
+  patterns)
 
-- [`fparse`](fparse.md) — parse 'SAS'-like format definitions from text
-  or file
+- [`fparse`](https://crow16384.github.io/ksformat/reference/fparse.md) —
+  parse 'SAS'-like format definitions from text or file
 
-- [`fimport`](fimport.md) — import formats from a 'SAS' CNTLOUT CSV file
+- [`fimport`](https://crow16384.github.io/ksformat/reference/fimport.md)
+  — import formats from a 'SAS' CNTLOUT CSV file
 
-- [`e`](e.md) — mark a label for expression evaluation at apply-time
+- [`e`](https://crow16384.github.io/ksformat/reference/e.md) — mark a
+  label for expression evaluation at apply-time
 
 **Format application:**
 
-- [`fput`](fput.md) — apply a format to a vector (value to label)
+- [`fput`](https://crow16384.github.io/ksformat/reference/fput.md) —
+  apply a format to a vector (value to label)
 
-- [`fputn`](fputn.md) — apply a numeric format by name (like 'SAS' PUTN)
+- [`fputn`](https://crow16384.github.io/ksformat/reference/fputn.md) —
+  apply a numeric format by name (like 'SAS' PUTN)
 
-- [`fputc`](fputc.md) — apply a character format by name (like 'SAS'
-  PUTC)
+- [`fputc`](https://crow16384.github.io/ksformat/reference/fputc.md) —
+  apply a character format by name (like 'SAS' PUTC)
 
-- [`fput_all`](fput_all.md) — apply a multilabel format returning all
-  matching labels
+- [`fput_all`](https://crow16384.github.io/ksformat/reference/fput_all.md)
+  — apply a multilabel format returning all matching labels
 
-- [`fput_df`](fput_df.md) — apply formats to data frame columns
+- [`fput_df`](https://crow16384.github.io/ksformat/reference/fput_df.md)
+  — apply formats to data frame columns
 
 **Reverse formatting:**
 
-- [`finputn`](finputn.md) — apply a numeric invalue by name (like 'SAS'
-  INPUTN)
+- [`finputn`](https://crow16384.github.io/ksformat/reference/finputn.md)
+  — apply a numeric invalue by name (like 'SAS' INPUTN)
 
-- [`finputc`](finputc.md) — apply a character invalue by name (like
-  'SAS' INPUTC)
+- [`finputc`](https://crow16384.github.io/ksformat/reference/finputc.md)
+  — apply a character invalue by name (like 'SAS' INPUTC)
 
 **Format library:**
 
-- [`format_get`](format_get.md) — retrieve a format from the global
-  library
+- [`format_get`](https://crow16384.github.io/ksformat/reference/format_get.md)
+  — retrieve a format from the global library
 
-- [`fprint`](fprint.md) — list or display registered formats
+- [`fprint`](https://crow16384.github.io/ksformat/reference/fprint.md) —
+  list or display registered formats
 
-- [`fclear`](fclear.md) — remove one or all formats from the library
+- [`fclear`](https://crow16384.github.io/ksformat/reference/fclear.md) —
+  remove one or all formats from the library
 
-- [`format_library_app`](format_library_app.md) — open interactive
-  library browser (Shiny)
+- [`format_library_app`](https://crow16384.github.io/ksformat/reference/format_library_app.md)
+  — open interactive library browser (Shiny)
 
-- [`fexport`](fexport.md) — export formats to 'SAS'-like text
+- [`fexport`](https://crow16384.github.io/ksformat/reference/fexport.md)
+  — export formats to 'SAS'-like text
 
 **Utilities:**
 
-- [`is_missing`](is_missing.md) — check for NA, NaN, and empty strings
+- [`is_missing`](https://crow16384.github.io/ksformat/reference/is_missing.md)
+  — check for NA, NaN, and empty strings
 
-- [`range_spec`](range_spec.md) — create a range specification object
+- [`range_spec`](https://crow16384.github.io/ksformat/reference/range_spec.md)
+  — create a range specification object
 
 **Key features:**
 
@@ -76,14 +88,17 @@ date/time/datetime formatting, and proper handling of missing values
   inclusive/exclusive bounds
 
 - *Multilabel* formats — a value can match multiple labels
-  (`multilabel = TRUE` in [`fnew`](fnew.md), retrieved with
-  [`fput_all`](fput_all.md))
+  (`multilabel = TRUE` in
+  [`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md),
+  retrieved with
+  [`fput_all`](https://crow16384.github.io/ksformat/reference/fput_all.md))
 
 - *Case-insensitive matching* (`ignore_case = TRUE` in
-  [`fnew`](fnew.md))
+  [`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md))
 
 - *Expression labels* — labels containing `.x1`, `.x2`, etc. are
-  evaluated at apply-time; see also [`e`](e.md)
+  evaluated at apply-time; see also
+  [`e`](https://crow16384.github.io/ksformat/reference/e.md)
 
 - *Date/time/datetime* formatting with built-in 'SAS' format names
   (auto-resolved) or custom `strftime` patterns
@@ -93,8 +108,9 @@ date/time/datetime formatting, and proper handling of missing values
 
 - *CNTLOUT import* — read format catalogues exported from 'SAS'
 
-Cheat sheet: run [`ksformat_cheatsheet()`](ksformat_cheatsheet.md) to
-open the HTML version in your browser, or see the files in
+Cheat sheet: run
+[`ksformat_cheatsheet()`](https://crow16384.github.io/ksformat/reference/ksformat_cheatsheet.md)
+to open the HTML version in your browser, or see the files in
 `system.file("doc", package = "ksformat")`.
 
 ## See also
@@ -169,7 +185,7 @@ fput_all(c(10, 30), ml)
 
 # Date format (SAS-style, auto-resolved)
 fputn(Sys.Date(), "DATE9.")
-#> [1] "13AUG2026"
+#> [1] "21AUG2026"
 
 # Export and library management
 cat(fexport(sex = format_get("sex")))

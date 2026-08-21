@@ -23,7 +23,7 @@ protocol-defined windows. The same idea extends to arm-specific rules,
 where one stratum has a slightly different window structure from
 another.
 
-`windows`` ``<-`` `[`fmap_strata`](../reference/fmap_strata.md)`(`` `` stratum ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"ARM_A"``, ``"ARM_A"``, ``"ARM_A"``, ``"ARM_B"``, ``"ARM_B"``)``,`` `` low ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``0``, ``7``, ``28``, ``0``, ``14``)``,`` `` high ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``7``, ``28``, ``Inf``, ``14``, ``Inf``)``,`` `` label ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"Baseline"``, ``"Wk1-3"``, ``"Wk4+"``, ``"Baseline"``, ``"Wk2+"``)``,`` `` inc_high ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``FALSE``, ``FALSE``, ``TRUE``, ``FALSE``, ``TRUE``)`` ``)`` `` `[`fnew`](../reference/fnew.md)`(`` `` ``windows``,`` `` type ``=`` ``"stratified_range"``,`` `` name ``=`` ``"visit_window"``,`` `` .other ``=`` ``"Outside window"`` ``)`` `` ``visit_df`` ``<-`` ``tibble``(`` `` arm ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"ARM_A"``, ``"ARM_A"``, ``"ARM_B"``, ``"ARM_B"``, ``"ARM_C"``)``,`` `` day ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``3``, ``35``, ``5``, ``40``, ``10``)`` ``)`` ``|>`` ``mutate``(`` `` window ``=`` `[`fputk`](../reference/fputk.md)`(``arm``, ``day``, format ``=`` ``"visit_window"``)``,`` ``)`` `` ``visit_df`
+`windows`` ``<-`` `[`fmap_strata`](https://crow16384.github.io/ksformat/reference/fmap_strata.md)`(`` `` stratum ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"ARM_A"``, ``"ARM_A"``, ``"ARM_A"``, ``"ARM_B"``, ``"ARM_B"``)``,`` `` low ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``0``, ``7``, ``28``, ``0``, ``14``)``,`` `` high ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``7``, ``28``, ``Inf``, ``14``, ``Inf``)``,`` `` label ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"Baseline"``, ``"Wk1-3"``, ``"Wk4+"``, ``"Baseline"``, ``"Wk2+"``)``,`` `` inc_high ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``FALSE``, ``FALSE``, ``TRUE``, ``FALSE``, ``TRUE``)`` ``)`` `` `[`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md)`(`` `` ``windows``,`` `` type ``=`` ``"stratified_range"``,`` `` name ``=`` ``"visit_window"``,`` `` .other ``=`` ``"Outside window"`` ``)`` `` ``visit_df`` ``<-`` ``tibble``(`` `` arm ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"ARM_A"``, ``"ARM_A"``, ``"ARM_B"``, ``"ARM_B"``, ``"ARM_C"``)``,`` `` day ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``3``, ``35``, ``5``, ``40``, ``10``)`` ``)`` ``|>`` ``mutate``(`` `` window ``=`` `[`fputk`](https://crow16384.github.io/ksformat/reference/fputk.md)`(``arm``, ``day``, format ``=`` ``"visit_window"``)``,`` ``)`` `` ``visit_df`
 
 This is useful for:
 
@@ -35,10 +35,11 @@ This is useful for:
 
 Clinical trial data often uses multi-column logic: lab category + test
 code + unit, or population + analysis flag + visit type.
-[`fputk()`](../reference/fputk.md) can build a lookup from multiple
-fields without manually concatenating in the analysis step.
+[`fputk()`](https://crow16384.github.io/ksformat/reference/fputk.md) can
+build a lookup from multiple fields without manually concatenating in
+the analysis step.
 
-[`fnew`](../reference/fnew.md)`(`` `` `[`fmap`](../reference/fmap.md)`(`` `` `[`paste`](https://rdrr.io/r/base/paste.html)`(`` `` `[`c`](https://rdrr.io/r/base/c.html)`(``"BLOOD CHEMISTRY"``, ``"COAGULOGRAM"``, ``"COAGULATION PANEL"``, ``"COAGULOGRAM"``)``,`` `` `[`c`](https://rdrr.io/r/base/c.html)`(``"BLOOD"``, ``"BLOOD"``, ``"BLOOD"``, ``"BLOOD"``)``,`` `` `[`c`](https://rdrr.io/r/base/c.html)`(``"ALB"``, ``"FIBRINO"``, ``"INR"``, ``"INR"``)``,`` `` `[`c`](https://rdrr.io/r/base/c.html)`(``"g/L"``, ``"g/L"``, ``NA``, ``NA``)``,`` `` sep ``=`` ``"|"`` `` ``)``,`` `` `[`c`](https://rdrr.io/r/base/c.html)`(``"ALB"``, ``"FIBRINO"``, ``"INR"``, ``"INR"``)`` `` ``)``,`` `` type ``=`` ``"character"``,`` `` name ``=`` ``"lb_param"``,`` `` ignore_case ``=`` ``TRUE``,`` `` .other ``=`` ``NA`` ``)`` `` ``lab_df`` ``<-`` ``tibble``(`` `` LBCAT ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"BLOOD CHEMISTRY"``, ``"COAGULOGRAM"``, ``"COAGULATION PANEL"``)``,`` `` LBSPEC ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"BLOOD"``, ``"BLOOD"``, ``"BLOOD"``)``,`` `` LBTESTCD ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"ALB"``, ``"INR"``, ``"INR"``)``,`` `` LBSTRESU ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"g/L"``, ``NA``, ``NA``)`` ``)`` ``|>`` ``mutate``(`` `` PARAMCD ``=`` `[`fputk`](../reference/fputk.md)`(``LBCAT``, ``LBSPEC``, ``LBTESTCD``, ``LBSTRESU``, format ``=`` ``"lb_param"``, na_as_string ``=`` ``TRUE``)`` ``)`` `` ``lab_df`
+[`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md)`(`` `` `[`fmap`](https://crow16384.github.io/ksformat/reference/fmap.md)`(`` `` `[`paste`](https://rdrr.io/r/base/paste.html)`(`` `` `[`c`](https://rdrr.io/r/base/c.html)`(``"BLOOD CHEMISTRY"``, ``"COAGULOGRAM"``, ``"COAGULATION PANEL"``, ``"COAGULOGRAM"``)``,`` `` `[`c`](https://rdrr.io/r/base/c.html)`(``"BLOOD"``, ``"BLOOD"``, ``"BLOOD"``, ``"BLOOD"``)``,`` `` `[`c`](https://rdrr.io/r/base/c.html)`(``"ALB"``, ``"FIBRINO"``, ``"INR"``, ``"INR"``)``,`` `` `[`c`](https://rdrr.io/r/base/c.html)`(``"g/L"``, ``"g/L"``, ``NA``, ``NA``)``,`` `` sep ``=`` ``"|"`` `` ``)``,`` `` `[`c`](https://rdrr.io/r/base/c.html)`(``"ALB"``, ``"FIBRINO"``, ``"INR"``, ``"INR"``)`` `` ``)``,`` `` type ``=`` ``"character"``,`` `` name ``=`` ``"lb_param"``,`` `` ignore_case ``=`` ``TRUE``,`` `` .other ``=`` ``NA`` ``)`` `` ``lab_df`` ``<-`` ``tibble``(`` `` LBCAT ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"BLOOD CHEMISTRY"``, ``"COAGULOGRAM"``, ``"COAGULATION PANEL"``)``,`` `` LBSPEC ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"BLOOD"``, ``"BLOOD"``, ``"BLOOD"``)``,`` `` LBTESTCD ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"ALB"``, ``"INR"``, ``"INR"``)``,`` `` LBSTRESU ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"g/L"``, ``NA``, ``NA``)`` ``)`` ``|>`` ``mutate``(`` `` PARAMCD ``=`` `[`fputk`](https://crow16384.github.io/ksformat/reference/fputk.md)`(``LBCAT``, ``LBSPEC``, ``LBTESTCD``, ``LBSTRESU``, format ``=`` ``"lb_param"``, na_as_string ``=`` ``TRUE``)`` ``)`` `` ``lab_df`
 
 The same pattern is useful for:
 
@@ -48,12 +49,12 @@ The same pattern is useful for:
 
 ## 4 3. Reverse lookup for QC and cleaning
 
-[`finputk()`](../reference/finputk.md) is helpful when raw labels must
-be normalized back to codes. In clinical programming, that makes it
-suitable for QC checks, mapping vendor text, and validating
-reviewer-facing labels.
+[`finputk()`](https://crow16384.github.io/ksformat/reference/finputk.md)
+is helpful when raw labels must be normalized back to codes. In clinical
+programming, that makes it suitable for QC checks, mapping vendor text,
+and validating reviewer-facing labels.
 
-[`finput`](../reference/finput.md)`(`` `` `[`fmap`](../reference/fmap.md)`(`` `` `[`paste`](https://rdrr.io/r/base/paste.html)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"PLACEBO"``, ``"DRUG A"``, ``"DRUG B"``)``, `[`c`](https://rdrr.io/r/base/c.html)`(``"PBO"``, ``"A50"``, ``"B100"``)``, sep ``=`` ``"|"``)``,`` `` `[`c`](https://rdrr.io/r/base/c.html)`(``1L``, ``2L``, ``3L``)`` `` ``)``,`` `` target_type ``=`` ``"integer"``,`` `` name ``=`` ``"trt_code_inv"`` ``)`` `` ``trt_df`` ``<-`` ``tibble``(`` `` ARMN ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"PLACEBO"``, ``"DRUG A"``, ``"DRUG B"``, ``"UNKNOWN"``)``,`` `` TRTCD ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"PBO"``, ``"A50"``, ``"B100"``, ``"X"``)`` ``)`` ``|>`` ``mutate``(`` `` TRTSEQ ``=`` `[`finputk`](../reference/finputk.md)`(``ARMN``, ``TRTCD``, invalue_name ``=`` ``"trt_code_inv"``)`` ``)`` `` ``trt_df`
+[`finput`](https://crow16384.github.io/ksformat/reference/finput.md)`(`` `` `[`fmap`](https://crow16384.github.io/ksformat/reference/fmap.md)`(`` `` `[`paste`](https://rdrr.io/r/base/paste.html)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"PLACEBO"``, ``"DRUG A"``, ``"DRUG B"``)``, `[`c`](https://rdrr.io/r/base/c.html)`(``"PBO"``, ``"A50"``, ``"B100"``)``, sep ``=`` ``"|"``)``,`` `` `[`c`](https://rdrr.io/r/base/c.html)`(``1L``, ``2L``, ``3L``)`` `` ``)``,`` `` target_type ``=`` ``"integer"``,`` `` name ``=`` ``"trt_code_inv"`` ``)`` `` ``trt_df`` ``<-`` ``tibble``(`` `` ARMN ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"PLACEBO"``, ``"DRUG A"``, ``"DRUG B"``, ``"UNKNOWN"``)``,`` `` TRTCD ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"PBO"``, ``"A50"``, ``"B100"``, ``"X"``)`` ``)`` ``|>`` ``mutate``(`` `` TRTSEQ ``=`` `[`finputk`](https://crow16384.github.io/ksformat/reference/finputk.md)`(``ARMN``, ``TRTCD``, invalue_name ``=`` ``"trt_code_inv"``)`` ``)`` `` ``trt_df`
 
 Typical uses include:
 
@@ -67,7 +68,7 @@ Typical uses include:
 presentation. This is not a lookup table; it is a pattern-driven
 formatter.
 
-[`fnew`](../reference/fnew.md)`(``"$%,.2f"``, type ``=`` ``"numeric"``, name ``=`` ``"currency"``)`` `[`fnew`](../reference/fnew.md)`(``"%.1f%%"``, type ``=`` ``"numeric"``, name ``=`` ``"pct"``)`` `` ``summary_df`` ``<-`` ``tibble``(`` `` metric ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"Cost"``, ``"Response rate"``)``,`` `` raw ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``1234.56``, ``0.153``)`` ``)`` ``|>`` ``mutate``(`` `` display ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(`[`fputn`](../reference/fputn.md)`(``raw``[``1``]``, ``"currency"``)``, `[`fputn`](../reference/fputn.md)`(``raw``[``2``]`` ``*`` ``100``, ``"pct"``)``)`` ``)`` `` ``summary_df`
+[`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md)`(``"$%,.2f"``, type ``=`` ``"numeric"``, name ``=`` ``"currency"``)`` `[`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md)`(``"%.1f%%"``, type ``=`` ``"numeric"``, name ``=`` ``"pct"``)`` `` ``summary_df`` ``<-`` ``tibble``(`` `` metric ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"Cost"``, ``"Response rate"``)``,`` `` raw ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``1234.56``, ``0.153``)`` ``)`` ``|>`` ``mutate``(`` `` display ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(`[`fputn`](https://crow16384.github.io/ksformat/reference/fputn.md)`(``raw``[``1``]``, ``"currency"``)``, `[`fputn`](https://crow16384.github.io/ksformat/reference/fputn.md)`(``raw``[``2``]`` ``*`` ``100``, ``"pct"``)``)`` ``)`` `` ``summary_df`
 
 Same result could be achieved using expression labels, but in base R,
 [`sprintf()`](https://rdrr.io/r/base/sprintf.html) itself does not
@@ -75,7 +76,7 @@ support thousands separators such as commas. We can use `formatC` for
 the formatting purposes. **Pattern-driven formatter** looks simplier for
 such case.
 
-`stat_fmt`` ``<-`` `[`fnew`](../reference/fnew.md)`(`` `` ``#"currency" = "sprintf('$%,.2f', .x1)", # Will not work!`` `` ``"currency"`` ``=`` ``"formatC(.x1, digits = 2, big.mark = ',', format = 'f', decimal.mark = '.')"``,`` `` ``"pct"`` ``=`` ``"sprintf('%.1f%%', .x1 * 100)"``,`` `` name ``=`` ``"stat"``,`` `` type ``=`` ``"character"`` ``)`` `` ``summary_df`` ``<-`` ``tibble``(`` `` metric ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"Cost"``, ``"Response rate"``)``,`` `` raw ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``1234.56``, ``0.153``)``,`` `` format ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"currency"``,``"pct"``)`` ``)`` ``|>`` ``mutate``(`` `` display ``=`` `[`fput`](../reference/fput.md)`(``format``, ``stat_fmt``, ``raw``)`` ``)`` `` ``summary_df`
+`stat_fmt`` ``<-`` `[`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md)`(`` `` ``#"currency" = "sprintf('$%,.2f', .x1)", # Will not work!`` `` ``"currency"`` ``=`` ``"formatC(.x1, digits = 2, big.mark = ',', format = 'f', decimal.mark = '.')"``,`` `` ``"pct"`` ``=`` ``"sprintf('%.1f%%', .x1 * 100)"``,`` `` name ``=`` ``"stat"``,`` `` type ``=`` ``"character"`` ``)`` `` ``summary_df`` ``<-`` ``tibble``(`` `` metric ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"Cost"``, ``"Response rate"``)``,`` `` raw ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``1234.56``, ``0.153``)``,`` `` format ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"currency"``,``"pct"``)`` ``)`` ``|>`` ``mutate``(`` `` display ``=`` `[`fput`](https://crow16384.github.io/ksformat/reference/fput.md)`(``format``, ``stat_fmt``, ``raw``)`` ``)`` `` ``summary_df`
 
 This is useful for:
 
@@ -90,7 +91,7 @@ follow-up, and analysis cut-offs. `date_range` and `datetime_range` let
 you keep those rules in one place instead of duplicating them in ad hoc
 code.
 
-[`fparse`](../reference/fparse.md)`(``text ``=`` ``'`` ``VALUE study_period (date_range)`` `` [2024-01-01, 2024-02-01) = "Screening"`` `` [2024-02-01, 2024-06-01) = "Treatment"`` `` [2024-06-01, HIGH] = "Follow-up"`` `` .missing = "No date"`` ``;`` ``'``)`` `` ``obs_dates`` ``<-`` `[`as.Date`](https://rdrr.io/r/base/as.Date.html)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"2024-01-15"``, ``"2024-03-10"``, ``"2024-07-01"``, ``NA``)``)`` ``tibble``(`` `` date ``=`` ``obs_dates``,`` `` period ``=`` `[`fput`](../reference/fput.md)`(``obs_dates``, ``"study_period"``)`` ``)`
+[`fparse`](https://crow16384.github.io/ksformat/reference/fparse.md)`(``text ``=`` ``'`` ``VALUE study_period (date_range)`` `` [2024-01-01, 2024-02-01) = "Screening"`` `` [2024-02-01, 2024-06-01) = "Treatment"`` `` [2024-06-01, HIGH] = "Follow-up"`` `` .missing = "No date"`` ``;`` ``'``)`` `` ``obs_dates`` ``<-`` `[`as.Date`](https://rdrr.io/r/base/as.Date.html)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"2024-01-15"``, ``"2024-03-10"``, ``"2024-07-01"``, ``NA``)``)`` ``tibble``(`` `` date ``=`` ``obs_dates``,`` `` period ``=`` `[`fput`](https://crow16384.github.io/ksformat/reference/fput.md)`(``obs_dates``, ``"study_period"``)`` ``)`
 
 ## 7 6. Text generation for listings and narratives
 
@@ -98,7 +99,7 @@ Expression labels make `ksformat` useful for building small text
 fragments in reports. In clinical settings, that can be handy for
 reviewer comments, summary phrases, or footnotes.
 
-[`fnew`](../reference/fnew.md)`(`` `` ``"high"`` ``=`` ``"sprintf('Above threshold: %s', .x1)"``,`` `` ``"low"`` ``=`` ``"sprintf('Below threshold: %s', .x1)"``,`` `` name ``=`` ``"thr_note"`` ``)`` `` `[`fput`](../reference/fput.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"high"``, ``"low"``)``, ``"thr_note"``, `[`c`](https://rdrr.io/r/base/c.html)`(``18.2``, ``7.4``)``)`
+[`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md)`(`` `` ``"high"`` ``=`` ``"sprintf('Above threshold: %s', .x1)"``,`` `` ``"low"`` ``=`` ``"sprintf('Below threshold: %s', .x1)"``,`` `` name ``=`` ``"thr_note"`` ``)`` `` `[`fput`](https://crow16384.github.io/ksformat/reference/fput.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"high"``, ``"low"``)``, ``"thr_note"``, `[`c`](https://rdrr.io/r/base/c.html)`(``18.2``, ``7.4``)``)`
 
 This is especially useful when the label depends on:
 
@@ -113,16 +114,20 @@ are stable and owned by the analysis team. A few guardrails help:
 
 - keep the format definition close to the analysis spec
 - prefer a named format for rules reused across tables and datasets
-- use [`fclear()`](../reference/fclear.md) in examples and tests to
-  avoid leaking state between steps
+- use
+  [`fclear()`](https://crow16384.github.io/ksformat/reference/fclear.md)
+  in examples and tests to avoid leaking state between steps
 - use `na_as_string = TRUE` only when the key was built with literal
   `"NA"` components from [`paste()`](https://rdrr.io/r/base/paste.html)
 
 ## 9 8. `fparse()` syntax for all format families
 
-If you want to express [`fnew()`](../reference/fnew.md)-style rules as
-text, [`fparse()`](../reference/fparse.md) supports the same
-VALUE/INVALUE families as the package parser. The main idea is:
+If you want to express
+[`fnew()`](https://crow16384.github.io/ksformat/reference/fnew.md)-style
+rules as text,
+[`fparse()`](https://crow16384.github.io/ksformat/reference/fparse.md)
+supports the same VALUE/INVALUE families as the package parser. The main
+idea is:
 
 - use `VALUE` for forward lookup formats
 - use `INVALUE` for reverse lookup formats
@@ -132,19 +137,22 @@ VALUE/INVALUE families as the package parser. The main idea is:
 
 ### 9.1 VALUE blocks for discrete lookup
 
-[`fparse`](../reference/fparse.md)`(``text ``=`` ``'`` ``VALUE sex (character)`` `` "M" = "Male"`` `` "F" = "Female"`` `` .missing = "Unknown"`` `` .other = "Other"`` ``;`` `` ``VALUE age_group (numeric)`` `` [0, 18) = "Child"`` `` [18, 65) = "Adult"`` `` [65, HIGH] = "Senior"`` ``;`` ``'``)`
+[`fparse`](https://crow16384.github.io/ksformat/reference/fparse.md)`(``text ``=`` ``'`` ``VALUE sex (character)`` `` "M" = "Male"`` `` "F" = "Female"`` `` .missing = "Unknown"`` `` .other = "Other"`` ``;`` `` ``VALUE age_group (numeric)`` `` [0, 18) = "Child"`` `` [18, 65) = "Adult"`` `` [65, HIGH] = "Senior"`` ``;`` ``'``)`
 
 ### 9.2 INVALUE blocks for reverse lookup
 
-[`fparse`](../reference/fparse.md)`(``text ``=`` ``'`` ``INVALUE sex_inv`` `` "Male" = "M"`` `` "Female" = "F"`` `` .missing = "U"`` ``;`` ``'``)`
+[`fparse`](https://crow16384.github.io/ksformat/reference/fparse.md)`(``text ``=`` ``'`` ``INVALUE sex_inv`` `` "Male" = "M"`` `` "Female" = "F"`` `` .missing = "U"`` ``;`` ``'``)`
 
 ### 9.3 Date, time, and datetime patterns
 
-This is the direct [`fparse()`](../reference/fparse.md) equivalent of
-[`fnew_date()`](../reference/fnew_date.md). For these blocks,
-`pattern = ...` is the right way to specify the display format.
+This is the direct
+[`fparse()`](https://crow16384.github.io/ksformat/reference/fparse.md)
+equivalent of
+[`fnew_date()`](https://crow16384.github.io/ksformat/reference/fnew_date.md).
+For these blocks, `pattern = ...` is the right way to specify the
+display format.
 
-[`fparse`](../reference/fparse.md)`(``text ``=`` ``'`` ``VALUE enrldt (date)`` `` pattern = "DATE9."`` `` .missing = "Not Enrolled"`` ``;`` `` ``VALUE visit_time (time)`` `` pattern = "TIME8."`` ``;`` `` ``VALUE stamp (datetime)`` `` pattern = "DATETIME20."`` ``;`` ``'``)`
+[`fparse`](https://crow16384.github.io/ksformat/reference/fparse.md)`(``text ``=`` ``'`` ``VALUE enrldt (date)`` `` pattern = "DATE9."`` `` .missing = "Not Enrolled"`` ``;`` `` ``VALUE visit_time (time)`` `` pattern = "TIME8."`` ``;`` `` ``VALUE stamp (datetime)`` `` pattern = "DATETIME20."`` ``;`` ``'``)`
 
 ### 9.4 Numeric display patterns
 
@@ -152,31 +160,32 @@ Numeric display formatting now has its own parser syntax. Put the
 pattern in the VALUE header and keep the block otherwise empty except
 for optional `.missing` / `.other` directives.
 
-[`fparse`](../reference/fparse.md)`(``text ``=`` ``'`` ``VALUE currency (numeric, pattern: "$%,.2f")`` `` .missing = "NO DATA"`` ``;`` `` ``VALUE pct (numeric, pattern: "%.1f%%")`` ``;`` ``'``)`` `` ``tibble``(`` `` raw ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``1234.56``, ``-``7890.12``, ``0``, ``NA``)``,`` `` currency ``=`` `[`fputn`](../reference/fputn.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``1234.56``, ``-``7890.12``, ``0``, ``NA``)``, ``"currency"``)``,`` `` pct ``=`` `[`fputn`](../reference/fputn.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``0``, ``12.3``, ``-``4.5``, ``NA``)``, ``"pct"``)`` ``)`
+[`fparse`](https://crow16384.github.io/ksformat/reference/fparse.md)`(``text ``=`` ``'`` ``VALUE currency (numeric, pattern: "$%,.2f")`` `` .missing = "NO DATA"`` ``;`` `` ``VALUE pct (numeric, pattern: "%.1f%%")`` ``;`` ``'``)`` `` ``tibble``(`` `` raw ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``1234.56``, ``-``7890.12``, ``0``, ``NA``)``,`` `` currency ``=`` `[`fputn`](https://crow16384.github.io/ksformat/reference/fputn.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``1234.56``, ``-``7890.12``, ``0``, ``NA``)``, ``"currency"``)``,`` `` pct ``=`` `[`fputn`](https://crow16384.github.io/ksformat/reference/fputn.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``0``, ``12.3``, ``-``4.5``, ``NA``)``, ``"pct"``)`` ``)`
 
 ### 9.5 Range formats
 
 Range formats are expressed with interval notation. The same syntax
 works for numeric, `date_range`, and `datetime_range` blocks.
 
-[`fparse`](../reference/fparse.md)`(``text ``=`` ``'`` ``VALUE study_period (date_range)`` `` [2024-01-01, 2024-02-01) = "Screening"`` `` [2024-02-01, 2024-06-01) = "Treatment"`` `` [2024-06-01, HIGH] = "Follow-up"`` ``;`` `` ``VALUE shift (datetime_range)`` `` [2024-01-15 00:00, 2024-01-15 08:00) = "Night"`` `` [2024-01-15 08:00, 2024-01-15 16:00) = "Day"`` `` [2024-01-15 16:00, 2024-01-16 00:00) = "Evening"`` ``;`` ``'``)`
+[`fparse`](https://crow16384.github.io/ksformat/reference/fparse.md)`(``text ``=`` ``'`` ``VALUE study_period (date_range)`` `` [2024-01-01, 2024-02-01) = "Screening"`` `` [2024-02-01, 2024-06-01) = "Treatment"`` `` [2024-06-01, HIGH] = "Follow-up"`` ``;`` `` ``VALUE shift (datetime_range)`` `` [2024-01-15 00:00, 2024-01-15 08:00) = "Night"`` `` [2024-01-15 08:00, 2024-01-15 16:00) = "Day"`` `` [2024-01-15 16:00, 2024-01-16 00:00) = "Evening"`` ``;`` ``'``)`
 
 ### 9.6 Stratified range formats
 
 `stratified_range` combines a stratum with an inner range. The parser
 accepts the friendly `STRATUM|[low, high)` form.
 
-[`fparse`](../reference/fparse.md)`(``text ``=`` ``'`` ``VALUE visit_window (stratified_range, range_subtype: numeric)`` `` "ARM_A"|[0, 7) = "Baseline"`` `` "ARM_A"|[7, 28) = "Wk1-3"`` `` "ARM_B"|[0, 14) = "Baseline"`` `` .other = "Outside"`` ``;`` ``'``)`
+[`fparse`](https://crow16384.github.io/ksformat/reference/fparse.md)`(``text ``=`` ``'`` ``VALUE visit_window (stratified_range, range_subtype: numeric)`` `` "ARM_A"|[0, 7) = "Baseline"`` `` "ARM_A"|[7, 28) = "Wk1-3"`` `` "ARM_B"|[0, 14) = "Baseline"`` `` .other = "Outside"`` ``;`` ``'``)`
 
 ### 9.7 When to use `fnew()` anyway
 
-[`fnew()`](../reference/fnew.md) remains the most concise way to create
-a report-formatting object when you already know you want a display
-pattern. [`fparse()`](../reference/fparse.md) is useful when the rule
-needs to be stored as text, versioned in a spec, or generated from
-another tool.
+[`fnew()`](https://crow16384.github.io/ksformat/reference/fnew.md)
+remains the most concise way to create a report-formatting object when
+you already know you want a display pattern.
+[`fparse()`](https://crow16384.github.io/ksformat/reference/fparse.md)
+is useful when the rule needs to be stored as text, versioned in a spec,
+or generated from another tool.
 
-[`fnew`](../reference/fnew.md)`(``"$%,.2f"``, type ``=`` ``"numeric"``, name ``=`` ``"currency_direct"``)`` `[`fputn`](../reference/fputn.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``1234.56``, ``-``7890.12``, ``0``)``, ``"currency_direct"``)`
+[`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md)`(``"$%,.2f"``, type ``=`` ``"numeric"``, name ``=`` ``"currency_direct"``)`` `[`fputn`](https://crow16384.github.io/ksformat/reference/fputn.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``1234.56``, ``-``7890.12``, ``0``)``, ``"currency_direct"``)`
 
 ## 10 Conclusion
 
@@ -187,4 +196,4 @@ narrative fragments. That makes it useful anywhere repeated conditional
 logic would otherwise be spread across scripts, spreadsheets, or one-off
 helper functions.
 
-[`fclear`](../reference/fclear.md)`(``)`
+[`fclear`](https://crow16384.github.io/ksformat/reference/fclear.md)`(``)`
