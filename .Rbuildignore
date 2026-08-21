@@ -1,8 +1,9 @@
 ^.*\.Rproj$
-^\.Rproj\.user$
+^\.Rproj\.user(/|$)
 ^\.github$
 ^examples$
-^\.serena
+^\.serena$
+^\.serena/$
 ^\.vscode$
 ^\.git$
 ^\.gitignore$
@@ -16,8 +17,11 @@
 ^tools$
 ^pkgdown$
 ^CLAUDE\.md$
+^\.cran-check\.(log|exit)$
+^check\.(out|exit)$
 
 ^doc$
 ^docs$
 ^Meta$
 ^.*\.Rcheck$
+^\.quarto$

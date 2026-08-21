@@ -3,8 +3,8 @@
     "serena": {
       "command": "bash",
       "args": [
-        "${workspaceFolder}/tools/start_serena.sh",
-        "${workspaceFolder}"
+        "/Users/meguty/Develop/R/ksformat/tools/start_serena.sh",
+        "/Users/meguty/Develop/R/ksformat"
       ]
     }
   }
