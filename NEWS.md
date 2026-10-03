@@ -1,3 +1,19 @@
+# ksformat 0.8.5
+
+## Documentation
+
+* Added an animated hero logo (`man/figures/ksformat-logo-hero.gif`,
+  `vignettes/figures/`) shown at the top of the README and of each
+  vignette; the GIF plays a value→label "format machine" sequence once
+  and settles on the package logo. The generator is preserved in
+  `scripts/gen_hero_gif.py`.
+* Vignettes now declare `resource_files` so the logo asset ships and
+  renders correctly in the installed package and on the pkgdown site.
+* The pkgdown site gained a navbar with Foundations/Advanced article
+  groups, a Changelog entry, a bundled cheatsheet PDF link, a landing
+  page hero, and a "document" theme with numbered report-style sections
+  (site-only files under `pkgdown/`, excluded from the tarball).
+
 # ksformat 0.8.4
 
 ## New features

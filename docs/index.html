@@ -15,10 +15,16 @@
 <link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="SAS-Style PROC FORMAT for R">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
+<meta property="og:title" content="SAS-Style PROC FORMAT for R">
 <meta name="description" content="Provides SAS PROC FORMAT-like functionality for creating and applying value formats in R. Supports discrete and range-based mapping of values to labels, reverse formatting (invalue), date/time/datetime formatting with built-in SAS format names, multi-label formats, expression labels evaluated at apply-time, case-insensitive matching, import/export of format definitions, and proper handling of missing values (NA, NULL, NaN).">
 <meta property="og:description" content="Provides SAS PROC FORMAT-like functionality for creating and applying value formats in R. Supports discrete and range-based mapping of values to labels, reverse formatting (invalue), date/time/datetime formatting with built-in SAS format names, multi-label formats, expression labels evaluated at apply-time, case-insensitive matching, import/export of format definitions, and proper handling of missing values (NA, NULL, NaN).">
 <meta property="og:image" content="https://crow16384.github.io/ksformat/logo.svg">
+<!-- Editorial serif for the site's "document" identity (source of headings,
+     blockquotes, hero tagline); falls back to Georgia/Times offline.
+     Auto-included by pkgdown from pkgdown/templates/ (same mechanism as ksTFL). --><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&amp;display=swap" rel="stylesheet">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -28,7 +34,7 @@
 
     <a class="navbar-brand me-2" href="index.html">ksformat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,10 +47,15 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/nonstandard-applications.html">Non-standard Applications of `ksformat` for Clinical Trials and Other Tasks</a></li>
+<li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Foundations</h6></li>
     <li><a class="dropdown-item" href="articles/usage_examples.html">ksformat Usage Examples</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Advanced</h6></li>
+    <li><a class="dropdown-item" href="articles/nonstandard-applications.html">Non-standard Applications of `ksformat` for Clinical Trials and Other Tasks</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="ksformat_cheatsheet.pdf"><span class="fa fa-file-pdf"></span> Cheatsheet</a></li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -59,315 +70,147 @@
   </div>
 </nav><div class="container template-home">
 <div class="row">
-  <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header">
-<img src="logo.svg" class="logo" alt=""><h1 id="ksformat-">ksformat <a class="anchor" aria-label="anchor" href="#ksformat-"></a>
-</h1>
+  <main id="main" class="col-md-9"><div class="kshero">
+<p><img src="reference/figures/ksformat-logo-hero.gif" alt="ksformat animated logo" class="kshero-logo" width="560"></p>
+<p class="kshero-tag">
+SAS PROC FORMAT, brought to R —<br>codes in, labels out: one rule engine for values, ranges, windows and patterns.
+</p>
+<div class="kshero-cta">
+<p><a class="btn btn-ksformat" href="articles/usage_examples.html">Start here</a> <a class="btn btn-ksformat-ghost" href="articles/nonstandard-applications.html">Clinical patterns</a></p>
 </div>
-<p><a href="https://github.com/crow16384/ksformat" class="external-link"><img src="https://img.shields.io/badge/PROC%20FORMAT%20for%20R-ksformat-217346?logo=r" alt="PROC FORMAT for R"></a> <a href="https://github.com/crow16384/ksformat" class="external-link"><img src="https://img.shields.io/badge/GitHub-crow16384%2Fksformat-181717?logo=github" alt="GitHub"></a> <a href="https://spdx.org/licenses/GPL-3.0-only.html" class="external-link"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3"></a> <a href="https://www.r-project.org/" class="external-link"><img src="https://img.shields.io/badge/R-package-276DC3?logo=r" alt="R package"></a> <a href="https://cran.r-project.org/package=ksformat" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/ksformat" alt="CRAN downloads for ksformat"></a></p>
-<p>SAS-style <strong>PROC FORMAT</strong> for R: create and apply value formats, range-based formatting, reverse formatting (invalue), and consistent handling of missing values (NA, NULL, NaN).</p>
-<p><strong>Repository:</strong> <a href="https://github.com/crow16384/ksformat" class="external-link">github.com/crow16384/ksformat</a> — source code, issue tracker, and development.</p>
-<div class="section level2">
-<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
-</h2>
-<p><strong>From GitHub</strong> (after cloning or from your repo URL):</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"crow16384/ksformat"</span><span class="op">)</span></span></code></pre></div>
-<p><strong>From local source:</strong></p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"."</span>, repos <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="st">"source"</span><span class="op">)</span></span>
-<span><span class="co"># or</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
+<h2 id="why-ksformat">Why ksformat<a class="anchor" aria-label="anchor" href="#why-ksformat"></a>
 </h2>
+<p><strong>ksformat</strong> re-implements the idea behind SAS <code>PROC FORMAT</code> for R: repeated conditional logic — code→label dictionaries, age and BMI buckets, protocol visit windows, date displays, report-ready numbers — lives in <strong>named, registered formats</strong> instead of scattered <code><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse()</a></code>/<code>case_when()</code> blocks. You define a format once near your analysis spec and apply it by name in every script of a study, so the mapping a reviewer approved is exactly the mapping the data were labelled with.</p>
+<p>The package is a pure data layer: it produces plain character, factor and Date columns that any downstream tool can render — into a <code>ksTFL</code> table, a <code>ggplot2</code> scale, or a SHINY display. No plotting, no document formatting, no lock-in: one small deterministic engine with <code>Imports: cli</code> and nothing else.</p>
+<div class="section level3">
+<h3 id="key-design-principles">Key design principles<a class="anchor" aria-label="anchor" href="#key-design-principles"></a>
+</h3>
 <ul>
 <li>
-<strong>Format creation</strong> — Value-to-label mappings like SAS PROC FORMAT</li>
+<strong>Rule engine, not a dictionary</strong> — discrete values, numeric ranges, dates, composites and patterns are one concept: a format with a name</li>
 <li>
-<strong>Format application</strong> — Apply formats to vectors and data frames</li>
+<strong>Both directions</strong> — value→label (<code>fput</code>) and label→value reverse lookups (<code>finput</code>) for QC, with <code><a href="reference/fnew_bid.html">fnew_bid()</a></code> creating the pair</li>
 <li>
-<strong>Reverse formatting</strong> — Convert labels back to values (INVALUE)</li>
+<strong>Missing values are first-class</strong> — <code>.missing</code> and <code>.other</code> rules beat silent <code>NA</code> fall-through</li>
 <li>
-<strong>Missing value handling</strong> — NA, NULL, NaN, and empty values</li>
+<strong>Text-diffable definitions</strong> — <code><a href="reference/fexport.html">fexport()</a></code>/<code><a href="reference/fparse.html">fparse()</a></code> round-trip formats as reviewable text that belongs in Git</li>
 <li>
-<strong>Range support</strong> — Numeric ranges with inclusive/exclusive bounds</li>
+<strong>SAS compatibility</strong> — import CNTLOUT catalogues, apply built-in <code>DATE9.</code>-style formats, and reuse <code>w.d</code> display patterns</li>
 <li>
-<strong>Multilabel</strong> — A single value can match multiple labels (<code>fput_all</code>)</li>
-<li>
-<strong>Expression labels</strong> — Dynamic labels with <code>.x1</code>, <code>.x2</code>, … evaluated at apply-time</li>
-<li>
-<strong>Case-insensitive matching</strong> — <code>ignore_case = TRUE</code> in <code>fnew</code>
-</li>
-<li>
-<strong>Numeric patterns</strong> — <code>%f</code>-style continuous formatting with grouping, prefix/suffix text, and currency-style output</li>
-<li>
-<strong>Date/time/datetime</strong> — Built-in SAS format names and custom <code>strftime</code> patterns</li>
-<li>
-<strong>Import/export</strong> — Parse SAS-like text (<code>fparse</code>), export (<code>fexport</code>), import CNTLOUT CSV (<code>fimport</code>)</li>
-<li>
-<strong>Format library</strong> — Register and retrieve formats globally</li>
+<strong>Expression labels</strong> — dynamic labels (<code>.x1</code>, <code>.x2</code>, …) evaluated at apply time for n(%) and p-value display strings</li>
 </ul>
+</div>
 </div>
 <div class="section level2">
 <h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
-<div class="section level3">
-<h3 id="discrete-formatting">Discrete formatting<a class="anchor" aria-label="anchor" href="#discrete-formatting"></a>
-</h3>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<p>One call registers a named format; another applies it — including the missing and unmatched branches that quietly corrupt most production pipelines:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://crow16384.github.io/ksformat/">ksformat</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="reference/fnew.html">fnew</a></span><span class="op">(</span></span>
-<span>  <span class="st">"M"</span> <span class="op">=</span> <span class="st">"Male"</span>,</span>
-<span>  <span class="st">"F"</span> <span class="op">=</span> <span class="st">"Female"</span>,</span>
-<span>  .missing <span class="op">=</span> <span class="st">"Unknown"</span>,</span>
-<span>  name <span class="op">=</span> <span class="st">"sex"</span></span>
-<span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/fnew.html">fnew</a></span><span class="op">(</span><span class="st">"M"</span> <span class="op">=</span> <span class="st">"Male"</span>, <span class="st">"F"</span> <span class="op">=</span> <span class="st">"Female"</span>,</span>
+<span>     .missing <span class="op">=</span> <span class="st">"Unknown"</span>, .other <span class="op">=</span> <span class="st">"Other"</span>,</span>
+<span>     name <span class="op">=</span> <span class="st">"sex"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="reference/fput.html">fput</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M"</span>, <span class="st">"F"</span>, <span class="cn">NA</span>, <span class="st">"X"</span><span class="op">)</span>, <span class="st">"sex"</span><span class="op">)</span></span>
-<span><span class="co"># [1] "Male"    "Female"  "Unknown" "X"</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="numeric-ranges">Numeric ranges<a class="anchor" aria-label="anchor" href="#numeric-ranges"></a>
-</h3>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<span><span class="fu"><a href="reference/fput.html">fput</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M"</span>, <span class="st">"F"</span>, <span class="cn">NA</span>, <span class="st">"U"</span><span class="op">)</span>, <span class="st">"sex"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Male"    "Female"  "Unknown" "Other"</span></span></code></pre></div>
+<p>Numeric ranges work the same way — and the same rules can be written as reviewable text for your spec files:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
-<span><span class="st">VALUE age (numeric)</span></span>
-<span><span class="st">  [0, 18)   = "Child"</span></span>
-<span><span class="st">  [18, 65)  = "Adult"</span></span>
+<span><span class="st">VALUE agegr (numeric)</span></span>
+<span><span class="st">  [0, 18)    = "Child"</span></span>
+<span><span class="st">  [18, 65)   = "Adult"</span></span>
 <span><span class="st">  [65, HIGH] = "Senior"</span></span>
-<span><span class="st">  .missing   = "Age Unknown"</span></span>
-<span><span class="st">;</span></span>
-<span><span class="st">'</span><span class="op">)</span></span>
+<span><span class="st">  .missing   = "Unknown"</span></span>
+<span><span class="st">;'</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="reference/fputn.html">fputn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">25</span>, <span class="fl">70</span>, <span class="cn">NA</span><span class="op">)</span>, <span class="st">"age"</span><span class="op">)</span></span>
-<span><span class="co"># [1] "Child"       "Adult"       "Senior"      "Age Unknown"</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="reverse-formatting-invalue">Reverse formatting (invalue)<a class="anchor" aria-label="anchor" href="#reverse-formatting-invalue"></a>
-</h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/finput.html">finput</a></span><span class="op">(</span><span class="st">"Male"</span> <span class="op">=</span> <span class="fl">1</span>, <span class="st">"Female"</span> <span class="op">=</span> <span class="fl">2</span>, name <span class="op">=</span> <span class="st">"sex_inv"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/finputn.html">finputn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Male"</span>, <span class="st">"Female"</span>, <span class="st">"Unknown"</span><span class="op">)</span>, <span class="st">"sex_inv"</span><span class="op">)</span></span>
-<span><span class="co"># [1]  1  2 NA</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="format-library">Format library<a class="anchor" aria-label="anchor" href="#format-library"></a>
-</h3>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/fprint.html">fprint</a></span><span class="op">(</span><span class="op">)</span>              <span class="co"># list all registered formats</span></span>
-<span><span class="va">fmt</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/format_get.html">format_get</a></span><span class="op">(</span><span class="st">"sex"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/fclear.html">fclear</a></span><span class="op">(</span><span class="st">"sex"</span><span class="op">)</span>         <span class="co"># remove one format</span></span>
-<span><span class="fu"><a href="reference/fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span>              <span class="co"># clear all</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="interactive-library-browser-shiny">Interactive library browser (Shiny)<a class="anchor" aria-label="anchor" href="#interactive-library-browser-shiny"></a>
-</h3>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"shiny"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="reference/format_library_app.html">format_library_app</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p>The app shows both VALUE (<code>ks_format</code>) and INVALUE (<code>ks_invalue</code>) objects, supports name/type filtering, shows a formatted mapping table, and includes library management actions (remove selected, clear all, or quit).</p>
-<p>In RStudio, you can also open it from <strong>Addins</strong> as <strong>Format Library Browser</strong>.</p>
-</div>
-<div class="section level3">
-<h3 id="data-frames">Data frames<a class="anchor" aria-label="anchor" href="#data-frames"></a>
-</h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  sex <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M"</span>, <span class="st">"F"</span>, <span class="st">"M"</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
-<span>  age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">15</span>, <span class="fl">25</span>, <span class="fl">70</span>, <span class="fl">35</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/fput_df.html">fput_df</a></span><span class="op">(</span><span class="va">df</span>, sex <span class="op">=</span> <span class="fu"><a href="reference/format_get.html">format_get</a></span><span class="op">(</span><span class="st">"sex"</span><span class="op">)</span>, age <span class="op">=</span> <span class="fu"><a href="reference/format_get.html">format_get</a></span><span class="op">(</span><span class="st">"age"</span><span class="op">)</span>, suffix <span class="op">=</span> <span class="st">"_label"</span><span class="op">)</span></span></code></pre></div>
-</div>
+<span><span class="fu"><a href="reference/fputn.html">fputn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">9</span>, <span class="fl">17</span>, <span class="fl">44</span>, <span class="fl">81</span>, <span class="cn">NA</span><span class="op">)</span>, <span class="st">"agegr"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Child"   "Child"   "Adult"   "Senior"  "Unknown"</span></span></code></pre></div>
+<p>Report-ready numbers are formats too:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/fnew.html">fnew</a></span><span class="op">(</span><span class="st">"$%,.2f"</span>, .missing <span class="op">=</span> <span class="st">"-"</span>, type <span class="op">=</span> <span class="st">"numeric"</span>, name <span class="op">=</span> <span class="st">"cash"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/fputn.html">fputn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1234.5</span>, <span class="fl">9.875</span>, <span class="cn">NA</span><span class="op">)</span>, <span class="st">"cash"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "$1,234.50" "$9.88"     "-"</span></span></code></pre></div>
+<p>That is the whole model: <code><a href="reference/fnew.html">fnew()</a></code>/<code><a href="reference/fparse.html">fparse()</a></code> <strong>define</strong> rules, <code>fput*()</code> <strong>applies</strong> them, <code>finput*()</code> <strong>reverses</strong> them, <code><a href="reference/fexport.html">fexport()</a></code> <strong>versions</strong> them. Every study table then shows the same label for the same code — because there is only one definition of it.</p>
 </div>
 <div class="section level2">
-<h2 id="multilabel-formats">Multilabel formats<a class="anchor" aria-label="anchor" href="#multilabel-formats"></a>
-</h2>
-<p>With <code>multilabel = TRUE</code>, a single value can match multiple labels. Use <code><a href="reference/fput_all.html">fput_all()</a></code> to collect all matches:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/fnew.html">fnew</a></span><span class="op">(</span></span>
-<span>  <span class="st">"0,17,TRUE,TRUE"</span>  <span class="op">=</span> <span class="st">"Pediatric"</span>,</span>
-<span>  <span class="st">"18,Inf,TRUE,TRUE"</span> <span class="op">=</span> <span class="st">"Adult"</span>,</span>
-<span>  <span class="st">"3,5,TRUE,TRUE"</span>   <span class="op">=</span> <span class="st">"Serious"</span>,</span>
-<span>  name <span class="op">=</span> <span class="st">"ae_age"</span>, type <span class="op">=</span> <span class="st">"numeric"</span>, multilabel <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/fput_all.html">fput_all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">25</span>, <span class="fl">4</span><span class="op">)</span>, <span class="st">"ae_age"</span><span class="op">)</span></span>
-<span><span class="co"># [[1]] "Pediatric"</span></span>
-<span><span class="co"># [[2]] "Adult"</span></span>
-<span><span class="co"># [[3]] "Pediatric" "Serious"</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="datetimedatetime-formats">Date/time/datetime formats<a class="anchor" aria-label="anchor" href="#datetimedatetime-formats"></a>
-</h2>
-<p>SAS date format names are auto-resolved — no pre-creation needed:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/fputn.html">fputn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"DATE9."</span><span class="op">)</span></span>
-<span><span class="co"># [1] "25MAR2026"</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/fputn.html">fputn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"MMDDYY10."</span><span class="op">)</span></span>
-<span><span class="co"># [1] "03/25/2026"</span></span>
-<span></span>
-<span><span class="co"># Custom strftime pattern</span></span>
-<span><span class="fu"><a href="reference/fnew_date.html">fnew_date</a></span><span class="op">(</span><span class="st">"%d.%m.%Y"</span>, name <span class="op">=</span> <span class="st">"ru_date"</span>, type <span class="op">=</span> <span class="st">"date"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/fput.html">fput</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"ru_date"</span><span class="op">)</span></span>
-<span><span class="co"># [1] "25.03.2026"</span></span></code></pre></div>
-<p>Time (seconds since midnight) and datetime are also supported:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/fputn.html">fputn</a></span><span class="op">(</span><span class="fl">3600</span>, <span class="st">"TIME8."</span><span class="op">)</span></span>
-<span><span class="co"># [1] "1:00:00"</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/fputn.html">fputn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"DATETIME20."</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="expression-labels">Expression labels<a class="anchor" aria-label="anchor" href="#expression-labels"></a>
-</h2>
-<p>Labels containing <code>.x1</code>, <code>.x2</code>, etc. are evaluated as R expressions at apply-time. Pass extra arguments through <code>fput(x, fmt, ...)</code>:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">stat_fmt</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fnew.html">fnew</a></span><span class="op">(</span></span>
-<span>  <span class="st">"n"</span>   <span class="op">=</span> <span class="st">"sprintf('%s', .x1)"</span>,</span>
-<span>  <span class="st">"pct"</span> <span class="op">=</span> <span class="st">"sprintf('%.1f%%', .x1 * 100)"</span>,</span>
-<span>  name <span class="op">=</span> <span class="st">"stat"</span>, type <span class="op">=</span> <span class="st">"character"</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/fput.html">fput</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n"</span>, <span class="st">"pct"</span><span class="op">)</span>, <span class="va">stat_fmt</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">42</span>, <span class="fl">0.053</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co"># [1] "42"   "5.3%"</span></span></code></pre></div>
-<p>Use <code><a href="reference/e.html">e()</a></code> to mark a label for evaluation even without <code>.xN</code> placeholders:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/fnew.html">fnew</a></span><span class="op">(</span><span class="st">"ts"</span> <span class="op">=</span> <span class="fu"><a href="reference/e.html">e</a></span><span class="op">(</span><span class="st">"format(Sys.time(), '%Y-%m-%d')"</span><span class="op">)</span>, name <span class="op">=</span> <span class="st">"demo"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/fput.html">fput</a></span><span class="op">(</span><span class="st">"ts"</span>, <span class="st">"demo"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="case-insensitive-matching">Case-insensitive matching<a class="anchor" aria-label="anchor" href="#case-insensitive-matching"></a>
-</h2>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/fnew.html">fnew</a></span><span class="op">(</span><span class="st">"M"</span> <span class="op">=</span> <span class="st">"Male"</span>, <span class="st">"F"</span> <span class="op">=</span> <span class="st">"Female"</span>, name <span class="op">=</span> <span class="st">"sex_nc"</span>,</span>
-<span>     type <span class="op">=</span> <span class="st">"character"</span>, ignore_case <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/fput.html">fput</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"m"</span>, <span class="st">"F"</span>, <span class="st">"M"</span>, <span class="st">"f"</span><span class="op">)</span>, <span class="st">"sex_nc"</span><span class="op">)</span></span>
-<span><span class="co"># [1] "Male"   "Female" "Male"   "Female"</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="missing-value-handling">Missing value handling<a class="anchor" aria-label="anchor" href="#missing-value-handling"></a>
-</h2>
-<p>Priority order:</p>
-<ol style="list-style-type: decimal">
-<li>
-<strong>NA, NULL, NaN</strong> → <code>.missing</code> label if defined, otherwise NA</li>
-<li>
-<strong>Exact match</strong> → value–label mapping</li>
-<li>
-<strong>Range match</strong> → range label (numeric formats)</li>
-<li>
-<strong>No match</strong> → <code>.other</code> label or original value</li>
-</ol>
-<p>Options: <code>keep_na = TRUE</code>, <code>na_if</code>, <code>include_empty = TRUE</code>.</p>
-</div>
-<div class="section level2">
-<h2 id="cheat-sheet">Cheat sheet<a class="anchor" aria-label="anchor" href="#cheat-sheet"></a>
+<h2 id="what-else-it-can-do">What else it can do<a class="anchor" aria-label="anchor" href="#what-else-it-can-do"></a>
 </h2>
 <ul>
 <li>
-<strong>In R:</strong> run <code><a href="reference/ksformat_cheatsheet.html">ksformat_cheatsheet()</a></code> to open the cheat sheet in your browser (HTML), or <code>ksformat_cheatsheet("pdf")</code> for the PDF.</li>
+<strong>Protocol visit windows.</strong> <code>stratified_range</code> formats map (arm, study day) to window labels — the derivation that usually hides in nested <code><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse()</a></code>, named and testable instead.</li>
 <li>
-<strong>In this repo:</strong> <a href="inst/doc/ksformat-cheatsheet.html">HTML</a> | <a href="inst/doc/ksformat-cheatsheet.pdf">PDF</a>
-</li>
+<strong>Composite keys, ADaM-style.</strong> <code><a href="reference/fputk.html">fputk()</a></code> looks up a label from several columns at once (LBCAT | LBSPEC | LBTESTCD | LBSTRESU → PARAMCD), with the <code>na_as_string</code> discipline spelled out in the vignettes.</li>
+<li>
+<strong>Dynamic labels.</strong> A label containing <code>.x1</code> is evaluated at apply time: one format emits <code>n (%)</code>, p-value censoring and unit-suffixed strings straight from the statistics frame.</li>
+<li>
+<strong>SAS date formats out of the box.</strong> <code>fputn(x, "DATE9.")</code> gives <code>27SEP2026</code> for Date, POSIXct and epoch numerics — with a documented locale protocol so month abbreviations never bake in Cyrillic.</li>
+<li>
+<strong>Reverse QC.</strong> <code><a href="reference/fnew_bid.html">fnew_bid()</a></code> registers the invalue next to the format (<code>name_inv</code>), so a mapping can be checked by converting the report labels back to codes.</li>
+<li>
+<strong>Multilabel.</strong> One value can match several rules (<code>fput_all</code>) — supertype/subtype groupings without duplicating data.</li>
+<li>
+<strong>Auditable.</strong> <code><a href="reference/flevels.html">flevels()</a></code>, <code><a href="reference/franges.html">franges()</a></code>, <code><a href="reference/fprint.html">fprint()</a></code> dump any format’s definition — the audit trail of a mapping is a function call.</li>
 </ul>
 </div>
 <div class="section level2">
-<h2 id="function-reference">Function reference<a class="anchor" aria-label="anchor" href="#function-reference"></a>
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>ksformat is on <strong>CRAN</strong>:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ksformat"</span><span class="op">)</span></span></code></pre></div>
+<p>The development version from GitHub:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"crow16384/ksformat"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="documentation--resources">Documentation &amp; resources<a class="anchor" aria-label="anchor" href="#documentation--resources"></a>
 </h2>
 <table class="table">
 <colgroup>
-<col width="35%">
-<col width="64%">
+<col width="63%">
+<col width="36%">
 </colgroup>
 <thead><tr>
-<th>Area</th>
-<th>Functions</th>
+<th>I want to…</th>
+<th>Go to</th>
 </tr></thead>
 <tbody>
 <tr>
-<td><strong>Creation</strong></td>
-<td>
-<code><a href="reference/fnew.html">fnew()</a></code>, <code><a href="reference/finput.html">finput()</a></code>, <code><a href="reference/fnew_bid.html">fnew_bid()</a></code>, <code><a href="reference/fnew_date.html">fnew_date()</a></code>, <code><a href="reference/fparse.html">fparse()</a></code>, <code><a href="reference/e.html">e()</a></code>
-</td>
+<td>Walk through the most common uses</td>
+<td><a href="articles/usage_examples.html">Usage Examples</a></td>
 </tr>
 <tr>
-<td><strong>Application</strong></td>
-<td>
-<code><a href="reference/fput.html">fput()</a></code>, <code><a href="reference/fputn.html">fputn()</a></code>, <code><a href="reference/fputc.html">fputc()</a></code>, <code><a href="reference/fput_all.html">fput_all()</a></code>, <code><a href="reference/fput_df.html">fput_df()</a></code>
-</td>
+<td>Solve clinical-trial problems: windows, PARAMCD, QC</td>
+<td><a href="articles/nonstandard-applications.html">Non-standard Applications</a></td>
 </tr>
 <tr>
-<td><strong>Reverse</strong></td>
-<td>
-<code><a href="reference/finputn.html">finputn()</a></code>, <code><a href="reference/finputc.html">finputc()</a></code>
-</td>
+<td>Look up any function</td>
+<td><a href="reference/index.html">Reference</a></td>
 </tr>
 <tr>
-<td><strong>Library</strong></td>
-<td>
-<code><a href="reference/format_get.html">format_get()</a></code>, <code><a href="reference/fprint.html">fprint()</a></code>, <code><a href="reference/fclear.html">fclear()</a></code>, <code><a href="reference/fexport.html">fexport()</a></code>, <code><a href="reference/fimport.html">fimport()</a></code>, <code><a href="reference/format_library_app.html">format_library_app()</a></code>
-</td>
+<td>Print a cheat sheet</td>
+<td><a href="ksformat_cheatsheet.pdf">Cheatsheet (PDF)</a></td>
 </tr>
 <tr>
-<td><strong>Utilities</strong></td>
-<td>
-<code><a href="reference/is_missing.html">is_missing()</a></code>, <code><a href="reference/range_spec.html">range_spec()</a></code>
-</td>
-</tr>
-<tr>
-<td><strong>Documentation</strong></td>
-<td>
-<code><a href="reference/ksformat_cheatsheet.html">ksformat_cheatsheet()</a></code> — open cheat sheet</td>
+<td>See what changed</td>
+<td><a href="news/index.html">Changelog</a></td>
 </tr>
 </tbody>
 </table>
+<hr>
+<p><strong>License.</strong> GPL-3. <strong>Authors.</strong> Vladimir Larchenko, Igor Aleschenkov — KeyStat</p>
 </div>
-<div class="section level2">
-<h2 id="development">Development<a class="anchor" aria-label="anchor" href="#development"></a>
-</h2>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"roxygen2"</span>, <span class="st">"testthat"</span>, <span class="st">"devtools"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/document.html" class="external-link">document</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/test.html" class="external-link">test</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/check.html" class="external-link">check</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>When bumping the package version, update <code>DESCRIPTION</code> and then run<br><code>Rscript scripts/sync-version.R</code> to refresh version references in <code>cran-comments.md</code> and any other synced files.</p>
-</div>
-<div class="section level2">
-<h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
-</h2>
-<p>GPL-3. See <a href="https://spdx.org/licenses/GPL-3.0-only.html" class="external-link uri">https://spdx.org/licenses/GPL-3.0-only.html</a>.</p>
-</div>
-</div>
+
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
 <li><a href="https://cloud.r-project.org/package=ksformat" class="external-link">View on CRAN</a></li>
 <li><a href="https://github.com/crow16384/ksformat/" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/crow16384/ksformat/issues" class="external-link">Report a bug</a></li>
-</ul>
-</div>
-
-<div class="license">
-<h2 data-toc-skip>License</h2>
-<ul class="list-unstyled">
-<li><a href="https://www.r-project.org/Licenses/GPL-3" class="external-link">GPL-3</a></li>
-</ul>
-</div>
-
-
-<div class="citation">
-<h2 data-toc-skip>Citation</h2>
-<ul class="list-unstyled">
-<li><a href="authors.html#citation">Citing ksformat</a></li>
 </ul>
 </div>
 

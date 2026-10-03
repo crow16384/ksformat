@@ -1,3 +1,54 @@
+# pkgdown site configuration for ksformat
+# https://pkgdown.r-lib.org/reference/build_site.html
+#
+# Same information architecture as the ksTFL site (crow16384.github.io/ksTFL):
+# navbar Reference / Articles / Cheatsheet / Changelog, a hero landing page
+# (pkgdown/index.md) with the animated logo, the "document" CSS theme
+# (pkgdown/extra.css), and the bundled cheatsheet PDF under pkgdown/assets/.
+# Kept under pkgdown/ (not repo root) on purpose: .Rbuildignore excludes
+# ^pkgdown$ from the source tarball, so the whole site config never ships.
+
 url: https://crow16384.github.io/ksformat/
+
 template:
   bootstrap: 5
+  bslib:
+    primary: "#173147"
+    border-radius: "0.375rem"
+    font-size-base: "0.95rem"
+
+navbar:
+  structure:
+    left: [reference, articles, cheatsheet, news]
+    right: [search, github]
+  components:
+    news:
+      text: Changelog
+      href: news/index.html
+    cheatsheet:
+      text: Cheatsheet
+      icon: fa-file-pdf
+      href: ksformat_cheatsheet.pdf
+
+home:
+  sidebar:
+    structure: [links, authors, dev]
+
+# Required by pkgdown so absolute links, sitemap entries, and installed
+# metadata point to the published site.
+deploy:
+  install_metadata: true
+
+# Development mode: auto = release vs devel based on version
+development:
+  mode: auto
+
+articles:
+  - title: Foundations
+    navbar: Foundations
+    contents:
+      - usage_examples
+  - title: Advanced Workflows
+    navbar: Advanced
+    contents:
+      - nonstandard-applications

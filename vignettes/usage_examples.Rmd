@@ -1,6 +1,8 @@
 ---
 title: "ksformat Usage Examples"
 output: rmarkdown::html_vignette
+resource_files:
+  - figures/
 vignette: >
   %\VignetteIndexEntry{ksformat Usage Examples}
   %\VignetteEngine{knitr::rmarkdown}
@@ -15,7 +17,9 @@ knitr::opts_chunk$set(
 library(ksformat)
 ```
 
-<img src="../man/figures/logo.svg" align="right" height="120" alt="ksformat logo" />
+<img src="figures/ksformat-logo-hero.gif" alt="ksformat logo" width="700"/>
+
+<div class="self-numbered" aria-hidden="true"></div>
 
 The **ksformat** package provides SAS PROC FORMAT-like functionality for R.
 This vignette walks through the most common use cases.

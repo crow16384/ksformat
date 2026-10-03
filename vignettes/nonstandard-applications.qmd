@@ -12,6 +12,10 @@ execute:
   enabled: false
 ---
 
+<img src="figures/ksformat-logo-hero.gif" alt="ksformat logo" width="700"/>
+
+<div class="self-numbered" aria-hidden="true"></div>
+
 ```{r}
 #| label: setup
 #| include: false

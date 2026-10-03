@@ -221,7 +221,7 @@ p{font-size:6px;line-height:1.2;margin:1px 0}
     <div class="sub">SAS-style <b>PROC FORMAT</b> for R — value→label mappings, numeric ranges, reverse formatting (invalue), date/time/datetime, expression labels, multilabel &amp; more</div>
   </div>
   <div class="hdr-r">
-    <b>v0.6.1</b><br>
+    <b>v0.8.5</b><br>
     Vladimir Larchenko · GPL-3<br>
     <code>install.packages("ksformat")</code>
   </div>
@@ -276,7 +276,7 @@ library(ksformat)</pre>
   </div>
 
   <div class="sh"><span class="fn">finput()</span> — Reverse (label→value) <span class="badge gr">INVALUE</span></div>
-  <div class="sig"><b>finput</b>(..., name=NULL, target_type="numeric", missing_value=NA)
+  <div class="sig"><b>finput</b>(..., name=NULL, target_type="numeric", missing_value=NA, ignore_case=FALSE)
 <span class="ar">... = named pairs label=value | target_type = "numeric"|"character" output type</span></div>
   <div class="ex">
     <div class="ex-c">
@@ -298,7 +298,7 @@ library(ksformat)</pre>
   </div>
 
   <div class="sh"><span class="fn">fnew_bid()</span> — Bidirectional <span class="badge bl">VALUE</span>+<span class="badge gr">INVALUE</span></div>
-  <div class="sig"><b>fnew_bid</b>(..., name=NULL, type="auto")
+  <div class="sig"><b>fnew_bid</b>(..., name=NULL, type="auto", ignore_case=FALSE)
 <span class="ar">Creates both a VALUE format and matching _inv INVALUE simultaneously</span></div>
   <div class="ex">
     <div class="ex-c">
@@ -554,6 +554,22 @@ library(ksformat)</pre>
     </div>
   </div>
 
+  <div class="sh">Numeric <span class="fn">patterns</span> — continuous display</div>
+  <div class="sig"><b>fnew</b>(pattern, type="numeric", .missing=..., name=...)
+<span class="ar">one %-spec, flags before width: $ currency, % literal, , grouping — "$%,.2f" / "%10.0f" / "%.1f%%"</span></div>
+  <div class="ex">
+    <div class="ex-c">
+<pre><span class="fn">fnew</span>(<span class="s">"$%,.2f"</span>, .missing = <span class="s">"-"</span>,
+  type = <span class="s">"numeric"</span>, name = <span class="s">"cash"</span>)
+
+<span class="fn">fputn</span>(c(<span class="n">1234.5</span>, <span class="n">9.875</span>, <span class="n">NA</span>), <span class="s">"cash"</span>)</pre>
+    </div>
+    <div class="ex-r">
+      <div class="rv"><span class="vs">"$1,234.50"</span><span class="vs">"$9.88"</span><span class="vs">"-"</span></div>
+      <div class="note">grouping comma goes BEFORE width: <b>%,10.2f</b> OK — %10,.2f is an error</div>
+    </div>
+  </div>
+
   <div class="sh">Exclusive / Inclusive bounds + .other</div>
   <div class="ex">
     <div class="ex-c">
@@ -596,19 +612,24 @@ library(ksformat)</pre>
     </div>
   </div>
 
-  <div class="sh"><span class="fn">range_spec()</span> — Build range strings</div>
-  <div class="sig"><b>range_spec</b>(low, high, label, inc_low=TRUE, inc_high=FALSE)
-<span class="ar">Programmatic range key builder for fnew() — returns "low,high,inc_low,inc_high"</span></div>
+  <div class="sh"><span class="fn">range_spec()</span> &amp; <span class="fn">fmap_ranges()</span> — Range helpers</div>
+  <div class="sig"><b>range_spec</b>(low, high, label, inc_low=TRUE, inc_high=FALSE) · <b>fmap_ranges</b>(low, high, label, inc_low, inc_high, date_format=NULL)
+<span class="ar">range_spec describes ONE range (label required, returns a list) — fmap_ranges builds data-driven canonical keys for fnew()</span></div>
   <div class="ex">
     <div class="ex-c">
-<pre><span class="fn">range_spec</span>(<span class="n">0</span>, <span class="n">18</span>)
+<pre><span class="cm"># canonical keys for fnew():</span>
+<span class="fn">fnew</span>(<span class="s">"0,18,TRUE,FALSE"</span> =
+  <span class="s">"Child"</span>, type = <span class="s">"numeric"</span>)
 
-<span class="fn">range_spec</span>(<span class="n">18</span>, <span class="n">Inf</span>,
-  inc_high = <span class="n">FALSE</span>)</pre>
+<span class="cm"># from data arrays:</span>
+f &lt;- <span class="fn">fmap_ranges</span>(
+  low = <span class="fn">c</span>(<span class="n">0</span>, <span class="n">18</span>), high = <span class="fn">c</span>(<span class="n">18</span>, <span class="n">Inf</span>),
+  label = <span class="fn">c</span>(<span class="s">"Child"</span>, <span class="s">"Adult"</span>))
+<span class="fn">fputn</span>(<span class="fn">c</span>(<span class="n">5</span>, <span class="n">30</span>), f)</pre>
     </div>
     <div class="ex-r">
-      <div class="rv"><span class="vs">"0,18,TRUE,FALSE"</span></div>
-      <div class="rv" style="margin-top:1px"><span class="vs">"18,Inf,TRUE,FALSE"</span></div>
+      <div class="rv"><span class="vs">"Child"</span><span class="vs">"Adult"</span></div>
+      <div class="note"><b>Do not pass range_spec() objects into fnew()</b> — use canonical "low,high,inc_low,inc_high" keys or fmap_ranges()</div>
     </div>
   </div>
 </div>
@@ -638,12 +659,29 @@ library(ksformat)</pre>
   <div class="ex">
     <div class="ex-c">
 <pre><span class="fn">finputc</span>(
-  c(<span class="s">"Active"</span>, <span class="s">"Pending"</span>),
+  c(<span class="s">"Active"</span>, <span class="s">"Inactive"</span>),
   <span class="s">"status_inv"</span>
 )</pre>
     </div>
     <div class="ex-r">
-      <div class="rv"><span class="vs">"A"</span><span class="vs">"P"</span></div>
+      <div class="rv"><span class="vs">"A"</span><span class="vs">"I"</span></div>
+    </div>
+  </div>
+
+  <div class="sh"><span class="fn">finputk()</span> — composite reverse</div>
+  <div class="sig"><b>finputk</b>(..., invalue_name, sep="|", na_as_string=FALSE)
+<span class="ar">labels pasted into a composite key → code components (mirror of fputk)</span></div>
+  <div class="ex">
+    <div class="ex-c">
+<pre><span class="fn">fnew_bid</span>(<span class="s">"A|1"</span> = <span class="s">"Alpha"</span>,
+  <span class="s">"B|2"</span> = <span class="s">"Beta"</span>, name = <span class="s">"pair"</span>)
+
+<span class="fn">finputk</span>(<span class="fn">c</span>(<span class="s">"Alpha"</span>, <span class="s">"Beta"</span>),
+  invalue_name = <span class="s">"pair_inv"</span>)</pre>
+    </div>
+    <div class="ex-r">
+      <div class="rv"><span class="vs">"A|1"</span><span class="vs">"B|2"</span></div>
+      <div class="note">fnew_bid registers the INVALUE as <b>name_inv</b></div>
     </div>
   </div>
 
@@ -752,8 +790,8 @@ date &lt;- <span class="fn">fputn</span>(number, datefmt)</pre>
     <div class="ex-r">
       <table class="rt tn">
         <tr><th>num</th><th>key</th><th>fmt</th><th>date</th></tr>
-        <tr><td>12103</td><td>1</td><td>date9.</td><td>03FEB2003</td></tr>
-        <tr><td>10899</td><td>2</td><td>mmddyy10.</td><td>11/07/1999</td></tr>
+        <tr><td>12103</td><td>1</td><td>date9.</td><td>20FEB2003</td></tr>
+        <tr><td>10899</td><td>2</td><td>mmddyy10.</td><td>11/04/1999</td></tr>
       </table>
     </div>
   </div>
@@ -790,6 +828,18 @@ date &lt;- <span class="fn">fputn</span>(number, datefmt)</pre>
     </div>
     <div class="ex-r">
       <p>Retrieve format object<br>Remove single format<br>Clear entire library</p>
+    </div>
+  </div>
+
+  <div class="sh"><span class="fn">flevels()</span> <span class="fn">franges()</span> <span class="fn">flist()</span> — Introspect</div>
+  <div class="sig"><b>flevels</b>(fmt) — tidy value→label data.frame (range keys canonicalized) &nbsp; <b>franges</b>(fmt) — range rows &nbsp; <b>flist</b>() — registered names</div>
+  <div class="ex">
+    <div class="ex-c">
+<pre><span class="fn">flevels</span>(<span class="s">"sex"</span>)</pre>
+    </div>
+    <div class="ex-r">
+      <table class="rt"><tr><th>value</th><th>label</th></tr>
+        <tr><td>M</td><td>Male</td></tr><tr><td>F</td><td>Female</td></tr></table>
     </div>
   </div>
 
@@ -926,6 +976,21 @@ m &lt;- <span class="fn">fimport</span>(csv,
     </div>
   </div>
 
+  <div class="sh"><span class="fn">e()</span> — force evaluation without .xN</div>
+  <div class="ex">
+    <div class="ex-c">
+<pre>lbl &lt;- <span class="fn">fnew</span>(
+  <span class="s">"ts"</span> = <span class="fn">e</span>(<span class="s">"format(Sys.Date(), '%Y')"</span>),
+  name = <span class="s">"demo"</span>)
+
+<span class="fn">fput</span>(<span class="s">"ts"</span>, <span class="s">"demo"</span>)</pre>
+    </div>
+    <div class="ex-r">
+      <div class="rv"><span class="vs">"2026"</span></div>
+      <div class="note">labels are VERBATIM unless they contain .xN or are wrapped in <b>e()</b> — failed eval = warning + NA, not an error</div>
+    </div>
+  </div>
+
   <div class="sh">Two args (.x1, .x2) + scalar recycling</div>
   <div class="ex">
     <div class="ex-c">
@@ -988,12 +1053,13 @@ word &lt;- <span class="fn">fputc</span>(response,
   <div class="exf">
     <table class="rf">
       <tr><th>Category</th><th>Function</th><th>Purpose</th></tr>
-      <tr><td class="cat bl" rowspan="5">Create</td>
+      <tr><td class="cat bl" rowspan="6">Create</td>
         <td><code class="ic">fnew(..., name)</code></td><td>Discrete value→label</td></tr>
       <tr><td><code class="ic">fmap(keys, values)</code></td><td>Data-driven key→value</td></tr>
       <tr><td><code class="ic">finput(..., name)</code></td><td>Reverse label→value</td></tr>
       <tr><td><code class="ic">fnew_bid(..., name)</code></td><td>Both format + invalue</td></tr>
       <tr><td><code class="ic">fnew_date(pattern, name)</code></td><td>Date/time/datetime</td></tr>
+      <tr><td><code class="ic">fmap_ranges/fmap_strata()</code></td><td>Range/stratified keys</td></tr>
       <tr><td class="cat gr" rowspan="6">Apply</td>
         <td><code class="ic">fput(x, format, ...)</code></td><td>Generic apply</td></tr>
       <tr><td><code class="ic">fputn(x, name, ...)</code></td><td>Numeric apply</td></tr>
@@ -1001,18 +1067,23 @@ word &lt;- <span class="fn">fputc</span>(response,
       <tr><td><code class="ic">fputk(..., format, sep)</code></td><td>Composite key apply</td></tr>
       <tr><td><code class="ic">fput_all(x, format)</code></td><td>All labels (multilabel)</td></tr>
       <tr><td><code class="ic">fput_df(data, ...)</code></td><td>Data frame columns</td></tr>
-      <tr><td class="cat am" rowspan="2">Reverse</td>
+      <tr><td class="cat am" rowspan="3">Reverse</td>
         <td><code class="ic">finputn(x, name)</code></td><td>Labels → numeric</td></tr>
       <tr><td><code class="ic">finputc(x, name)</code></td><td>Labels → character</td></tr>
-      <tr><td class="cat cy" rowspan="4">Library</td>
+      <tr><td><code class="ic">finputk(..., invalue_name)</code></td><td>Composite reverse</td></tr>
+      <tr><td class="cat cy" rowspan="7">Library</td>
         <td><code class="ic">format_get(name)</code></td><td>Get from library</td></tr>
       <tr><td><code class="ic">fprint(name)</code></td><td>List/inspect</td></tr>
       <tr><td><code class="ic">fclear(name)</code></td><td>Remove format(s)</td></tr>
       <tr><td><code class="ic">fimport(file)</code></td><td>SAS CNTLOUT CSV</td></tr>
-      <tr><td class="cat nv" rowspan="3">Utils</td>
+      <tr><td><code class="ic">flevels(fmt)</code></td><td>Value/label frame</td></tr>
+      <tr><td><code class="ic">franges(fmt)</code></td><td>Range audit rows</td></tr>
+      <tr><td><code class="ic">flist()</code></td><td>Registered names</td></tr>
+      <tr><td class="cat nv" rowspan="4">Utils</td>
         <td><code class="ic">fparse(text, file)</code></td><td>Parse definitions</td></tr>
       <tr><td><code class="ic">fexport(..., file)</code></td><td>Export to text</td></tr>
-      <tr><td><code class="ic">range_spec(lo, hi)</code></td><td>Build range key</td></tr>
+      <tr><td><code class="ic">range_spec(lo, hi, label)</code></td><td>One range descriptor</td></tr>
+      <tr><td><code class="ic">e(expr)</code></td><td>Force label eval</td></tr>
       <tr><td class="cat" style="color:var(--red)">Check</td>
         <td><code class="ic">is_missing(x)</code></td><td>NA/NaN/"" → TRUE</td></tr>
     </table>
@@ -1024,7 +1095,7 @@ word &lt;- <span class="fn">fputc</span>(response,
 </div><!-- /g4 -->
 
 <div class="ftr">
-  <b>ksformat</b> v0.6.1 · Vladimir Larchenko · GPL-3 · <code style="font-size:5.5px;background:rgba(0,0,0,.04);padding:0 4px;border-radius:2px;font-family:monospace">install.packages("ksformat")</code> · github.com/crow16384/ksformat
+  <b>ksformat</b> v0.8.5 · Vladimir Larchenko · GPL-3 · <code style="font-size:5.5px;background:rgba(0,0,0,.04);padding:0 4px;border-radius:2px;font-family:monospace">install.packages("ksformat")</code> · github.com/crow16384/ksformat
 </div>
 
 </body>

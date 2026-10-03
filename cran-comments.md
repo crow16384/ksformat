@@ -1,13 +1,20 @@
 # CRAN submission comments
 
-## Package: ksformat 0.8.4 (from 0.8.2)
+## Package: ksformat 0.8.5 (from 0.8.4)
 
 ### Test environments
 - Local: R 4.5.3 on macOS (arm64)
-- GitHub Actions: R 4.1, 4.2, 4.3, 4.4, 4.5
+- GitHub Actions: R 4.1, R 4.2, R 4.3, R 4.4, R 4.5
 
 ### R CMD check results
-- `R CMD check --as-cran ksformat_0.8.4.tar.gz` passes with no errors, warnings, or notes.
+- `R CMD check --as-cran ksformat_0.8.5.tar.gz` passes with no errors, warnings, or notes.
+
+### Summary of changes from 0.8.4 to 0.8.5
+
+**Documentation only — no code changes:**
+- Added an animated hero logo (GIF) shown at the top of the README and of each vignette; the GIF generator is included under `scripts/` (site/tooling only).
+- Vignettes declare `resource_files` so the logo asset ships with the installed package.
+- Pkgdown site configuration reorganized under `pkgdown/` (navbar article groups, landing-page hero, theme CSS, bundled cheatsheet link); these files are excluded from the source tarball.
 
 ### Summary of changes from 0.8.2 to 0.8.4
 

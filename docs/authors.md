@@ -12,9 +12,13 @@ Source:
 [`DESCRIPTION`](https://github.com/crow16384/ksformat/blob/HEAD/DESCRIPTION)
 
 Larchenko V, Aleschenkov I (2026). *ksformat: 'SAS'-Style 'PROC FORMAT'
-for R*. R package version 0.8.4,
+for R*. R package version 0.8.5,
 <https://crow16384.github.io/ksformat/>.
 
-@Manual{, title = {ksformat: 'SAS'-Style 'PROC FORMAT' for R}, author =
-{Vladimir Larchenko and Igor Aleschenkov}, year = {2026}, note = {R
-package version 0.8.4}, url = {https://crow16384.github.io/ksformat/}, }
+@Manual{,\
+  title = {ksformat: 'SAS'-Style 'PROC FORMAT' for R},\
+  author = {Vladimir Larchenko and Igor Aleschenkov},\
+  year = {2026},\
+  note = {R package version 0.8.5},\
+  url = {https://crow16384.github.io/ksformat/},\
+}

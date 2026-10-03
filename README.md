@@ -1,10 +1,12 @@
-# ksformat <img src="man/figures/logo.svg" align="right" height="139" alt="ksformat logo" />
+# ksformat: SAS-Style PROC FORMAT for R
 
 [![PROC FORMAT for R](https://img.shields.io/badge/PROC%20FORMAT%20for%20R-ksformat-217346?logo=r)](https://github.com/crow16384/ksformat)
 [![GitHub](https://img.shields.io/badge/GitHub-crow16384%2Fksformat-181717?logo=github)](https://github.com/crow16384/ksformat)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://spdx.org/licenses/GPL-3.0-only.html)
 [![R package](https://img.shields.io/badge/R-package-276DC3?logo=r)](https://www.r-project.org/)
 [![CRAN downloads for ksformat](https://cranlogs.r-pkg.org/badges/ksformat)](https://cran.r-project.org/package=ksformat)
+
+<img src="man/figures/ksformat-logo-hero.gif" alt="ksformat logo" width="700" />
 
 SAS-style **PROC FORMAT** for R: create and apply value formats, range-based formatting, reverse formatting (invalue), and consistent handling of missing values (NA, NULL, NaN).
 
