@@ -30,6 +30,39 @@
   Old format objects serialized without `decl_iter` (pre-fix `.RDS`) keep the
   corrected semantics via a `sort_perm` fallback.
 
+* `POSIXct` value-type formats now support range keys. Bounds were previously
+  parsed as `Date`, so comparisons against `POSIXct` input dispatched
+  incompatible `Ops` methods and every range lookup returned `NA` with
+  warnings (in any timezone). Datetime bounds are now parsed as `POSIXct`
+  (UTC epoch representation), input keeps its native class instead of
+  lossy string round-tripping, and reversed bounds (`low > high`) degrade to
+  discrete keys with a warning like numeric range keys.
+
+* Vectorized `fputn()`/`fputc()` now warn when `format_name` contains `NA`
+  (those elements return `NA`); previously they were silently skipped.
+
+* `%OS` (fractional seconds) is kept for `POSIXct` input in `TIME11.`/`TOD11`/
+  `DATETIME22.` and other `%OS` patterns — previously the fraction was
+  silently dropped (strftime has no `%OS`). Numeric-seconds output now pads
+  the integer part (`12:30:00.50`, not `12:30:0.50`).
+
+* Numeric display patterns reject out-of-range width/digits at creation
+  (`"%10000000000.2f"` aborted cryptically at apply time before).
+
+* `ignore_case = TRUE` formats/invalues warn about case-insensitive
+  duplicate keys (`"Yes"` + `"yes"`); previously only exact duplicates
+  warned while nocase-colliding pairs silently pinned the first key.
+
+* `fputk()`/`finputk()` validate component lengths (all non-scalar
+  components must share one length, scalars recycle) instead of silently
+  partial-recycling mismatched vectors through `paste()`.
+
+* Empty (`""`) mapping keys are rejected by every creator (`fnew()`,
+  `finput()`, `fparse()` VALUE/INVALUE blocks) with guidance to use
+  `.missing` — they were unreachable at apply time (`is_missing("")` is
+  `TRUE`), crashed `fnew()` cryptically, and were silently accepted by
+  `fparse()`.
+
 # ksformat 0.8.5
 
 ## Documentation

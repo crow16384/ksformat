@@ -378,6 +378,57 @@ VALUE shift (datetime_range)
 ')
 ```
 
+### Overlapping ranges: declaration order wins
+
+Ranges are tried **top-down in the order they are written**; the first range
+that contains the value decides the label, and later (even narrower) ranges
+never get a chance. Keep the specific buckets above the general ones — a wide
+catch-all declared first shadows everything it covers:
+
+```{r}
+fparse(text = '
+VALUE grade (numeric)
+  [1, 3]  = "Mild"
+  [4, 6]  = "Severe"
+  [0, 10] = "Abnormal (any grade)"
+;')
+fput(c(2, 5, 9), "grade")
+
+fclear("grade")
+fparse(text = '
+VALUE grade_wide_first (numeric)
+  [0, 10] = "Abnormal (any grade)"
+  [1, 3]  = "Mild"
+  [4, 6]  = "Severe"
+;')
+fput(c(2, 5, 9), "grade_wide_first")
+fclear("grade_wide_first")
+```
+
+The first block yields `"Mild" "Severe" "Abnormal (any grade)"`; the second —
+with the wide range declared first — collapses everything to
+`"Abnormal (any grade)"`. No warning is emitted for overlaps, so precedence
+belongs to the definition itself. When several labels are *wanted* for one
+value, make them explicit: declare the format `multilabel` and collect all
+matches with `fput_all()`:
+
+```{r}
+fparse(text = '
+VALUE risk_flags (numeric, multilabel)
+  [0, 3]  = "Low"
+  [0, 7]  = "Monitored"
+  (3, 7]  = "Medium"
+;')
+fput_all(2, "risk_flags")[[1]]   # "Low" "Monitored" (declaration order)
+fclear("risk_flags")
+```
+
+A note on key text: under `type = "auto"`, a key becomes a range spec only
+when it actually parses as one. Plain text keys that merely happen to contain
+a comma (`"San Francisco, CA"`, `"Yes, unknown"`) stay character keys; a
+thousands-style key like `"1,000"` is flagged at creation and treated as
+discrete. Prefer explicit `type = "character"` for such mappings.
+
 ## Stratified range formats
 
 `stratified_range` combines a stratum with an inner range. The parser accepts

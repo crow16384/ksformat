@@ -382,6 +382,23 @@ fput <- function(x, format, ..., keep_na = FALSE) {
   width_txt <- token_parts[3]
   digits_txt <- token_parts[4]
 
+  # Reject widths/digits that overflow integer at parse time instead of
+  # storing a silent NA and dying with a cryptic error at apply time.
+  width_val <- if (nzchar(width_txt)) suppressWarnings(as.integer(width_txt)) else 0L
+  if (nzchar(width_txt) && (is.na(width_val) || width_val < 0L)) {
+    cli_abort(c(
+      "Numeric pattern width {.val {width_txt}} is out of the supported range.",
+      "i" = "Maximum supported width is {format(.Machine$integer.max, big.mark = ',')}."
+    ))
+  }
+  digits_val <- if (nzchar(digits_txt)) suppressWarnings(as.integer(digits_txt)) else 6L
+  if (nzchar(digits_txt) && (is.na(digits_val) || digits_val < 0L)) {
+    cli_abort(c(
+      "Numeric pattern digits {.val {digits_txt}} is out of the supported range.",
+      "i" = "Maximum supported digits is {format(.Machine$integer.max, big.mark = ',')}."
+    ))
+  }
+
   out_flags <- ""
   if (grepl("\\+", flags)) out_flags <- paste0(out_flags, "+")
   if (grepl("-", flags, fixed = TRUE)) out_flags <- paste0(out_flags, "-")
@@ -395,8 +412,8 @@ fput <- function(x, format, ..., keep_na = FALSE) {
     token = token,
     prefix = gsub("%%", "%", prefix_raw, fixed = TRUE),
     suffix = gsub("%%", "%", suffix_raw, fixed = TRUE),
-    width = if (nzchar(width_txt)) as.integer(width_txt) else 0L,
-    digits = if (nzchar(digits_txt)) as.integer(digits_txt) else 6L,
+    width = width_val,
+    digits = digits_val,
     flags = out_flags,
     use_grouping = grepl(",", flags, fixed = TRUE)
   )
@@ -520,7 +537,22 @@ fput <- function(x, format, ..., keep_na = FALSE) {
   if (vtype %in% c("Date", "POSIXct")) {
     range_entries <- list()
     for (i in seq_along(map_keys)) {
-      parsed <- .parse_date_range_key(map_keys[i], format$date_format)
+      # POSIXct value types need POSIXct bounds (the Date parser returns
+      # Date bounds whose Ops methods are incompatible with POSIXct input
+      # comparisons -> warning + silent NA). Datetime bounds parse in UTC;
+      # all comparisons below happen on the shared epoch representation.
+      parsed <- if (vtype == "POSIXct") {
+        .parse_datetime_range_key(map_keys[i], format$date_format)
+      } else {
+        .parse_date_range_key(map_keys[i], format$date_format)
+      }
+      if (!is.null(parsed) && isTRUE(parsed$low > parsed$high)) {
+        cli_warn(c(
+          "Key {.val {map_keys[i]}} parses as a range with low > high.",
+          "i" = "Treating it as a discrete key."
+        ))
+        parsed <- NULL
+      }
       if (!is.null(parsed)) {
         range_entries[[length(range_entries) + 1L]] <- list(
           low = parsed$low, high = parsed$high,
@@ -533,20 +565,31 @@ fput <- function(x, format, ..., keep_na = FALSE) {
     if (length(range_entries) > 0L) {
       unmatched_nm <- non_miss[!matched[non_miss]]
       if (length(unmatched_nm) > 0L) {
-        # Convert input to the target type for range comparison
+        # Convert input to the target type for range comparison. Keep the
+        # native class (epoch arithmetic) instead of string round-tripping:
+        # re-parsing without an explicit tz was timezone-drift prone.
+        xin <- x[unmatched_nm]
         vals <- if (vtype == "Date") {
-          if (!is.null(format$date_format)) {
-            suppressWarnings(as.Date(as.character(x[unmatched_nm]),
+          if (inherits(xin, "Date")) {
+            xin
+          } else if (is.numeric(xin)) {
+            as.Date(as.integer(xin), origin = "1970-01-01")
+          } else if (!is.null(format$date_format)) {
+            suppressWarnings(as.Date(as.character(xin),
                                      format = format$date_format))
           } else {
-            suppressWarnings(as.Date(as.character(x[unmatched_nm])))
+            suppressWarnings(as.Date(as.character(xin)))
           }
         } else {
-          if (!is.null(format$date_format)) {
-            suppressWarnings(as.POSIXct(as.character(x[unmatched_nm]),
-                                        format = format$date_format))
+          if (inherits(xin, "POSIXt")) {
+            xin
+          } else if (is.numeric(xin)) {
+            as.POSIXct(xin, tz = "UTC", origin = "1970-01-01")
+          } else if (!is.null(format$date_format)) {
+            suppressWarnings(as.POSIXct(as.character(xin),
+                                        format = format$date_format, tz = "UTC"))
           } else {
-            suppressWarnings(as.POSIXct(as.character(x[unmatched_nm])))
+            suppressWarnings(as.POSIXct(as.character(xin), tz = "UTC"))
           }
         }
         valid <- !is.na(vals)
@@ -601,6 +644,14 @@ fput <- function(x, format, ..., keep_na = FALSE) {
       cli_warn("Format {.val {fmt_name}} is type {.val {format_obj$type}}, not {.val {type_check}}.")
     }
     result[idx] <- fput(x[idx], format_obj, ...)
+  }
+
+  na_nm <- is.na(format_names)
+  if (any(na_nm)) {
+    cli_warn(c(
+      "{sum(na_nm)} element{?s} skipped: NA in {.arg format_name}.",
+      "i" = "The corresponding results are NA."
+    ))
   }
 
   result
@@ -1072,6 +1123,7 @@ fputk <- function(..., format, sep = "|", keep_na = FALSE,
   if (length(args) < 1L) {
     cli_abort("At least one key component must be provided in {.code ...}.")
   }
+  .check_key_lengths(args)
 
   # Resolve format upfront for stratified dispatch
   fmt <- format

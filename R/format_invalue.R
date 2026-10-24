@@ -58,6 +58,8 @@ finput <- function(..., name = NULL, target_type = "numeric", missing_value = NA
   # Expand named vectors (c(Label = value) -> individual mappings)
   mappings <- .expand_named_vectors(mappings, reverse = FALSE)
 
+  .assert_no_empty_keys(mappings, "finput()")
+
   if (length(mappings) == 0L) {
     cli_abort("At least one label-value mapping must be provided.")
   }
@@ -309,6 +311,7 @@ finputk <- function(..., invalue_name, sep = "|", na_as_string = FALSE) {
   if (length(args) < 1L) {
     cli_abort("At least one label component must be provided in {.code ...}.")
   }
+  .check_key_lengths(args, what = "label components")
 
   inv_obj <- .format_get(invalue_name)
   if (!inherits(inv_obj, "ks_invalue")) {

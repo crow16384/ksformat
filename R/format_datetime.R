@@ -380,6 +380,32 @@ fnew_date <- function(pattern, name = NULL, type = "auto",
 }
 
 
+#' strftime() with %OS fractional-seconds support
+#' @keywords internal
+#' @noRd
+.strftime_with_os <- function(x, pattern) {
+  # Base strftime has no %OS; unknown-platform handling silently degrades it
+  # to %S (fraction lost). Substitute the precomputed two-decimal seconds
+  # string ("%05.2f") per element — the same representation the numeric
+  # seconds branch produces, keeping TIME11/TOD11/DATETIME22 faithful.
+  if (inherits(x, "POSIXlt")) x <- as.POSIXct(x)
+  if (!grepl("%OS", pattern, fixed = TRUE)) {
+    return(format(x, pattern))
+  }
+  ok <- !is.na(x)
+  result <- rep(NA_character_, length(x))
+  if (any(ok)) {
+    xs <- x[ok]
+    secs <- as.numeric(format(xs, "%S")) + (as.numeric(xs) %% 1)
+    fmt <- sprintf("%05.2f", secs)
+    vals <- vapply(seq_along(xs), function(i) {
+      format(xs[i], sub("%OS", fmt[i], pattern, fixed = TRUE))
+    }, character(1L))
+    result[ok] <- vals
+  }
+  result
+}
+
 #' Format time values
 #' @keywords internal
 .format_time_values <- function(x, pattern) {
@@ -387,7 +413,7 @@ fnew_date <- function(pattern, name = NULL, type = "auto",
   std_pattern <- if (no_lz_hour) sub("%_H", "%H", pattern, fixed = TRUE) else pattern
 
   if (inherits(x, c("POSIXct", "POSIXlt"))) {
-    result <- format(x, std_pattern)
+    result <- .strftime_with_os(x, std_pattern)
     if (no_lz_hour) result <- sub("^0(\\d)", "\\1", result)
     return(result)
   }
@@ -406,7 +432,7 @@ fnew_date <- function(pattern, name = NULL, type = "auto",
     h_str <- if (no_lz_hour) sprintf("%d", h) else sprintf("%02d", h)
     m_str <- sprintf("%02d", m)
     s_int_str <- sprintf("%02d", as.integer(s))
-    s_frac_str <- sprintf("%.2f", s)
+    s_frac_str <- sprintf("%05.2f", s)
 
     has_os  <- grepl("%OS", std_pattern, fixed = TRUE)
     has_h   <- grepl("%H", std_pattern, fixed = TRUE)
@@ -425,7 +451,7 @@ fnew_date <- function(pattern, name = NULL, type = "auto",
 
   dts <- tryCatch(as.POSIXct(x, tz = "UTC"), error = function(e) NULL)
   if (!is.null(dts)) {
-    result <- format(dts, std_pattern)
+    result <- .strftime_with_os(dts, std_pattern)
     if (no_lz_hour) result <- sub("^0(\\d)", "\\1", result)
     return(result)
   }
@@ -438,7 +464,7 @@ fnew_date <- function(pattern, name = NULL, type = "auto",
 #' @keywords internal
 .format_datetime_values <- function(x, pattern, origin = "1970-01-01") {
   dts <- .to_r_datetime(x, origin = origin)
-  result <- format(dts, pattern)
+  result <- .strftime_with_os(dts, pattern)
   return(result)
 }
 

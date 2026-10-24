@@ -278,6 +278,10 @@ fnew <- function(..., name = NULL, type = "auto", default = NULL,
   do_reverse <- if (has_fmap || is_strat) FALSE else !is_vtype
   mappings <- .expand_named_vectors(mappings, reverse = do_reverse)
 
+  # Reject "" keys at creation: unreachable at apply time (is_missing("")
+  # is TRUE, .missing/NA shadow them) and cryptic elsewhere.
+  .assert_no_empty_keys(mappings, "fnew()")
+
   if (length(mappings) == 0L && is.null(num_pattern)) {
     cli_abort("At least one value-label mapping must be provided.")
   }

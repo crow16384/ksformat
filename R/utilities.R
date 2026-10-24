@@ -789,6 +789,43 @@ in_range <- function(x, range_spec) {
   seq_along(rt$low)
 }
 
+#' Validate equal lengths of recycled key components
+#'
+#' fput()/fput_all() enforce this for expression arguments; fputk()/finputk()
+#' must not silently partial-recycle paste() components of mismatched lengths.
+#' Scalars are recycled; all non-scalar components must share one length.
+#' @keywords internal
+#' @noRd
+.check_key_lengths <- function(args, what = "key components") {
+  lens <- vapply(args, length, integer(1L))
+  non_scalar <- lens[lens > 1L]
+  if (length(non_scalar) > 0L && !all(non_scalar == non_scalar[1L])) {
+    cli_abort(c(
+      "Length mismatch in {.arg ...} {what}: lengths {paste(lens, collapse = ', ')}.",
+      "i" = "All non-scalar {what} must have the same length (scalars are recycled)."
+    ))
+  }
+  invisible(TRUE)
+}
+
+#' Abort when mapping keys contain the empty string
+#'
+#' "" keys are unreachable at apply time (is_missing() treats "" as missing)
+#' and crash list->name coercions elsewhere; reject them at every creator with
+#' guidance toward .missing.
+#' @keywords internal
+#' @noRd
+.assert_no_empty_keys <- function(mappings, creator = "fnew()") {
+  k <- names(mappings)
+  if (!is.null(k) && any(nzchar(k) == FALSE)) {
+    cli_abort(c(
+      "{creator}: empty ({.val \"\"}) mapping key{?s} not supported.",
+      "i" = "Empty strings are treated as missing at apply time — define {.code .missing} instead."
+    ))
+  }
+  invisible(TRUE)
+}
+
 
 #' Split a stratified mapping key into (stratum, range_key)
 #'
@@ -1507,11 +1544,24 @@ fclear <- function(name = NULL) {
       }
     }
 
-    # Check for duplicate keys
+    # Check for duplicate keys (case-insensitive formats: compare lowercase,
+    # since apply-time match() runs on tolower() and silently picks the first
+    # of any case-colliding pair)
     keys <- names(format_obj$mappings)
-    if (anyDuplicated(keys)) {
-      dupes <- unique(keys[duplicated(keys)])
-      cli_warn("Format{name_str}: Duplicate keys: {.val {dupes}}")
+    if (!is.null(keys) && length(keys) > 0) {
+      if (isTRUE(format_obj$ignore_case)) {
+        low_keys <- tolower(keys)
+        if (anyDuplicated(low_keys)) {
+          dupes <- unique(low_keys[duplicated(low_keys)])
+          cli_warn(c(
+            "Format{name_str}: Duplicate keys (case-insensitive): {.val {dupes}}",
+            "i" = "Only the first key per case-insensitive match will ever be reachable."
+          ))
+        }
+      } else if (anyDuplicated(keys)) {
+        dupes <- unique(keys[duplicated(keys)])
+        cli_warn("Format{name_str}: Duplicate keys: {.val {dupes}}")
+      }
     }
 
     # For numeric type, validate that keys are valid numbers or ranges
@@ -1531,10 +1581,20 @@ fclear <- function(name = NULL) {
       ""
     }
 
-    # Check for duplicate keys
+    # Check for duplicate keys (case-insensitive invalues match on tolower()
+    # at apply time — a case-colliding pair silently becomes unreachable)
     if (length(format_obj$mappings) > 0) {
       keys <- names(format_obj$mappings)
-      if (anyDuplicated(keys)) {
+      if (isTRUE(format_obj$ignore_case)) {
+        low_keys <- tolower(keys)
+        if (anyDuplicated(low_keys)) {
+          dupes <- unique(low_keys[duplicated(low_keys)])
+          cli_warn(c(
+            "Invalue{name_str}: Duplicate keys (case-insensitive): {.val {dupes}}",
+            "i" = "Only the first key per case-insensitive match will ever be reachable."
+          ))
+        }
+      } else if (anyDuplicated(keys)) {
         dupes <- unique(keys[duplicated(keys)])
         cli_warn("Invalue{name_str}: Duplicate keys: {.val {dupes}}")
       }

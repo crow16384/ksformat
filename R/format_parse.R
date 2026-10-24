@@ -619,6 +619,7 @@ fparse <- function(text = NULL, file = NULL, verbose = FALSE) {
   # Build the format
   type <- block$subtype
 
+  .assert_no_empty_keys(mappings, "fparse()")
   format_obj <- structure(
     list(
       name = block$name,
@@ -884,6 +885,7 @@ fparse <- function(text = NULL, file = NULL, verbose = FALSE) {
     }
   }
 
+  .assert_no_empty_keys(mappings, "fparse()")
   format_obj <- structure(
     list(
       name = block$name,
@@ -967,6 +969,7 @@ fparse <- function(text = NULL, file = NULL, verbose = FALSE) {
   # Use block subtype; for INVALUE blocks, default is "numeric"
   target_type <- block$subtype
 
+  .assert_no_empty_keys(mappings, "fparse()")
   invalue_obj <- structure(
     list(
       name = block$name,

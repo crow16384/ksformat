@@ -22,3 +22,26 @@ treating as discrete"), `fput(1500)` → `"1500"` (fallthrough original), без
 reverse date_range, legacy date-auto path). Suite: 796 pass / 0 fail.
 
 ## №1 — приоритет пересекающихся диапазонов (High) — см. коммит 4868d09
+
+## №3–№9 — FIXED (один коммит, suite 824/0)
+
+- №3 POSIXct value-type ranges: bounds теперь парсятся .parse_datetime_range_key
+  (UTC), вход сохраняет класс вместо строкового round-trip (латентный tz-drift
+  тоже закрыт); обратные границы деградируют как в numeric.
+- №4 .fput_vectorized: varning при NA в векторе имён форматов (результат тот же NA).
+- №5 %OS: helper .strftime_with_os (POSIXct/datetime ветки) + "%05.2f" pad в numeric
+  ветке; TIME11/TOD11/DATETIME22 сохраняют дробную часть.
+- №6 .parse_num_pattern: overflow width/digits -> cli_abort на создании.
+- №7 проверка дублей ключей для ignore_case форматов и инvalue делает
+  tolower-коллизии видимыми (первый ключ достижим, второй — никогда).
+- №8 fputk/finputk: общая валидация длин компонентов (.check_key_lengths).
+- №9 .assert_no_empty_keys: fnew/finput/fparse (VALUE/INVALUE/vtype-блоки)
+  отвергают ""-ключи с подсказкой про .missing (раньше fnew падал
+  base-сообщением, fparse принимал недостижимое правило; в R-source `""=`
+  вообще синтаксическая ошибка — отсюда «cryptic»).
+
+## Виньетка (owner directive)
+
+nonstandard-applications.qmd: новый подраздел "Overlapping ranges: declaration
+order wins" (working example: narrow-first vs wide-first, multilabel+fput_all)
++ примечание про ключи с запятыми. Выводы чанков проверены прогоном.

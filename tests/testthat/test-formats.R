@@ -3617,6 +3617,102 @@ test_that("date-looking auto keys keep the legacy loud numeric path (#2)", {
   expect_equal(detect_format_type(c("2024-01-01,2024-02-01")), "numeric")
 })
 
+test_that("POSIXct value-type formats support range keys (#3)", {
+  fnew("2024-06-01 11:00:00,2024-06-01 13:00:00,TRUE,FALSE" =
+         as.POSIXct("2024-06-15 09:00", tz = "UTC"),
+       type = "POSIXct", name = "vpc_t")
+  res <- fput(as.POSIXct("2024-06-01 11:30:00", tz = "UTC"), "vpc_t")
+  expect_equal(format(res, tz = "UTC"), "2024-06-15 09:00:00")
+  expect_true(is.na(fput(as.POSIXct("2024-06-01 14:00:00", tz = "UTC"), "vpc_t")))
+  # timezone-independent: same instant matched under a non-UTC session TZ
+  oldtz <- Sys.getenv("TZ")
+  Sys.setenv(TZ = "America/New_York")
+  on.exit(Sys.setenv(TZ = oldtz), add = TRUE)
+  res2 <- fput(as.POSIXct("2024-06-01 11:30:00", tz = "UTC"), "vpc_t")
+  expect_equal(format(res2, tz = "UTC"), "2024-06-15 09:00:00")
+  fclear()
+})
+
+test_that("POSIXct value-type accepts date-only range bounds (#3)", {
+  fnew("2024-06-01,2024-06-30,TRUE,FALSE" = as.POSIXct("2024-07-01 00:00", tz = "UTC"),
+       type = "POSIXct", name = "vpc_d")
+  res <- fput(as.POSIXct("2024-06-15 12:00", tz = "UTC"), "vpc_d")
+  expect_equal(format(res, "%Y-%m-%d %H:%M:%S", tz = "UTC"), "2024-07-01 00:00:00")
+  expect_true(is.na(fput(as.POSIXct("2024-07-01 12:00", tz = "UTC"), "vpc_d")))
+  fclear()
+})
+
+test_that("NA format names in vectorized fputn warn instead of staying silent (#4)", {
+  fnew("0,10,TRUE,FALSE" = "lo", .missing = "MISSING", name = "f1x")
+  expect_warning(
+    out <- fputn(c(5, 7), c("f1x", NA)),
+    "skipped: NA"
+  )
+  expect_equal(out, c("lo", NA))
+  fclear()
+})
+
+test_that("%OS keeps fractional seconds on POSIXct and numeric paths (#5)", {
+  expect_equal(fputn(45000.5, "TIME11."), "12:30:00.50")
+  expect_equal(fputn(as.POSIXct("2024-01-01 00:00:00.75", tz = "UTC"), "TIME11."),
+               "0:00:00.75")
+  expect_equal(fputn(as.POSIXct("2024-01-01 12:30:15.75", tz = "UTC"), "TIME11."),
+               "12:30:15.75")
+  expect_equal(
+    fputn(as.POSIXct("2024-01-15 12:30:15.75", tz = "UTC"), "DATETIME22."),
+    "15JAN2024:12:30:15.75")
+  # fractionless formats untouched
+  expect_equal(fputn(as.POSIXct("2024-01-01 12:30:15.75", tz = "UTC"), "TIME8."),
+               "12:30:15")
+  fclear()
+})
+
+test_that("pattern width/digits overflow is rejected at creation (#6)", {
+  expect_error(fnew("%10000000000.2f", type = "numeric"), "out of the supported range")
+  expect_error(fnew("%.100000000000f", type = "numeric"), "out of the supported range")
+  fclear()
+})
+
+test_that("case-insensitive duplicate keys warn (#7)", {
+  expect_warning(finput("Yes" = 1, "yes" = 2, name = "ynx", ignore_case = TRUE),
+                 "case-insensitive")
+  expect_equal(finputn("YES", "ynx"), 1)
+  expect_warning(fnew("M" = "Male", "m" = "Male2", name = "mcx",
+                      type = "character", ignore_case = TRUE),
+                 "case-insensitive")
+  # exact duplicates keep the plain message
+  expect_warning(finput("Yes" = 1, "Yes" = 2, name = "yny"), "Duplicate keys")
+  fclear()
+})
+
+test_that("fputk/finputk reject mismatched component lengths (#8)", {
+  fnew("A|1" = "x", "A|2" = "y", "B|1" = "z", name = "ckx")
+  expect_error(fputk(c("A", "B"), c(1, 2, NA), format = "ckx"), "Length mismatch")
+  expect_error(finputk(c("A", "B"), c(1, 2, NA), invalue_name = "ckx"),
+               "Length mismatch|not an INVALUE")
+  # scalars still recycle, equal lengths still pass
+  expect_equal(fputk("A", 1, format = "ckx"), "x")
+  expect_equal(fputk(c("A", "B"), c(1, 1), format = "ckx"), c("x", "z"))
+  fclear()
+})
+
+test_that("empty ('') keys are rejected by every creator (#9)", {
+  # NOTE: `fnew("" = x)` cannot even be written in R source (parse-time
+  # "zero-length variable name"); runtime-constructed mappings are the
+  # realistic attack vector, hence fparse/do.call here.
+  expect_error(fparse(text = 'VALUE e2 (character)\n  "" = "X"\n;'), "empty")
+  expect_error(fparse(text = 'INVALUE e4\n  "" = 1\n;'), "empty")
+  expect_error(fparse(text = 'VALUE e5 (Date)\n  "" = "2024-01-01"\n;'), "empty")
+  # do.call drops "" names -> caught even earlier by the unnamed-argument check
+  expect_error(do.call(fnew, c(stats::setNames(list("Blank"), ""), list(name = "e1"))),
+               "empty|Unnamed argument")
+  expect_error(do.call(finput, c(stats::setNames(list(1), ""), list(name = "e3"))),
+               "empty|Unnamed argument")
+  # direct guard unit
+  expect_error(.assert_no_empty_keys(stats::setNames(list(1), "")), "empty")
+  fclear()
+})
+
 test_that("fput with exclusive lower bound on first range uses general path", {
   fparse(text = '
   VALUE excl_rt (numeric)
