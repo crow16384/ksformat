@@ -30,7 +30,7 @@ BUG 3 - POSIXct value-type + range-ключи сломаны (Med)
   warning> Несовместимые методы ("Ops.POSIXt", "Ops.Date") для "<="
   TZ=NY   fput(2024-06-10 UTC)       => NA
 # datetime-ключ со временем в value-type СОЗДАЁТСЯ молча, но lookup ломается так же:
-  fnew('2024-06-01 11:00:00,2024-06-01 13:00:00,TRUE,FALSE', type='POSIXct') => vpd | POSIXct | NULL | NULL | 1717243200 | NULL | NULL | NULL | NULL | FALSE | FALSE | NULL | NULL | NULL | 1         , FALSE     , 1717243200, FALSE     , TRUE       | NULL | 2026-10-24 04:57:10
+  fnew('2024-06-01 11:00:00,2024-06-01 13:00:00,TRUE,FALSE', type='POSIXct') => vpd | POSIXct | NULL | NULL | 1717243200 | NULL | NULL | NULL | NULL | FALSE | FALSE | NULL | NULL | NULL | 1         , FALSE     , 1717243200, FALSE     , TRUE       | NULL | 2026-10-24 10:38:39
 # для сравнения: Date value-type + date-only ключи РАБОТАЮТ:
   fput(Date 2024-06, 'dtv')          => 2024-06-01
 All formats cleared from library.
