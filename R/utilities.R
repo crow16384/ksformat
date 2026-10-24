@@ -820,7 +820,7 @@ in_range <- function(x, range_spec) {
   if (!is.null(k) && any(nzchar(k) == FALSE)) {
     cli_abort(c(
       "{creator}: empty ({.val \"\"}) mapping key{?s} not supported.",
-      "i" = "Empty strings are treated as missing at apply time — define {.code .missing} instead."
+      "i" = "Empty strings are treated as missing at apply time; define {.code .missing} instead."
     ))
   }
   invisible(TRUE)

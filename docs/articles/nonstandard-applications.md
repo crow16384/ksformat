@@ -334,6 +334,15 @@ for optional `.missing` / `.other` directives.
 Range formats are expressed with interval notation. The same syntax
 works for numeric, `date_range`, and `datetime_range` blocks.
 
+When ranges overlap, the **first matching range in declaration order
+wins** — exactly the order the entries are written, top-down. No warning
+is emitted for overlaps, so keep the intended precedence explicit in the
+definition: put the specific (narrow) ranges before the general (wide)
+ones. To collect *all* matching labels instead of the first one, create
+the format with `multilabel = TRUE` (or an `fparse`
+`(numeric, multilabel)` header) and use
+[`fput_all()`](https://crow16384.github.io/ksformat/reference/fput_all.md).
+
 \
 [`fparse`](https://crow16384.github.io/ksformat/reference/fparse.md)`(``text ``=`` ``'`\
 `VALUE study_period (date_range)`\
@@ -348,6 +357,58 @@ works for numeric, `date_range`, and `datetime_range` blocks.
 `  [2024-01-15 16:00, 2024-01-16 00:00) = "Evening"`\
 `;`\
 `'``)`
+
+#### 9.5.1 Overlapping ranges: declaration order wins
+
+Ranges are tried **top-down in the order they are written**; the first
+range that contains the value decides the label, and later (even
+narrower) ranges never get a chance. Keep the specific buckets above the
+general ones — a wide catch-all declared first shadows everything it
+covers:
+
+\
+[`fparse`](https://crow16384.github.io/ksformat/reference/fparse.md)`(``text ``=`` ``'`\
+`VALUE grade (numeric)`\
+`  [1, 3]  = "Mild"`\
+`  [4, 6]  = "Severe"`\
+`  [0, 10] = "Abnormal (any grade)"`\
+`;'``)`\
+[`fput`](https://crow16384.github.io/ksformat/reference/fput.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``2``, ``5``, ``9``)``, ``"grade"``)`\
+\
+[`fclear`](https://crow16384.github.io/ksformat/reference/fclear.md)`(``"grade"``)`\
+[`fparse`](https://crow16384.github.io/ksformat/reference/fparse.md)`(``text ``=`` ``'`\
+`VALUE grade_wide_first (numeric)`\
+`  [0, 10] = "Abnormal (any grade)"`\
+`  [1, 3]  = "Mild"`\
+`  [4, 6]  = "Severe"`\
+`;'``)`\
+[`fput`](https://crow16384.github.io/ksformat/reference/fput.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``2``, ``5``, ``9``)``, ``"grade_wide_first"``)`\
+[`fclear`](https://crow16384.github.io/ksformat/reference/fclear.md)`(``"grade_wide_first"``)`
+
+The first block yields `"Mild" "Severe" "Abnormal (any grade)"`; the
+second — with the wide range declared first — collapses everything to
+`"Abnormal (any grade)"`. No warning is emitted for overlaps, so
+precedence belongs to the definition itself. When several labels are
+*wanted* for one value, make them explicit: declare the format
+`multilabel` and collect all matches with
+[`fput_all()`](https://crow16384.github.io/ksformat/reference/fput_all.md):
+
+\
+[`fparse`](https://crow16384.github.io/ksformat/reference/fparse.md)`(``text ``=`` ``'`\
+`VALUE risk_flags (numeric, multilabel)`\
+`  [0, 3]  = "Low"`\
+`  [0, 7]  = "Monitored"`\
+`  (3, 7]  = "Medium"`\
+`;'``)`\
+[`fput_all`](https://crow16384.github.io/ksformat/reference/fput_all.md)`(``2``, ``"risk_flags"``)``[[``1``]``]``   ``# "Low" "Monitored" (declaration order)`\
+[`fclear`](https://crow16384.github.io/ksformat/reference/fclear.md)`(``"risk_flags"``)`
+
+A note on key text: under `type = "auto"`, a key becomes a range spec
+only when it actually parses as one. Plain text keys that merely happen
+to contain a comma (`"San Francisco, CA"`, `"Yes, unknown"`) stay
+character keys; a thousands-style key like `"1,000"` is flagged at
+creation and treated as discrete. Prefer explicit `type = "character"`
+for such mappings.
 
 ### 9.6 Stratified range formats
 

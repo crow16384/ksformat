@@ -41,29 +41,29 @@ CNTLOUT columns: `FMTNAME`, `START`, `END`, `LABEL`, `TYPE`, `HLO`,
 
 - `N`:
 
-  Numeric VALUE format \\\to\\ `ks_format` with `type = "numeric"`
+  Numeric VALUE format \\(\to\\) `ks_format` with `type = "numeric"`
 
 - `C`:
 
-  Character VALUE format \\\to\\ `ks_format` with `type = "character"`
+  Character VALUE format \\(\to\\) `ks_format` with `type = "character"`
 
 - `I`:
 
-  Numeric INVALUE (informat) \\\to\\ `ks_invalue` with
+  Numeric INVALUE (informat) \\(\to\\) `ks_invalue` with
   `target_type = "numeric"`
 
 - `J`:
 
-  Character INVALUE (informat) \\\to\\ `ks_invalue` with
+  Character INVALUE (informat) \\(\to\\) `ks_invalue` with
   `target_type = "character"`
 
 **Incompatible types (logged with a warning):**
 
 - `P`:
 
-  PICTURE formats \\-\\ no equivalent in ksformat
+  PICTURE formats \\(-\\) no equivalent in ksformat
 
-Rows with SAS special missing values (`.A`\\-\\`.Z`, `._`) in the HLO
+Rows with SAS special missing values (`.A`\\(-\\)`.Z`, `._`) in the HLO
 field are logged as incompatible entries and skipped because R has no
 equivalent concept.
 
@@ -83,7 +83,7 @@ imported <- fimport(csv_file)
 #> Warning: Skipped incompatible entry in format "SMISSING":
 #> ✖ SAS special missing value '.B' (HLO='S') has no R equivalent.
 #> ✔ Imported 4 formats and 1 invalue from
-#>   /private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmpiew0So/temp_libpath67243bbc49ff/ksformat/extdata/test_cntlout.csv.
+#>   /private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpUvfWNU/temp_libpath1736e67c1ae3b/ksformat/extdata/test_cntlout.csv.
 flist()
 #> [1] "AGEGRP"   "BMICAT"   "GENDER"   "RACEIN"   "SMISSING"
 fprint()

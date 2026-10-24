@@ -1,5 +1,91 @@
 # Changelog
 
+## ksformat 0.8.6
+
+### Bug Fixes
+
+- Comma-containing discrete keys no longer break numeric range
+  machinery. Two layers: (1)
+  [`detect_format_type()`](https://crow16384.github.io/ksformat/reference/detect_format_type.md)
+  now classifies a comma key as a range spec only if it actually parses
+  with the canonical range grammar (`low,high[,inc_low[,inc_high]]`) —
+  plain text keys like `"San Francisco, CA"` stay `character` under
+  `type = "auto"` instead of being forced to `numeric`. (2)
+  `.build_range_table()` validates every parsed range: keys like
+  `"1,000"` (parses as `low = 1, high = 0`) are degraded to discrete
+  keys with a visible warning. Previously such formats passed
+  `sorted_disjoint = TRUE` (the adjacency test is vacuous for degenerate
+  intervals) and
+  [`fput()`](https://crow16384.github.io/ksformat/reference/fput.md)
+  aborted at apply time with `'vec' must be sorted non-decreasingly`
+  from [`findInterval()`](https://rdrr.io/r/base/findInterval.html).
+  Date-looking auto keys keep the legacy warning path nudging
+  `type = "date_range"`.
+
+- Overlapping ranges in non-multilabel formats now match in
+  **declaration order** (first-hit-wins, top-down as written). The
+  `(low, high)` sort introduced in 0.6.5 for the
+  [`findInterval()`](https://rdrr.io/r/base/findInterval.html) fast path
+  had also reordered the general fallback loop, so precedence silently
+  became “smallest `low` first” — a wide catch-all declared last could
+  steal matches from narrow ranges declared earlier. The range table
+  keeps the sorted layout for the fast path (disjoint ranges are
+  order-insensitive anyway); the general path in
+  [`fput()`](https://crow16384.github.io/ksformat/reference/fput.md),
+  [`fput_all()`](https://crow16384.github.io/ksformat/reference/fput_all.md),
+  and stratified matching now iterate a stored declaration-order view
+  (`decl_iter`).
+  [`fput_all()`](https://crow16384.github.io/ksformat/reference/fput_all.md)
+  label sequence within an element now follows declaration order as
+  well. Precedence for overlapping ranges is documented in
+  [`?fput`](https://crow16384.github.io/ksformat/reference/fput.md) and
+  the nonstandard-applications vignette. Old format objects serialized
+  without `decl_iter` (pre-fix `.RDS`) keep the corrected semantics via
+  a `sort_perm` fallback.
+
+- `POSIXct` value-type formats now support range keys. Bounds were
+  previously parsed as `Date`, so comparisons against `POSIXct` input
+  dispatched incompatible `Ops` methods and every range lookup returned
+  `NA` with warnings (in any timezone). Datetime bounds are now parsed
+  as `POSIXct` (UTC epoch representation), input keeps its native class
+  instead of lossy string round-tripping, and reversed bounds
+  (`low > high`) degrade to discrete keys with a warning like numeric
+  range keys.
+
+- Vectorized
+  [`fputn()`](https://crow16384.github.io/ksformat/reference/fputn.md)/[`fputc()`](https://crow16384.github.io/ksformat/reference/fputc.md)
+  now warn when `format_name` contains `NA` (those elements return
+  `NA`); previously they were silently skipped.
+
+- `%OS` (fractional seconds) is kept for `POSIXct` input in
+  `TIME11.`/`TOD11`/ `DATETIME22.` and other `%OS` patterns — previously
+  the fraction was silently dropped (strftime has no `%OS`).
+  Numeric-seconds output now pads the integer part (`12:30:00.50`, not
+  `12:30:0.50`).
+
+- Numeric display patterns reject out-of-range width/digits at creation
+  (`"%10000000000.2f"` aborted cryptically at apply time before).
+
+- `ignore_case = TRUE` formats/invalues warn about case-insensitive
+  duplicate keys (`"Yes"` + `"yes"`); previously only exact duplicates
+  warned while nocase-colliding pairs silently pinned the first key.
+
+- [`fputk()`](https://crow16384.github.io/ksformat/reference/fputk.md)/[`finputk()`](https://crow16384.github.io/ksformat/reference/finputk.md)
+  validate component lengths (all non-scalar components must share one
+  length, scalars recycle) instead of silently partial-recycling
+  mismatched vectors through
+  [`paste()`](https://rdrr.io/r/base/paste.html).
+
+- Empty (`""`) mapping keys are rejected by every creator
+  ([`fnew()`](https://crow16384.github.io/ksformat/reference/fnew.md),
+  [`finput()`](https://crow16384.github.io/ksformat/reference/finput.md),
+  [`fparse()`](https://crow16384.github.io/ksformat/reference/fparse.md)
+  VALUE/INVALUE blocks) with guidance to use `.missing` — they were
+  unreachable at apply time (`is_missing("")` is `TRUE`), crashed
+  [`fnew()`](https://crow16384.github.io/ksformat/reference/fnew.md)
+  cryptically, and were silently accepted by
+  [`fparse()`](https://crow16384.github.io/ksformat/reference/fparse.md).
+
 ## ksformat 0.8.5
 
 ### Documentation

@@ -11,7 +11,7 @@ Properly handles NA, NULL, NaN, and other missing values."><meta property="og:im
 
     <a class="navbar-brand me-2" href="../index.html">ksformat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,7 +88,11 @@ missing label.</p></dd>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The function handles missing values in the following order:</p><ol><li><p>NA, NULL, NaN -&gt; Uses format's missing_label if defined</p></li>
 <li><p>Exact matches -&gt; Uses defined value-label mapping</p></li>
-<li><p>Range matches (for numeric) -&gt; Uses range label</p></li>
+<li><p>Range matches (numeric / date_range / datetime_range) -&gt; uses the
+    first matching range in <strong>declaration order</strong> (overlapping ranges
+    are resolved top-down as written, like 'SAS' PROC FORMAT entries;
+    no warning is emitted for overlaps). Use <code>multilabel = TRUE</code> with
+    <code><a href="fput_all.html">fput_all()</a></code> to collect every matching label.</p></li>
 <li><p>No match -&gt; Uses format's other_label or returns original value</p></li>
 </ol><p><strong>Expression labels:</strong> If a label string contains <code>.x1</code>, <code>.x2</code>,
 etc., it is evaluated as an R expression at apply-time. Extra data is passed

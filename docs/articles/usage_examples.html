@@ -31,7 +31,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ksformat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -419,12 +419,12 @@ once:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;      format           result</span></span>
-<span><span class="co">#&gt; 1    DATE9.        03OCT2026</span></span>
-<span><span class="co">#&gt; 2 MMDDYY10.       10/03/2026</span></span>
-<span><span class="co">#&gt; 3 DDMMYY10.       03/10/2026</span></span>
-<span><span class="co">#&gt; 4 YYMMDD10.       2026-10-03</span></span>
+<span><span class="co">#&gt; 1    DATE9.        24OCT2026</span></span>
+<span><span class="co">#&gt; 2 MMDDYY10.       10/24/2026</span></span>
+<span><span class="co">#&gt; 3 DDMMYY10.       24/10/2026</span></span>
+<span><span class="co">#&gt; 4 YYMMDD10.       2026-10-24</span></span>
 <span><span class="co">#&gt; 5   MONYY7.          OCT2026</span></span>
-<span><span class="co">#&gt; 6 WORDDATE. October 03, 2026</span></span>
+<span><span class="co">#&gt; 6 WORDDATE. October 24, 2026</span></span>
 <span><span class="co">#&gt; 7    YEAR4.             2026</span></span>
 <span><span class="co">#&gt; 8      QTR.                4</span></span>
 <span></span>
@@ -480,10 +480,10 @@ once:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;        format             result</span></span>
-<span><span class="co">#&gt; 1 DATETIME20. 03OCT2026:20:44:45</span></span>
-<span><span class="co">#&gt; 2 DATETIME13.      03OCT26:20:44</span></span>
-<span><span class="co">#&gt; 3     DTDATE.          03OCT2026</span></span>
-<span><span class="co">#&gt; 4   DTYYMMDD.         2026-10-03</span></span>
+<span><span class="co">#&gt; 1 DATETIME20. 24OCT2026:14:13:24</span></span>
+<span><span class="co">#&gt; 2 DATETIME13.      24OCT26:14:13</span></span>
+<span><span class="co">#&gt; 3     DTDATE.          24OCT2026</span></span>
+<span><span class="co">#&gt; 4   DTYYMMDD.         2026-10-24</span></span>
 <span></span>
 <span><span class="co"># From numeric R-epoch seconds</span></span>
 <span><span class="va">r_secs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2025-06-15 14:30:00"</span>, tz <span class="op">=</span> <span class="st">"UTC"</span><span class="op">)</span><span class="op">)</span></span>
@@ -608,7 +608,7 @@ labels:</p>
 <span></span>
 <span><span class="co"># fput returns first match only</span></span>
 <span><span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="va">ages</span>, <span class="st">"age_categories"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Infant"        "Pediatric"     "Adult"         "Non-Pediatric"</span></span>
+<span><span class="co">#&gt; [1] "Infant"     "Adolescent" "Adult"      "Elderly"</span></span>
 <span></span>
 <span><span class="co"># fput_all returns ALL matching labels</span></span>
 <span><span class="va">all_labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fput_all.html">fput_all</a></span><span class="op">(</span><span class="va">ages</span>, <span class="st">"age_categories"</span><span class="op">)</span></span>
@@ -616,9 +616,9 @@ labels:</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Age"</span>, <span class="va">ages</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, <span class="st">"-&gt;"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">all_labels</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>, collapse <span class="op">=</span> <span class="st">", "</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt; Age 3 -&gt; Infant, Pediatric </span></span>
-<span><span class="co">#&gt; Age 14 -&gt; Pediatric, Adolescent </span></span>
+<span><span class="co">#&gt; Age 14 -&gt; Adolescent, Pediatric </span></span>
 <span><span class="co">#&gt; Age 25 -&gt; Adult, Non-Pediatric </span></span>
-<span><span class="co">#&gt; Age 70 -&gt; Non-Pediatric, Elderly</span></span></code></pre></div>
+<span><span class="co">#&gt; Age 70 -&gt; Elderly, Non-Pediatric</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="multilabel-with-missing-values">Multilabel with Missing Values<a class="anchor" aria-label="anchor" href="#multilabel-with-missing-values"></a>
@@ -644,7 +644,7 @@ labels:</p>
 <span>      <span class="st">"-&gt;"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">ml_result</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>, collapse <span class="op">=</span> <span class="st">", "</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt; Score 95 -&gt; Valid Score, Above Average, Excellent </span></span>
-<span><span class="co">#&gt; Score 45 -&gt; Below Average, Valid Score </span></span>
+<span><span class="co">#&gt; Score 45 -&gt; Valid Score, Below Average </span></span>
 <span><span class="co">#&gt; Score NA -&gt; No Score </span></span>
 <span><span class="co">#&gt; Score 150 -&gt; Out of Range</span></span></code></pre></div>
 </div>
@@ -717,10 +717,10 @@ labels:</p>
 <span>      <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">ae_labels</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>, collapse <span class="op">=</span> <span class="st">" + "</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt; Grade 1 : Mild + Non-serious </span></span>
-<span><span class="co">#&gt; Grade 2 : Non-serious + Moderate </span></span>
+<span><span class="co">#&gt; Grade 2 : Moderate + Non-serious </span></span>
 <span><span class="co">#&gt; Grade 3 : Severe + Serious </span></span>
-<span><span class="co">#&gt; Grade 4 : Serious + Life-threatening </span></span>
-<span><span class="co">#&gt; Grade 5 : Serious + Fatal</span></span>
+<span><span class="co">#&gt; Grade 4 : Life-threatening + Serious </span></span>
+<span><span class="co">#&gt; Grade 5 : Fatal + Serious</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
@@ -1037,7 +1037,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmpiew0So/temp_libpath67243bbc49ff/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpUvfWNU/temp_libpath1736e67c1ae3b/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">imported</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "AGEGRP"   "BMICAT"   "GENDER"   "RACEIN"   "SMISSING"</span></span>
 <span></span>
@@ -1165,7 +1165,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmpiew0So/temp_libpath67243bbc49ff/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpUvfWNU/temp_libpath1736e67c1ae3b/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span></span>
 <span><span class="co"># Library should be empty</span></span>
 <span><span class="fu"><a href="../reference/flist.html">flist</a></span><span class="op">(</span><span class="op">)</span></span>

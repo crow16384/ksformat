@@ -180,12 +180,12 @@ fput_all(c(10, 30), ml)
 #> [1] "Pediatric" "Any Age"  
 #> 
 #> [[2]]
-#> [1] "Any Age" "Adult"  
+#> [1] "Adult"   "Any Age"
 #> 
 
 # Date format (SAS-style, auto-resolved)
 fputn(Sys.Date(), "DATE9.")
-#> [1] "03OCT2026"
+#> [1] "24OCT2026"
 
 # Export and library management
 cat(fexport(sex = format_get("sex")))

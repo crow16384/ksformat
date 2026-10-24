@@ -56,7 +56,7 @@ fput_all(c(3, 15, 25), age_ml)
 #> [1] "Infant" "Minor" 
 #> 
 #> [[2]]
-#> [1] "Minor" "Teen" 
+#> [1] "Teen"  "Minor"
 #> 
 #> [[3]]
 #> [1] "Adult"
@@ -80,7 +80,7 @@ fput_all(c(95, 45, NA, 150), "score_ml")
 #> [1] "Valid Score"   "Above Average" "Excellent"    
 #> 
 #> [[2]]
-#> [1] "Below Average" "Valid Score"  
+#> [1] "Valid Score"   "Below Average"
 #> 
 #> [[3]]
 #> [1] "No Score"

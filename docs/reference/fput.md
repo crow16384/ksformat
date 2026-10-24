@@ -43,7 +43,12 @@ The function handles missing values in the following order:
 
 2.  Exact matches -\> Uses defined value-label mapping
 
-3.  Range matches (for numeric) -\> Uses range label
+3.  Range matches (numeric / date_range / datetime_range) -\> uses the
+    first matching range in **declaration order** (overlapping ranges
+    are resolved top-down as written, like 'SAS' PROC FORMAT entries; no
+    warning is emitted for overlaps). Use `multilabel = TRUE` with
+    [`fput_all()`](https://crow16384.github.io/ksformat/reference/fput_all.md)
+    to collect every matching label.
 
 4.  No match -\> Uses format's other_label or returns original value
 

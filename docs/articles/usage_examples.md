@@ -327,12 +327,12 @@ SAS date format names are auto-resolved — no pre-creation needed:
 `  ``)`\
 `)`\
 `#>      format           result`\
-`#> 1    DATE9.        03OCT2026`\
-`#> 2 MMDDYY10.       10/03/2026`\
-`#> 3 DDMMYY10.       03/10/2026`\
-`#> 4 YYMMDD10.       2026-10-03`\
+`#> 1    DATE9.        24OCT2026`\
+`#> 2 MMDDYY10.       10/24/2026`\
+`#> 3 DDMMYY10.       24/10/2026`\
+`#> 4 YYMMDD10.       2026-10-24`\
 `#> 5   MONYY7.          OCT2026`\
-`#> 6 WORDDATE. October 03, 2026`\
+`#> 6 WORDDATE. October 24, 2026`\
 `#> 7    YEAR4.             2026`\
 `#> 8      QTR.                4`\
 \
@@ -386,10 +386,10 @@ Time is represented as seconds since midnight:
 `  ``)`\
 `)`\
 `#>        format             result`\
-`#> 1 DATETIME20. 03OCT2026:20:44:45`\
-`#> 2 DATETIME13.      03OCT26:20:44`\
-`#> 3     DTDATE.          03OCT2026`\
-`#> 4   DTYYMMDD.         2026-10-03`\
+`#> 1 DATETIME20. 24OCT2026:14:13:24`\
+`#> 2 DATETIME13.      24OCT26:14:13`\
+`#> 3     DTDATE.          24OCT2026`\
+`#> 4   DTYYMMDD.         2026-10-24`\
 \
 `# From numeric R-epoch seconds`\
 `r_secs`` ``<-`` `[`as.numeric`](https://rdrr.io/r/base/numeric.html)`(`[`as.POSIXct`](https://rdrr.io/r/base/as.POSIXlt.html)`(``"2025-06-15 14:30:00"``, tz ``=`` ``"UTC"``)``)`\
@@ -508,7 +508,7 @@ With multilabel formats, a single value can match multiple labels:
 \
 `# fput returns first match only`\
 [`fput`](https://crow16384.github.io/ksformat/reference/fput.md)`(``ages``, ``"age_categories"``)`\
-`#> [1] "Infant"        "Pediatric"     "Adult"         "Non-Pediatric"`\
+`#> [1] "Infant"     "Adolescent" "Adult"      "Elderly"`\
 \
 `# fput_all returns ALL matching labels`\
 `all_labels`` ``<-`` `[`fput_all`](https://crow16384.github.io/ksformat/reference/fput_all.md)`(``ages``, ``"age_categories"``)`\
@@ -516,9 +516,9 @@ With multilabel formats, a single value can match multiple labels:
 `  `[`cat`](https://rdrr.io/r/base/cat.html)`(``"Age"``, ``ages``[``i``]``, ``"->"``, `[`paste`](https://rdrr.io/r/base/paste.html)`(``all_labels``[[``i``]``]``, collapse ``=`` ``", "``)``, ``"\n"``)`\
 `}`\
 `#> Age 3 -> Infant, Pediatric `\
-`#> Age 14 -> Pediatric, Adolescent `\
+`#> Age 14 -> Adolescent, Pediatric `\
 `#> Age 25 -> Adult, Non-Pediatric `\
-`#> Age 70 -> Non-Pediatric, Elderly`
+`#> Age 70 -> Elderly, Non-Pediatric`
 
 ### Multilabel with Missing Values
 
@@ -543,7 +543,7 @@ With multilabel formats, a single value can match multiple labels:
 `      ``"->"``, `[`paste`](https://rdrr.io/r/base/paste.html)`(``ml_result``[[``i``]``]``, collapse ``=`` ``", "``)``, ``"\n"``)`\
 `}`\
 `#> Score 95 -> Valid Score, Above Average, Excellent `\
-`#> Score 45 -> Below Average, Valid Score `\
+`#> Score 45 -> Valid Score, Below Average `\
 `#> Score NA -> No Score `\
 `#> Score 150 -> Out of Range`
 
@@ -613,10 +613,10 @@ With multilabel formats, a single value can match multiple labels:
 `      `[`paste`](https://rdrr.io/r/base/paste.html)`(``ae_labels``[[``i``]``]``, collapse ``=`` ``" + "``)``, ``"\n"``)`\
 `}`\
 `#> Grade 1 : Mild + Non-serious `\
-`#> Grade 2 : Non-serious + Moderate `\
+`#> Grade 2 : Moderate + Non-serious `\
 `#> Grade 3 : Severe + Serious `\
-`#> Grade 4 : Serious + Life-threatening `\
-`#> Grade 5 : Serious + Fatal`\
+`#> Grade 4 : Life-threatening + Serious `\
+`#> Grade 5 : Fatal + Serious`\
 \
 [`fclear`](https://crow16384.github.io/ksformat/reference/fclear.md)`(``)`\
 `#> All formats cleared from library.`
@@ -933,7 +933,7 @@ function reads a CSV file exported from a SAS format catalogue
 `#> Warning: Skipped incompatible entry in format ``"SMISSING"``:`\
 `#> ``✖`` SAS special missing value '.B' (HLO='S') has no R equivalent.`\
 `#> ``✔`` Imported 4 formats and 1 invalue from`\
-`#>   ``/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmpiew0So/temp_libpath67243bbc49ff/ksformat/extdata/test_cntlout.csv``.`\
+`#>   ``/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpUvfWNU/temp_libpath1736e67c1ae3b/ksformat/extdata/test_cntlout.csv``.`\
 [`names`](https://rdrr.io/r/base/names.html)`(``imported``)`\
 `#> [1] "AGEGRP"   "BMICAT"   "GENDER"   "RACEIN"   "SMISSING"`\
 \
@@ -1058,7 +1058,7 @@ function reads a CSV file exported from a SAS format catalogue
 `#> Warning: Skipped incompatible entry in format ``"SMISSING"``:`\
 `#> ``✖`` SAS special missing value '.B' (HLO='S') has no R equivalent.`\
 `#> ``✔`` Imported 4 formats and 1 invalue from`\
-`#>   ``/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/Rtmpiew0So/temp_libpath67243bbc49ff/ksformat/extdata/test_cntlout.csv``.`\
+`#>   ``/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpUvfWNU/temp_libpath1736e67c1ae3b/ksformat/extdata/test_cntlout.csv``.`\
 \
 `# Library should be empty`\
 [`flist`](https://crow16384.github.io/ksformat/reference/flist.md)`(``)`\

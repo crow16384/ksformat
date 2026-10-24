@@ -1,7 +1,7 @@
 Package: ksformat
 Type: Package
 Title: 'SAS'-Style 'PROC FORMAT' for R
-Version: 0.8.5
+Version: 0.8.6
 Author: Vladimir Larchenko [aut, cre], Igor Aleschenkov [aut]
 Maintainer: Vladimir Larchenko <vladimir.larchenko@keystatsolutions.com>
 Authors@R: c(
@@ -39,4 +39,4 @@ Suggests:
     testthat (>= 3.0.0),
     tidyr
 VignetteBuilder: knitr, quarto
-Config/roxygen2/version: 8.1.0
+Config/roxygen2/version: 8.1.1

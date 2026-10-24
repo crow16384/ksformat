@@ -217,19 +217,19 @@ fnew(
 
 # fput returns first match; fput_all returns all matches
 fput(c(3, 14, 25, 70), "age_categories")
-#> [1] "Infant"        "Pediatric"     "Adult"         "Non-Pediatric"
+#> [1] "Infant"     "Adolescent" "Adult"      "Elderly"   
 fput_all(c(3, 14, 25, 70), "age_categories")
 #> [[1]]
 #> [1] "Infant"    "Pediatric"
 #> 
 #> [[2]]
-#> [1] "Pediatric"  "Adolescent"
+#> [1] "Adolescent" "Pediatric" 
 #> 
 #> [[3]]
 #> [1] "Adult"         "Non-Pediatric"
 #> 
 #> [[4]]
-#> [1] "Non-Pediatric" "Elderly"      
+#> [1] "Elderly"       "Non-Pediatric"
 #> 
 fclear()
 #> All formats cleared from library.

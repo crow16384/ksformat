@@ -31,7 +31,11 @@ The function handles missing values in the following order:
 \enumerate{
   \item NA, NULL, NaN -> Uses format's missing_label if defined
   \item Exact matches -> Uses defined value-label mapping
-  \item Range matches (for numeric) -> Uses range label
+  \item Range matches (numeric / date_range / datetime_range) -> uses the
+    first matching range in \strong{declaration order} (overlapping ranges
+    are resolved top-down as written, like 'SAS' PROC FORMAT entries;
+    no warning is emitted for overlaps). Use \code{multilabel = TRUE} with
+    \code{\link{fput_all}()} to collect every matching label.
   \item No match -> Uses format's other_label or returns original value
 }
 

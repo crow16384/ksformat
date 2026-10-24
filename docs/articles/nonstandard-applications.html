@@ -34,7 +34,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ksformat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -388,6 +388,7 @@
 <span class="header-section-number">9.5</span> Range formats<a class="anchor" aria-label="anchor" href="#range-formats"></a>
 </h3>
 <p>Range formats are expressed with interval notation. The same syntax works for numeric, <code>date_range</code>, and <code>datetime_range</code> blocks.</p>
+<p>When ranges overlap, the <strong>first matching range in declaration order wins</strong> — exactly the order the entries are written, top-down. No warning is emitted for overlaps, so keep the intended precedence explicit in the definition: put the specific (narrow) ranges before the general (wide) ones. To collect <em>all</em> matching labels instead of the first one, create the format with <code>multilabel = TRUE</code> (or an <code>fparse</code> <code>(numeric, multilabel)</code> header) and use <code><a href="../reference/fput_all.html">fput_all()</a></code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
@@ -404,12 +405,49 @@
 <span><span class="st">;</span></span>
 <span><span class="st">'</span><span class="op">)</span></span></code></pre></div>
 </div>
-</section><section class="level2" data-number="9.6"><h3 data-number="9.6" id="stratified-range-formats">
+<section class="level3" data-number="9.5.1"><h4 data-number="9.5.1" id="overlapping-ranges-declaration-order-wins">
+<span class="header-section-number">9.5.1</span> Overlapping ranges: declaration order wins<a class="anchor" aria-label="anchor" href="#overlapping-ranges-declaration-order-wins"></a>
+</h4>
+<p>Ranges are tried <strong>top-down in the order they are written</strong>; the first range that contains the value decides the label, and later (even narrower) ranges never get a chance. Keep the specific buckets above the general ones — a wide catch-all declared first shadows everything it covers:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
+<span><span class="st">VALUE grade (numeric)</span></span>
+<span><span class="st">  [1, 3]  = "Mild"</span></span>
+<span><span class="st">  [4, 6]  = "Severe"</span></span>
+<span><span class="st">  [0, 10] = "Abnormal (any grade)"</span></span>
+<span><span class="st">;'</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">5</span>, <span class="fl">9</span><span class="op">)</span>, <span class="st">"grade"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="st">"grade"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
+<span><span class="st">VALUE grade_wide_first (numeric)</span></span>
+<span><span class="st">  [0, 10] = "Abnormal (any grade)"</span></span>
+<span><span class="st">  [1, 3]  = "Mild"</span></span>
+<span><span class="st">  [4, 6]  = "Severe"</span></span>
+<span><span class="st">;'</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">5</span>, <span class="fl">9</span><span class="op">)</span>, <span class="st">"grade_wide_first"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="st">"grade_wide_first"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<p>The first block yields <code>"Mild" "Severe" "Abnormal (any grade)"</code>; the second — with the wide range declared first — collapses everything to <code>"Abnormal (any grade)"</code>. No warning is emitted for overlaps, so precedence belongs to the definition itself. When several labels are <em>wanted</em> for one value, make them explicit: declare the format <code>multilabel</code> and collect all matches with <code><a href="../reference/fput_all.html">fput_all()</a></code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
+<span><span class="st">VALUE risk_flags (numeric, multilabel)</span></span>
+<span><span class="st">  [0, 3]  = "Low"</span></span>
+<span><span class="st">  [0, 7]  = "Monitored"</span></span>
+<span><span class="st">  (3, 7]  = "Medium"</span></span>
+<span><span class="st">;'</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/fput_all.html">fput_all</a></span><span class="op">(</span><span class="fl">2</span>, <span class="st">"risk_flags"</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>   <span class="co"># "Low" "Monitored" (declaration order)</span></span>
+<span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="st">"risk_flags"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<p>A note on key text: under <code>type = "auto"</code>, a key becomes a range spec only when it actually parses as one. Plain text keys that merely happen to contain a comma (<code>"San Francisco, CA"</code>, <code>"Yes, unknown"</code>) stay character keys; a thousands-style key like <code>"1,000"</code> is flagged at creation and treated as discrete. Prefer explicit <code>type = "character"</code> for such mappings.</p>
+</section></section><section class="level2" data-number="9.6"><h3 data-number="9.6" id="stratified-range-formats">
 <span class="header-section-number">9.6</span> Stratified range formats<a class="anchor" aria-label="anchor" href="#stratified-range-formats"></a>
 </h3>
 <p><code>stratified_range</code> combines a stratum with an inner range. The parser accepts the friendly <code>STRATUM|[low, high)</code> form.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
 <span><span class="st">VALUE visit_window (stratified_range, range_subtype: numeric)</span></span>
 <span><span class="st">  "ARM_A"|[0, 7)     = "Baseline"</span></span>
@@ -424,7 +462,7 @@
 </h3>
 <p><code><a href="../reference/fnew.html">fnew()</a></code> remains the most concise way to create a report-formatting object when you already know you want a display pattern. <code><a href="../reference/fparse.html">fparse()</a></code> is useful when the rule needs to be stored as text, versioned in a spec, or generated from another tool.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="st">"$%,.2f"</span>, type <span class="op">=</span> <span class="st">"numeric"</span>, name <span class="op">=</span> <span class="st">"currency_direct"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/fputn.html">fputn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1234.56</span>, <span class="op">-</span><span class="fl">7890.12</span>, <span class="fl">0</span><span class="op">)</span>, <span class="st">"currency_direct"</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -433,7 +471,7 @@
 </h2>
 <p><code>ksformat</code> is not limited to simple code-to-label dictionaries. In clinical trials it can also serve as a compact rule engine for visit windows, composite keys, reverse mappings, report formatting, and small narrative fragments. That makes it useful anywhere repeated conditional logic would otherwise be spread across scripts, spreadsheets, or one-off helper functions.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 </section><script id="quarto-html-after-body" type="application/javascript">
