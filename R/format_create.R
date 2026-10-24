@@ -458,7 +458,20 @@ detect_format_type <- function(keys) {
     return("numeric")
   }
 
-  if (any(grepl(",", keys, fixed = TRUE))) {
+  # Comma alone does NOT imply a range spec: only keys that actually parse
+  # with the canonical range grammar ("low,high[,inc_low[,inc_high]]") do.
+  # Plain character keys containing commas (addresses, "Yes, no", thousands
+  # separators) must not hijack the type to "numeric".
+  comma_keys <- non_empty[grepl(",", non_empty, fixed = TRUE)]
+  if (length(comma_keys) > 0L &&
+      any(vapply(comma_keys, function(k) !is.null(.parse_range_key(k)), logical(1L)))) {
+    return("numeric")
+  }
+  # Date/datetime range-looking keys under type="auto": keep the legacy
+  # loud path ("numeric" + per-key validation warning nudging the user to
+  # pass type="date_range"/"datetime_range" explicitly).
+  if (length(comma_keys) > 0L &&
+      any(grepl("^\\s*-?\\d{4}-\\d{2}-\\d{2}", comma_keys))) {
     return("numeric")
   }
 

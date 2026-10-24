@@ -2,6 +2,20 @@
 
 ## Bug Fixes
 
+* Comma-containing discrete keys no longer break numeric range machinery.
+  Two layers: (1) `detect_format_type()` now classifies a comma key as a
+  range spec only if it actually parses with the canonical range grammar
+  (`low,high[,inc_low[,inc_high]]`) — plain text keys like
+  `"San Francisco, CA"` stay `character` under `type = "auto"` instead of
+  being forced to `numeric`. (2) `.build_range_table()` validates every
+  parsed range: keys like `"1,000"` (parses as `low = 1, high = 0`) are
+  degraded to discrete keys with a visible warning. Previously such formats
+  passed `sorted_disjoint = TRUE` (the adjacency test is vacuous for
+  degenerate intervals) and `fput()` aborted at apply time with
+  `'vec' must be sorted non-decreasingly` from `findInterval()`.
+  Date-looking auto keys keep the legacy warning path nudging
+  `type = "date_range"`.
+
 * Overlapping ranges in non-multilabel formats now match in **declaration
   order** (first-hit-wins, top-down as written). The `(low, high)` sort
   introduced in 0.6.5 for the `findInterval()` fast path had also reordered

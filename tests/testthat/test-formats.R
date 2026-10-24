@@ -3573,6 +3573,50 @@ test_that("legacy range_table without decl_iter still gets declaration order", {
   fclear()
 })
 
+test_that("comma text keys no longer hijack auto type (#2)", {
+  expect_equal(detect_format_type(c("San Francisco, CA", "New York, NY")), "character")
+  city <- fnew("San Francisco, CA" = "SF", name = "city")
+  expect_equal(city$type, "character")
+  expect_equal(fput("San Francisco, CA", "city"), "SF")
+  fclear()
+})
+
+test_that("degenerate range-like keys degrade to discrete with warning (#2)", {
+  warns <- character(0)
+  fmt <- withCallingHandlers(
+    fnew("1,000" = "thousand", "2,000" = "twoK", name = "thou"),
+    warning = function(w) {
+      warns <<- c(warns, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    })
+  expect_s3_class(fmt, "ks_format")
+  expect_true(any(grepl("low > high", warns)))
+  expect_true(any(grepl("discrete", warns)))
+  # text lookup still works as discrete...
+  expect_equal(fput("1,000", "thou"), "thousand")
+  # ...and numeric input no longer aborts in findInterval (was the crash)
+  expect_equal(fput(1500, "thou"), "1500")
+  expect_equal(fmt$range_table$low, numeric(0))
+  fclear()
+})
+
+test_that("mixed valid and degenerate range keys keep the valid ones (#2)", {
+  expect_warning(
+    fmt <- fnew("0,10,TRUE,FALSE" = "lo", "1,000" = "x", name = "mix"),
+    "low > high")
+  rt <- fmt$range_table
+  expect_equal(rt$low, 0)
+  expect_equal(rt$high, 10)
+  expect_equal(fput(5, "mix"), "lo")
+  expect_equal(fput("1,000", "mix"), "x")
+  expect_equal(fput(1500, "mix"), "1500")
+  fclear()
+})
+
+test_that("date-looking auto keys keep the legacy loud numeric path (#2)", {
+  expect_equal(detect_format_type(c("2024-01-01,2024-02-01")), "numeric")
+})
+
 test_that("fput with exclusive lower bound on first range uses general path", {
   fparse(text = '
   VALUE excl_rt (numeric)

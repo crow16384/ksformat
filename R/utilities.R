@@ -694,8 +694,21 @@ in_range <- function(x, range_spec) {
   for (i in seq_len(n)) {
     p <- parser(map_keys[i])
     if (!is.null(p)) {
-      parsed_list[[i]] <- p
-      is_range[i] <- TRUE
+      # Validate the parsed range: NA bounds or low > high cannot be a real
+      # interval (e.g. a thousands-separated discrete key like "1,000"
+      # parses as low=1, high=0). Degrade such keys to DISCRETE with a
+      # visible warning — otherwise the fast path would hand findInterval()
+      # unsorted breaks and abort at apply time.
+      degenerate <- isTRUE(is.na(p$low) || is.na(p$high) || p$low > p$high)
+      if (degenerate) {
+        cli_warn(c(
+          "Key {.val {map_keys[i]}} parses as a range with low > high (or NA bounds).",
+          "i" = "Treating it as a discrete key. For comma-containing text keys pass {.code type = \"character\"}."
+        ))
+      } else {
+        parsed_list[[i]] <- p
+        is_range[i] <- TRUE
+      }
     }
   }
   ridx <- which(is_range)
