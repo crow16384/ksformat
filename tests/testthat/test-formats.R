@@ -3518,6 +3518,61 @@ test_that("fput with overlapping multilabel ranges falls back to general path", 
   fclear()
 })
 
+test_that("overlapping ranges match in declaration order (fput)", {
+  fmt <- fnew("3,5,TRUE,TRUE" = "B", "0,10,TRUE,TRUE" = "A", type = "numeric")
+  expect_equal(fput(4, fmt), "B")
+  fmt2 <- fnew("0,10,TRUE,TRUE" = "A", "3,5,TRUE,TRUE" = "B", type = "numeric")
+  expect_equal(fput(4, fmt2), "A")
+  fclear()
+})
+
+test_that("wide catch-all declared last does not steal narrow matches", {
+  ae <- fnew("1,3,TRUE,TRUE" = "Mild", "4,6,TRUE,TRUE" = "Severe",
+             "0,10,TRUE,TRUE" = "Abnormal-any", type = "numeric")
+  expect_equal(fput(c(2, 5, 8), ae), c("Mild", "Severe", "Abnormal-any"))
+  fclear()
+})
+
+test_that("fparse overlapping ranges follow declaration order", {
+  fparse(text = '
+VALUE wind_rt (numeric)
+  [3, 5]  = "Narrow"
+  [0, 10] = "Wide"
+;')
+  expect_equal(fput(4, "wind_rt"), "Narrow")
+  fclear()
+})
+
+test_that("date_range overlapping follows declaration order", {
+  dr <- fnew("2024-06-01,2024-08-31,TRUE,FALSE" = "Summer",
+             "2024-01-01,2024-12-31,TRUE,FALSE" = "Year2024",
+             type = "date_range")
+  expect_equal(fput(as.Date("2024-07-01"), dr), "Summer")
+  expect_equal(fput(as.Date("2024-10-01"), dr), "Year2024")
+  fclear()
+})
+
+test_that("stratified overlapping ranges follow declaration order", {
+  fnew("A|3,5,TRUE,TRUE" = "B", "A|0,10,TRUE,TRUE" = "A2",
+       type = "stratified_range", name = "vw_rt")
+  expect_equal(fputk("A", 4, format = "vw_rt"), "B")
+  fclear()
+})
+
+test_that("fput_all label sequence follows declaration order", {
+  ml <- fnew("3,5,TRUE,TRUE" = "B", "0,10,TRUE,TRUE" = "A",
+             type = "numeric", multilabel = TRUE)
+  expect_equal(fput_all(4, ml)[[1]], c("B", "A"))
+  fclear()
+})
+
+test_that("legacy range_table without decl_iter still gets declaration order", {
+  fmt <- fnew("3,5,TRUE,TRUE" = "B", "0,10,TRUE,TRUE" = "A", type = "numeric")
+  fmt$range_table$decl_iter <- NULL   # simulate pre-fix serialized object
+  expect_equal(fput(4, fmt), "B")
+  fclear()
+})
+
 test_that("fput with exclusive lower bound on first range uses general path", {
   fparse(text = '
   VALUE excl_rt (numeric)

@@ -19,7 +19,11 @@
 #' \enumerate{
 #'   \item NA, NULL, NaN -> Uses format's missing_label if defined
 #'   \item Exact matches -> Uses defined value-label mapping
-#'   \item Range matches (for numeric) -> Uses range label
+#'   \item Range matches (numeric / date_range / datetime_range) -> uses the
+#'     first matching range in \strong{declaration order} (overlapping ranges
+#'     are resolved top-down as written, like 'SAS' PROC FORMAT entries;
+#'     no warning is emitted for overlaps). Use \code{multilabel = TRUE} with
+#'     \code{\link{fput_all}()} to collect every matching label.
 #'   \item No match -> Uses format's other_label or returns original value
 #' }
 #'
@@ -271,8 +275,9 @@ fput <- function(x, format, ..., keep_na = FALSE) {
           matched[target] <- TRUE
         }
       } else {
-        # General path: iterate cached numeric vectors directly
-        for (i in seq_along(rt$low)) {
+        # General path: iterate cached numeric vectors in DECLARATION order
+        # (positions into the sorted table); first hit wins for overlaps.
+        for (i in .rt_decl_iter(rt)) {
           still_free <- !matched[unmatched_nm] & valid_num
           if (!any(still_free)) break
 
@@ -872,7 +877,7 @@ fput_all <- function(x, format, ..., keep_na = FALSE) {
     vals <- .to_range_numeric(x[non_miss], format$type, format$date_format)
     valid_num <- !is.na(vals)
 
-    for (i in seq_along(rt$low)) {
+    for (i in .rt_decl_iter(rt)) {
       low_ok  <- if (rt$inc_low[i])  vals >= rt$low[i]  else vals > rt$low[i]
       high_ok <- if (rt$inc_high[i]) vals <= rt$high[i] else vals < rt$high[i]
       in_rng <- low_ok & high_ok & valid_num
@@ -1151,7 +1156,7 @@ fputk <- function(..., format, sep = "|", keep_na = FALSE,
   }
 
   matched <- logical(n)
-  for (i in seq_len(nr)) {
+  for (i in .rt_decl_iter(rt)) {
     still_free <- !matched & valid_num
     if (!any(still_free)) break
     fi <- which(still_free)

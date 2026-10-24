@@ -354,6 +354,14 @@ tibble(
 Range formats are expressed with interval notation. The same syntax works for
 numeric, `date_range`, and `datetime_range` blocks.
 
+When ranges overlap, the **first matching range in declaration order wins** —
+exactly the order the entries are written, top-down. No warning is emitted for
+overlaps, so keep the intended precedence explicit in the definition: put the
+specific (narrow) ranges before the general (wide) ones. To collect *all*
+matching labels instead of the first one, create the format with
+`multilabel = TRUE` (or an `fparse` `(numeric, multilabel)` header) and use
+`fput_all()`.
+
 ```{r}
 fparse(text = '
 VALUE study_period (date_range)

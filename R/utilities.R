@@ -674,6 +674,7 @@ in_range <- function(x, range_spec) {
     mapping_labels = map_labels,
     sorted_disjoint = FALSE,
     sort_perm = integer(0),
+    decl_iter = integer(0),
     discrete_numeric_possible = n > 0L
   )
 
@@ -745,12 +746,34 @@ in_range <- function(x, range_spec) {
     mapping_labels = map_labels,
     sorted_disjoint = disjoint,
     sort_perm = sort_perm,
+    # Declaration-order view: position in the sorted table of the j-th
+    # declared range. General (non-fast) path iterates in DECLARATION order
+    # so overlapping ranges keep first-hit-wins semantics.
+    decl_iter = order(sort_perm),
     discrete_numeric_possible = {
       d_idx <- setdiff(seq_len(n), ridx)
       if (length(d_idx) == 0L) FALSE
       else any(is.finite(suppressWarnings(as.numeric(map_keys[d_idx]))))
     }
   )
+}
+
+#' Declaration-order iteration vector for a range table
+#'
+#' Returns positions in the (sorted) range table such that iterating them
+#' visits ranges in DECLARATION order. Falls back to `order(sort_perm)` for
+#' tables serialized before `decl_iter` existed, and to natural order for
+#' degenerate/missing cases.
+#' @keywords internal
+#' @noRd
+.rt_decl_iter <- function(rt) {
+  if (!is.null(rt$decl_iter) && length(rt$decl_iter) == length(rt$low)) {
+    return(rt$decl_iter)
+  }
+  if (length(rt$sort_perm) == length(rt$low) && length(rt$low) > 0L) {
+    return(order(rt$sort_perm))
+  }
+  seq_along(rt$low)
 }
 
 

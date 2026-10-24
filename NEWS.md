@@ -1,3 +1,21 @@
+# ksformat 0.8.6
+
+## Bug Fixes
+
+* Overlapping ranges in non-multilabel formats now match in **declaration
+  order** (first-hit-wins, top-down as written). The `(low, high)` sort
+  introduced in 0.6.5 for the `findInterval()` fast path had also reordered
+  the general fallback loop, so precedence silently became "smallest `low`
+  first" — a wide catch-all declared last could steal matches from narrow
+  ranges declared earlier. The range table keeps the sorted layout for the
+  fast path (disjoint ranges are order-insensitive anyway); the general path
+  in `fput()`, `fput_all()`, and stratified matching now iterate a stored
+  declaration-order view (`decl_iter`). `fput_all()` label sequence within an
+  element now follows declaration order as well. Precedence for overlapping
+  ranges is documented in `?fput` and the nonstandard-applications vignette.
+  Old format objects serialized without `decl_iter` (pre-fix `.RDS`) keep the
+  corrected semantics via a `sort_perm` fallback.
+
 # ksformat 0.8.5
 
 ## Documentation
