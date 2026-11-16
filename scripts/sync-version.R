@@ -86,6 +86,7 @@ if (!is.na(prev)) {
   hits <- suppressWarnings(system2("grep",
     c("-rIn", shQuote(prev), ".",
       "--exclude-dir=docs", "--exclude-dir=doc", "--exclude-dir=Meta",
+      "--exclude-dir=*_files",  # quarto/rmarkdown render artifact dirs (vendored libs)
       "--exclude-dir=.git", "--exclude-dir=.Rproj.user",
       "--exclude=*.tar.gz", "--exclude=*.log",
       sprintf("--exclude-dir=%s", "*.Rcheck")),

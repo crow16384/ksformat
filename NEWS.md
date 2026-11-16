@@ -1,3 +1,14 @@
+# ksformat 0.8.7
+
+Documentation-only release; no behavior changes.
+
+* The article **"Non-standard Applications of `ksformat` for Clinical Trials
+      and Other Tasks"** now executes all example chunks at build time and
+      displays their results (it previously shipped with chunk execution
+      disabled, so examples appeared as code-only listings). All examples run
+      cleanly and deterministically against the package itself, which also
+      turns every future build into a live validation of the vignette code.
+
 # ksformat 0.8.6
 
 ## Bug Fixes

@@ -31,7 +31,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ksformat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -418,15 +418,15 @@ once:</p>
 <span>    <span class="fu"><a href="../reference/fputn.html">fputn</a></span><span class="op">(</span><span class="va">today</span>, <span class="st">"QTR."</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt;      format           result</span></span>
-<span><span class="co">#&gt; 1    DATE9.        24OCT2026</span></span>
-<span><span class="co">#&gt; 2 MMDDYY10.       10/24/2026</span></span>
-<span><span class="co">#&gt; 3 DDMMYY10.       24/10/2026</span></span>
-<span><span class="co">#&gt; 4 YYMMDD10.       2026-10-24</span></span>
-<span><span class="co">#&gt; 5   MONYY7.          OCT2026</span></span>
-<span><span class="co">#&gt; 6 WORDDATE. October 24, 2026</span></span>
-<span><span class="co">#&gt; 7    YEAR4.             2026</span></span>
-<span><span class="co">#&gt; 8      QTR.                4</span></span>
+<span><span class="co">#&gt;      format            result</span></span>
+<span><span class="co">#&gt; 1    DATE9.         16NOV2026</span></span>
+<span><span class="co">#&gt; 2 MMDDYY10.        11/16/2026</span></span>
+<span><span class="co">#&gt; 3 DDMMYY10.        16/11/2026</span></span>
+<span><span class="co">#&gt; 4 YYMMDD10.        2026-11-16</span></span>
+<span><span class="co">#&gt; 5   MONYY7.           NOV2026</span></span>
+<span><span class="co">#&gt; 6 WORDDATE. November 16, 2026</span></span>
+<span><span class="co">#&gt; 7    YEAR4.              2026</span></span>
+<span><span class="co">#&gt; 8      QTR.                 4</span></span>
 <span></span>
 <span><span class="co"># Multiple dates</span></span>
 <span><span class="va">dates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2020-01-15"</span>, <span class="st">"2020-06-30"</span>, <span class="st">"2020-12-25"</span><span class="op">)</span><span class="op">)</span></span>
@@ -480,10 +480,10 @@ once:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;        format             result</span></span>
-<span><span class="co">#&gt; 1 DATETIME20. 24OCT2026:14:13:24</span></span>
-<span><span class="co">#&gt; 2 DATETIME13.      24OCT26:14:13</span></span>
-<span><span class="co">#&gt; 3     DTDATE.          24OCT2026</span></span>
-<span><span class="co">#&gt; 4   DTYYMMDD.         2026-10-24</span></span>
+<span><span class="co">#&gt; 1 DATETIME20. 16NOV2026:22:01:53</span></span>
+<span><span class="co">#&gt; 2 DATETIME13.      16NOV26:22:01</span></span>
+<span><span class="co">#&gt; 3     DTDATE.          16NOV2026</span></span>
+<span><span class="co">#&gt; 4   DTYYMMDD.         2026-11-16</span></span>
 <span></span>
 <span><span class="co"># From numeric R-epoch seconds</span></span>
 <span><span class="va">r_secs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2025-06-15 14:30:00"</span>, tz <span class="op">=</span> <span class="st">"UTC"</span><span class="op">)</span><span class="op">)</span></span>
@@ -1037,7 +1037,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpUvfWNU/temp_libpath1736e67c1ae3b/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmplpEBcP/temp_libpathba0852d904b3/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">imported</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "AGEGRP"   "BMICAT"   "GENDER"   "RACEIN"   "SMISSING"</span></span>
 <span></span>
@@ -1165,7 +1165,7 @@ SAS format catalogue (<code>PROC FORMAT ... CNTLOUT=</code>):</p>
 <span><span class="co">#&gt; Warning: Skipped incompatible entry in format <span style="color: #0000BB;">"SMISSING"</span>:</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> SAS special missing value '.B' (HLO='S') has no R equivalent.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Imported 4 formats and 1 invalue from</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpUvfWNU/temp_libpath1736e67c1ae3b/ksformat/extdata/test_cntlout.csv</span>.</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmplpEBcP/temp_libpathba0852d904b3/ksformat/extdata/test_cntlout.csv</span>.</span></span>
 <span></span>
 <span><span class="co"># Library should be empty</span></span>
 <span><span class="fu"><a href="../reference/flist.html">flist</a></span><span class="op">(</span><span class="op">)</span></span>

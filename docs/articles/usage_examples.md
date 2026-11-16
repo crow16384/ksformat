@@ -326,15 +326,15 @@ SAS date format names are auto-resolved — no pre-creation needed:
 `    `[`fputn`](https://crow16384.github.io/ksformat/reference/fputn.md)`(``today``, ``"QTR."``)`\
 `  ``)`\
 `)`\
-`#>      format           result`\
-`#> 1    DATE9.        24OCT2026`\
-`#> 2 MMDDYY10.       10/24/2026`\
-`#> 3 DDMMYY10.       24/10/2026`\
-`#> 4 YYMMDD10.       2026-10-24`\
-`#> 5   MONYY7.          OCT2026`\
-`#> 6 WORDDATE. October 24, 2026`\
-`#> 7    YEAR4.             2026`\
-`#> 8      QTR.                4`\
+`#>      format            result`\
+`#> 1    DATE9.         16NOV2026`\
+`#> 2 MMDDYY10.        11/16/2026`\
+`#> 3 DDMMYY10.        16/11/2026`\
+`#> 4 YYMMDD10.        2026-11-16`\
+`#> 5   MONYY7.           NOV2026`\
+`#> 6 WORDDATE. November 16, 2026`\
+`#> 7    YEAR4.              2026`\
+`#> 8      QTR.                 4`\
 \
 `# Multiple dates`\
 `dates`` ``<-`` `[`as.Date`](https://rdrr.io/r/base/as.Date.html)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"2020-01-15"``, ``"2020-06-30"``, ``"2020-12-25"``)``)`\
@@ -386,10 +386,10 @@ Time is represented as seconds since midnight:
 `  ``)`\
 `)`\
 `#>        format             result`\
-`#> 1 DATETIME20. 24OCT2026:14:13:24`\
-`#> 2 DATETIME13.      24OCT26:14:13`\
-`#> 3     DTDATE.          24OCT2026`\
-`#> 4   DTYYMMDD.         2026-10-24`\
+`#> 1 DATETIME20. 16NOV2026:22:01:53`\
+`#> 2 DATETIME13.      16NOV26:22:01`\
+`#> 3     DTDATE.          16NOV2026`\
+`#> 4   DTYYMMDD.         2026-11-16`\
 \
 `# From numeric R-epoch seconds`\
 `r_secs`` ``<-`` `[`as.numeric`](https://rdrr.io/r/base/numeric.html)`(`[`as.POSIXct`](https://rdrr.io/r/base/as.POSIXlt.html)`(``"2025-06-15 14:30:00"``, tz ``=`` ``"UTC"``)``)`\
@@ -933,7 +933,7 @@ function reads a CSV file exported from a SAS format catalogue
 `#> Warning: Skipped incompatible entry in format ``"SMISSING"``:`\
 `#> ``✖`` SAS special missing value '.B' (HLO='S') has no R equivalent.`\
 `#> ``✔`` Imported 4 formats and 1 invalue from`\
-`#>   ``/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpUvfWNU/temp_libpath1736e67c1ae3b/ksformat/extdata/test_cntlout.csv``.`\
+`#>   ``/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmplpEBcP/temp_libpathba0852d904b3/ksformat/extdata/test_cntlout.csv``.`\
 [`names`](https://rdrr.io/r/base/names.html)`(``imported``)`\
 `#> [1] "AGEGRP"   "BMICAT"   "GENDER"   "RACEIN"   "SMISSING"`\
 \
@@ -1058,7 +1058,7 @@ function reads a CSV file exported from a SAS format catalogue
 `#> Warning: Skipped incompatible entry in format ``"SMISSING"``:`\
 `#> ``✖`` SAS special missing value '.B' (HLO='S') has no R equivalent.`\
 `#> ``✔`` Imported 4 formats and 1 invalue from`\
-`#>   ``/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmpUvfWNU/temp_libpath1736e67c1ae3b/ksformat/extdata/test_cntlout.csv``.`\
+`#>   ``/private/var/folders/rn/3s0h46m118j426j_fmjr1z8m0000gn/T/RtmplpEBcP/temp_libpathba0852d904b3/ksformat/extdata/test_cntlout.csv``.`\
 \
 `# Library should be empty`\
 [`flist`](https://crow16384.github.io/ksformat/reference/flist.md)`(``)`\

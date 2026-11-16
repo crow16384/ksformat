@@ -34,7 +34,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ksformat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -129,7 +129,15 @@
 <span>  window <span class="op">=</span> <span class="fu"><a href="../reference/fputk.html">fputk</a></span><span class="op">(</span><span class="va">arm</span>, <span class="va">day</span>, format <span class="op">=</span> <span class="st">"visit_window"</span><span class="op">)</span>,</span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">visit_df</span></span></code></pre></div>
+<span><span class="va">visit_df</span></span>
+<span><span class="co">#&gt; # A tibble: 5 × 3</span></span>
+<span><span class="co">#&gt;   arm     day window        </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;         </span></span>
+<span><span class="co">#&gt; 1 ARM_A     3 Baseline      </span></span>
+<span><span class="co">#&gt; 2 ARM_A    35 Wk4+          </span></span>
+<span><span class="co">#&gt; 3 ARM_B     5 Baseline      </span></span>
+<span><span class="co">#&gt; 4 ARM_B    40 Wk2+          </span></span>
+<span><span class="co">#&gt; 5 ARM_C    10 Outside window</span></span></code></pre></div>
 </div>
 <p>This is useful for:</p>
 <ul>
@@ -168,7 +176,13 @@
 <span>  PARAMCD <span class="op">=</span> <span class="fu"><a href="../reference/fputk.html">fputk</a></span><span class="op">(</span><span class="va">LBCAT</span>, <span class="va">LBSPEC</span>, <span class="va">LBTESTCD</span>, <span class="va">LBSTRESU</span>, format <span class="op">=</span> <span class="st">"lb_param"</span>, na_as_string <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">lab_df</span></span></code></pre></div>
+<span><span class="va">lab_df</span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 5</span></span>
+<span><span class="co">#&gt;   LBCAT             LBSPEC LBTESTCD LBSTRESU PARAMCD</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;             &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt;  </span></span>
+<span><span class="co">#&gt; 1 BLOOD CHEMISTRY   BLOOD  ALB      g/L      ALB    </span></span>
+<span><span class="co">#&gt; 2 COAGULOGRAM       BLOOD  INR      &lt;NA&gt;     INR    </span></span>
+<span><span class="co">#&gt; 3 COAGULATION PANEL BLOOD  INR      &lt;NA&gt;     INR</span></span></code></pre></div>
 </div>
 <p>The same pattern is useful for:</p>
 <ul>
@@ -189,6 +203,12 @@
 <span>  target_type <span class="op">=</span> <span class="st">"integer"</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"trt_code_inv"</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; KS Invalue: trt_code_inv</span></span>
+<span><span class="co">#&gt; Target Type: integer </span></span>
+<span><span class="co">#&gt; Mappings:</span></span>
+<span><span class="co">#&gt;   PLACEBO|PBO =&gt; 1</span></span>
+<span><span class="co">#&gt;   DRUG A|A50 =&gt; 2</span></span>
+<span><span class="co">#&gt;   DRUG B|B100 =&gt; 3</span></span>
 <span></span>
 <span><span class="va">trt_df</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span></span>
 <span>  ARMN <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PLACEBO"</span>, <span class="st">"DRUG A"</span>, <span class="st">"DRUG B"</span>, <span class="st">"UNKNOWN"</span><span class="op">)</span>,</span>
@@ -197,7 +217,14 @@
 <span>  TRTSEQ <span class="op">=</span> <span class="fu"><a href="../reference/finputk.html">finputk</a></span><span class="op">(</span><span class="va">ARMN</span>, <span class="va">TRTCD</span>, invalue_name <span class="op">=</span> <span class="st">"trt_code_inv"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">trt_df</span></span></code></pre></div>
+<span><span class="va">trt_df</span></span>
+<span><span class="co">#&gt; # A tibble: 4 × 3</span></span>
+<span><span class="co">#&gt;   ARMN    TRTCD TRTSEQ</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;   &lt;chr&gt;  &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1 PLACEBO PBO        1</span></span>
+<span><span class="co">#&gt; 2 DRUG A  A50        2</span></span>
+<span><span class="co">#&gt; 3 DRUG B  B100       3</span></span>
+<span><span class="co">#&gt; 4 UNKNOWN X         NA</span></span></code></pre></div>
 </div>
 <p>Typical uses include:</p>
 <ul>
@@ -220,7 +247,12 @@
 <span>  display <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/fputn.html">fputn</a></span><span class="op">(</span><span class="va">raw</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="st">"currency"</span><span class="op">)</span>, <span class="fu"><a href="../reference/fputn.html">fputn</a></span><span class="op">(</span><span class="va">raw</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">*</span> <span class="fl">100</span>, <span class="st">"pct"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">summary_df</span></span></code></pre></div>
+<span><span class="va">summary_df</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 3</span></span>
+<span><span class="co">#&gt;   metric             raw display  </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;            &lt;dbl&gt; &lt;chr&gt;    </span></span>
+<span><span class="co">#&gt; 1 Cost          1235.    $1,234.56</span></span>
+<span><span class="co">#&gt; 2 Response rate    0.153 15.3%</span></span></code></pre></div>
 </div>
 <p>Same result could be achieved using expression labels, but in base R, <code><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf()</a></code> itself does not support thousands separators such as commas. We can use <code>formatC</code> for the formatting purposes. <strong>Pattern-driven formatter</strong> looks simplier for such case.</p>
 <div class="cell">
@@ -241,7 +273,12 @@
 <span>  display <span class="op">=</span> <span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="va">format</span>, <span class="va">stat_fmt</span>, <span class="va">raw</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">summary_df</span></span></code></pre></div>
+<span><span class="va">summary_df</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 4</span></span>
+<span><span class="co">#&gt;   metric             raw format   display </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;            &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;   </span></span>
+<span><span class="co">#&gt; 1 Cost          1235.    currency 1,234.56</span></span>
+<span><span class="co">#&gt; 2 Response rate    0.153 pct      15.3%</span></span></code></pre></div>
 </div>
 <p>This is useful for:</p>
 <ul>
@@ -267,7 +304,14 @@
 <span><span class="fu">tibble</span><span class="op">(</span></span>
 <span>  date <span class="op">=</span> <span class="va">obs_dates</span>,</span>
 <span>  period <span class="op">=</span> <span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="va">obs_dates</span>, <span class="st">"study_period"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 4 × 2</span></span>
+<span><span class="co">#&gt;   date       period   </span></span>
+<span><span class="co">#&gt;   &lt;date&gt;     &lt;chr&gt;    </span></span>
+<span><span class="co">#&gt; 1 2024-01-15 Screening</span></span>
+<span><span class="co">#&gt; 2 2024-03-10 Treatment</span></span>
+<span><span class="co">#&gt; 3 2024-07-01 Follow-up</span></span>
+<span><span class="co">#&gt; 4 NA         No date</span></span></code></pre></div>
 </div>
 </section><section class="section level2" data-number="7"><h2 data-number="7" id="text-generation-for-listings-and-narratives">
 <span class="header-section-number">7</span> 6. Text generation for listings and narratives<a class="anchor" aria-label="anchor" href="#text-generation-for-listings-and-narratives"></a>
@@ -281,7 +325,8 @@
 <span>  name <span class="op">=</span> <span class="st">"thr_note"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"high"</span>, <span class="st">"low"</span><span class="op">)</span>, <span class="st">"thr_note"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">18.2</span>, <span class="fl">7.4</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"high"</span>, <span class="st">"low"</span><span class="op">)</span>, <span class="st">"thr_note"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">18.2</span>, <span class="fl">7.4</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Above threshold: 18.2" "Below threshold: 7.4"</span></span></code></pre></div>
 </div>
 <p>This is especially useful when the label depends on:</p>
 <ul>
@@ -382,7 +427,14 @@
 <span>  raw <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1234.56</span>, <span class="op">-</span><span class="fl">7890.12</span>, <span class="fl">0</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
 <span>  currency <span class="op">=</span> <span class="fu"><a href="../reference/fputn.html">fputn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1234.56</span>, <span class="op">-</span><span class="fl">7890.12</span>, <span class="fl">0</span>, <span class="cn">NA</span><span class="op">)</span>, <span class="st">"currency"</span><span class="op">)</span>,</span>
 <span>  pct <span class="op">=</span> <span class="fu"><a href="../reference/fputn.html">fputn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">12.3</span>, <span class="op">-</span><span class="fl">4.5</span>, <span class="cn">NA</span><span class="op">)</span>, <span class="st">"pct"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 4 × 3</span></span>
+<span><span class="co">#&gt;      raw currency   pct  </span></span>
+<span><span class="co">#&gt;    &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;</span></span>
+<span><span class="co">#&gt; 1  1235. $1,234.56  0.0% </span></span>
+<span><span class="co">#&gt; 2 -7890. -$7,890.12 12.3%</span></span>
+<span><span class="co">#&gt; 3     0  $0.00      -4.5%</span></span>
+<span><span class="co">#&gt; 4    NA  NO DATA    &lt;NA&gt;</span></span></code></pre></div>
 </div>
 </section><section class="level2" data-number="9.5"><h3 data-number="9.5" id="range-formats">
 <span class="header-section-number">9.5</span> Range formats<a class="anchor" aria-label="anchor" href="#range-formats"></a>
@@ -418,8 +470,10 @@
 <span><span class="st">  [0, 10] = "Abnormal (any grade)"</span></span>
 <span><span class="st">;'</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">5</span>, <span class="fl">9</span><span class="op">)</span>, <span class="st">"grade"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Mild"                 "Severe"               "Abnormal (any grade)"</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="st">"grade"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Format "grade" removed from library.</span></span>
 <span><span class="fu"><a href="../reference/fparse.html">fparse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="st">'</span></span>
 <span><span class="st">VALUE grade_wide_first (numeric)</span></span>
 <span><span class="st">  [0, 10] = "Abnormal (any grade)"</span></span>
@@ -427,7 +481,9 @@
 <span><span class="st">  [4, 6]  = "Severe"</span></span>
 <span><span class="st">;'</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/fput.html">fput</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">5</span>, <span class="fl">9</span><span class="op">)</span>, <span class="st">"grade_wide_first"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="st">"grade_wide_first"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "Abnormal (any grade)" "Abnormal (any grade)" "Abnormal (any grade)"</span></span>
+<span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="st">"grade_wide_first"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Format "grade_wide_first" removed from library.</span></span></code></pre></div>
 </div>
 <p>The first block yields <code>"Mild" "Severe" "Abnormal (any grade)"</code>; the second — with the wide range declared first — collapses everything to <code>"Abnormal (any grade)"</code>. No warning is emitted for overlaps, so precedence belongs to the definition itself. When several labels are <em>wanted</em> for one value, make them explicit: declare the format <code>multilabel</code> and collect all matches with <code><a href="../reference/fput_all.html">fput_all()</a></code>:</p>
 <div class="cell">
@@ -439,7 +495,9 @@
 <span><span class="st">  (3, 7]  = "Medium"</span></span>
 <span><span class="st">;'</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/fput_all.html">fput_all</a></span><span class="op">(</span><span class="fl">2</span>, <span class="st">"risk_flags"</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>   <span class="co"># "Low" "Monitored" (declaration order)</span></span>
-<span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="st">"risk_flags"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "Low"       "Monitored"</span></span>
+<span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="st">"risk_flags"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Format "risk_flags" removed from library.</span></span></code></pre></div>
 </div>
 <p>A note on key text: under <code>type = "auto"</code>, a key becomes a range spec only when it actually parses as one. Plain text keys that merely happen to contain a comma (<code>"San Francisco, CA"</code>, <code>"Yes, unknown"</code>) stay character keys; a thousands-style key like <code>"1,000"</code> is flagged at creation and treated as discrete. Prefer explicit <code>type = "character"</code> for such mappings.</p>
 </section></section><section class="level2" data-number="9.6"><h3 data-number="9.6" id="stratified-range-formats">
@@ -464,7 +522,8 @@
 <div class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fnew.html">fnew</a></span><span class="op">(</span><span class="st">"$%,.2f"</span>, type <span class="op">=</span> <span class="st">"numeric"</span>, name <span class="op">=</span> <span class="st">"currency_direct"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/fputn.html">fputn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1234.56</span>, <span class="op">-</span><span class="fl">7890.12</span>, <span class="fl">0</span><span class="op">)</span>, <span class="st">"currency_direct"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/fputn.html">fputn</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1234.56</span>, <span class="op">-</span><span class="fl">7890.12</span>, <span class="fl">0</span><span class="op">)</span>, <span class="st">"currency_direct"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "$1,234.56"  "-$7,890.12" "$0.00"</span></span></code></pre></div>
 </div>
 </section></section><section class="section level2" data-number="10"><h2 data-number="10" id="conclusion">
 <span class="header-section-number">10</span> Conclusion<a class="anchor" aria-label="anchor" href="#conclusion"></a>
@@ -472,7 +531,8 @@
 <p><code>ksformat</code> is not limited to simple code-to-label dictionaries. In clinical trials it can also serve as a compact rule engine for visit windows, composite keys, reverse mappings, report formatting, and small narrative fragments. That makes it useful anywhere repeated conditional logic would otherwise be spread across scripts, spreadsheets, or one-off helper functions.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fclear.html">fclear</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; All formats cleared from library.</span></span></code></pre></div>
 </div>
 </section><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -483,7 +543,8 @@
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
       // Inspect non-navigation links and adorn them if external
-     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
       for (var i=0; i<links.length; i++) {
         const link = links[i];
         if (!isInternal(link.href)) {
@@ -492,8 +553,69 @@
           if (link.dataset.originalHref !== undefined) {
             link.href = link.dataset.originalHref;
           }
+          if (!link.classList.contains('no-external-icon')) {
+          }
         }
       }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
     function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
       const config = {
         allowHTML: true,
@@ -507,6 +629,7 @@
         interactiveBorder: 10,
         theme: 'light-border',
         placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
       };
       if (contentFn) {
         config.content = contentFn;

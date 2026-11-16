@@ -26,3 +26,5 @@
 ^.*\.Rcheck$
 ^\.quarto$
 ^vignettes/\.quarto($|/)
+^\.Rproj\.user$
+^Icon\r$

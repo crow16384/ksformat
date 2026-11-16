@@ -48,7 +48,15 @@ another.
 `  window ``=`` `[`fputk`](https://crow16384.github.io/ksformat/reference/fputk.md)`(``arm``, ``day``, format ``=`` ``"visit_window"``)``,`\
 `)`\
 \
-`visit_df`
+`visit_df`\
+`#> # A tibble: 5 × 3`\
+`#>   arm     day window        `\
+`#>   <chr> <dbl> <chr>         `\
+`#> 1 ARM_A     3 Baseline      `\
+`#> 2 ARM_A    35 Wk4+          `\
+`#> 3 ARM_B     5 Baseline      `\
+`#> 4 ARM_B    40 Wk2+          `\
+`#> 5 ARM_C    10 Outside window`
 
 This is useful for:
 
@@ -91,7 +99,13 @@ the analysis step.
 `  PARAMCD ``=`` `[`fputk`](https://crow16384.github.io/ksformat/reference/fputk.md)`(``LBCAT``, ``LBSPEC``, ``LBTESTCD``, ``LBSTRESU``, format ``=`` ``"lb_param"``, na_as_string ``=`` ``TRUE``)`\
 `)`\
 \
-`lab_df`
+`lab_df`\
+`#> # A tibble: 3 × 5`\
+`#>   LBCAT             LBSPEC LBTESTCD LBSTRESU PARAMCD`\
+`#>   <chr>             <chr>  <chr>    <chr>    <chr>  `\
+`#> 1 BLOOD CHEMISTRY   BLOOD  ALB      g/L      ALB    `\
+`#> 2 COAGULOGRAM       BLOOD  INR      <NA>     INR    `\
+`#> 3 COAGULATION PANEL BLOOD  INR      <NA>     INR`
 
 The same pattern is useful for:
 
@@ -115,6 +129,12 @@ and validating reviewer-facing labels.
 `  target_type ``=`` ``"integer"``,`\
 `  name ``=`` ``"trt_code_inv"`\
 `)`\
+`#> KS Invalue: trt_code_inv`\
+`#> Target Type: integer `\
+`#> Mappings:`\
+`#>   PLACEBO|PBO => 1`\
+`#>   DRUG A|A50 => 2`\
+`#>   DRUG B|B100 => 3`\
 \
 `trt_df`` ``<-`` ``tibble``(`\
 `  ARMN ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``"PLACEBO"``, ``"DRUG A"``, ``"DRUG B"``, ``"UNKNOWN"``)``,`\
@@ -123,7 +143,14 @@ and validating reviewer-facing labels.
 `  TRTSEQ ``=`` `[`finputk`](https://crow16384.github.io/ksformat/reference/finputk.md)`(``ARMN``, ``TRTCD``, invalue_name ``=`` ``"trt_code_inv"``)`\
 `)`\
 \
-`trt_df`
+`trt_df`\
+`#> # A tibble: 4 × 3`\
+`#>   ARMN    TRTCD TRTSEQ`\
+`#>   <chr>   <chr>  <int>`\
+`#> 1 PLACEBO PBO        1`\
+`#> 2 DRUG A  A50        2`\
+`#> 3 DRUG B  B100       3`\
+`#> 4 UNKNOWN X         NA`
 
 Typical uses include:
 
@@ -148,7 +175,12 @@ formatter.
 `  display ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(`[`fputn`](https://crow16384.github.io/ksformat/reference/fputn.md)`(``raw``[``1``]``, ``"currency"``)``, `[`fputn`](https://crow16384.github.io/ksformat/reference/fputn.md)`(``raw``[``2``]`` ``*`` ``100``, ``"pct"``)``)`\
 `)`\
 \
-`summary_df`
+`summary_df`\
+`#> # A tibble: 2 × 3`\
+`#>   metric             raw display  `\
+`#>   <chr>            <dbl> <chr>    `\
+`#> 1 Cost          1235.    $1,234.56`\
+`#> 2 Response rate    0.153 15.3%`
 
 Same result could be achieved using expression labels, but in base R,
 [`sprintf()`](https://rdrr.io/r/base/sprintf.html) itself does not
@@ -173,7 +205,12 @@ such case.
 `  display ``=`` `[`fput`](https://crow16384.github.io/ksformat/reference/fput.md)`(``format``, ``stat_fmt``, ``raw``)`\
 `)`\
 \
-`summary_df`
+`summary_df`\
+`#> # A tibble: 2 × 4`\
+`#>   metric             raw format   display `\
+`#>   <chr>            <dbl> <chr>    <chr>   `\
+`#> 1 Cost          1235.    currency 1,234.56`\
+`#> 2 Response rate    0.153 pct      15.3%`
 
 This is useful for:
 
@@ -202,7 +239,14 @@ code.
 `tibble``(`\
 `  date ``=`` ``obs_dates``,`\
 `  period ``=`` `[`fput`](https://crow16384.github.io/ksformat/reference/fput.md)`(``obs_dates``, ``"study_period"``)`\
-`)`
+`)`\
+`#> # A tibble: 4 × 2`\
+`#>   date       period   `\
+`#>   <date>     <chr>    `\
+`#> 1 2024-01-15 Screening`\
+`#> 2 2024-03-10 Treatment`\
+`#> 3 2024-07-01 Follow-up`\
+`#> 4 NA         No date`
 
 ## 7 6. Text generation for listings and narratives
 
@@ -217,7 +261,8 @@ reviewer comments, summary phrases, or footnotes.
 `  name ``=`` ``"thr_note"`\
 `)`\
 \
-[`fput`](https://crow16384.github.io/ksformat/reference/fput.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"high"``, ``"low"``)``, ``"thr_note"``, `[`c`](https://rdrr.io/r/base/c.html)`(``18.2``, ``7.4``)``)`
+[`fput`](https://crow16384.github.io/ksformat/reference/fput.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``"high"``, ``"low"``)``, ``"thr_note"``, `[`c`](https://rdrr.io/r/base/c.html)`(``18.2``, ``7.4``)``)`\
+`#> [1] "Above threshold: 18.2" "Below threshold: 7.4"`
 
 This is especially useful when the label depends on:
 
@@ -327,7 +372,14 @@ for optional `.missing` / `.other` directives.
 `  raw ``=`` `[`c`](https://rdrr.io/r/base/c.html)`(``1234.56``, ``-``7890.12``, ``0``, ``NA``)``,`\
 `  currency ``=`` `[`fputn`](https://crow16384.github.io/ksformat/reference/fputn.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``1234.56``, ``-``7890.12``, ``0``, ``NA``)``, ``"currency"``)``,`\
 `  pct ``=`` `[`fputn`](https://crow16384.github.io/ksformat/reference/fputn.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``0``, ``12.3``, ``-``4.5``, ``NA``)``, ``"pct"``)`\
-`)`
+`)`\
+`#> # A tibble: 4 × 3`\
+`#>      raw currency   pct  `\
+`#>    <dbl> <chr>      <chr>`\
+`#> 1  1235. $1,234.56  0.0% `\
+`#> 2 -7890. -$7,890.12 12.3%`\
+`#> 3     0  $0.00      -4.5%`\
+`#> 4    NA  NO DATA    <NA>`
 
 ### 9.5 Range formats
 
@@ -374,8 +426,10 @@ covers:
 `  [0, 10] = "Abnormal (any grade)"`\
 `;'``)`\
 [`fput`](https://crow16384.github.io/ksformat/reference/fput.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``2``, ``5``, ``9``)``, ``"grade"``)`\
+`#> [1] "Mild"                 "Severe"               "Abnormal (any grade)"`\
 \
 [`fclear`](https://crow16384.github.io/ksformat/reference/fclear.md)`(``"grade"``)`\
+`#> Format "grade" removed from library.`\
 [`fparse`](https://crow16384.github.io/ksformat/reference/fparse.md)`(``text ``=`` ``'`\
 `VALUE grade_wide_first (numeric)`\
 `  [0, 10] = "Abnormal (any grade)"`\
@@ -383,7 +437,9 @@ covers:
 `  [4, 6]  = "Severe"`\
 `;'``)`\
 [`fput`](https://crow16384.github.io/ksformat/reference/fput.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``2``, ``5``, ``9``)``, ``"grade_wide_first"``)`\
-[`fclear`](https://crow16384.github.io/ksformat/reference/fclear.md)`(``"grade_wide_first"``)`
+`#> [1] "Abnormal (any grade)" "Abnormal (any grade)" "Abnormal (any grade)"`\
+[`fclear`](https://crow16384.github.io/ksformat/reference/fclear.md)`(``"grade_wide_first"``)`\
+`#> Format "grade_wide_first" removed from library.`
 
 The first block yields `"Mild" "Severe" "Abnormal (any grade)"`; the
 second — with the wide range declared first — collapses everything to
@@ -401,7 +457,9 @@ precedence belongs to the definition itself. When several labels are
 `  (3, 7]  = "Medium"`\
 `;'``)`\
 [`fput_all`](https://crow16384.github.io/ksformat/reference/fput_all.md)`(``2``, ``"risk_flags"``)``[[``1``]``]``   ``# "Low" "Monitored" (declaration order)`\
-[`fclear`](https://crow16384.github.io/ksformat/reference/fclear.md)`(``"risk_flags"``)`
+`#> [1] "Low"       "Monitored"`\
+[`fclear`](https://crow16384.github.io/ksformat/reference/fclear.md)`(``"risk_flags"``)`\
+`#> Format "risk_flags" removed from library.`
 
 A note on key text: under `type = "auto"`, a key becomes a range spec
 only when it actually parses as one. Plain text keys that merely happen
@@ -436,7 +494,8 @@ or generated from another tool.
 
 \
 [`fnew`](https://crow16384.github.io/ksformat/reference/fnew.md)`(``"$%,.2f"``, type ``=`` ``"numeric"``, name ``=`` ``"currency_direct"``)`\
-[`fputn`](https://crow16384.github.io/ksformat/reference/fputn.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``1234.56``, ``-``7890.12``, ``0``)``, ``"currency_direct"``)`
+[`fputn`](https://crow16384.github.io/ksformat/reference/fputn.md)`(`[`c`](https://rdrr.io/r/base/c.html)`(``1234.56``, ``-``7890.12``, ``0``)``, ``"currency_direct"``)`\
+`#> [1] "$1,234.56"  "-$7,890.12" "$0.00"`
 
 ## 10 Conclusion
 
@@ -448,4 +507,5 @@ logic would otherwise be spread across scripts, spreadsheets, or one-off
 helper functions.
 
 \
-[`fclear`](https://crow16384.github.io/ksformat/reference/fclear.md)`(``)`
+[`fclear`](https://crow16384.github.io/ksformat/reference/fclear.md)`(``)`\
+`#> All formats cleared from library.`

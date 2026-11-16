@@ -1,13 +1,13 @@
 # CRAN submission comments
 
-## Package: ksformat 0.8.6 (from 0.8.4)
+## Package: ksformat 0.8.7 (from 0.8.4)
 
 ### Test environments
 - Local: R 4.5.3 on macOS (arm64)
 - GitHub Actions: R 4.1, R 4.2, R 4.3, R 4.4, R 4.5
 
 ### R CMD check results
-- `R CMD check --as-cran ksformat_0.8.6.tar.gz` passes with no errors, warnings, or notes.
+- `R CMD check --as-cran ksformat_0.8.7.tar.gz` passes with no errors, warnings, or notes.
 
 ### Summary of changes from 0.8.4 to 0.8.5
 
