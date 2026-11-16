@@ -8,8 +8,6 @@ format:
   html:
     toc: true
     number-sections: true
-execute:
-  enabled: false
 ---
 
 <img src="figures/ksformat-logo-hero.gif" alt="ksformat logo" width="700"/>
